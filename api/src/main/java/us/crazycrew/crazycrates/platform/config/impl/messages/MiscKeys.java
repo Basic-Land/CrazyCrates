@@ -22,8 +22,8 @@ public class MiscKeys implements SettingsHolder {
         conf.setComment("misc", header);
     }
 
-    @Comment("A list of available placeholders: {prefix}")
-    public static final Property<String> unknown_command = newProperty("misc.unknown-command", "{prefix}&cThis command is not known.");
+    @Comment("A list of available placeholders: {prefix}, {command}")
+    public static final Property<String> unknown_command = newProperty("misc.unknown-command", "{prefix}&c{command} is not a known command.");
 
     @Comment("Only activates when you try to use an ender pearl while opening a crate.")
     public static final Property<String> no_teleporting = newProperty("misc.no-teleporting", "{prefix}&cYou may not teleport away while opening a crate.");

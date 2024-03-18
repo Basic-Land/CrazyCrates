@@ -1,10 +1,11 @@
 package com.badbones69.crazycrates.tasks.crates.types;
 
 import com.badbones69.crazycrates.api.objects.Crate;
+import com.badbones69.crazycrates.api.objects.Key;
 import com.badbones69.crazycrates.api.objects.Prize;
-import com.badbones69.crazycrates.api.PrizeManager;
-import com.badbones69.crazycrates.tasks.BukkitUserManager;
+import com.badbones69.crazycrates.api.utils.MiscUtils;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
+import com.badbones69.crazycrates.tasks.crates.UserManager;
 import org.bukkit.Material;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
@@ -13,9 +14,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
-import us.crazycrew.crazycrates.api.enums.types.KeyType;
 import com.badbones69.crazycrates.api.builders.CrateBuilder;
-import com.badbones69.crazycrates.api.utils.MiscUtils;
+import us.crazycrew.crazycrates.api.enums.types.KeyType;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -23,33 +24,34 @@ import java.util.Map;
 
 public class WheelCrate extends CrateBuilder {
 
-    @NotNull
-    private final CrateManager crateManager = this.plugin.getCrateManager();
+    private final @NotNull UserManager userManager = this.plugin.getUserManager();
+    private final @NotNull CrateManager crateManager = this.plugin.getCrateManager();
 
-    @NotNull
-    private final BukkitUserManager userManager = this.plugin.getUserManager();
-
-    public WheelCrate(Crate crate, Player player, int size) {
-        super(crate, player, size);
+    public WheelCrate(Key key, Crate crate, Player player, int size) {
+        super(key, crate, player, size);
     }
 
     private Map<Integer, ItemStack> rewards;
 
     @Override
-    public void open(KeyType type, boolean checkHand) {
-        // Crate event failed so we return.
-        if (isCrateEventValid(type, checkHand)) {
+    public void open(KeyType keyType, boolean checkHand) {
+        if (isCrateEventValid(keyType, checkHand)) {
             return;
         }
 
-        boolean keyCheck = this.userManager.takeKeys(1, getPlayer().getUniqueId(), getCrate().getName(), type, checkHand);
+        Crate crate = getCrate();
+        Key key = getKey();
+        Player player = getPlayer();
+
+        // Crate event failed so we return.
+        boolean keyCheck = this.userManager.takeKeys(1, player.getUniqueId(), crate.getName(), key.getName(), true, checkHand);
 
         if (!keyCheck) {
             // Send the message about failing to take the key.
-            MiscUtils.failedToTakeKey(getPlayer(), getCrate().getName());
+            MiscUtils.failedToTakeKey(player, crate.getName(), key.getName());
 
             // Remove from opening list.
-            this.crateManager.removePlayerFromOpeningList(getPlayer());
+            this.crateManager.removePlayerFromOpeningList(player);
 
             return;
         }
@@ -61,10 +63,11 @@ public class WheelCrate extends CrateBuilder {
         this.rewards = new HashMap<>();
 
         for (int number : getBorder()) {
-            Prize prize = getCrate().pickPrize(getPlayer());
-            setItem(number, prize.getDisplayItem(getPlayer()));
+            Prize prize = crate.pickPrize(player);
 
-            this.rewards.put(number, prize.getDisplayItem(getPlayer()));
+            setItem(number, prize.getDisplayItem(player));
+
+            this.rewards.put(number, prize.getDisplayItem(player));
         }
 
         getPlayer().openInventory(getInventory());
@@ -170,17 +173,18 @@ public class WheelCrate extends CrateBuilder {
                     if (this.full >= (this.timer + 55 + 47)) {
                         Prize prize = null;
 
-                        if (crateManager.isInOpeningList(getPlayer())) {
-                            prize = getCrate().getPrize(rewards.get(this.slots.get(this.what)));
+                        if (crateManager.isInOpeningList(player)) {
+                            prize = crate.getPrize(rewards.get(this.slots.get(this.what)));
                         }
 
-                        PrizeManager.givePrize(getPlayer(), getCrate(), prize);
+                        crate.givePrize(player, prize);
 
                         playSound("stop-sound", SoundCategory.PLAYERS, "ENTITY_PLAYER_LEVELUP");
 
-                        getPlayer().closeInventory(InventoryCloseEvent.Reason.UNLOADED);
-                        crateManager.removePlayerFromOpeningList(getPlayer());
-                        crateManager.endCrate(getPlayer());
+                        player.closeInventory(InventoryCloseEvent.Reason.UNLOADED);
+
+                        crateManager.removePlayerFromOpeningList(player);
+                        crateManager.endActiveTask(player);
 
                         // Clear it because why not.
                         rewards.clear();
@@ -193,7 +197,7 @@ public class WheelCrate extends CrateBuilder {
                 this.open++;
 
                 if (this.open > 5) {
-                    getPlayer().openInventory(getInventory());
+                    player.openInventory(getInventory());
                     this.open = 0;
                 }
             }

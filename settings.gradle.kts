@@ -18,16 +18,18 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
             version("adventure4", "4.16.0")
-            version("cluster", "6.3")
+            version("cluster", "7.5")
 
             library("holographicdisplays", "me.filoghost.holographicdisplays", "holographicdisplays-api").version("3.0.0")
 
             library("decentholograms", "com.github.decentsoftware-eu", "decentholograms").version("2.8.6")
 
-            library("triumphcmds", "dev.triumphteam", "triumph-cmd-bukkit").version("2.0.0-SNAPSHOT")
+            library("triumphcmds", "dev.triumphteam", "triumph-cmd-bukkit").version("2.0.0-ALPHA-9")
+
+            library("simpleyaml", "com.github.Carleslc.Simple-YAML", "Simple-Yaml").version("1.8.4")
 
             library("cluster_paper", "com.ryderbelserion.cluster", "paper").versionRef("cluster")
-            library("cluster_api", "com.ryderbelserion.cluster", "paper").versionRef("cluster")
+            library("cluster_api", "com.ryderbelserion.cluster", "api").versionRef("cluster")
 
             library("adventure4", "net.kyori", "adventure-text-minimessage").versionRef("adventure4")
             library("minimessage4", "net.kyori", "adventure-api").versionRef("adventure4")
@@ -50,4 +52,4 @@ rootProject.name = "CrazyCrates"
 
 include("api")
 include("paper")
-//include("fabric")
+include("alpha")

@@ -4,13 +4,13 @@ import com.badbones69.crazycrates.CrazyCratesPaper;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,8 +19,7 @@ import java.util.logging.Logger;
 
 public class FileManager {
 
-    @NotNull
-    private final CrazyCratesPaper plugin = CrazyCratesPaper.get();
+    private final @NotNull CrazyCratesPaper plugin = JavaPlugin.getPlugin(CrazyCratesPaper.class);
 
     private final Map<Files, File> files = new HashMap<>();
     private final List<String> homeFolders = new ArrayList<>();
@@ -35,7 +34,7 @@ public class FileManager {
     /**
      * Sets up the plugin and loads all necessary files.
      */
-    public void setup() {
+    public void setup(boolean configuration) {
         File dataFolder = this.plugin.getDataFolder();
 
         if (!dataFolder.exists()) dataFolder.mkdirs();
@@ -90,12 +89,14 @@ public class FileManager {
                                 for (String name : folder) {
                                     if (!name.endsWith(".yml")) continue;
 
-                                    CustomFile file = new CustomFile(name, homeFolder + "/", directory.getName());
+                                    if (configuration) {
+                                        CustomFile file = new CustomFile(name, homeFolder + "/", directory.getName());
 
-                                    if (file.exists()) {
-                                        this.customFiles.add(file);
+                                        if (file.exists()) {
+                                            this.customFiles.add(file);
 
-                                        if (this.isLogging) this.logger.info("Loaded new custom file: " + homeFolder + "/" + directory.getName() + "/" + name + ".");
+                                            if (this.isLogging) this.logger.info("Loaded new custom file: " + homeFolder + "/" + directory.getName() + "/" + name + ".");
+                                        }
                                     }
                                 }
                             }
@@ -104,12 +105,14 @@ public class FileManager {
 
                             if (!name.endsWith(".yml")) continue;
 
-                            CustomFile file = new CustomFile(name, homeFolder);
+                            if (configuration) {
+                                CustomFile file = new CustomFile(name, homeFolder);
 
-                            if (file.exists()) {
-                                this.customFiles.add(file);
+                                if (file.exists()) {
+                                    this.customFiles.add(file);
 
-                                if (this.isLogging) this.logger.info("Loaded new custom file: " + homeFolder + "/" + name + ".");
+                                    if (this.isLogging) this.logger.info("Loaded new custom file: " + homeFolder + "/" + name + ".");
+                                }
                             }
                         }
                     }
@@ -128,7 +131,7 @@ public class FileManager {
 
                             copyFile(jarFile, serverFile);
 
-                            if (fileName.toLowerCase().endsWith(".yml")) this.customFiles.add(new CustomFile(fileName, homeFolder));
+                            if (fileName.toLowerCase().endsWith(".yml") && configuration) this.customFiles.add(new CustomFile(fileName, homeFolder));
 
                             if (this.isLogging) this.logger.info("Created new default file: " + homeFolder + "/" + fileName + ".");
                         } catch (Exception exception) {
@@ -345,45 +348,6 @@ public class FileManager {
     }
 
     /**
-     * @return A list of crate names.
-     */
-    public List<String> getAllCratesNames() {
-        List<String> files = new ArrayList<>();
-
-        File crateDirectory = new File(this.plugin.getDataFolder(), "/crates");
-
-        String[] file = crateDirectory.list();
-
-        if (file != null) {
-            File[] filesList = crateDirectory.listFiles();
-
-            if (filesList != null) {
-                for (File directory : filesList) {
-                    if (directory.isDirectory()) {
-                        String[] folder = directory.list();
-
-                        if (folder != null) {
-                            for (String name : folder) {
-                                if (!name.endsWith(".yml")) continue;
-
-                                files.add(name.replaceAll(".yml", ""));
-                            }
-                        }
-                    }
-                }
-            }
-
-            for (String name : file) {
-                if (!name.endsWith(".yml")) continue;
-
-                files.add(name.replaceAll(".yml", ""));
-            }
-        }
-
-        return Collections.unmodifiableList(files);
-    }
-
-    /**
      * Was found here: <a href="https://bukkit.org/threads/extracting-file-from-jar.16962">...</a>
      */
     private void copyFile(InputStream in, File out) throws Exception {
@@ -409,11 +373,9 @@ public class FileManager {
         private final String fileJar;
         private final String fileLocation;
 
-        @NotNull
-        private final CrazyCratesPaper plugin = CrazyCratesPaper.get();
+        private final @NotNull CrazyCratesPaper plugin = JavaPlugin.getPlugin(CrazyCratesPaper.class);
 
-        @NotNull
-        private final FileManager fileManager = this.plugin.getFileManager();
+        private final @NotNull FileManager fileManager = this.plugin.getFileManager();
 
         /**
          * The files that the server will try and load.
@@ -496,8 +458,7 @@ public class FileManager {
         private final String homeFolder;
         private FileConfiguration file;
 
-        @NotNull
-        private final CrazyCratesPaper plugin = CrazyCratesPaper.get();
+        private final @NotNull CrazyCratesPaper plugin = JavaPlugin.getPlugin(CrazyCratesPaper.class);
 
         /**
          * A custom file that is being made.

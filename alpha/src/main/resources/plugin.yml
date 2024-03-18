@@ -1,0 +1,11 @@
+name: '${name}'
+main: '${group}.CrazyCratesPaper'
+
+authors: ${authors}
+
+version: '${version}'
+api-version: '${apiVersion}'
+description: '${description}'
+website: '${website}'
+
+softdepend: [CMI, DecentHolograms, HolographicDisplays, PlaceholderAPI, ItemsAdder, Oraxen]

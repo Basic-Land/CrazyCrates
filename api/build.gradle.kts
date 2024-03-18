@@ -9,8 +9,12 @@ base {
     archivesName.set("${rootProject.name}-${project.name}")
 }
 
+repositories {
+    maven("https://jitpack.io/")
+}
+
 dependencies {
-    compileOnlyApi(libs.bundles.adventure)
+    compileOnlyApi(libs.cluster.api)
 
     compileOnly(libs.configme)
 }
@@ -38,7 +42,7 @@ tasks {
         publications {
             create<MavenPublication>("maven") {
                 group = project.group
-                artifactId = "api"
+                artifactId = project.name
                 version = "0.4"
 
                 from(component)

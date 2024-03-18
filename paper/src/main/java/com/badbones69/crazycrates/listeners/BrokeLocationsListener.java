@@ -1,44 +1,50 @@
 package com.badbones69.crazycrates.listeners;
 
 import com.badbones69.crazycrates.CrazyCratesPaper;
+import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.other.BrokeLocation;
 import com.badbones69.crazycrates.api.objects.other.CrateLocation;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
+import com.badbones69.crazycrates.tasks.crates.CrateManager;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldLoadEvent;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
-import com.badbones69.crazycrates.tasks.crates.CrateManager;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 // Only use for this class is to check if for broken locations and to try and fix them when the server loads the world.
 public class BrokeLocationsListener implements Listener {
 
-    @NotNull
-    private final CrazyCratesPaper plugin = CrazyCratesPaper.get();
-
-    @NotNull
-    private final CrateManager crateManager = this.plugin.getCrateManager();
+    private final @NotNull CrazyCratesPaper plugin = JavaPlugin.getPlugin(CrazyCratesPaper.class);
+    private final @NotNull CrateManager crateManager = this.plugin.getCrateManager();
     
     @EventHandler
     public void onWorldLoad(WorldLoadEvent event) {
-        if (this.crateManager.getBrokeLocations().isEmpty()) return;
+        Set<BrokeLocation> brokeLocations = this.crateManager.getBrokenLocations();
+
+        if (brokeLocations.isEmpty()) return;
 
         int fixedAmount = 0;
-        List<BrokeLocation> fixedWorlds = new ArrayList<>();
+        Set<BrokeLocation> fixedWorlds = new HashSet<>();
 
-        for (BrokeLocation brokeLocation : this.crateManager.getBrokeLocations()) {
+        for (BrokeLocation brokeLocation : brokeLocations) {
             Location location = brokeLocation.getLocation();
 
             if (location.getWorld() != null) {
                 if (brokeLocation.getCrate() != null) {
                     this.crateManager.addLocation(new CrateLocation(brokeLocation.getLocationName(), brokeLocation.getCrate(), location));
 
-                    if (brokeLocation.getCrate().getHologram().isEnabled() && this.crateManager.getHolograms() != null) this.crateManager.getHolograms().createHologram(location.getBlock(), brokeLocation.getCrate());
+                    Crate crate = brokeLocation.getCrate();
+
+                    if (this.crateManager.getHologramManager() != null && crate.getCrateHologram().isEnabled()) {
+                        this.crateManager.getHologramManager().createHologram(location.getBlock(), crate);
+                    }
 
                     fixedWorlds.add(brokeLocation);
+
                     fixedAmount++;
                 }
             }
@@ -49,7 +55,7 @@ public class BrokeLocationsListener implements Listener {
         if (MiscUtils.isLogging()) {
             this.plugin.getLogger().warning("Fixed " + fixedAmount + " broken crate locations.");
 
-            if (this.crateManager.getBrokeLocations().isEmpty()) this.plugin.getLogger().warning("All broken crate locations have been fixed.");
+            if (brokeLocations.isEmpty()) this.plugin.getLogger().warning("All broken crate locations have been fixed.");
         }
     }
 }

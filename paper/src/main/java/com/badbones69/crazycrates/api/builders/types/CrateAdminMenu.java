@@ -4,23 +4,25 @@ import com.badbones69.crazycrates.CrazyCratesPaper;
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.enums.Messages;
 import com.badbones69.crazycrates.api.enums.Permissions;
-import com.badbones69.crazycrates.api.objects.Crate;
+import com.badbones69.crazycrates.api.objects.Key;
+import com.badbones69.crazycrates.api.utils.ItemUtils;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
+import com.badbones69.crazycrates.tasks.crates.UserManager;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 import com.badbones69.crazycrates.api.builders.InventoryBuilder;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 import us.crazycrew.crazycrates.api.enums.types.KeyType;
-import us.crazycrew.crazycrates.api.users.UserManager;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,8 +43,8 @@ public class CrateAdminMenu extends InventoryBuilder {
                 .addLore("&7&lRight click to get virtual keys.")
                 .addLore("&7&lLeft click to get physical keys.").build());
 
-        for (Crate crate : this.plugin.getCrateManager().getUsableCrates()) {
-            if (inventory.firstEmpty() >= 0) inventory.setItem(inventory.firstEmpty(), crate.getKey(1, getPlayer()));
+        for (Key key : this.plugin.getKeyManager().getKeys()) {
+            if (inventory.firstEmpty() >= 0) inventory.setItem(inventory.firstEmpty(), key.getKey());
         }
 
         return this;
@@ -50,14 +52,11 @@ public class CrateAdminMenu extends InventoryBuilder {
 
     public static class CrateAdminListener implements Listener {
 
-        @NotNull
-        private final CrazyCratesPaper plugin = CrazyCratesPaper.get();
+        private final @NotNull CrazyCratesPaper plugin = JavaPlugin.getPlugin(CrazyCratesPaper.class);
 
-        @NotNull
-        private final CrateManager crateManager = this.plugin.getCrateManager();
+        private final @NotNull UserManager userManager = this.plugin.getUserManager();
 
-        @NotNull
-        private final UserManager userManager = this.plugin.getUserManager();
+        private final @NotNull CrateManager crateManager = this.plugin.getCrateManager();
 
         @EventHandler
         public void onInventoryClick(InventoryClickEvent event) {
@@ -83,22 +82,18 @@ public class CrateAdminMenu extends InventoryBuilder {
 
             if (item == null || item.getType() == Material.AIR) return;
 
-            if (!this.crateManager.isKey(item)) return;
+            Key key = this.plugin.getKeyManager().getKey(ItemUtils.getKey(item.getItemMeta()));
 
-            Crate crate = this.crateManager.getCrateFromKey(item);
-
-            ClickType clickType = event.getClick();
+            if (key == null) return;
 
             Map<String, String> placeholders = new HashMap<>();
 
             placeholders.put("{amount}", String.valueOf(1));
-            placeholders.put("{key}", crate.getKeyName());
+            placeholders.put("{key}", key.getName());
 
-            switch (clickType) {
+            switch (event.getClick()) {
                 case LEFT -> {
-                    ItemStack key = crate.getKey(player);
-
-                    player.getInventory().addItem(key);
+                    player.getInventory().addItem(key.getKey());
 
                     player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1f, 1f);
 
@@ -108,7 +103,7 @@ public class CrateAdminMenu extends InventoryBuilder {
                 }
 
                 case RIGHT -> {
-                    this.userManager.addKeys(1, player.getUniqueId(), crate.getName(), KeyType.virtual_key);
+                    this.userManager.addVirtualKeys(1, player.getUniqueId(), key.getName());
 
                     player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1f, 1f);
 

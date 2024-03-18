@@ -6,10 +6,12 @@ jars
 common/build
 paper/build
 api/build
+alpha/build
 
 common/.gradle
 api/.gradle
 paper/.gradle
+alpha/.gradle
 
 paper/run
 
@@ -20,3 +22,13 @@ paper/run
 !paper/run/server.properties
 !paper/run/plugins
 !paper/run/ops.json
+
+alpha/run
+
+!alpha/run/config
+!alpha/run/spigot.yml
+!alpha/run/bukkit.yml
+!alpha/run/eula.txt
+!alpha/run/server.properties
+!alpha/run/plugins
+!alpha/run/ops.json

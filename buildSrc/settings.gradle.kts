@@ -8,7 +8,7 @@ dependencyResolutionManagement {
 
     versionCatalogs {
         create("libs") {
-            library("paperweight", "io.papermc.paperweight", "paperweight-userdev").version("1.5.9")
+            library("paperweight", "io.papermc.paperweight", "paperweight-userdev").version("1.5.11")
 
             library("hangar", "io.papermc", "hangar-publish-plugin").version("0.1.2")
 

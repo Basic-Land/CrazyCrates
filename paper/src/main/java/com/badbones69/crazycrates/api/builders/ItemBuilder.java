@@ -8,6 +8,7 @@ import com.badbones69.crazycrates.support.PluginSupport;
 import com.badbones69.crazycrates.support.SkullCreator;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.ryderbelserion.cluster.utils.DyeUtils;
+import com.ryderbelserion.cluster.utils.RegistryUtils;
 import io.th0rgal.oraxen.api.OraxenItems;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.minecraft.nbt.TagParser;
@@ -34,11 +35,13 @@ import org.bukkit.inventory.meta.trim.TrimMaterial;
 import org.bukkit.inventory.meta.trim.TrimPattern;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.NotNull;
+import us.crazycrew.crazycrates.platform.utils.EnchantUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -50,8 +53,7 @@ import java.util.stream.Collectors;
 
 public class ItemBuilder {
 
-    @NotNull
-    private final CrazyCratesPaper plugin = CrazyCratesPaper.get();
+    private final @NotNull CrazyCratesPaper plugin = JavaPlugin.getPlugin(CrazyCratesPaper.class);
 
     // Items
     private Material material = Material.STONE;
@@ -611,7 +613,7 @@ public class ItemBuilder {
             }
         }
 
-        Material material = Material.matchMaterial(type);
+        Material material = RegistryUtils.getMaterial(type.toLowerCase());
 
         if (material != null) {
             this.itemStack = new ItemStack(material);
@@ -652,6 +654,40 @@ public class ItemBuilder {
         return this;
     }
 
+    public ItemBuilder setString(NamespacedKey key, String value) {
+        this.itemStack.editMeta(meta -> meta.getPersistentDataContainer().set(key, PersistentDataType.STRING, value));
+
+        return this;
+    }
+
+    public boolean hasString(NamespacedKey key) {
+        ItemMeta meta = this.itemStack.getItemMeta();
+
+        if (meta == null) return false;
+
+        return meta.getPersistentDataContainer().has(key);
+    }
+
+    public String getString(String key) {
+        ItemMeta meta = this.itemStack.getItemMeta();
+
+        if (meta == null) return null;
+
+        return meta.getPersistentDataContainer().get(new NamespacedKey(this.plugin, key), PersistentDataType.STRING);
+    }
+
+    public ItemBuilder setBoolean(NamespacedKey key, boolean value) {
+        this.itemStack.editMeta(meta -> meta.getPersistentDataContainer().set(key, PersistentDataType.BOOLEAN, value));
+
+        return this;
+    }
+
+    public ItemBuilder removeTag(NamespacedKey key) {
+        this.itemStack.editMeta(meta -> meta.getPersistentDataContainer().remove(key));
+
+        return this;
+    }
+
     /**
      * Sets the crate name
      *
@@ -666,9 +702,12 @@ public class ItemBuilder {
 
     /**
      * @param damage the damage value of the item.
+     * @return the ItemBuilder with updated damage.
      */
-    public void setDamage(int damage) {
+    public ItemBuilder setDamage(int damage) {
         this.itemDamage = damage;
+
+        return this;
     }
 
     /**
@@ -921,9 +960,7 @@ public class ItemBuilder {
      * @return the ItemBuilder with updated enchantments.
      */
     public ItemBuilder addEnchantment(Enchantment enchantment, int level, boolean unsafeEnchantments) {
-        getItemStack().editMeta(itemMeta -> {
-            itemMeta.addEnchant(enchantment, level, unsafeEnchantments);
-        });
+        getItemStack().editMeta(itemMeta -> itemMeta.addEnchant(enchantment, level, unsafeEnchantments));
 
         return this;
     }
@@ -936,9 +973,7 @@ public class ItemBuilder {
      * @return the ItemBuilder with updated enchantments.
      */
     public ItemBuilder addEnchantment(Enchantment enchantment, int level) {
-        getItemStack().editMeta(itemMeta -> {
-            itemMeta.addEnchant(enchantment, level, false);
-        });
+        getItemStack().editMeta(itemMeta -> itemMeta.addEnchant(enchantment, level, false));
 
         return this;
     }
@@ -950,9 +985,7 @@ public class ItemBuilder {
      * @return the ItemBuilder with updated data.
      */
     public ItemBuilder removeEnchantment(Enchantment enchantment) {
-        getItemStack().editMeta(itemMeta -> {
-            itemMeta.removeEnchant(enchantment);
-        });
+        getItemStack().editMeta(itemMeta -> itemMeta.removeEnchant(enchantment));
 
         return this;
     }
@@ -1068,9 +1101,7 @@ public class ItemBuilder {
      * @return the ItemBuilder with a list of updated enchantments.
      */
     public ItemBuilder setEnchantments(HashMap<Enchantment, Integer> enchantments) {
-        if (enchantments != null) getItemStack().editMeta(meta -> {
-            enchantments.forEach((enchantment, amount) -> meta.addEnchant(enchantment, amount, false));
-        });
+        if (enchantments != null) getItemStack().editMeta(meta -> enchantments.forEach((enchantment, amount) -> meta.addEnchant(enchantment, amount, false)));
 
         return this;
     }
@@ -1083,9 +1114,7 @@ public class ItemBuilder {
      * @return the ItemBuilder with updated enchantments.
      */
     public ItemBuilder addEnchantments(Enchantment enchantment, int level) {
-        getItemStack().editMeta(meta -> {
-            meta.addEnchant(enchantment, level, false);
-        });
+        getItemStack().editMeta(meta -> meta.addEnchant(enchantment, level, false));
 
         return this;
     }
@@ -1097,9 +1126,7 @@ public class ItemBuilder {
      * @return the ItemBuilder with updated enchantments.
      */
     public ItemBuilder removeEnchantments(Enchantment enchantment) {
-        getItemStack().editMeta(meta -> {
-            meta.removeEnchant(enchantment);
-        });
+        getItemStack().editMeta(meta -> meta.removeEnchant(enchantment));
 
         return this;
     }
@@ -1172,7 +1199,7 @@ public class ItemBuilder {
                         if (!value.isEmpty()) itemBuilder.setTrimMaterial(Registry.TRIM_MATERIAL.get(NamespacedKey.minecraft(value.toLowerCase())));
                     }
                     default -> {
-                        Enchantment enchantment = getEnchantment(option);
+                        Enchantment enchantment = RegistryUtils.getEnchantment(EnchantUtils.getEnchant(option));
 
                         if (enchantment != null) {
                             try {
@@ -1206,7 +1233,7 @@ public class ItemBuilder {
         } catch (Exception exception) {
             itemBuilder.setMaterial(Material.RED_TERRACOTTA).setName("&c&lERROR").setLore(Arrays.asList("&cThere is an error", "&cFor : &c" + (placeHolder != null ? placeHolder : "")));
 
-            CrazyCratesPaper plugin = CrazyCratesPaper.get();
+            CrazyCratesPaper plugin = JavaPlugin.getPlugin(CrazyCratesPaper.class);
             plugin.getLogger().log(Level.WARNING, "An error has occurred with the item builder: ", exception);
         }
 

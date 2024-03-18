@@ -1,9 +1,11 @@
 package com.badbones69.crazycrates.api.builders;
 
 import ch.jalu.configme.SettingsManager;
+import com.badbones69.crazycrates.CrazyCratesPaper;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.Tier;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
+import org.bukkit.plugin.java.JavaPlugin;
 import us.crazycrew.crazycrates.platform.config.ConfigManager;
 import us.crazycrew.crazycrates.platform.config.impl.ConfigKeys;
 import me.clip.placeholderapi.PlaceholderAPI;
@@ -12,19 +14,16 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.InventoryView;
 import org.jetbrains.annotations.NotNull;
-import com.badbones69.crazycrates.CrazyCratesPaper;
 import com.badbones69.crazycrates.api.utils.MsgUtils;
 import java.util.List;
-import static java.util.regex.Matcher.quoteReplacement;
 
 @SuppressWarnings("ALL")
 public abstract class InventoryBuilder implements InventoryHolder {
 
-    @NotNull
-    protected final CrazyCratesPaper plugin = CrazyCratesPaper.get();
+    protected final @NotNull CrazyCratesPaper plugin = JavaPlugin.getPlugin(CrazyCratesPaper.class);
 
     private final Inventory inventory;
-    private final Player player;
+    private Player player;
     private String title;
     private Crate crate;
     private int size;
@@ -88,10 +87,9 @@ public abstract class InventoryBuilder implements InventoryHolder {
 
             if (!commands.isEmpty()) {
                 commands.forEach(value -> {
-                    String command = value.replaceAll("%player%", quoteReplacement(player.getName()))
-                            .replaceAll("%crate%", quoteReplacement(crate.getName()));
+                    //String command = value.replaceAll("%player%", quoteReplacement(player.getName())).replaceAll("%crate%", quoteReplacement(crate.getName()));
 
-                    MiscUtils.sendCommand(command);
+                    //MiscUtils.sendCommand(command);
                 });
 
                 return true;
@@ -106,6 +104,12 @@ public abstract class InventoryBuilder implements InventoryHolder {
     }
 
     public abstract InventoryBuilder build();
+
+    public InventoryBuilder setPlayer(Player player) {
+        this.player = player;
+
+        return this;
+    }
 
     public void size(int size) {
         this.size = size;

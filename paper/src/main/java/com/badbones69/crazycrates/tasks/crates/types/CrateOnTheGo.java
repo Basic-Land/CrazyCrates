@@ -1,57 +1,50 @@
 package com.badbones69.crazycrates.tasks.crates.types;
 
 import com.badbones69.crazycrates.api.objects.Crate;
-import com.badbones69.crazycrates.api.objects.Prize;
-import com.badbones69.crazycrates.api.PrizeManager;
-import com.badbones69.crazycrates.tasks.BukkitUserManager;
+import com.badbones69.crazycrates.api.objects.Key;
+import com.badbones69.crazycrates.api.utils.MiscUtils;
+import com.badbones69.crazycrates.tasks.crates.CrateManager;
+import com.badbones69.crazycrates.tasks.crates.UserManager;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import us.crazycrew.crazycrates.api.enums.types.KeyType;
-import com.badbones69.crazycrates.CrazyCratesPaper;
 import com.badbones69.crazycrates.api.builders.CrateBuilder;
-import com.badbones69.crazycrates.tasks.crates.CrateManager;
-import com.badbones69.crazycrates.api.utils.MiscUtils;
+import us.crazycrew.crazycrates.api.enums.types.KeyType;
 
 public class CrateOnTheGo extends CrateBuilder {
 
-    @NotNull
-    private final CrazyCratesPaper plugin = CrazyCratesPaper.get();
+    private final @NotNull CrateManager crateManager = this.plugin.getCrateManager();
+    private final @NotNull UserManager userManager = this.plugin.getUserManager();
 
-    @NotNull
-    private final CrateManager crateManager = this.plugin.getCrateManager();
-
-    @NotNull
-    private final BukkitUserManager userManager = this.plugin.getUserManager();
-
-    public CrateOnTheGo(Crate crate, Player player) {
-        super(crate, player);
+    public CrateOnTheGo(Key key, Crate crate, Player player) {
+        super(key, crate, player);
     }
 
     @Override
-    public void open(KeyType type, boolean checkHand) {
-        // Crate event failed so we return.
-        if (isCrateEventValid(KeyType.physical_key, checkHand)) {
+    public void open(KeyType keyType, boolean checkHand) {
+        if (isCrateEventValid(keyType, checkHand)) {
             return;
         }
 
-        boolean keyCheck = this.userManager.takeKeys(1, getPlayer().getUniqueId(), getCrate().getName(), KeyType.physical_key, true);
+        Crate crate = getCrate();
+        Key key = getKey();
+        Player player = getPlayer();
+
+        // Crate event failed so we return.
+        boolean keyCheck = this.userManager.takeKeys(1, player.getUniqueId(), crate.getName(), key.getName(), true, true);
 
         if (!keyCheck) {
             // Send the message about failing to take the key.
-            MiscUtils.failedToTakeKey(getPlayer(), getCrate().getName());
+            MiscUtils.failedToTakeKey(player, crate.getName(), key.getName());
 
             // Remove from opening list.
-            this.crateManager.removePlayerFromOpeningList(getPlayer());
+            this.crateManager.removePlayerFromOpeningList(player);
 
             return;
         }
 
-        Prize prize = getCrate().pickPrize(getPlayer());
-        PrizeManager.givePrize(getPlayer(), prize, getCrate());
+        crate.givePrize(player, crate.pickPrize(player));
 
-        if (prize.useFireworks()) MiscUtils.spawnFirework(getPlayer().getLocation().add(0, 1, 0), null);
-
-        this.crateManager.removePlayerKeyType(getPlayer());
+        this.crateManager.removePlayerKeyType(player);
     }
 
     @Override

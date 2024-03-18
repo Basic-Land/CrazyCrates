@@ -1,75 +1,96 @@
 package com.badbones69.crazycrates.commands;
 
+import com.badbones69.crazycrates.CrazyCratesPaper;
 import com.badbones69.crazycrates.api.objects.other.CrateLocation;
+import com.badbones69.crazycrates.api.utils.FileUtils;
+import com.badbones69.crazycrates.commands.crates.types.CommandTest;
+import com.badbones69.crazycrates.commands.crates.types.admin.*;
+import com.badbones69.crazycrates.commands.crates.types.admin.keys.CommandGive;
+import com.badbones69.crazycrates.commands.crates.types.admin.keys.CommandTake;
 import com.badbones69.crazycrates.commands.relations.ArgumentRelations;
-import com.badbones69.crazycrates.commands.relations.MiscRelations;
-import com.badbones69.crazycrates.commands.subs.CrateBaseCommand;
-import com.badbones69.crazycrates.commands.subs.BaseKeyCommand;
+import com.badbones69.crazycrates.commands.crates.types.CommandHelp;
+import com.badbones69.crazycrates.tasks.crates.CrateManager;
 import dev.triumphteam.cmd.bukkit.BukkitCommandManager;
 import dev.triumphteam.cmd.core.suggestion.SuggestionKey;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
-import com.badbones69.crazycrates.CrazyCratesPaper;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public class CommandManager {
 
-    @NotNull
-    private final CrazyCratesPaper plugin = CrazyCratesPaper.get();
+    private final static @NotNull CrazyCratesPaper plugin = JavaPlugin.getPlugin(CrazyCratesPaper.class);
 
-    @NotNull
-    private final BukkitCommandManager<CommandSender> bukkitCommandManager = this.plugin.getCommandManager();
+    private final static @NotNull CrateManager BUKKIT_CRATE_MANAGER = plugin.getCrateManager();
 
-    /**
-     * Loads commands.
-     */
-    public void load() {
-        new MiscRelations().build();
+    private final static @NotNull BukkitCommandManager<CommandSender> commandManager = BukkitCommandManager.create(plugin);
+
+    public static void load() {
         new ArgumentRelations().build();
 
-        this.bukkitCommandManager.registerSuggestion(SuggestionKey.of("crates"), (sender, context) -> {
-            List<String> crates = new ArrayList<>(this.plugin.getFileManager().getAllCratesNames());
+        Collection<? extends Player> players = plugin.getServer().getOnlinePlayers();
 
-            crates.add("Menu");
+        getCommandManager().registerSuggestion(SuggestionKey.of("players"), (sender, context) -> players.stream().map(Player::getName).toList());
 
-            return crates;
-        });
-
-        this.bukkitCommandManager.registerSuggestion(SuggestionKey.of("key-types"), (sender, context) -> List.of("virtual", "v", "physical", "p"));
-
-        this.bukkitCommandManager.registerSuggestion(SuggestionKey.of("online-players"), (sender, context) -> this.plugin.getServer().getOnlinePlayers().stream().map(Player::getName).toList());
-
-        this.bukkitCommandManager.registerSuggestion(SuggestionKey.of("locations"), (sender, context) -> this.plugin.getCrateManager().getCrateLocations().stream().map(CrateLocation::getID).toList());
-
-        this.bukkitCommandManager.registerSuggestion(SuggestionKey.of("prizes"), (sender, context) -> {
+        getCommandManager().registerSuggestion(SuggestionKey.of("numbers"), (sender, context) -> {
             List<String> numbers = new ArrayList<>();
 
-            this.plugin.getCrateManager().getCrateFromName(context.getArgs().get(0)).getPrizes().forEach(prize -> numbers.add(prize.getPrizeNumber()));
+            for (int i = 1; i <= 64; i++) numbers.add(String.valueOf(i));
 
             return numbers;
         });
 
-        this.bukkitCommandManager.registerSuggestion(SuggestionKey.of("tiers"), (sender, context) -> {
-            List<String> numbers = new ArrayList<>();
+        getCommandManager().registerSuggestion(SuggestionKey.of("key-types"), (sender, arguments) -> List.of("virtual", "v", "physical", "p"));
 
-            this.plugin.getCrateManager().getCrateFromName(context.getArgs().get(0)).getTiers().forEach(tier -> numbers.add(tier.getName()));
+        getCommandManager().registerSuggestion(SuggestionKey.of("locations"), (sender, arguments) -> BUKKIT_CRATE_MANAGER.getCrateLocations().stream().map(CrateLocation::getID).toList());
 
-            return numbers;
-        });
+        getCommandManager().registerSuggestion(SuggestionKey.of("crates"), (sender, arguments) -> FileUtils.getFiles("crates"));
 
-        this.bukkitCommandManager.registerSuggestion(SuggestionKey.of("numbers"), (sender, context) -> {
-            List<String> numbers = new ArrayList<>();
+        getCommandManager().registerSuggestion(SuggestionKey.of("keys"), (sender, arguments) -> FileUtils.getFiles("keys"));
 
-            for (int i = 1; i <= 100; i++) numbers.add(String.valueOf(i));
+        getCommandManager().registerArgument(CustomPlayer.class, (sender, arguments) -> new CustomPlayer(arguments));
 
-            return numbers;
-        });
+        List.of(
+                // Admin commands
+                new CommandSchematic(),
+                new CommandTeleport(),
+                new CommandPreview(),
+                new CommandReload(),
+                new CommandDebug(),
+                new CommandAdmin(),
+                new CommandList(),
+                new CommandGive(),
+                new CommandTake(),
 
-        this.bukkitCommandManager.registerArgument(CrateBaseCommand.CustomPlayer.class, (sender, context) -> new CrateBaseCommand.CustomPlayer(context));
+                // Test commands
+                new CommandTest(),
 
-        this.bukkitCommandManager.registerCommand(new CrateBaseCommand());
-        this.bukkitCommandManager.registerCommand(new BaseKeyCommand());
+                // Player commands
+                new CommandHelp()
+        ).forEach(getCommandManager()::registerCommand);
+    }
+
+    public record CustomPlayer(String name) {
+        private static final @NotNull CrazyCratesPaper plugin = CrazyCratesPaper.getPlugin(CrazyCratesPaper.class);
+
+        public @NotNull OfflinePlayer getOfflinePlayer() {
+            CompletableFuture<UUID> future = CompletableFuture.supplyAsync(() -> plugin.getServer().getOfflinePlayer(name)).thenApply(OfflinePlayer::getUniqueId);
+
+            return plugin.getServer().getOfflinePlayer(future.join());
+        }
+
+        public Player getPlayer() {
+            return plugin.getServer().getPlayer(name);
+        }
+    }
+
+    public static @NotNull BukkitCommandManager<CommandSender> getCommandManager() {
+        return commandManager;
     }
 }

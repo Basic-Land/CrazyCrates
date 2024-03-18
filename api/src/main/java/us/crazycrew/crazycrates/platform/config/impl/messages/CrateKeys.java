@@ -22,6 +22,9 @@ public class CrateKeys implements SettingsHolder {
     @Comment("A list of available placeholders: {prefix}, {crate}")
     public static final Property<String> not_a_crate = newProperty("crates.requirements.not-a-crate", "{prefix}&cThere is no crate called &6{crate}.");
 
+    @Comment("A list of available placeholders: {prefix}, {key}")
+    public static final Property<String> not_a_key = newProperty("crates.requirements.not-a-key", "{prefix}&cThere is no key called &6{key}.");
+
     @Comment("A list of available placeholders: {prefix}, {number}")
     public static final Property<String> not_a_number = newProperty("crates.requirements.not-a-number", "{prefix}&6{number} &cis not a number.");
 

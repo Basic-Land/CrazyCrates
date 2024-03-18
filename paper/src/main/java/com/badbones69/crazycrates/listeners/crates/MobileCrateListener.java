@@ -1,12 +1,10 @@
 package com.badbones69.crazycrates.listeners.crates;
 
 import com.badbones69.crazycrates.CrazyCratesPaper;
-import com.badbones69.crazycrates.api.PrizeManager;
 import com.badbones69.crazycrates.api.enums.PersistentKeys;
-import com.badbones69.crazycrates.tasks.crates.CrateManager;
-import com.badbones69.crazycrates.api.events.PlayerPrizeEvent;
 import com.badbones69.crazycrates.api.objects.Crate;
-import com.badbones69.crazycrates.api.objects.Prize;
+import com.badbones69.crazycrates.api.utils.ItemUtils;
+import com.badbones69.crazycrates.tasks.crates.CrateManager;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,18 +16,15 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import us.crazycrew.crazycrates.api.enums.types.CrateType;
-import com.badbones69.crazycrates.api.utils.ItemUtils;
-import com.badbones69.crazycrates.api.utils.MiscUtils;
 
 public class MobileCrateListener implements Listener {
 
-    @NotNull
-    private final CrazyCratesPaper plugin = CrazyCratesPaper.get();
+    private final @NotNull CrazyCratesPaper plugin = JavaPlugin.getPlugin(CrazyCratesPaper.class);
 
-    @NotNull
-    private final CrateManager crateManager = this.plugin.getCrateManager();
+    private final @NotNull CrateManager crateManager = this.plugin.getCrateManager();
 
     @EventHandler
     public void onCrateUse(PlayerInteractEvent event) {
@@ -49,13 +44,15 @@ public class MobileCrateListener implements Listener {
 
         PersistentDataContainer container = itemMeta.getPersistentDataContainer();
 
-        Crate crate = this.crateManager.getCrateFromName(container.get(PersistentKeys.crate_key.getNamespacedKey(), PersistentDataType.STRING));
+        Crate crate = this.crateManager.getCrate(container.get(PersistentKeys.crate_key.getNamespacedKey(), PersistentDataType.STRING));
 
         if (crate == null) return;
 
         if (crate.getCrateType() != CrateType.crate_on_the_go) return;
 
-        if (!this.crateManager.isKeyFromCrate(item, crate)) return;
+        //boolean isKey = this.crateManager.hasKey(true, player, crate);
+
+        //if (!isKey) return;
 
         event.setCancelled(true);
 
@@ -63,13 +60,7 @@ public class MobileCrateListener implements Listener {
 
         ItemUtils.removeItem(item, player);
 
-        Prize prize = crate.pickPrize(player);
-
-        PrizeManager.givePrize(player, prize, crate);
-
-        this.plugin.getServer().getPluginManager().callEvent(new PlayerPrizeEvent(player, crate, this.crateManager.getOpeningCrate(player).getName(), prize));
-
-        if (prize.useFireworks()) MiscUtils.spawnFirework(player.getLocation().add(0, 1, 0), null);
+        crate.givePrize(player, crate.pickPrize(player));
 
         this.crateManager.removePlayerFromOpeningList(player);
     }

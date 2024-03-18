@@ -3,14 +3,19 @@ package com.badbones69.crazycrates.support.metrics;
 import com.badbones69.crazycrates.CrazyCratesPaper;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
 import org.bstats.bukkit.Metrics;
+import org.bstats.charts.AdvancedPie;
 import org.bstats.charts.SimplePie;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import us.crazycrew.crazycrates.api.enums.types.CrateType;
+import us.crazycrew.crazycrates.platform.config.ConfigManager;
+import us.crazycrew.crazycrates.platform.config.impl.ConfigKeys;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MetricsManager {
 
-    @NotNull
-    private final CrazyCratesPaper plugin = CrazyCratesPaper.get();
+    private final @NotNull CrazyCratesPaper plugin = JavaPlugin.getPlugin(CrazyCratesPaper.class);
 
     private Metrics metrics;
 
@@ -23,16 +28,19 @@ public class MetricsManager {
 
         this.metrics = new Metrics(this.plugin, 4514);
 
-        this.plugin.getCrateManager().getUsableCrates().forEach(crate -> {
-            CrateType crateType = crate.getCrateType();
+        this.metrics.addCustomChart(new SimplePie("use_new_random", () -> ConfigManager.getConfig().getProperty(ConfigKeys.use_different_random).toString()));
 
-            // If the crate type is null. don't add to the pie chart.
-            if (crateType == null) return;
+        this.metrics.addCustomChart(new AdvancedPie("crate_types", () -> {
+            Map<String, Integer> values = new HashMap<>();
 
-            SimplePie chart = new SimplePie("crate_types", crateType::getName);
+            plugin.getCrateManager().getCrates().forEach(crate -> {
+                CrateType crateType = crate.getCrateType();
 
-            this.metrics.addCustomChart(chart);
-        });
+                values.put(crateType.getName(), plugin.getCrateManager().getCrates().stream().filter(type -> type.getCrateType() == crateType).toList().size());
+            });
+
+            return values;
+        }));
 
         if (MiscUtils.isLogging()) this.plugin.getLogger().fine("Metrics has been enabled.");
     }

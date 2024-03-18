@@ -18,7 +18,7 @@ public class DecentHologramsSupport extends HologramManager {
 
     @Override
     public void createHologram(Block block, Crate crate) {
-        CrateHologram crateHologram = crate.getHologram();
+        CrateHologram crateHologram = crate.getCrateHologram();
 
         if (!crateHologram.isEnabled()) return;
 
