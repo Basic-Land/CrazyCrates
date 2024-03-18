@@ -1,10 +1,11 @@
 package com.badbones69.crazycrates.platform.utils;
 
 import com.badbones69.crazycrates.CrazyCratesPaper;
-import com.badbones69.crazycrates.api.FileManager.Files;
-import org.bukkit.configuration.file.FileConfiguration;
+import com.badbones69.crazycrates.api.enums.Files;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.simpleyaml.configuration.file.FileConfiguration;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -156,19 +157,19 @@ public class FileUtil {
     }
 
     public static void cleanFiles() {
-        FileConfiguration locations = Files.LOCATIONS.getFile();
-        FileConfiguration data = Files.DATA.getFile();
+        FileConfiguration locations = Files.locations.getFile();
+        FileConfiguration data = Files.data.getFile();
 
         if (!locations.contains("Locations")) {
             locations.set("Locations.Clear", null);
 
-            Files.LOCATIONS.saveFile();
+            Files.locations.save();
         }
 
         if (!data.contains("Players")) {
             data.set("Players.Clear", null);
 
-            Files.DATA.saveFile();
+            Files.data.save();
         }
     }
 }

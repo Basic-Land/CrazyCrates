@@ -16,7 +16,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.simpleyaml.configuration.ConfigurationSection;
 import us.crazycrew.crazycrates.api.enums.types.CrateType;
-import us.crazycrew.crazycrates.platform.utils.EnchantUtils;
+import us.crazycrew.crazycrates.platform.utils.EnchantUtil;
 import java.util.*;
 
 public class Prize {
@@ -111,7 +111,7 @@ public class Prize {
 
         if (this.section.contains("DisplayEnchantments")) {
             for (String enchant : this.section.getStringList("DisplayEnchantments")) {
-                Enchantment enchantment = RegistryUtils.getEnchantment(EnchantUtils.getEnchant(enchant.split(":")[0]));
+                Enchantment enchantment = RegistryUtils.getEnchantment(EnchantUtil.getEnchant(enchant.split(":")[0]));
 
                 if (enchantment != null) {
                     this.displayItem.addEnchantment(enchantment, Integer.parseInt(enchant.split(":")[1]));

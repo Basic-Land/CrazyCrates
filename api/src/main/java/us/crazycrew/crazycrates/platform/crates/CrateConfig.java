@@ -3,6 +3,7 @@ package us.crazycrew.crazycrates.platform.crates;
 import org.simpleyaml.configuration.ConfigurationSection;
 import org.simpleyaml.configuration.file.YamlFile;
 import us.crazycrew.crazycrates.api.enums.types.CrateType;
+
 import java.io.File;
 import java.io.IOException;
 

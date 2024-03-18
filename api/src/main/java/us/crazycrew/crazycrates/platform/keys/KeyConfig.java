@@ -1,6 +1,7 @@
 package us.crazycrew.crazycrates.platform.keys;
 
 import org.simpleyaml.configuration.file.YamlConfiguration;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;

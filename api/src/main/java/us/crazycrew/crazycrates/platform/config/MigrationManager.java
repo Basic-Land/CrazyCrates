@@ -6,14 +6,11 @@ import ch.jalu.configme.resource.YamlFileResourceOptions;
 import org.jetbrains.annotations.NotNull;
 import org.simpleyaml.configuration.ConfigurationSection;
 import org.simpleyaml.configuration.file.YamlConfiguration;
-import us.crazycrew.crazycrates.platform.Server;
 import us.crazycrew.crazycrates.CrazyCratesProvider;
+import us.crazycrew.crazycrates.platform.Server;
 import us.crazycrew.crazycrates.platform.config.impl.ConfigKeys;
-import us.crazycrew.crazycrates.platform.config.impl.messages.CommandKeys;
-import us.crazycrew.crazycrates.platform.config.impl.messages.CrateKeys;
-import us.crazycrew.crazycrates.platform.config.impl.messages.ErrorKeys;
-import us.crazycrew.crazycrates.platform.config.impl.messages.MiscKeys;
-import us.crazycrew.crazycrates.platform.config.impl.messages.PlayerKeys;
+import us.crazycrew.crazycrates.platform.config.impl.messages.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;

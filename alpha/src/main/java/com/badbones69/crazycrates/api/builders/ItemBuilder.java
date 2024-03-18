@@ -32,8 +32,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.NotNull;
-import us.crazycrew.crazycrates.platform.utils.EnchantUtils;
-
+import us.crazycrew.crazycrates.platform.utils.EnchantUtil;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -1187,7 +1186,7 @@ public class ItemBuilder {
                         if (!value.isEmpty()) itemBuilder.setTrimMaterial(Registry.TRIM_MATERIAL.get(NamespacedKey.minecraft(value.toLowerCase())));
                     }
                     default -> {
-                        Enchantment enchantment = RegistryUtil.getEnchantment(EnchantUtils.getEnchant(option));
+                        Enchantment enchantment = RegistryUtil.getEnchantment(EnchantUtil.getEnchant(option));
 
                         if (enchantment != null) {
                             try {

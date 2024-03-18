@@ -4,6 +4,7 @@ import com.badbones69.crazycrates.commands.CommandManager;
 import com.badbones69.crazycrates.platform.PaperServer;
 import com.badbones69.crazycrates.platform.crates.KeyManager;
 import com.badbones69.crazycrates.platform.crates.UserManager;
+import com.badbones69.crazycrates.platform.utils.MiscUtil;
 import com.ryderbelserion.cluster.ClusterFactory;
 import com.ryderbelserion.cluster.api.files.FileManager;
 import org.bukkit.plugin.java.JavaPlugin;

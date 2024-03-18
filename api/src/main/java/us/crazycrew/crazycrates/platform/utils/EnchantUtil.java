@@ -1,6 +1,6 @@
 package us.crazycrew.crazycrates.platform.utils;
 
-public class EnchantUtils {
+public class EnchantUtil {
 
     public static String getEnchant(String enchant) {
         switch (enchant) {
