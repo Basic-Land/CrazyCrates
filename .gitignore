@@ -22,5 +22,3 @@ paper/run
 !paper/run/server.properties
 !paper/run/plugins
 !paper/run/ops.json
-
-Cluster
