@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    compileOnlyApi(libs.cluster.api)
+    implementation(project(":cluster:api"))
 
     compileOnly(libs.configme)
 }

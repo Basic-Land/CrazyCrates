@@ -5,7 +5,7 @@ plugins {
 dependencies {
     implementation(project(":api"))
 
-    implementation(libs.cluster.paper)
+    implementation(project(":cluster:paper"))
 
     implementation(libs.triumphcmds)
     implementation(libs.triumphgui)
