@@ -23,12 +23,4 @@ paper/run
 !paper/run/plugins
 !paper/run/ops.json
 
-alpha/run
-
-!alpha/run/config
-!alpha/run/spigot.yml
-!alpha/run/bukkit.yml
-!alpha/run/eula.txt
-!alpha/run/server.properties
-!alpha/run/plugins
-!alpha/run/ops.json
+Cluster
