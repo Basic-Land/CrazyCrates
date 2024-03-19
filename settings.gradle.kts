@@ -53,3 +53,4 @@ rootProject.name = "CrazyCrates"
 
 include("api")
 include("paper")
+include("cluster")
