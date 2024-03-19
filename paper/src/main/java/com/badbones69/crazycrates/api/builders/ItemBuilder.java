@@ -1,11 +1,10 @@
 package com.badbones69.crazycrates.api.builders;
 
 import com.badbones69.crazycrates.CrazyCratesPaper;
-import com.badbones69.crazycrates.api.enums.PersistentKeys;
-import com.badbones69.crazycrates.api.utils.MiscUtils;
-import com.badbones69.crazycrates.api.utils.MsgUtils;
+import com.badbones69.crazycrates.platform.utils.MiscUtils;
+import com.badbones69.crazycrates.platform.utils.MsgUtils;
 import com.badbones69.crazycrates.support.PluginSupport;
-import com.badbones69.crazycrates.support.SkullCreator;
+import com.badbones69.crazycrates.support.SkullSupport;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.ryderbelserion.cluster.utils.DyeUtils;
 import com.ryderbelserion.cluster.utils.RegistryUtils;
@@ -22,18 +21,10 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ArmorMeta;
-import org.bukkit.inventory.meta.BannerMeta;
-import org.bukkit.inventory.meta.BlockStateMeta;
-import org.bukkit.inventory.meta.Damageable;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.LeatherArmorMeta;
-import org.bukkit.inventory.meta.MapMeta;
-import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.inventory.meta.*;
 import org.bukkit.inventory.meta.trim.ArmorTrim;
 import org.bukkit.inventory.meta.trim.TrimMaterial;
 import org.bukkit.inventory.meta.trim.TrimPattern;
-import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionData;
@@ -42,11 +33,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.NotNull;
 import us.crazycrew.crazycrates.platform.utils.EnchantUtil;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -312,9 +299,9 @@ public class ItemBuilder {
         if (this.isHead) { // Has to go 1st due to it removing all data when finished.
             if (this.isHash) { // Sauce: https://github.com/deanveloper/SkullCreator
                 if (this.isURL) {
-                    this.itemStack = SkullCreator.itemWithUrl(this.itemStack, this.player);
+                    this.itemStack = SkullSupport.itemWithUrl(this.itemStack, this.player);
                 } else {
-                    this.itemStack = SkullCreator.itemWithBase64(this.itemStack, this.player);
+                    this.itemStack = SkullSupport.itemWithBase64(this.itemStack, this.player);
                 }
             }
         }
@@ -425,11 +412,11 @@ public class ItemBuilder {
                 itemMeta.setDisplayName(getUpdatedName());
                 itemMeta.setLore(getUpdatedLore());
 
-                if (!this.crateName.isBlank() || !this.crateName.isEmpty()) {
-                    PersistentDataContainer container = itemMeta.getPersistentDataContainer();
+                //if (!this.crateName.isBlank() || !this.crateName.isEmpty()) {
+                //    PersistentDataContainer container = itemMeta.getPersistentDataContainer();
 
-                    container.set(PersistentKeys.crate_key.getNamespacedKey(), PersistentDataType.STRING, crateName);
-                }
+                //container.set(PersistentKeys.crate_key.getNamespacedKey(), PersistentDataType.STRING, crateName);
+                //}
             });
         } else {
             if (MiscUtils.isLogging()) {
@@ -594,7 +581,7 @@ public class ItemBuilder {
             if (isInt(metaData)) {
                 this.itemDamage = Integer.parseInt(metaData);
             } else {
-                this.potionType = getPotionType(PotionEffectType.getByName(metaData)).getEffectType();
+                this.potionType = RegistryUtils.getPotionEffect(metaData);
 
                 this.potionColor = DyeUtils.getColor(metaData);
                 this.armorColor = DyeUtils.getColor(metaData);
@@ -915,7 +902,7 @@ public class ItemBuilder {
      * @param amount the amount of the item stack.
      * @return the ItemBuilder with an updated item count.
      */
-    public ItemBuilder setAmount(Integer amount) {
+    public ItemBuilder setAmount(int amount) {
         this.itemAmount = amount;
 
         return this;
@@ -1214,6 +1201,7 @@ public class ItemBuilder {
                         for (ItemFlag itemFlag : ItemFlag.values()) {
                             if (itemFlag.name().equalsIgnoreCase(option)) {
                                 itemBuilder.addItemFlag(itemFlag);
+
                                 break;
                             }
                         }
@@ -1222,7 +1210,9 @@ public class ItemBuilder {
                             for (PatternType pattern : PatternType.values()) {
                                 if (option.equalsIgnoreCase(pattern.name()) || value.equalsIgnoreCase(pattern.getIdentifier())) {
                                     DyeColor color = DyeUtils.getDyeColor(value);
+
                                     if (color != null) itemBuilder.addPattern(new Pattern(color, pattern));
+
                                     break;
                                 }
                             }
@@ -1301,85 +1291,6 @@ public class ItemBuilder {
         }
 
         return null;
-    }
-
-    /**
-     * Get the enchantment from a string.
-     *
-     * @param enchantmentName the string of the enchantment.
-     * @return the enchantment from the string.
-     */
-    private static Enchantment getEnchantment(String enchantmentName) {
-        enchantmentName = stripEnchantmentName(enchantmentName);
-
-        for (Enchantment enchantment : Enchantment.values()) {
-            try {
-                if (stripEnchantmentName(enchantment.getKey().getKey()).equalsIgnoreCase(enchantmentName)) return enchantment;
-
-                Map<String, String> enchantments = getEnchantmentList();
-
-                if (stripEnchantmentName(enchantment.getName()).equalsIgnoreCase(enchantmentName) || (enchantments.get(enchantment.getName()) != null &&
-                        stripEnchantmentName(enchantments.get(enchantment.getName())).equalsIgnoreCase(enchantmentName))) return enchantment;
-            } catch (Exception ignore) {}
-        }
-
-        return null;
-    }
-
-    /**
-     * Strip extra characters from an enchantment name.
-     *
-     * @param enchantmentName the enchantment name.
-     * @return the stripped enchantment name.
-     */
-    private static String stripEnchantmentName(String enchantmentName) {
-        return enchantmentName != null ? enchantmentName.replace("-", "").replace("_", "").replace(" ", "") : null;
-    }
-
-    /**
-     * Get the list of enchantments and their in-Game names.
-     *
-     * @return the hashmap of enchantments and their in-game names.
-     */
-    private static Map<String, String> getEnchantmentList() {
-        Map<String, String> enchantments = new HashMap<>();
-
-        enchantments.put("ARROW_DAMAGE", "Power");
-        enchantments.put("ARROW_FIRE", "Flame");
-        enchantments.put("ARROW_INFINITE", "Infinity");
-        enchantments.put("ARROW_KNOCKBACK", "Punch");
-        enchantments.put("DAMAGE_ALL", "Sharpness");
-        enchantments.put("DAMAGE_ARTHROPODS", "Bane_Of_Arthropods");
-        enchantments.put("DAMAGE_UNDEAD", "Smite");
-        enchantments.put("DEPTH_STRIDER", "Depth_Strider");
-        enchantments.put("DIG_SPEED", "Efficiency");
-        enchantments.put("DURABILITY", "Unbreaking");
-        enchantments.put("FIRE_ASPECT", "Fire_Aspect");
-        enchantments.put("KNOCKBACK", "KnockBack");
-        enchantments.put("LOOT_BONUS_BLOCKS", "Fortune");
-        enchantments.put("LOOT_BONUS_MOBS", "Looting");
-        enchantments.put("LUCK", "Luck_Of_The_Sea");
-        enchantments.put("LURE", "Lure");
-        enchantments.put("OXYGEN", "Respiration");
-        enchantments.put("PROTECTION_ENVIRONMENTAL", "Protection");
-        enchantments.put("PROTECTION_EXPLOSIONS", "Blast_Protection");
-        enchantments.put("PROTECTION_FALL", "Feather_Falling");
-        enchantments.put("PROTECTION_FIRE", "Fire_Protection");
-        enchantments.put("PROTECTION_PROJECTILE", "Projectile_Protection");
-        enchantments.put("SILK_TOUCH", "Silk_Touch");
-        enchantments.put("THORNS", "Thorns");
-        enchantments.put("WATER_WORKER", "Aqua_Affinity");
-        enchantments.put("BINDING_CURSE", "Curse_Of_Binding");
-        enchantments.put("MENDING", "Mending");
-        enchantments.put("FROST_WALKER", "Frost_Walker");
-        enchantments.put("VANISHING_CURSE", "Curse_Of_Vanishing");
-        enchantments.put("SWEEPING_EDGE", "Sweeping_Edge");
-        enchantments.put("RIPTIDE", "Riptide");
-        enchantments.put("CHANNELING", "Channeling");
-        enchantments.put("IMPALING", "Impaling");
-        enchantments.put("LOYALTY", "Loyalty");
-
-        return enchantments;
     }
 
     /**

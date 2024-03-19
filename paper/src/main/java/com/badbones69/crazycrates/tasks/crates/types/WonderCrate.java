@@ -2,11 +2,10 @@ package com.badbones69.crazycrates.tasks.crates.types;
 
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.objects.Crate;
-import com.badbones69.crazycrates.api.objects.Key;
 import com.badbones69.crazycrates.api.objects.Prize;
-import com.badbones69.crazycrates.api.utils.MiscUtils;
-import com.badbones69.crazycrates.tasks.crates.CrateManager;
-import com.badbones69.crazycrates.tasks.crates.UserManager;
+import com.badbones69.crazycrates.platform.crates.UserManager;
+import com.badbones69.crazycrates.platform.crates.objects.Key;
+import com.badbones69.crazycrates.platform.crates.CrateManager;
 import org.bukkit.Material;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
@@ -16,14 +15,13 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import com.badbones69.crazycrates.api.builders.CrateBuilder;
 import us.crazycrew.crazycrates.api.enums.types.KeyType;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class WonderCrate extends CrateBuilder {
 
-    private final @NotNull UserManager userManager = this.plugin.getUserManager();
-    private final @NotNull CrateManager crateManager = this.plugin.getCrateManager();
+    private final @NotNull UserManager userManager = null;
+    private final @NotNull CrateManager crateManager = null;
 
     public WonderCrate(Key key, Crate crate, Player player, int size) {
         super(key, crate, player, size);
@@ -40,14 +38,14 @@ public class WonderCrate extends CrateBuilder {
         Player player = getPlayer();
 
         // Crate event failed so we return.
-        boolean keyCheck = this.userManager.takeKeys(1, player.getUniqueId(), crate.getName(), key.getName(), true, checkHand);
+        //boolean keyCheck = this.userManager.takeKeys(1, player.getUniqueId(), crate.getName(), key.getName(), true, checkHand);
 
-        if (!keyCheck) {
+        if (!true) {
             // Send the message about failing to take the key.
-            MiscUtils.failedToTakeKey(player, crate.getName(), key.getName());
+            //MiscUtils.failedToTakeKey(player, crate.getName(), key.getName());
 
             // Remove from opening list.
-            this.crateManager.removePlayerFromOpeningList(player);
+           // this.crateManager.removePlayerFromOpeningList(player);
 
             return;
         }
@@ -107,7 +105,7 @@ public class WonderCrate extends CrateBuilder {
                 player.openInventory(getInventory());
 
                 if (this.full > 100) {
-                    crateManager.endActiveTask(player);
+                    //crateManager.endActiveTask(player);
 
                     player.closeInventory(InventoryCloseEvent.Reason.UNLOADED);
 
@@ -115,7 +113,7 @@ public class WonderCrate extends CrateBuilder {
 
                     playSound("stop-sound", SoundCategory.PLAYERS, "ENTITY_PLAYER_LEVELUP");
 
-                    crateManager.removePlayerFromOpeningList(getPlayer());
+                    //crateManager.removePlayerFromOpeningList(getPlayer());
 
                     return;
                 }

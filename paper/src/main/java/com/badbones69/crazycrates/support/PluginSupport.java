@@ -12,7 +12,7 @@ public enum PluginSupport {
     PLACEHOLDERAPI("PlaceholderAPI"),
     ORAXEN("Oraxen"),
     ITEMS_ADDER("ItemsAdder");
-    
+
     private final String name;
 
     private final @NotNull CrazyCratesPaper plugin = JavaPlugin.getPlugin(CrazyCratesPaper.class);

@@ -10,7 +10,7 @@ public class Key {
 
     private final ItemBuilder key;
     private final String keyName;
-    private final boolean isVirtual;
+    private boolean isVirtual;
 
     public Key(KeyConfig keyConfig) {
         this.key = new ItemBuilder()
@@ -50,5 +50,9 @@ public class Key {
 
     public boolean isVirtual() {
         return this.isVirtual;
+    }
+
+    public void setVirtual(boolean isVirtual) {
+        this.isVirtual = isVirtual;
     }
 }

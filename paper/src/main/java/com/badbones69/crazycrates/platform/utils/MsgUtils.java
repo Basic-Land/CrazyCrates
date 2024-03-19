@@ -1,4 +1,4 @@
-package com.badbones69.crazycrates.api.utils;
+package com.badbones69.crazycrates.platform.utils;
 
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
@@ -10,7 +10,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import static java.util.regex.Matcher.quoteReplacement;
 
-@SuppressWarnings("ALL")
 public class MsgUtils {
 
     public static String color(String message) {

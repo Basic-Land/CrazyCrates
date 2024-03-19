@@ -17,8 +17,8 @@ public class PaperServer extends Server {
     private final File keyFolder;
     private final File folder;
 
-    public PaperServer() {
-        super(null);
+    public PaperServer(File dataFolder) {
+        super(dataFolder);
         
         this.folder = this.plugin.getDataFolder();
 

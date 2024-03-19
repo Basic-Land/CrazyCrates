@@ -1,6 +1,7 @@
 package com.badbones69.crazycrates.commands.crates.types.admin;
 
 import com.badbones69.crazycrates.commands.crates.BaseCommand;
+import com.badbones69.crazycrates.platform.utils.MsgUtils;
 import dev.triumphteam.cmd.bukkit.annotation.Permission;
 import dev.triumphteam.cmd.core.annotations.Command;
 import dev.triumphteam.cmd.core.annotations.Suggestion;
@@ -10,14 +11,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.Location;
 import org.bukkit.World;
-import com.badbones69.crazycrates.api.FileManager.Files;
-import com.badbones69.crazycrates.api.utils.MsgUtils;
 import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 
 public class CommandTeleport extends BaseCommand {
 
-    private final @NotNull FileConfiguration locations = Files.LOCATIONS.getFile();
+    private final @NotNull FileConfiguration locations = null;
 
     @Command("tp")
     @Permission(value = "crazycrates.teleport", def = PermissionDefault.OP)
@@ -27,7 +26,7 @@ public class CommandTeleport extends BaseCommand {
         if (section == null) {
             this.locations.set("Locations.Clear", null);
 
-            Files.LOCATIONS.saveFile();
+            //Files.LOCATIONS.saveFile();
 
             return;
         }

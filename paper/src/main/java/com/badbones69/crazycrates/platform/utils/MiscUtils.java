@@ -2,10 +2,12 @@ package com.badbones69.crazycrates.platform.utils;
 
 import com.badbones69.crazycrates.CrazyCratesPaper;
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
+import com.badbones69.crazycrates.api.enums.Files;
 import com.badbones69.crazycrates.api.enums.Permissions;
 import com.badbones69.crazycrates.api.enums.PersistentKeys;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.simpleyaml.configuration.file.FileConfiguration;
 import us.crazycrew.crazycrates.platform.config.ConfigManager;
 import us.crazycrew.crazycrates.platform.config.impl.ConfigKeys;
 import com.badbones69.crazycrates.support.PluginSupport;
@@ -26,6 +28,7 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -33,7 +36,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class MiscUtil {
+public class MiscUtils {
 
     private static final @NotNull CrazyCratesPaper plugin = JavaPlugin.getPlugin(CrazyCratesPaper.class);
 
@@ -174,7 +177,7 @@ public class MiscUtil {
 
     public static void failedToTakeKey(CommandSender player, String crateName, String keyName) {
         List.of(
-                "An error has occurred while trying to take a physical key from a player.",
+                "An error has occurred while trying to take a key from a player.",
                 "Player: " + player.getName(),
                 "Key: " + keyName,
                 "Crate: " + crateName
@@ -183,7 +186,20 @@ public class MiscUtil {
         List.of(
                 "&cAn issue has occurred when trying to take a key.",
                 "&cCommon reasons includes not having enough keys."
-        ).forEach(line -> player.sendMessage(MsgUtil.getPrefix(line)));
+        ).forEach(line -> player.sendMessage(MsgUtils.getPrefix(line)));
+    }
+
+    public static void failedToTakeKey(Player player, String keyName) {
+        List.of(
+                "An error has occurred while trying to take a key from a player.",
+                "Player: " + player.getName(),
+                "Key: " + keyName
+        ).forEach(plugin.getServer().getLogger()::warning);
+
+        List.of(
+                "&cAn issue has occurred when trying to take a key.",
+                "&cCommon reasons includes not having enough keys."
+        ).forEach(line -> player.sendMessage(MsgUtils.getPrefix(line)));
     }
 
     public static long pickNumber(long min, long max) {
@@ -198,7 +214,7 @@ public class MiscUtil {
     }
 
     public static int randomNumber(int min, int max) {
-        return MiscUtil.useOtherRandom() ? min + ThreadLocalRandom.current().nextInt(max - min) : min + new Random().nextInt(max - min);
+        return MiscUtils.useOtherRandom() ? min + ThreadLocalRandom.current().nextInt(max - min) : min + new Random().nextInt(max - min);
     }
 
     public static Enchantment getEnchantment(String enchantmentName) {
@@ -342,5 +358,50 @@ public class MiscUtil {
 
     public static boolean isLogging() {
         return ConfigManager.getConfig().getProperty(ConfigKeys.verbose_logging);
+    }
+
+    public static void loadFiles() {
+        File file = new File(plugin.getDataFolder(), "examples");
+
+        if (file.exists()) {
+            String[] entries = file.list();
+
+            if (entries != null) {
+                for (String entry : entries) {
+                    File currentFile = new File(file.getPath(), entry);
+
+                    currentFile.delete();
+                }
+            }
+
+            file.delete();
+        }
+
+        /*copyFile(file.toPath(), "config.yml");
+        copyFile(file.toPath(), "messages.yml");
+
+        copyFiles(new File(file, "crates").toPath(), "crates", List.of(
+                "QuadCrateExample.yml",
+                "QuickCrateExample.yml",
+                "WarCrateExample.yml",
+                "CrateExample.yml"
+        ));*/
+    }
+
+    public static void cleanFiles() {
+        FileConfiguration locations = Files.locations.getFile();
+        FileConfiguration data = Files.data.getFile();
+
+        if (!locations.contains("Locations")) {
+            locations.set("Locations.Clear", null);
+
+            Files.locations.save();
+        }
+
+        if (!data.contains("Players")) {
+            data.set("Players.Clear", null);
+
+            Files.data.save();
+        }
     }
 }

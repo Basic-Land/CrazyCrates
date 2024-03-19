@@ -3,8 +3,7 @@ package com.badbones69.crazycrates.listeners.crates;
 import com.badbones69.crazycrates.CrazyCratesPaper;
 import com.badbones69.crazycrates.api.enums.PersistentKeys;
 import com.badbones69.crazycrates.api.objects.Crate;
-import com.badbones69.crazycrates.api.utils.ItemUtils;
-import com.badbones69.crazycrates.tasks.crates.CrateManager;
+import com.badbones69.crazycrates.platform.crates.CrateManager;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -24,7 +23,7 @@ public class MobileCrateListener implements Listener {
 
     private final @NotNull CrazyCratesPaper plugin = JavaPlugin.getPlugin(CrazyCratesPaper.class);
 
-    private final @NotNull CrateManager crateManager = this.plugin.getCrateManager();
+    private final @NotNull CrateManager crateManager = null;
 
     @EventHandler
     public void onCrateUse(PlayerInteractEvent event) {
@@ -44,11 +43,11 @@ public class MobileCrateListener implements Listener {
 
         PersistentDataContainer container = itemMeta.getPersistentDataContainer();
 
-        Crate crate = this.crateManager.getCrate(container.get(PersistentKeys.crate_key.getNamespacedKey(), PersistentDataType.STRING));
+        //Crate crate = this.crateManager.getCrate(container.get(PersistentKeys.crate_key.getNamespacedKey(), PersistentDataType.STRING));
 
-        if (crate == null) return;
+        //if (crate == null) return;
 
-        if (crate.getCrateType() != CrateType.crate_on_the_go) return;
+        //if (crate.getCrateType() != CrateType.crate_on_the_go) return;
 
         //boolean isKey = this.crateManager.hasKey(true, player, crate);
 
@@ -56,12 +55,12 @@ public class MobileCrateListener implements Listener {
 
         event.setCancelled(true);
 
-        this.crateManager.addPlayerToOpeningList(player, crate);
+        //this.crateManager.addPlayerToOpeningList(player, crate);
 
-        ItemUtils.removeItem(item, player);
+        //ItemUtils.removeItem(item, player);
 
-        crate.givePrize(player, crate.pickPrize(player));
+        //crate.givePrize(player, crate.pickPrize(player));
 
-        this.crateManager.removePlayerFromOpeningList(player);
+        //this.crateManager.removePlayerFromOpeningList(player);
     }
 }

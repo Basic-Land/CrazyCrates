@@ -1,12 +1,12 @@
 package com.badbones69.crazycrates.commands.crates.types.admin;
 
-import com.badbones69.crazycrates.api.FileManager;
 import com.badbones69.crazycrates.api.enums.Messages;
-import com.badbones69.crazycrates.api.utils.FileUtils;
 import com.badbones69.crazycrates.commands.crates.BaseCommand;
+import com.badbones69.crazycrates.platform.utils.MiscUtils;
 import com.badbones69.crazycrates.support.metrics.MetricsManager;
 import com.badbones69.crazycrates.tasks.InventoryManager;
-import com.badbones69.crazycrates.tasks.crates.CrateManager;
+import com.badbones69.crazycrates.platform.crates.CrateManager;
+import com.ryderbelserion.cluster.api.files.FileManager;
 import dev.triumphteam.cmd.bukkit.annotation.Permission;
 import dev.triumphteam.cmd.core.annotations.Command;
 import org.bukkit.command.CommandSender;
@@ -18,18 +18,18 @@ import us.crazycrew.crazycrates.platform.config.impl.ConfigKeys;
 
 public class CommandReload extends BaseCommand {
 
-    private final @NotNull InventoryManager inventoryManager = this.plugin.getInventoryManager();
-    private final @NotNull CrateManager crateManager = this.plugin.getCrateManager();
+    private final @NotNull InventoryManager inventoryManager = null;
+    private final @NotNull CrateManager crateManager = null;
     private final @NotNull FileManager fileManager = this.plugin.getFileManager();
-    private final @NotNull MetricsManager metrics = this.plugin.getMetrics();
+    private final @NotNull MetricsManager metrics = null;
 
     @Command("reload")
     @Permission(value = "crazycrates.reload", def = PermissionDefault.OP)
     public void reload(CommandSender sender) {
         ConfigManager.reload();
 
-        FileUtils.cleanFiles();
-        FileUtils.loadFiles();
+        MiscUtils.cleanFiles();
+        MiscUtils.loadFiles();
 
         boolean isEnabled = this.config.getProperty(ConfigKeys.toggle_metrics);
 
@@ -52,8 +52,8 @@ public class CommandReload extends BaseCommand {
             });
         }
 
-        this.fileManager.reloadAllFiles();
-        this.fileManager.setup(false);
+        //this.fileManager.reloadAllFiles();
+        //this.fileManager.setup(false);
 
         this.crateManager.load();
 

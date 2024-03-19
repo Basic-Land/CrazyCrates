@@ -3,6 +3,7 @@ package com.badbones69.crazycrates.support.holograms.types;
 
 import com.badbones69.crazycrates.CrazyCratesPaper;
 import com.badbones69.crazycrates.api.objects.Crate;
+import com.badbones69.crazycrates.platform.utils.MsgUtils;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import us.crazycrew.crazycrates.api.crates.CrateHologram;
@@ -10,8 +11,6 @@ import me.filoghost.holographicdisplays.api.HolographicDisplaysAPI;
 import me.filoghost.holographicdisplays.api.hologram.Hologram;
 import org.bukkit.block.Block;
 import com.badbones69.crazycrates.support.holograms.HologramManager;
-import com.badbones69.crazycrates.api.utils.MsgUtils;
-
 import java.util.HashMap;
 import java.util.Map;
 

@@ -8,6 +8,7 @@ dependencies {
     implementation(libs.cluster.paper)
 
     implementation(libs.triumphcmds)
+    implementation(libs.triumphgui)
 
     implementation(libs.configme) {
         exclude(group = "org.yaml", module = "snakeyaml")
@@ -34,6 +35,7 @@ tasks {
             "com.ryderbelserion.cluster.paper",
             "de.tr7zw.changeme.nbtapi",
             "dev.triumphteam.cmd",
+            "dev.triumphteam.gui",
             "org.bstats"
         ).forEach {
             relocate(it, "libs.$it")

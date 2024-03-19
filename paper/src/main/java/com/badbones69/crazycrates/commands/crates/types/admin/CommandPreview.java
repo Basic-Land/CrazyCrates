@@ -4,7 +4,7 @@ import com.badbones69.crazycrates.api.enums.Messages;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.commands.crates.BaseCommand;
 import com.badbones69.crazycrates.tasks.InventoryManager;
-import com.badbones69.crazycrates.tasks.crates.CrateManager;
+import com.badbones69.crazycrates.platform.crates.CrateManager;
 import dev.triumphteam.cmd.bukkit.annotation.Permission;
 import dev.triumphteam.cmd.core.annotations.Command;
 import dev.triumphteam.cmd.core.annotations.Suggestion;
@@ -16,13 +16,13 @@ import us.crazycrew.crazycrates.api.enums.types.CrateType;
 
 public class CommandPreview extends BaseCommand {
 
-    private final @NotNull InventoryManager inventoryManager = this.plugin.getInventoryManager();
-    private final @NotNull CrateManager crateManager = this.plugin.getCrateManager();
+    private final @NotNull InventoryManager inventoryManager = null;
+    private final @NotNull CrateManager crateManager = null;
 
     @Command("preview")
     @Permission(value = "crazycrates.preview", def = PermissionDefault.OP)
     public void onAdminCratePreview(CommandSender sender, @Suggestion("crates") String crateName, @Suggestion("players") Player target) {
-        Crate crate = this.crateManager.getCrate(crateName);
+        Crate crate = null;
 
         if (crate == null) {
             if (sender instanceof Player player) {

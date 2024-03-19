@@ -4,79 +4,86 @@ import ch.jalu.configme.SettingsManager;
 import com.badbones69.crazycrates.CrazyCratesPaper;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.Tier;
-import com.badbones69.crazycrates.api.utils.MiscUtils;
+import com.badbones69.crazycrates.platform.utils.MiscUtils;
+import com.ryderbelserion.cluster.utils.AdvUtils;
+import dev.triumphteam.gui.builder.item.ItemBuilder;
+import dev.triumphteam.gui.components.GuiAction;
+import dev.triumphteam.gui.guis.Gui;
+import dev.triumphteam.gui.guis.GuiItem;
+import net.kyori.adventure.text.Component;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import us.crazycrew.crazycrates.platform.config.ConfigManager;
 import us.crazycrew.crazycrates.platform.config.impl.ConfigKeys;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.InventoryView;
 import org.jetbrains.annotations.NotNull;
-import com.badbones69.crazycrates.api.utils.MsgUtils;
 import java.util.List;
 
 @SuppressWarnings("ALL")
-public abstract class InventoryBuilder implements InventoryHolder {
+public abstract class InventoryBuilder {
 
     protected final @NotNull CrazyCratesPaper plugin = JavaPlugin.getPlugin(CrazyCratesPaper.class);
 
-    private final Inventory inventory;
+    private @NotNull Gui gui;
     private Player player;
     private String title;
+    private Component newTitle;
     private Crate crate;
-    private int size;
+    private int rows;
     private int page;
     private List<Tier> tiers;
 
-    public InventoryBuilder(Player player, int size, String title) {
+    public InventoryBuilder(Player player, int rows, String title) {
         this.title = title;
         this.player = player;
-        this.size = size;
+        this.rows = rows;
 
-        String inventoryTitle = MiscUtils.isPapiActive() ? PlaceholderAPI.setPlaceholders(getPlayer(), MsgUtils.color(this.title)) : MsgUtils.color(this.title);
+        Component inventoryTitle = MiscUtils.isPapiActive() ? AdvUtils.parse(PlaceholderAPI.setPlaceholders(getPlayer(), this.title)) : AdvUtils.parse(this.title);
 
-        this.inventory = this.plugin.getServer().createInventory(this, this.size, inventoryTitle);
+        this.gui = Gui.gui().title(inventoryTitle).rows(this.rows).apply(consumer -> consumer.setDefaultTopClickAction(event -> event.setCancelled(true))).create();
     }
 
-    public InventoryBuilder(Crate crate, Player player, int size, String title) {
+    public InventoryBuilder(Crate crate, Player player, int rows, String title) {
         this.title = title;
         this.player = player;
-        this.size = size;
+        this.rows = rows;
 
         this.crate = crate;
 
-        String inventoryTitle = MiscUtils.isPapiActive() ? PlaceholderAPI.setPlaceholders(getPlayer(), MsgUtils.color(this.title)) : MsgUtils.color(this.title);
+        Component inventoryTitle = MiscUtils.isPapiActive() ? AdvUtils.parse(PlaceholderAPI.setPlaceholders(getPlayer(), this.title)) : AdvUtils.parse(this.title);
 
-        this.inventory = this.plugin.getServer().createInventory(this, this.size, inventoryTitle);
+        this.gui = Gui.gui().title(inventoryTitle).rows(this.rows).apply(consumer -> consumer.setDefaultTopClickAction(event -> event.setCancelled(true))).create();
     }
 
-    public InventoryBuilder(Crate crate, Player player, int size, int page, String title) {
+    public InventoryBuilder(Crate crate, Player player, int rows, int page, String title) {
         this.title = title;
         this.player = player;
-        this.size = size;
+        this.rows = rows;
         this.page = page;
 
         this.crate = crate;
 
-        String inventoryTitle = MiscUtils.isPapiActive() ? PlaceholderAPI.setPlaceholders(getPlayer(), MsgUtils.color(this.title)) : MsgUtils.color(this.title);
+        Component inventoryTitle = MiscUtils.isPapiActive() ? AdvUtils.parse(PlaceholderAPI.setPlaceholders(getPlayer(), this.title)) : AdvUtils.parse(this.title);
 
-        this.inventory = this.plugin.getServer().createInventory(this, this.size, inventoryTitle);
+        this.gui = Gui.gui().title(inventoryTitle).rows(this.rows).apply(consumer -> consumer.setDefaultTopClickAction(event -> event.setCancelled(true))).create();
     }
 
-    public InventoryBuilder(List<Tier> tiers, Crate crate, Player player, int size, String title) {
+    public InventoryBuilder(List<Tier> tiers, Crate crate, Player player, int rows, String title) {
         this.title = title;
         this.player = player;
-        this.size = size;
+        this.rows = rows;
 
         this.crate = crate;
 
         this.tiers = tiers;
 
-        String inventoryTitle = MiscUtils.isPapiActive() ? PlaceholderAPI.setPlaceholders(getPlayer(), MsgUtils.color(this.title)) : MsgUtils.color(this.title);
+        Component inventoryTitle = MiscUtils.isPapiActive() ? AdvUtils.parse(PlaceholderAPI.setPlaceholders(getPlayer(), this.title)) : AdvUtils.parse(this.title);
 
-        this.inventory = this.plugin.getServer().createInventory(this, this.size, inventoryTitle);
+        this.gui = Gui.gui().title(inventoryTitle).rows(this.rows).apply(consumer -> consumer.setDefaultTopClickAction(event -> event.setCancelled(true))).create();
     }
 
     public boolean overrideMenu() {
@@ -111,12 +118,12 @@ public abstract class InventoryBuilder implements InventoryHolder {
         return this;
     }
 
-    public void size(int size) {
-        this.size = size;
+    public void setRows(int rows) {
+        this.rows = rows;
     }
 
-    public int getSize() {
-        return this.size;
+    public int getRows() {
+        return this.rows;
     }
 
     public void setPage(int page) {
@@ -151,9 +158,17 @@ public abstract class InventoryBuilder implements InventoryHolder {
         return getPlayer().getOpenInventory();
     }
 
-    @Override
-    @NotNull
-    public Inventory getInventory() {
-        return this.inventory;
+    public @NotNull GuiItem getItem(ItemStack itemStack, @NotNull final GuiAction<InventoryClickEvent> action) {
+        return ItemBuilder.from(itemStack).asGuiItem(event -> {
+
+        });
+    }
+
+    public @NotNull GuiItem getItem(ItemStack itemStack) {
+        return ItemBuilder.from(itemStack).asGuiItem();
+    }
+
+    public @NotNull Gui getGui() {
+        return this.gui;
     }
 }

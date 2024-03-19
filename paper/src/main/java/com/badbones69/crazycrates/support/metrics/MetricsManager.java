@@ -1,7 +1,7 @@
 package com.badbones69.crazycrates.support.metrics;
 
 import com.badbones69.crazycrates.CrazyCratesPaper;
-import com.badbones69.crazycrates.api.utils.MiscUtils;
+import com.badbones69.crazycrates.platform.utils.MiscUtils;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.AdvancedPie;
 import org.bstats.charts.SimplePie;
@@ -33,11 +33,11 @@ public class MetricsManager {
         this.metrics.addCustomChart(new AdvancedPie("crate_types", () -> {
             Map<String, Integer> values = new HashMap<>();
 
-            plugin.getCrateManager().getCrates().forEach(crate -> {
+            /*plugin.getCrateManager().getCrates().forEach(crate -> {
                 CrateType crateType = crate.getCrateType();
 
                 values.put(crateType.getName(), plugin.getCrateManager().getCrates().stream().filter(type -> type.getCrateType() == crateType).toList().size());
-            });
+            });*/
 
             return values;
         }));

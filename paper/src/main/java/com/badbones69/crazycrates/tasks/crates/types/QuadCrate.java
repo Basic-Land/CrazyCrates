@@ -1,10 +1,10 @@
 package com.badbones69.crazycrates.tasks.crates.types;
 
 import com.badbones69.crazycrates.api.objects.Crate;
-import com.badbones69.crazycrates.api.objects.Key;
 import com.badbones69.crazycrates.api.objects.other.CrateLocation;
+import com.badbones69.crazycrates.platform.crates.objects.Key;
 import com.badbones69.crazycrates.support.StructureHandler;
-import com.badbones69.crazycrates.tasks.crates.CrateManager;
+import com.badbones69.crazycrates.platform.crates.CrateManager;
 import com.badbones69.crazycrates.tasks.crates.other.quadcrates.QuadCrateManager;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -17,7 +17,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class QuadCrate extends CrateBuilder {
 
-    private final @NotNull CrateManager crateManager = this.plugin.getCrateManager();
+    private final @NotNull CrateManager crateManager = null;
 
     private final Location location;
 
@@ -36,12 +36,12 @@ public class QuadCrate extends CrateBuilder {
         Crate crate = getCrate();
         Player player = getPlayer();
 
-        CrateSchematic crateSchematic = this.crateManager.getCrateSchematics().get(ThreadLocalRandom.current().nextInt(this.crateManager.getCrateSchematics().size()));
-        StructureHandler handler = new StructureHandler(crateSchematic.getSchematicFile());
-        CrateLocation crateLocation = this.crateManager.getCrateLocation(this.location);
-        QuadCrateManager session = new QuadCrateManager(player, getKey(), crate, keyType, crateLocation.getLocation(), checkHand, handler);
+        //CrateSchematic crateSchematic = this.crateManager.getCrateSchematics().get(ThreadLocalRandom.current().nextInt(this.crateManager.getCrateSchematics().size()));
+        //StructureHandler handler = new StructureHandler(crateSchematic.getSchematicFile());
+        //CrateLocation crateLocation = this.crateManager.getCrateLocation(this.location);
+        //QuadCrateManager session = new QuadCrateManager(player, getKey(), crate, keyType, crateLocation.getLocation(), checkHand, handler);
 
-        session.startCrate();
+        //session.startCrate();
     }
 
     @Override

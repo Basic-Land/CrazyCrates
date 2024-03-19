@@ -2,7 +2,9 @@ package com.badbones69.crazycrates.api.enums;
 
 import ch.jalu.configme.SettingsManager;
 import ch.jalu.configme.properties.Property;
-import com.badbones69.crazycrates.api.utils.MiscUtils;
+import com.badbones69.crazycrates.platform.utils.MiscUtils;
+import com.badbones69.crazycrates.platform.utils.MsgUtils;
+import com.ryderbelserion.cluster.utils.StringUtils;
 import us.crazycrew.crazycrates.platform.config.ConfigManager;
 import us.crazycrew.crazycrates.platform.config.impl.messages.CommandKeys;
 import us.crazycrew.crazycrates.platform.config.impl.messages.CrateKeys;
@@ -13,8 +15,6 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import us.crazycrew.crazycrates.platform.config.impl.ConfigKeys;
-import us.crazycrew.crazycrates.utils.StringUtils;
-import com.badbones69.crazycrates.api.utils.MsgUtils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +53,7 @@ public enum Messages {
     needs_more_room(CrateKeys.needs_more_room),
     out_of_time(CrateKeys.out_of_time),
     not_a_crate(CrateKeys.not_a_crate),
+    not_a_key(CrateKeys.not_a_key),
     not_a_number(CrateKeys.not_a_number),
     preview_disabled(CrateKeys.preview_disabled),
     required_keys(CrateKeys.required_keys),
@@ -111,8 +112,7 @@ public enum Messages {
         this.isList = isList;
     }
 
-    @NotNull
-    private final SettingsManager configuration = ConfigManager.getMessages();
+    private final @NotNull SettingsManager configuration = ConfigManager.getMessages();
 
     private boolean isList() {
         return this.isList;

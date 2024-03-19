@@ -28,13 +28,13 @@ import java.util.List;
 
 public class CratePreviewMenu extends InventoryBuilder {
 
-    private final @NotNull InventoryManager inventoryManager = this.plugin.getInventoryManager();
+    private final @NotNull InventoryManager inventoryManager = null;
 
     private final boolean isTier;
     private final Tier tier;
 
-    public CratePreviewMenu(Crate crate, Player player, int size, int page, String title, boolean isTier, Tier tier) {
-        super(crate, player, size, page, title);
+    public CratePreviewMenu(Crate crate, Player player, int rows, int page, String title, boolean isTier, Tier tier) {
+        super(crate, player, rows, page, title);
 
         this.isTier = isTier;
         this.tier = tier;
@@ -42,7 +42,7 @@ public class CratePreviewMenu extends InventoryBuilder {
 
     @Override
     public InventoryBuilder build() {
-        Inventory inventory = getInventory();
+        Inventory inventory = getGui().getInventory();
 
         setDefaultItems(inventory);
 
@@ -135,7 +135,7 @@ public class CratePreviewMenu extends InventoryBuilder {
 
         private final @NotNull CrazyCratesPaper plugin = JavaPlugin.getPlugin(CrazyCratesPaper.class);
 
-        private final @NotNull InventoryManager inventoryManager = this.plugin.getInventoryManager();
+        private final @NotNull InventoryManager inventoryManager = null;
 
         private final @NotNull SettingsManager config = ConfigManager.getConfig();
 
@@ -180,7 +180,7 @@ public class CratePreviewMenu extends InventoryBuilder {
 
                     CrateMainMenu crateMainMenu = new CrateMainMenu(player, this.config.getProperty(ConfigKeys.inventory_size), this.config.getProperty(ConfigKeys.inventory_name));
 
-                    player.openInventory(crateMainMenu.build().getInventory());
+                    player.openInventory(crateMainMenu.build().getGui().getInventory());
                 }
 
                 return;

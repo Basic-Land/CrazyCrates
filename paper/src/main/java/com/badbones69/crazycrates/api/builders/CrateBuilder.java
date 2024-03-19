@@ -4,8 +4,9 @@ import com.badbones69.crazycrates.CrazyCratesPaper;
 import com.badbones69.crazycrates.api.builders.types.CratePrizeMenu;
 import com.badbones69.crazycrates.api.events.CrateOpenEvent;
 import com.badbones69.crazycrates.api.objects.Crate;
-import com.badbones69.crazycrates.api.objects.Key;
 import com.badbones69.crazycrates.api.objects.Tier;
+import com.badbones69.crazycrates.platform.crates.objects.Key;
+import com.badbones69.crazycrates.platform.utils.MiscUtils;
 import com.badbones69.crazycrates.tasks.crates.effects.SoundEffect;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
@@ -20,7 +21,6 @@ import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.simpleyaml.configuration.ConfigurationSection;
 import us.crazycrew.crazycrates.api.enums.types.CrateType;
-import com.badbones69.crazycrates.api.utils.MiscUtils;
 import us.crazycrew.crazycrates.api.enums.types.KeyType;
 
 import java.util.List;
@@ -60,7 +60,7 @@ public abstract class CrateBuilder extends BukkitRunnable {
         this.size = size;
 
         this.builder = new CratePrizeMenu(crate, player, size, crate.getPreviewName());
-        this.inventory = this.builder.build().getInventory();
+        this.inventory = this.builder.build().getGui().getInventory();
     }
 
     /**
@@ -87,7 +87,7 @@ public abstract class CrateBuilder extends BukkitRunnable {
         this.size = size;
 
         this.builder = new CratePrizeMenu(crate, player, size, crateName);
-        this.inventory = this.builder.build().getInventory();
+        this.inventory = this.builder.build().getGui().getInventory();
     }
 
     /**
@@ -115,7 +115,7 @@ public abstract class CrateBuilder extends BukkitRunnable {
         this.size = size;
 
         this.builder = new CratePrizeMenu(crate, player, size, crate.getPreviewName());
-        this.inventory = this.builder.build().getInventory();
+        this.inventory = this.builder.build().getGui().getInventory();
     }
 
     /**
@@ -184,14 +184,14 @@ public abstract class CrateBuilder extends BukkitRunnable {
      * @param task task to add.
      */
     public void addCrateTask(BukkitTask task) {
-        this.plugin.getCrateManager().addActiveTask(this.player, task);
+        //this.plugin.getCrateManager().addActiveTask(this.player, task);
     }
 
     /**
      * Remove crate task.
      */
     public void removeTask() {
-        this.plugin.getCrateManager().removeCrateTask(this.player);
+        //this.plugin.getCrateManager().removeCrateTask(this.player);
     }
 
     /**
@@ -199,7 +199,7 @@ public abstract class CrateBuilder extends BukkitRunnable {
      */
     public void cancelCrateTask() {
         // Cancel
-        this.plugin.getCrateManager().getCrateTask(this.player).cancel();
+        //this.plugin.getCrateManager().getCrateTask(this.player).cancel();
 
         // Remove the task.
         removeTask();
@@ -209,7 +209,8 @@ public abstract class CrateBuilder extends BukkitRunnable {
      * @return true or false.
      */
     public boolean hasCrateTask() {
-        return this.plugin.getCrateManager().hasActiveTask(this.player);
+        return true;
+        //return this.plugin.getCrateManager().hasActiveTask(this.player);
     }
 
     /**

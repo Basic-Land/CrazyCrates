@@ -3,7 +3,7 @@ package com.badbones69.crazycrates.listeners.crates;
 import com.badbones69.crazycrates.CrazyCratesPaper;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.Prize;
-import com.badbones69.crazycrates.tasks.crates.CrateManager;
+import com.badbones69.crazycrates.platform.crates.CrateManager;
 import org.bukkit.Material;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
@@ -23,7 +23,7 @@ public class WarCrateListener implements Listener {
 
     private final @NotNull CrazyCratesPaper plugin = JavaPlugin.getPlugin(CrazyCratesPaper.class);
 
-    private final @NotNull CrateManager crateManager = this.plugin.getCrateManager();
+    private final @NotNull CrateManager crateManager = null;
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
@@ -35,7 +35,7 @@ public class WarCrateListener implements Listener {
 
         event.setCancelled(true);
 
-        if (this.crateManager.containsPicker(player) && this.crateManager.isInOpeningList(player)) {
+        /*if (this.crateManager.containsPicker(player) && this.crateManager.isInOpeningList(player)) {
             Crate crate = this.crateManager.getOpeningCrate(player);
 
             if (crate.getCrateType() == CrateType.war && this.crateManager.isPicker(player)) {
@@ -93,14 +93,14 @@ public class WarCrateListener implements Listener {
                     }.runTaskLater(this.plugin, 30));
                 }
             }
-        }
+        }*/
     }
 
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
         Player player = (Player) event.getPlayer();
 
-        if (this.crateManager.containsPicker(player) && this.crateManager.isPicker(player)) {
+        /*if (this.crateManager.containsPicker(player) && this.crateManager.isPicker(player)) {
             for (Crate crate : this.crateManager.getCrates()) {
                 if (crate.getCrateType() == CrateType.war && event.getInventory().getHolder(false) instanceof CratePrizeMenu) {
                     if (this.crateManager.hasActiveTask(player)) {
@@ -110,6 +110,6 @@ public class WarCrateListener implements Listener {
                     }
                 }
             }
-        }
+        }*/
     }
 }

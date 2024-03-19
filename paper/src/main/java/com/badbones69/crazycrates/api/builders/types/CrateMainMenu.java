@@ -5,13 +5,12 @@ import com.badbones69.crazycrates.CrazyCratesPaper;
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.enums.Messages;
 import com.badbones69.crazycrates.api.objects.Crate;
-import com.badbones69.crazycrates.api.objects.Key;
-import com.badbones69.crazycrates.api.utils.ItemUtils;
-import com.badbones69.crazycrates.api.utils.MiscUtils;
+import com.badbones69.crazycrates.platform.crates.CrateManager;
+import com.badbones69.crazycrates.platform.crates.KeyManager;
+import com.badbones69.crazycrates.platform.crates.UserManager;
+import com.badbones69.crazycrates.platform.crates.objects.Key;
+import com.badbones69.crazycrates.platform.utils.MiscUtils;
 import com.badbones69.crazycrates.tasks.InventoryManager;
-import com.badbones69.crazycrates.tasks.crates.CrateManager;
-import com.badbones69.crazycrates.tasks.crates.KeyManager;
-import com.badbones69.crazycrates.tasks.crates.UserManager;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -34,28 +33,28 @@ import java.util.Map;
 
 public class CrateMainMenu extends InventoryBuilder {
 
-    private final @NotNull UserManager userManager = this.plugin.getUserManager();
+    private final @NotNull CrateManager crateManager = this.plugin.getCrateManager();
 
     private final @NotNull KeyManager keyManager = this.plugin.getKeyManager();
 
-    private final @NotNull CrateManager crateManager = this.plugin.getCrateManager();
+    private final @NotNull UserManager userManager = this.plugin.getUserManager();
 
     private final @NotNull SettingsManager config = ConfigManager.getConfig();
 
-    public CrateMainMenu(Player player, int size, String title) {
-        super(player, size, title);
+    public CrateMainMenu(Player player, int rows, String title) {
+        super(player, rows, title);
     }
 
     @Override
     public InventoryBuilder build() {
-        Inventory inventory = getInventory();
+        Inventory inventory = getGui().getInventory();
 
         Player player = getPlayer();
 
         for (Crate crate : this.crateManager.getCrates()) {
             int slot = crate.getSlot();
 
-            if (slot > getSize()) continue;
+            if (slot > getRows()) continue;
 
             slot--;
 
@@ -71,7 +70,7 @@ public class CrateMainMenu extends InventoryBuilder {
 
             ItemStack item = new ItemBuilder().setMaterial(id).setName(name).setLore(lore).setTarget(player).build();
 
-            for (int i = 0; i < getSize(); i++) {
+            for (int i = 0; i < getRows(); i++) {
                 inventory.setItem(i, item.clone());
             }
         }
@@ -120,7 +119,7 @@ public class CrateMainMenu extends InventoryBuilder {
                         if (option.contains("hide-item-flags")) item.hideItemFlags(Boolean.parseBoolean(option.replace("hide-item-flags:", "")));
                     }
 
-                    if (slot > getSize()) continue;
+                    if (slot > getRows()) continue;
 
                     slot--;
 
@@ -135,7 +134,7 @@ public class CrateMainMenu extends InventoryBuilder {
     private String getCrates(String option) {
         Player player = getPlayer();
 
-        for (Key key : this.keyManager.getKeys()) {
+        /*for (Key key : this.keyManager.getKeys()) {
             String name = key.getName().toLowerCase();
 
             int virtualKeys = this.userManager.getVirtualKeys(player.getUniqueId(), key.getName());
@@ -152,7 +151,7 @@ public class CrateMainMenu extends InventoryBuilder {
 
         for (Crate crate : this.crateManager.getCrates()) {
             option = option.replaceAll("%" + crate.getName() + "_opened%", this.userManager.getCrateOpened(player.getUniqueId(), crate.getName()) + "");
-        }
+        }*/
 
         return option;
     }
@@ -161,21 +160,21 @@ public class CrateMainMenu extends InventoryBuilder {
 
         private final @NotNull CrazyCratesPaper plugin = JavaPlugin.getPlugin(CrazyCratesPaper.class);
 
-        private final @NotNull KeyManager keyManager = this.plugin.getKeyManager();
+        private final @NotNull KeyManager keyManager = null;
 
-        private final @NotNull CrateManager crateManager = this.plugin.getCrateManager();
+        private final @NotNull CrateManager crateManager = null;
 
         private final @NotNull SettingsManager config = ConfigManager.getConfig();
 
-        private final @NotNull InventoryManager inventoryManager = this.plugin.getInventoryManager();
+        private final @NotNull InventoryManager inventoryManager = null;
 
-        private final @NotNull UserManager userManager = this.plugin.getUserManager();
+        private final @NotNull UserManager userManager = null;
 
         @EventHandler
         public void onInventoryClick(InventoryClickEvent event) {
             if (!(event.getInventory().getHolder(false) instanceof CrateMainMenu holder)) return;
 
-            Inventory inventory = holder.getInventory();
+            Inventory inventory = holder.getGui().getInventory();
 
             event.setCancelled(true);
 
@@ -187,7 +186,8 @@ public class CrateMainMenu extends InventoryBuilder {
 
             if (!item.hasItemMeta()) return;
 
-            Crate crate = this.crateManager.getCrate(ItemUtils.getCrate(item.getItemMeta()));
+            //Crate crate = this.crateManager.getCrate(ItemUtils.getCrate(item.getItemMeta()));
+            Crate crate = null;
 
             switch (event.getClick()) {
                 case RIGHT, SHIFT_RIGHT -> {
@@ -206,25 +206,25 @@ public class CrateMainMenu extends InventoryBuilder {
                 }
 
                 case LEFT, SHIFT_LEFT -> {
-                    if (this.crateManager.isCrateActive(player)) {
-                        player.sendMessage(Messages.already_opening_crate.getMessage("{crate}", crate.getCrateName(), player));
+                    //if (this.crateManager.isCrateActive(player)) {
+                    //    player.sendMessage(Messages.already_opening_crate.getMessage("{crate}", crate.getCrateName(), player));
 
-                        return;
-                    }
+                    //    return;
+                    //}
 
                     Key key = null;
 
-                    if (this.keyManager.getItem(player) == null) {
-                        for (String keyName : crate.getKeys()) {
-                            key = this.keyManager.getKey(keyName);
+                    //if (this.keyManager.getItem(player) == null) {
+                    //    for (String keyName : crate.getKeys()) {
+                    //        key = this.keyManager.getKey(keyName);
 
-                            break;
-                        }
-                    } else {
-                        key = this.keyManager.getKey(crate, this.keyManager.getItem(player).getItemMeta());
-                    }
+                    //        break;
+                    //    }
+                    //} else {
+                        //key = this.keyManager.getKey(crate, this.keyManager.getItem(player).getItemMeta());
+                    //}
 
-                    if (key == null) return;
+                    //if (key == null) return;
 
                     crate.playSound(player, "click-sound", "UI_BUTTON_CLICK", SoundCategory.PLAYERS);
 
@@ -233,13 +233,13 @@ public class CrateMainMenu extends InventoryBuilder {
 
                     //hasKey =
 
-                    if (this.userManager.getVirtualKeys(player.getUniqueId(), key.getName()) >= 1) {
+                    if (this.userManager.getVirtualKeys(player.getUniqueId(), "") >= 1) {
                         hasKey = true;
                     } else {
-                        if (this.config.getProperty(ConfigKeys.virtual_accepts_physical_keys) && this.userManager.hasPhysicalKey(player.getUniqueId(), crate.getName(), key.getName(), false)) {
-                            hasKey = true;
-                            keyType = KeyType.physical_key;
-                        }
+                        //if (this.config.getProperty(ConfigKeys.virtual_accepts_physical_keys) && this.userManager.hasPhysicalKey(player.getUniqueId(), crate.getName(), "", false)) {
+                        //    hasKey = true;
+                        //    keyType = KeyType.physical_key;
+                        //}
                     }
 
                     if (!hasKey) {
@@ -250,7 +250,7 @@ public class CrateMainMenu extends InventoryBuilder {
                         Map<String, String> placeholders = new HashMap<>();
 
                         placeholders.put("{crate}", crate.getName());
-                        placeholders.put("{key}", key.getName());
+                        //placeholders.put("{key}", key.getName());
 
                         player.sendMessage(Messages.no_keys.getMessage(placeholders, player));
 
@@ -271,7 +271,7 @@ public class CrateMainMenu extends InventoryBuilder {
                         return;
                     }
 
-                    this.crateManager.openCrate(player, crate, key, keyType, player.getLocation(), true, false);
+                    //this.crateManager.openCrate(player, crate, key, keyType, player.getLocation(), true, false);
                 }
             }
         }

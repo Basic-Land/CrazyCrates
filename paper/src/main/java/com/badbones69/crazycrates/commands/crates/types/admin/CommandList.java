@@ -2,18 +2,21 @@ package com.badbones69.crazycrates.commands.crates.types.admin;
 
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.other.CrateLocation;
-import com.badbones69.crazycrates.api.utils.MsgUtils;
 import com.badbones69.crazycrates.commands.crates.BaseCommand;
-import com.badbones69.crazycrates.tasks.crates.CrateManager;
+import com.badbones69.crazycrates.platform.utils.MsgUtils;
+import com.badbones69.crazycrates.platform.crates.CrateManager;
 import dev.triumphteam.cmd.bukkit.annotation.Permission;
 import dev.triumphteam.cmd.core.annotations.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.PermissionDefault;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 public class CommandList extends BaseCommand {
 
-    private final @NotNull CrateManager crateManager = this.plugin.getCrateManager();
+    private final @NotNull CrateManager crateManager = null;
 
     @Command("list")
     @Permission(value = "crazycrates.list", def = PermissionDefault.OP)
@@ -25,7 +28,7 @@ public class CommandList extends BaseCommand {
 
         StringBuilder brokeCratesBuilder = new StringBuilder();
 
-        this.crateManager.getBrokenCrates().forEach(crate -> brokeCratesBuilder.append("&c").append(crate).append(".yml&8,"));
+        //this.crateManager.getBrokenCrates().forEach(crate -> brokeCratesBuilder.append("&c").append(crate).append(".yml&8,"));
 
         brokeCrates = brokeCratesBuilder.toString();
 
@@ -37,7 +40,7 @@ public class CommandList extends BaseCommand {
         sender.sendMessage(MsgUtils.color("&c[ID]&8, &c[Crate]&8, &c[World]&8, &c[X]&8, &c[Y]&8, &c[Z]"));
         int line = 1;
 
-        for (CrateLocation loc : this.crateManager.getCrateLocations()) {
+        for (CrateLocation loc : new ArrayList<CrateLocation>()) {
             Crate crate = loc.getCrate();
             String world = loc.getLocation().getWorld().getName();
 

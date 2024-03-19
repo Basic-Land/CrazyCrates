@@ -6,7 +6,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
-public class ItemUtil {
+public class ItemUtils {
 
     public static void removeItem(ItemStack item, Player player) {
         try {

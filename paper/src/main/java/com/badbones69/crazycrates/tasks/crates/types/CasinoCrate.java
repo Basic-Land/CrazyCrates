@@ -3,11 +3,11 @@ package com.badbones69.crazycrates.tasks.crates.types;
 import com.badbones69.crazycrates.api.builders.CrateBuilder;
 import com.badbones69.crazycrates.api.enums.PersistentKeys;
 import com.badbones69.crazycrates.api.objects.Crate;
-import com.badbones69.crazycrates.api.objects.Key;
 import com.badbones69.crazycrates.api.objects.Tier;
-import com.badbones69.crazycrates.api.utils.MiscUtils;
-import com.badbones69.crazycrates.tasks.crates.CrateManager;
-import com.badbones69.crazycrates.tasks.crates.UserManager;
+import com.badbones69.crazycrates.platform.crates.UserManager;
+import com.badbones69.crazycrates.platform.crates.objects.Key;
+import com.badbones69.crazycrates.platform.utils.MiscUtils;
+import com.badbones69.crazycrates.platform.crates.CrateManager;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -24,8 +24,8 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class CasinoCrate extends CrateBuilder {
 
-    private final @NotNull CrateManager crateManager = this.plugin.getCrateManager();
-    private final @NotNull UserManager userManager = this.plugin.getUserManager();
+    private final @NotNull CrateManager crateManager = null;
+    private final @NotNull UserManager userManager = null;
 
     public CasinoCrate(Key key, Crate crate, Player player, int size) {
         super(key, crate, player, size);
@@ -78,13 +78,13 @@ public class CasinoCrate extends CrateBuilder {
             if (this.time >= 60) { // When the crate task is finished.
                 playSound("stop-sound", SoundCategory.PLAYERS, "ENTITY_PLAYER_LEVELUP");
 
-                this.crateManager.endActiveTask(player);
+                //this.crateManager.endActiveTask(player);
 
                 crate.givePrize(inventory, 11, player);
                 crate.givePrize(inventory, 13, player);
                 crate.givePrize(inventory, 15, player);
 
-                this.crateManager.removePlayerFromOpeningList(player);
+                //this.crateManager.removePlayerFromOpeningList(player);
 
                 new BukkitRunnable() {
                     @Override
@@ -112,14 +112,14 @@ public class CasinoCrate extends CrateBuilder {
         Crate crate = getCrate();
         Key key = getKey();
 
-        boolean keyCheck = this.userManager.takeKeys(1, player.getUniqueId(), crate.getName(), key.getName(), true, checkHand);
+        //boolean keyCheck = this.userManager.takeKeys(1, player.getUniqueId(), crate.getName(), key.getName(), true, checkHand);
 
-        if (!keyCheck) {
+        if (!true) {
             // Send the message about failing to take the key.
-            MiscUtils.failedToTakeKey(player, crate.getName(), key.getName());
+            //MiscUtils.failedToTakeKey(player, crate.getName(), key.getName());
 
             // Remove from opening list.
-            this.crateManager.removePlayerFromOpeningList(player);
+            //this.crateManager.removePlayerFromOpeningList(player);
 
             return;
         }

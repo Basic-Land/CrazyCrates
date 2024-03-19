@@ -3,9 +3,10 @@ package com.badbones69.crazycrates.tasks.crates.types;
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.builders.types.CratePrizeMenu;
 import com.badbones69.crazycrates.api.objects.Crate;
-import com.badbones69.crazycrates.api.objects.Key;
-import com.badbones69.crazycrates.tasks.crates.CrateManager;
-import com.badbones69.crazycrates.tasks.crates.UserManager;
+import com.badbones69.crazycrates.platform.crates.UserManager;
+import com.badbones69.crazycrates.platform.crates.objects.Key;
+import com.badbones69.crazycrates.platform.utils.MiscUtils;
+import com.badbones69.crazycrates.platform.crates.CrateManager;
 import org.bukkit.Material;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
@@ -13,16 +14,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import com.badbones69.crazycrates.api.builders.CrateBuilder;
-import com.badbones69.crazycrates.api.utils.MiscUtils;
 import us.crazycrew.crazycrates.api.enums.types.KeyType;
-
 import java.util.HashMap;
 import java.util.Map;
 
 public class WarCrate extends CrateBuilder {
 
-    private final @NotNull UserManager userManager = this.plugin.getUserManager();
-    private final @NotNull CrateManager crateManager = this.plugin.getCrateManager();
+    private final @NotNull UserManager userManager = null;
+    private final @NotNull CrateManager crateManager = null;
 
     private final Map<ItemStack, String> colorCodes = new HashMap<>();
 
@@ -41,24 +40,24 @@ public class WarCrate extends CrateBuilder {
         Player player = getPlayer();
 
         // Crate event failed so we return.
-        boolean keyCheck = this.userManager.takeKeys(1, player.getUniqueId(), crate.getName(), key.getName(), true, checkHand);
+        //boolean keyCheck = this.userManager.takeKeys(1, player.getUniqueId(), crate.getName(), key.getName(), true, checkHand);
 
-        if (!keyCheck) {
+        if (!true) {
             // Send the message about failing to take the key.
-            MiscUtils.failedToTakeKey(player, crate.getName(), key.getName());
+            //MiscUtils.failedToTakeKey(player, crate.getName(), key.getName());
 
             // Remove from opening list.
-            this.crateManager.removePlayerFromOpeningList(player);
+            //this.crateManager.removePlayerFromOpeningList(player);
 
             // Remove closer/picker
-            this.crateManager.removeCloser(player);
-            this.crateManager.removePicker(player);
+            //this.crateManager.removeCloser(player);
+            //this.crateManager.removePicker(player);
 
             return;
         }
 
-        this.crateManager.addPicker(player, false);
-        this.crateManager.addCloser(player, false);
+        //this.crateManager.addPicker(player, false);
+        //this.crateManager.addCloser(player, false);
 
         addCrateTask(new BukkitRunnable() {
             int full = 0;
@@ -87,7 +86,7 @@ public class WarCrate extends CrateBuilder {
 
                     setRandomGlass();
 
-                    crateManager.addPicker(player, true);
+                    //crateManager.addPicker(player, true);
                 }
             }
         }.runTaskTimer(this.plugin, 1, 3));
@@ -97,7 +96,7 @@ public class WarCrate extends CrateBuilder {
         Player player = getPlayer();
         Crate crate = getCrate();
 
-        if (!this.crateManager.isInOpeningList(player) && !(getInventory().getHolder(false) instanceof CratePrizeMenu)) return;
+        //if (!this.crateManager.isInOpeningList(player) && !(getInventory().getHolder(false) instanceof CratePrizeMenu)) return;
 
         for (int index = 0; index < 9; index++) {
             setItem(index, crate.pickPrize(player).getDisplayItem(player));
@@ -105,7 +104,7 @@ public class WarCrate extends CrateBuilder {
     }
 
     private void setRandomGlass() {
-        if (!this.crateManager.isInOpeningList(getPlayer()) && !(getInventory().getHolder(false) instanceof CratePrizeMenu)) return;
+        //if (!this.crateManager.isInOpeningList(getPlayer()) && !(getInventory().getHolder(false) instanceof CratePrizeMenu)) return;
 
         if (this.colorCodes.isEmpty()) getColorCode();
 

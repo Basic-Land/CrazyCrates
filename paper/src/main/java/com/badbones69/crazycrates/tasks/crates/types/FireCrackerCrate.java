@@ -1,10 +1,10 @@
 package com.badbones69.crazycrates.tasks.crates.types;
 
 import com.badbones69.crazycrates.api.objects.Crate;
-import com.badbones69.crazycrates.api.objects.Key;
-import com.badbones69.crazycrates.api.utils.MiscUtils;
-import com.badbones69.crazycrates.tasks.crates.CrateManager;
-import com.badbones69.crazycrates.tasks.crates.UserManager;
+import com.badbones69.crazycrates.platform.crates.UserManager;
+import com.badbones69.crazycrates.platform.crates.objects.Key;
+import com.badbones69.crazycrates.platform.utils.MiscUtils;
+import com.badbones69.crazycrates.platform.crates.CrateManager;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -12,15 +12,14 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import com.badbones69.crazycrates.api.builders.CrateBuilder;
 import us.crazycrew.crazycrates.api.enums.types.KeyType;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class FireCrackerCrate extends CrateBuilder {
 
-    private final @NotNull UserManager userManager = this.plugin.getUserManager();
-    private final @NotNull CrateManager crateManager = this.plugin.getCrateManager();
+    private final @NotNull UserManager userManager = null;
+    private final @NotNull CrateManager crateManager = null;
 
     public FireCrackerCrate(Key key, Crate crate, Player player, int size, Location location) {
         super(key, crate, player, size, location);
@@ -39,23 +38,23 @@ public class FireCrackerCrate extends CrateBuilder {
         Location location = getLocation();
 
         // Crate event failed so we return.
-        this.crateManager.addActiveCrate(player, location);
+        //this.crateManager.addActiveCrate(player, location);
 
-        boolean keyCheck = this.userManager.takeKeys(1, player.getUniqueId(), crate.getName(), key.getName(), true, checkHand);
+        //boolean keyCheck = this.userManager.takeKeys(1, player.getUniqueId(), crate.getName(), key.getName(), true, checkHand);
 
-        if (!keyCheck) {
+        if (!true) {
             // Send the message about failing to take the key.
-            MiscUtils.failedToTakeKey(player, crate.getName(), key.getName());
+            //MiscUtils.failedToTakeKey(player, crate.getName(), key.getName());
 
             // Remove from opening list.
-            this.crateManager.removePlayerFromOpeningList(player);
+            //this.crateManager.removePlayerFromOpeningList(player);
 
             return;
         }
 
-        if (this.crateManager.getHologramManager() != null) {
-            this.crateManager.getHologramManager().removeHologram(location.getBlock());
-        }
+        //if (this.crateManager.getHologramManager() != null) {
+            //this.crateManager.getHologramManager().removeHologram(location.getBlock());
+        //}
 
         List<Color> colors = Arrays.asList(Color.RED, Color.YELLOW, Color.GREEN, Color.BLUE, Color.BLACK, Color.AQUA, Color.MAROON, Color.PURPLE);
 
@@ -74,11 +73,11 @@ public class FireCrackerCrate extends CrateBuilder {
                 this.length++;
 
                 if (this.length == 25) {
-                    crateManager.endActiveTask(player);
+                    //crateManager.endActiveTask(player);
 
-                    QuickCrate quickCrate = new QuickCrate(key, crate, player, location);
+                    //QuickCrate quickCrate = new QuickCrate(key, crate, player, location);
 
-                    quickCrate.open(KeyType.free_key, false);
+                    //quickCrate.open(KeyType.free_key, false);
                 }
             }
         }.runTaskTimer(this.plugin, 0, 2));

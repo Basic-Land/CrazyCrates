@@ -1,8 +1,8 @@
 package com.badbones69.crazycrates.commands.relations;
 
 import com.badbones69.crazycrates.api.enums.Messages;
-import com.badbones69.crazycrates.api.utils.MsgUtils;
 import com.badbones69.crazycrates.commands.MessageManager;
+import com.badbones69.crazycrates.platform.utils.MsgUtils;
 import dev.triumphteam.cmd.bukkit.message.BukkitMessageKey;
 import dev.triumphteam.cmd.core.extention.meta.MetaKey;
 import dev.triumphteam.cmd.core.message.MessageKey;

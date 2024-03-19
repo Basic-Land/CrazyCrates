@@ -16,9 +16,9 @@ public class CommandHelp extends BaseCommand {
     @Permission("crazycrates.gui")
     public void gui(Player player) {
         if (this.config.getProperty(ConfigKeys.enable_crate_menu)) {
-            CrateMainMenu crateMainMenu = new CrateMainMenu(player, this.config.getProperty(ConfigKeys.inventory_size), this.config.getProperty(ConfigKeys.inventory_name));
+            //CrateMainMenu crateMainMenu = new CrateMainMenu(player, this.config.getProperty(ConfigKeys.inventory_size), this.config.getProperty(ConfigKeys.inventory_name));
 
-            player.openInventory(crateMainMenu.build().getInventory());
+            //player.openInventory(crateMainMenu.build().getInventory());
 
             return;
         }

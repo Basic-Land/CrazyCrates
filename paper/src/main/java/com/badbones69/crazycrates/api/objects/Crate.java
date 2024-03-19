@@ -7,8 +7,8 @@ import com.badbones69.crazycrates.api.builders.types.CrateTierMenu;
 import com.badbones69.crazycrates.api.enums.Messages;
 import com.badbones69.crazycrates.api.enums.PersistentKeys;
 import com.badbones69.crazycrates.api.events.PlayerPrizeEvent;
-import com.badbones69.crazycrates.api.utils.MiscUtils;
-import com.badbones69.crazycrates.api.utils.MsgUtils;
+import com.badbones69.crazycrates.platform.utils.MiscUtils;
+import com.badbones69.crazycrates.platform.utils.MsgUtils;
 import com.badbones69.crazycrates.support.PluginSupport;
 import com.badbones69.crazycrates.tasks.InventoryManager;
 import com.badbones69.crazycrates.tasks.crates.effects.SoundEffect;
@@ -44,7 +44,7 @@ public class Crate {
 
     private final @NotNull CrazyCratesPaper plugin = JavaPlugin.getPlugin(CrazyCratesPaper.class);
 
-    private final @NotNull InventoryManager inventoryManager = this.plugin.getInventoryManager();
+    private final @NotNull InventoryManager inventoryManager = null;
 
     private final boolean executeCommands;
     private final List<String> commands;
@@ -320,7 +320,7 @@ public class Crate {
     public Inventory getPreview(Player player, int page, boolean isTier, Tier tier) {
         CratePreviewMenu cratePreviewMenu = new CratePreviewMenu(this, player, !this.fillerToggle && (this.inventoryManager.inCratePreview(player) || this.maxPage > 1) && this.maxSlots == 9 ? this.maxSlots + 9 : this.maxSlots, page, this.previewName, isTier, tier);
 
-        return cratePreviewMenu.build().getInventory();
+        return cratePreviewMenu.build().getGui().getInventory();
     }
 
     /**
@@ -379,7 +379,7 @@ public class Crate {
     public Inventory getTierPreview(Player player) {
         CrateTierMenu crateTierMenu = new CrateTierMenu(getTiers(), this, player, !this.tierFillerToggle && (this.inventoryManager.inCratePreview(player)) && this.tierMaxSlots == 9 ? this.tierMaxSlots + 9 : this.tierMaxSlots, this.previewName);
 
-        return crateTierMenu.build().getInventory();
+        return crateTierMenu.build().getGui().getInventory();
     }
 
     /**
