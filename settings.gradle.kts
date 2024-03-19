@@ -17,6 +17,12 @@ dependencyResolutionManagement {
 
     versionCatalogs {
         create("libs") {
+            library("paperweight", "io.papermc.paperweight", "paperweight-userdev").version("1.5.11")
+
+            library("shadow", "com.github.johnrengelman", "shadow").version("8.1.1")
+
+            library("runpaper", "xyz.jpenilla", "run-task").version("2.2.3")
+
             version("adventure4", "4.16.0")
             version("cluster", "7.6")
 
@@ -34,6 +40,10 @@ dependencyResolutionManagement {
 
             library("adventure4", "net.kyori", "adventure-text-minimessage").versionRef("adventure4")
             library("minimessage4", "net.kyori", "adventure-api").versionRef("adventure4")
+
+            library("simpleyaml", "com.github.Carleslc.Simple-YAML", "Simple-Yaml").version("1.8.4")
+
+            library("arcaniax", "com.arcaniax", "HeadDatabase-API").version("1.3.0")
 
             library("itemsadder", "com.github.LoneDev6", "api-itemsadder").version("3.6.1")
 
@@ -54,3 +64,6 @@ rootProject.name = "CrazyCrates"
 include("api")
 include("paper")
 include("cluster")
+include("cluster:api")
+include("cluster:paper")
+include("cluster:buildSrc")
