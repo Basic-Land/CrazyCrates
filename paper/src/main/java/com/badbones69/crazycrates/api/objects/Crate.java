@@ -536,7 +536,7 @@ public class Crate {
         this.commands.forEach(command -> {
             String builder;
 
-            if (PluginSupport.PLACEHOLDERAPI.isPluginEnabled()) {
+            if (MiscUtils.isPapiActive()) {
                 builder = PlaceholderAPI.setPlaceholders(player, command.replaceAll("%prefix%", MsgUtils.getPrefix()).replaceAll("%player%", player.getName()));
             } else {
                 builder = command.replaceAll("%prefix%", MsgUtils.getPrefix()).replaceAll("%player%", player.getName());

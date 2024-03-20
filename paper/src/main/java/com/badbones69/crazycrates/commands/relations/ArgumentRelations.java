@@ -3,9 +3,11 @@ package com.badbones69.crazycrates.commands.relations;
 import com.badbones69.crazycrates.api.enums.Messages;
 import com.badbones69.crazycrates.commands.MessageManager;
 import com.badbones69.crazycrates.platform.utils.MsgUtils;
+import com.ryderbelserion.cluster.utils.AdvUtils;
 import dev.triumphteam.cmd.bukkit.message.BukkitMessageKey;
 import dev.triumphteam.cmd.core.extention.meta.MetaKey;
 import dev.triumphteam.cmd.core.message.MessageKey;
+import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -135,12 +137,12 @@ public class ArgumentRelations extends MessageManager {
     }
 
     @Override
-    public void send(@NotNull CommandSender sender, @NotNull String component) {
-        sender.sendMessage(parse(component));
+    public void send(@NotNull CommandSender sender, @NotNull Component component) {
+        sender.sendMessage(component);
     }
 
     @Override
-    public String parse(@NotNull String message) {
-        return MsgUtils.color(message);
+    public Component parse(@NotNull String message) {
+        return AdvUtils.parse(message);
     }
 }

@@ -72,10 +72,10 @@ public class ConfigKeys implements SettingsHolder {
     public static final Property<Boolean> toggle_metrics = newProperty("root.toggle_metrics", true);
 
     @Comment("The prefix used in commands")
-    public static final Property<String> command_prefix = newProperty("root.command_prefix", "&8[&bCrazyCrates&8]: ");
+    public static final Property<String> command_prefix = newProperty("root.command_prefix", "<dark_gray>[<light_blue>CrazyCrates<dark_gray>]: ");
 
     @Comment("The prefix used in console")
-    public static final Property<String> console_prefix = newProperty("root.console_prefix", "&8[&bCrazyCrates&8] ");
+    public static final Property<String> console_prefix = newProperty("root.console_prefix", "<dark_gray>[<light_blue>CrazyCrates<dark_gray>] ");
 
     @Comment("If /crates should open the main menu. Warning: This will remove the menu button from crate previews.")
     public static final Property<Boolean> enable_crate_menu = newProperty("gui.toggle", true);
@@ -90,7 +90,7 @@ public class ConfigKeys implements SettingsHolder {
     public static final Property<Boolean> log_to_console = newProperty("crate.log-console", false);
 
     @Comment("The name of the gui.")
-    public static final Property<String> inventory_name = newProperty("gui.inventory.name", "&b&lCrazy &4&lCrates");
+    public static final Property<String> inventory_name = newProperty("gui.inventory.name", "<bold><light_blue>Crazy <dark_red>Crates");
 
     @Comment("The size of the gui. Valid sizes are 9,18,27,36,45")
     public static final Property<Integer> inventory_size = newProperty("gui.inventory.size", 45);
@@ -141,7 +141,7 @@ public class ConfigKeys implements SettingsHolder {
     ));
 
     @Comment("The item the button should be.")
-    public static final Property<String> menu_button_item = newProperty("gui.inventory.buttons.menu.item", "COMPASS");
+    public static final Property<String> menu_button_item = newProperty("gui.inventory.buttons.menu.item", "compaass");
 
     @Comment({
             "This will disable our current functionality of our main menu button in crate previews.",
@@ -155,7 +155,7 @@ public class ConfigKeys implements SettingsHolder {
     public static final Property<List<String>> menu_button_command_list = newListProperty("gui.inventory.buttons.menu.override.list", List.of("see {player}"));
 
     @Comment("The name of the item.")
-    public static final Property<String> menu_button_name = newProperty("gui.inventory.buttons.menu.name", "&7&l>> &c&lMenu &7&l<<");
+    public static final Property<String> menu_button_name = newProperty("gui.inventory.buttons.menu.name", "<bold><light_gray>>> <red>Menu <gray><<");
 
     @Comment("The lore of the item.")
     public static final Property<List<String>> menu_button_lore = newListProperty("gui.inventory.buttons.menu.lore", List.of(
@@ -163,25 +163,25 @@ public class ConfigKeys implements SettingsHolder {
     ));
 
     @Comment("The item the button should be.")
-    public static final Property<String> next_button_item = newProperty("gui.inventory.buttons.next.item", "FEATHER");
+    public static final Property<String> next_button_item = newProperty("gui.inventory.buttons.next.item", "feather");
 
     @Comment("The name of the item.")
-    public static final Property<String> next_button_name = newProperty("gui.inventory.buttons.next.name", "&6&lNext >>");
+    public static final Property<String> next_button_name = newProperty("gui.inventory.buttons.next.name", "<bold><gold>Next >>");
 
     @Comment("The lore of the item.")
     public static final Property<List<String>> next_button_lore = newListProperty("gui.inventory.buttons.next.lore", List.of(
-            "&7&lPage: &b{page}"
+            "<bold><gray>Page:</bold> <light_blue>{page}"
     ));
 
     @Comment("The item the button should be.")
     public static final Property<String> back_button_item = newProperty("gui.inventory.buttons.back.item", "FEATHER");
 
     @Comment("The name of the item.")
-    public static final Property<String> back_button_name = newProperty("gui.inventory.buttons.back.name", "&6&l<< Back");
+    public static final Property<String> back_button_name = newProperty("gui.inventory.buttons.back.name", "<bold><gold><< Back");
 
     @Comment("The lore of the item.")
     public static final Property<List<String>> back_button_lore = newListProperty("gui.inventory.buttons.back.lore", List.of(
-            "&7&lPage: &b{page}"
+            "<bold><gray>Page:</bold> <light_blue>{page}"
     ));
 
     @Comment("Should the menu should be filled with one type of item?")

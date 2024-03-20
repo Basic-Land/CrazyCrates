@@ -1,6 +1,7 @@
 package com.badbones69.crazycrates.commands;
 
 import dev.triumphteam.cmd.bukkit.BukkitCommandManager;
+import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,8 +11,8 @@ public abstract class MessageManager {
 
     public abstract void build();
 
-    public abstract void send(@NotNull CommandSender sender, @NotNull String component);
+    public abstract void send(@NotNull CommandSender sender, @NotNull Component component);
 
-    public abstract String parse(@NotNull String message);
+    public abstract Component parse(@NotNull String message);
 
 }

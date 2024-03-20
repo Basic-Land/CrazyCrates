@@ -336,7 +336,7 @@ public class MiscUtils {
     }
 
     public static boolean isPapiActive() {
-        return PluginSupport.PLACEHOLDERAPI.isPluginEnabled();
+        return PluginSupport.placeholderapi.isPluginEnabled();
     }
 
     public static boolean useOtherRandom() {
