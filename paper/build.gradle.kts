@@ -16,7 +16,7 @@ dependencies {
 
     implementation(libs.metrics)
 
-    compileOnly(libs.holographicdisplays)
+    compileOnly(libs.bundles.adventure)
 
     compileOnly(libs.decentholograms)
 

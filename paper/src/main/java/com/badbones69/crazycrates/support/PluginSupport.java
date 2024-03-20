@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 public enum PluginSupport {
 
     DECENT_HOLOGRAMS("DecentHolograms"),
-    HOLOGRAPHIC_DISPLAYS("HolographicDisplays"),
+    cmi_holograms("CMI"),
     CMI("CMI"),
     PLACEHOLDERAPI("PlaceholderAPI"),
     ORAXEN("Oraxen"),
