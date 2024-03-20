@@ -6,12 +6,11 @@ import org.jetbrains.annotations.NotNull;
 
 public enum PluginSupport {
 
-    DECENT_HOLOGRAMS("DecentHolograms"),
+    decent_holograms("DecentHolograms"),
     cmi_holograms("CMI"),
-    CMI("CMI"),
-    PLACEHOLDERAPI("PlaceholderAPI"),
-    ORAXEN("Oraxen"),
-    ITEMS_ADDER("ItemsAdder");
+    placeholderapi("PlaceholderAPI"),
+    oraxen("Oraxen"),
+    items_adder("ItemsAdder");
 
     private final String name;
 

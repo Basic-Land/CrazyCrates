@@ -261,7 +261,7 @@ public class ItemBuilder {
     public ItemBuilder() {}
 
     private String parse(String message) {
-        if (PluginSupport.PLACEHOLDERAPI.isPluginEnabled() && this.target != null) {
+        if (PluginSupport.placeholderapi.isPluginEnabled() && this.target != null) {
             return MsgUtils.color(PlaceholderAPI.setPlaceholders(this.target, message));
         }
 
@@ -275,7 +275,7 @@ public class ItemBuilder {
      */
     public ItemStack build() {
         // Check if oraxen is enabled.
-        if (PluginSupport.ORAXEN.isPluginEnabled()) {
+        if (PluginSupport.oraxen.isPluginEnabled()) {
             // Get the item.
             io.th0rgal.oraxen.items.ItemBuilder oraxenItem = OraxenItems.getItemById(this.customMaterial);
 
@@ -607,7 +607,7 @@ public class ItemBuilder {
 
             this.material = this.itemStack.getType();
         } else {
-            if (PluginSupport.ORAXEN.isPluginEnabled()) {
+            if (PluginSupport.oraxen.isPluginEnabled()) {
                 io.th0rgal.oraxen.items.ItemBuilder oraxenItem = OraxenItems.getItemById(this.customMaterial);
 
                 if (oraxenItem != null) {

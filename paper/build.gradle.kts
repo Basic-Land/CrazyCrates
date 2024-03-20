@@ -7,12 +7,18 @@ plugins {
     alias(libs.plugins.shadow)
 }
 
+repositories {
+    maven("https://repo.oraxen.com/releases/")
+}
+
 dependencies {
     paperweight.paperDevBundle(libs.versions.bundle)
 
     implementation(libs.bundles.triumph)
 
-    implementation(libs.cluster.paper)
+    api(libs.cluster.paper) {
+        isTransitive = true
+    }
 
     implementation(libs.config.me) {
         exclude(group = "org.yaml", module = "snakeyaml")
@@ -22,9 +28,17 @@ dependencies {
 
     implementation(projects.api)
 
+    compileOnly(libs.head.database.api)
+
     compileOnly(libs.bundles.adventure)
 
     compileOnly(libs.bundles.holograms)
+
+    compileOnly(libs.placeholder.api)
+
+    compileOnly(libs.itemsadder.api)
+
+    compileOnly(libs.oraxen.api)
 
     compileOnly(libs.vault)
 
