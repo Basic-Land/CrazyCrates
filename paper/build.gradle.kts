@@ -1,39 +1,48 @@
 plugins {
-    id("paper-plugin")
+    `paper-plugin`
+
+    id("io.papermc.paperweight.userdev")
+
+    alias(libs.plugins.run.paper)
+    alias(libs.plugins.shadow)
 }
 
 dependencies {
-    implementation(project(":api"))
+    paperweight.paperDevBundle(libs.versions.bundle)
 
-    implementation(project(":cluster:paper"))
+    implementation(libs.bundles.triumph)
 
-    implementation(libs.triumphcmds)
-    implementation(libs.triumphgui)
+    implementation(libs.cluster.paper)
 
-    implementation(libs.configme) {
+    implementation(libs.config.me) {
         exclude(group = "org.yaml", module = "snakeyaml")
     }
 
     implementation(libs.metrics)
 
+    implementation(projects.api)
+
     compileOnly(libs.bundles.adventure)
 
-    compileOnly(libs.decentholograms)
+    compileOnly(libs.bundles.holograms)
 
-    compileOnly(libs.placeholderapi)
-
-    compileOnly(libs.itemsadder)
-
-    compileOnly(libs.oraxen)
+    compileOnly(libs.vault)
 
     compileOnly(fileTree("libs").include("*.jar"))
 }
 
 tasks {
+    runServer {
+        jvmArgs("-Dnet.kyori.ansi.colorLevel=truecolor")
+
+        defaultCharacterEncoding = Charsets.UTF_8.name()
+
+        minecraftVersion("1.20.4")
+    }
+
     shadowJar {
         listOf(
-            "com.ryderbelserion.cluster.paper",
-            "de.tr7zw.changeme.nbtapi",
+            "com.ryderbelserion.cluster",
             "dev.triumphteam.cmd",
             "dev.triumphteam.gui",
             "org.bstats"
