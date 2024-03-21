@@ -55,6 +55,8 @@ tasks {
     }
 
     shadowJar {
+        archiveClassifier.set("")
+
         listOf(
             "com.ryderbelserion.cluster",
             "dev.triumphteam.cmd",
