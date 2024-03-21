@@ -31,8 +31,8 @@ public class CrateTierMenu extends InventoryBuilder {
 
     private final @NotNull SettingsManager config = ConfigManager.getConfig();
 
-    public CrateTierMenu(List<Tier> tiers, Crate crate, Player player, int rows, String title) {
-        super(tiers, crate, player, rows, title);
+    public CrateTierMenu(String guiName, int rows, Player player, Crate crate, List<Tier> tiers) {
+        super(guiName, rows, player, crate, tiers);
     }
 
     @Override
@@ -109,9 +109,9 @@ public class CrateTierMenu extends InventoryBuilder {
                     this.inventoryManager.removeViewer(player);
                     this.inventoryManager.closeCratePreview(player);
 
-                    CrateMainMenu crateMainMenu = new CrateMainMenu(player, this.config.getProperty(ConfigKeys.inventory_size), this.config.getProperty(ConfigKeys.inventory_name));
+                    //CrateMainMenu crateMainMenu = new CrateMainMenu(player, this.config.getProperty(ConfigKeys.inventory_size), this.config.getProperty(ConfigKeys.inventory_name));
 
-                    player.openInventory(crateMainMenu.build().getGui().getInventory());
+                    //player.openInventory(crateMainMenu.build().getGui().getInventory());
                 }
 
                 return;

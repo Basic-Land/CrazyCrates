@@ -1,8 +1,12 @@
 package com.badbones69.crazycrates.platform.crates.objects;
 
-import com.badbones69.crazycrates.api.builders.ItemBuilder;
+import com.badbones69.crazycrates.CrazyCratesPaper;
+import com.badbones69.crazycrates.api.enums.PersistentKeys;
+import com.ryderbelserion.cluster.items.ItemBuilder;
+import com.ryderbelserion.cluster.items.ParentBuilder;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
+import org.bukkit.plugin.java.JavaPlugin;
 import us.crazycrew.crazycrates.platform.keys.KeyConfig;
 import java.util.ArrayList;
 
@@ -13,15 +17,15 @@ public class Key {
     private boolean isVirtual;
 
     public Key(KeyConfig keyConfig) {
-        this.key = new ItemBuilder()
+        this.key = ParentBuilder.of()
                 .setMaterial(keyConfig.getMaterial())
-                .setName(keyConfig.getItemName())
-                .setLore(keyConfig.getLore())
-                .setGlow(keyConfig.isGlowing())
+                .setDisplayName(keyConfig.getItemName())
+                .setDisplayLore(keyConfig.getLore())
+                .setGlowing(keyConfig.isGlowing())
                 .setUnbreakable(keyConfig.isUnbreakable())
-                .setItemFlags(new ArrayList<>() {{
-                    keyConfig.getItemFlags().forEach(flag -> add(ItemFlag.valueOf(flag)));
-                }});
+                .addItemFlags(new ArrayList<>() {{
+                    this.addAll(keyConfig.getItemFlags());
+                }}).setPlugin(JavaPlugin.getPlugin(CrazyCratesPaper.class)).setString(PersistentKeys.crate_key.getNamespacedKey(), keyConfig.getKeyName());
 
         this.keyName = keyConfig.getKeyName();
 

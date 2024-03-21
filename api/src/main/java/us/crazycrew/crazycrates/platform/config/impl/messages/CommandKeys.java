@@ -70,29 +70,29 @@ public class CommandKeys implements SettingsHolder {
     public static final Property<String> transfer_received_keys = newProperty("command.transfer.transferred-keys-received", "{prefix}<gray>You have received {amount} {crate} keys from {player}.");
 
     @Comment("A list of available placeholders: {prefix}")
-    public static final Property<String> no_virtual_keys = newProperty("command.keys.personal.no-virtual-keys", "{prefix}<bold><dark_gray>(<dark_red>!<dark_gray>) <gray>You currently do not have any virtual keys.");
+    public static final Property<String> no_virtual_keys = newProperty("command.keys.personal.no-virtual-keys", "{prefix}<bold><dark_gray>(<dark_red>!<dark_gray>)</bold> <gray>You currently do not have any virtual keys.");
 
     @Comment("A list of available placeholders: {crates_opened}")
     public static final Property<List<String>> virtual_keys_header = newListProperty("command.keys.personal.virtual-keys-header", List.of(
-            "<bold><dark_gray>(<gold>!<dark_gray>) <gray>List of your current number of keys.",
+            "<bold><dark_gray>(<gold>!<dark_gray>)</bold> <gray>List of your current number of keys.",
             " <yellow> -> Total Crates Opened: <red>{crates_opened}"
     ));
 
     @Comment("A list of available placeholders: {prefix}, {player}")
-    public static final Property<String> other_player_no_keys = newProperty("command.keys.other-player.no-virtual-keys", "{prefix}<bold><dark_gray>(<dark_red>!<dark_gray>) <gray>The player {player} does not have any keys.");
+    public static final Property<String> other_player_no_keys = newProperty("command.keys.other-player.no-virtual-keys", "{prefix}<bold><dark_gray>(<dark_red>!<dark_gray>)</bold> <gray>The player {player} does not have any keys.");
 
     @Comment("A list of available placeholders: {player}, {crates_opened}")
     public static final Property<List<String>> other_player_header = newListProperty("command.keys.other-player.virtual-keys-header", List.of(
-            "<bold><dark_gray>(<gold>!<dark_gray>) <gray>List of {player}''s current number of keys.",
+            "<bold><dark_gray>(<gold>!<dark_gray>)</bold> <gray>List of {player}''s current number of keys.",
             " <yellow> -> Total Crates Opened: <red>{crates_opened}"
     ));
 
     @Comment("A list of available placeholders: {crate}, {keys}, {crate_opened}")
-    public static final Property<String> per_crate = newProperty("command.keys.crate-format", "{crate} <bold><gray>><dark_gray>> <gold>{keys} keys <gray>: Opened <gold>{crate_opened} times");
+    public static final Property<String> per_crate = newProperty("command.keys.crate-format", "{crate} <bold><gray>><dark_gray>></bold> <gold>{keys} keys <gray>: Opened <gold>{crate_opened} times");
 
     @Comment("This requires crazycrates.command.help")
     public static final Property<List<String>> help = newListProperty("command.player-help", List.of(
-            "<bold><yellow>Crazy Crates Player Help",
+            "<bold><yellow>Crazy Crates Player Help</bold>",
             "<gold>/keys view [player] <gray>- <yellow>Check the number of keys a player has.",
             "<gold>/keys <gray>- <yellow>Shows how many keys you have.",
             "<gold>/cc <gray>- <yellow>Opens the menu."
@@ -100,7 +100,7 @@ public class CommandKeys implements SettingsHolder {
 
     @Comment("This requires crazycrates.command.admin.help")
     public static final Property<List<String>> admin_help = newListProperty("command.admin-help", List.of(
-            "<bold><red>Crazy Crates Admin Help",
+            "<bold><red>Crazy Crates Admin Help</bold>",
             "",
             "<gold>/cc additem <crate_name> <prize_number> <chance> [tier] <gray>- <yellow>Add items in-game to a prize in a crate including Cosmic/Casino.",
             "<gold>/cc preview <crate_name> [player] <gray>- <yellow>Opens the preview of a crate for a player.",

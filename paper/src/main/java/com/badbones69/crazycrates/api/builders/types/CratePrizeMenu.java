@@ -6,8 +6,8 @@ import com.badbones69.crazycrates.api.builders.InventoryBuilder;
 
 public class CratePrizeMenu extends InventoryBuilder {
 
-    public CratePrizeMenu(Crate crate, Player player, int rows, String title) {
-        super(crate, player, rows, title);
+    public CratePrizeMenu(String title, int rows, Player player, Crate crate) {
+        super(title, rows, player, crate);
     }
 
     @Override

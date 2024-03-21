@@ -181,6 +181,6 @@ public enum Messages {
             return AdvUtils.parse(PlaceholderAPI.setPlaceholders(player, message));
         }
 
-        return AdvUtils.parse(this.message);
+        return AdvUtils.parse(message);
     }
 }

@@ -33,8 +33,8 @@ public class CratePreviewMenu extends InventoryBuilder {
     private final boolean isTier;
     private final Tier tier;
 
-    public CratePreviewMenu(Crate crate, Player player, int rows, int page, String title, boolean isTier, Tier tier) {
-        super(crate, player, rows, page, title);
+    public CratePreviewMenu(String guiName, int rows, int page, Player player, Crate crate, boolean isTier, Tier tier) {
+        super(guiName, rows, page, player, crate);
 
         this.isTier = isTier;
         this.tier = tier;
@@ -178,9 +178,9 @@ public class CratePreviewMenu extends InventoryBuilder {
                     this.inventoryManager.removeViewer(player);
                     this.inventoryManager.closeCratePreview(player);
 
-                    CrateMainMenu crateMainMenu = new CrateMainMenu(player, this.config.getProperty(ConfigKeys.inventory_size), this.config.getProperty(ConfigKeys.inventory_name));
+                    //CrateMainMenu crateMainMenu = new CrateMainMenu(player, this.config.getProperty(ConfigKeys.inventory_size), this.config.getProperty(ConfigKeys.inventory_name));
 
-                    player.openInventory(crateMainMenu.build().getGui().getInventory());
+                    //player.openInventory(crateMainMenu.build().getGui().getInventory());
                 }
 
                 return;

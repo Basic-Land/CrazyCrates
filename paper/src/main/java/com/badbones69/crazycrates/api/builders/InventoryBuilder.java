@@ -18,62 +18,60 @@ import us.crazycrew.crazycrates.platform.config.ConfigManager;
 import us.crazycrew.crazycrates.platform.config.impl.ConfigKeys;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.InventoryView;
 import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
-@SuppressWarnings("ALL")
 public abstract class InventoryBuilder {
 
     protected final @NotNull CrazyCratesPaper plugin = JavaPlugin.getPlugin(CrazyCratesPaper.class);
 
-    private @NotNull Gui gui;
+    private Component title;
+    private List<Tier> tiers;
+    private final Gui gui;
     private Player player;
-    private String title;
-    private Component newTitle;
+    private String guiName;
     private Crate crate;
     private int rows;
     private int page;
-    private List<Tier> tiers;
 
-    public InventoryBuilder(Player player, int rows, String title) {
-        this.title = title;
+    public InventoryBuilder(String guiName, int rows, Player player) {
+        this.guiName = guiName;
         this.player = player;
         this.rows = rows;
 
-        Component inventoryTitle = MiscUtils.isPapiActive() ? AdvUtils.parse(PlaceholderAPI.setPlaceholders(getPlayer(), this.title)) : AdvUtils.parse(this.title);
+        this.title = MiscUtils.isPapiActive() ? AdvUtils.parse(PlaceholderAPI.setPlaceholders(getPlayer(), this.guiName)) : AdvUtils.parse(this.guiName);
 
-        this.gui = Gui.gui().title(inventoryTitle).rows(this.rows).apply(consumer -> consumer.setDefaultTopClickAction(event -> event.setCancelled(true))).create();
+        this.gui = Gui.gui().title(this.title).rows(this.rows).apply(consumer -> consumer.setDefaultTopClickAction(event -> event.setCancelled(true))).create();
     }
 
-    public InventoryBuilder(Crate crate, Player player, int rows, String title) {
-        this.title = title;
+    public InventoryBuilder(String guiName, int rows, Player player, Crate crate) {
+        this.guiName = guiName;
         this.player = player;
         this.rows = rows;
 
         this.crate = crate;
 
-        Component inventoryTitle = MiscUtils.isPapiActive() ? AdvUtils.parse(PlaceholderAPI.setPlaceholders(getPlayer(), this.title)) : AdvUtils.parse(this.title);
+        this.title = MiscUtils.isPapiActive() ? AdvUtils.parse(PlaceholderAPI.setPlaceholders(getPlayer(), this.guiName)) : AdvUtils.parse(this.guiName);
 
-        this.gui = Gui.gui().title(inventoryTitle).rows(this.rows).apply(consumer -> consumer.setDefaultTopClickAction(event -> event.setCancelled(true))).create();
+        this.gui = Gui.gui().title(this.title).rows(this.rows).apply(consumer -> consumer.setDefaultTopClickAction(event -> event.setCancelled(true))).create();
     }
 
-    public InventoryBuilder(Crate crate, Player player, int rows, int page, String title) {
-        this.title = title;
+    public InventoryBuilder(String guiName, int rows, int page, Player player, Crate crate) {
+        this.guiName = guiName;
         this.player = player;
         this.rows = rows;
         this.page = page;
 
         this.crate = crate;
 
-        Component inventoryTitle = MiscUtils.isPapiActive() ? AdvUtils.parse(PlaceholderAPI.setPlaceholders(getPlayer(), this.title)) : AdvUtils.parse(this.title);
+        this.title = MiscUtils.isPapiActive() ? AdvUtils.parse(PlaceholderAPI.setPlaceholders(getPlayer(), this.guiName)) : AdvUtils.parse(this.guiName);
 
-        this.gui = Gui.gui().title(inventoryTitle).rows(this.rows).apply(consumer -> consumer.setDefaultTopClickAction(event -> event.setCancelled(true))).create();
+        this.gui = Gui.gui().title(this.title).rows(this.rows).apply(consumer -> consumer.setDefaultTopClickAction(event -> event.setCancelled(true))).create();
     }
 
-    public InventoryBuilder(List<Tier> tiers, Crate crate, Player player, int rows, String title) {
-        this.title = title;
+    public InventoryBuilder(String guiName, int rows, Player player, Crate crate, List<Tier> tiers) {
+        this.guiName = guiName;
         this.player = player;
         this.rows = rows;
 
@@ -81,9 +79,9 @@ public abstract class InventoryBuilder {
 
         this.tiers = tiers;
 
-        Component inventoryTitle = MiscUtils.isPapiActive() ? AdvUtils.parse(PlaceholderAPI.setPlaceholders(getPlayer(), this.title)) : AdvUtils.parse(this.title);
+        this.title = MiscUtils.isPapiActive() ? AdvUtils.parse(PlaceholderAPI.setPlaceholders(getPlayer(), this.guiName)) : AdvUtils.parse(this.guiName);
 
-        this.gui = Gui.gui().title(inventoryTitle).rows(this.rows).apply(consumer -> consumer.setDefaultTopClickAction(event -> event.setCancelled(true))).create();
+        this.gui = Gui.gui().title(this.title).rows(this.rows).apply(consumer -> consumer.setDefaultTopClickAction(event -> event.setCancelled(true))).create();
     }
 
     public boolean overrideMenu() {
@@ -138,12 +136,12 @@ public abstract class InventoryBuilder {
         return this.crate;
     }
 
-    public void title(String title) {
-        this.title = title;
+    public void setGuiName(String guiName) {
+        this.guiName = guiName;
     }
 
-    public boolean contains(String message) {
-        return this.title.contains(message);
+    public boolean containsString(String message) {
+        return this.guiName.contains(message);
     }
 
     public Player getPlayer() {
@@ -159,9 +157,7 @@ public abstract class InventoryBuilder {
     }
 
     public @NotNull GuiItem getItem(ItemStack itemStack, @NotNull final GuiAction<InventoryClickEvent> action) {
-        return ItemBuilder.from(itemStack).asGuiItem(event -> {
-
-        });
+        return ItemBuilder.from(itemStack).asGuiItem(action);
     }
 
     public @NotNull GuiItem getItem(ItemStack itemStack) {

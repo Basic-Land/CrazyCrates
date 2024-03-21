@@ -1,5 +1,6 @@
 package com.badbones69.crazycrates;
 
+import com.badbones69.crazycrates.commands.CommandManager;
 import com.badbones69.crazycrates.platform.PaperServer;
 import com.badbones69.crazycrates.platform.crates.CrateManager;
 import com.badbones69.crazycrates.platform.crates.KeyManager;
@@ -28,34 +29,36 @@ public class CrazyCratesPaper extends JavaPlugin {
         this.factory = new ClusterFactory(this);
         this.factory.setLogging(MiscUtils.isLogging());
 
-        this.fileManager = new FileManager();
-
-        this.fileManager.addStaticFile("locations.yml").addStaticFile("data.yml").create();
+        Path cratesDirectory = new File(getDataFolder(), "crates").toPath();
+        Path keysDirectory = new File(getDataFolder(), "keys").toPath();
 
         List.of(
                 "CrateExample.yml",
                 "WarCrateExample.yml",
                 "QuadCrateExample.yml",
                 "QuickCrateExample.yml"
-        ).forEach(file -> this.factory.copyFile(new File(getDataFolder(), "crates").toPath(), file));
+        ).forEach(file -> this.factory.copyFile(cratesDirectory, file));
 
-        Path directory = new File(getDataFolder(), "keys").toPath();
+        List.of(
+                "CasinoKey.yml",
+                "DiamondKey.yml"
+        ).forEach(file -> this.factory.copyFile(keysDirectory, file));
 
-        this.factory.copyFile(directory, "CasinoKey.yml");
-        this.factory.copyFile(directory, "DiamondKey.yml");
+        this.fileManager = new FileManager();
+        this.fileManager.addStaticFile("locations.yml").addStaticFile("data.yml").create();
     }
 
     @Override
     public void onEnable() {
-        //this.crateManager = new CrateManager();
-        //this.crateManager.load();
+        this.crateManager = new CrateManager();
+        this.crateManager.load();
 
-        //this.keyManager = new KeyManager();
-        //this.keyManager.load();
+        this.keyManager = new KeyManager();
+        this.keyManager.load();
 
-        //this.userManager = new UserManager();
+        this.userManager = new UserManager();
 
-        //CommandManager.load();
+        CommandManager.load();
     }
 
     @Override

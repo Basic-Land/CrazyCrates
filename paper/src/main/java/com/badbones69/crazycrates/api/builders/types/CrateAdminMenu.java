@@ -2,6 +2,7 @@ package com.badbones69.crazycrates.api.builders.types;
 
 import com.badbones69.crazycrates.api.enums.Messages;
 import com.badbones69.crazycrates.api.enums.Permissions;
+import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.platform.crates.KeyManager;
 import com.badbones69.crazycrates.platform.crates.UserManager;
 import com.badbones69.crazycrates.platform.crates.objects.Key;
@@ -26,8 +27,8 @@ public class CrateAdminMenu extends InventoryBuilder {
     private final @NotNull UserManager userManager = this.plugin.getUserManager();
     private final @NotNull KeyManager keyManager = this.plugin.getKeyManager();
 
-    public CrateAdminMenu(Player player, int rows, String title) {
-        super(player, rows, title);
+    public CrateAdminMenu(String title, int rows, Player player) {
+        super(title, rows, player);
     }
 
     @Override
@@ -35,11 +36,11 @@ public class CrateAdminMenu extends InventoryBuilder {
         Gui gui = getGui();
 
         ItemStack button = ParentBuilder.of(Material.CHEST)
-                .setDisplayName("<red>What is this menu?")
+                .setDisplayName("<#e91e63:#fe909a>What is this menu?")
                 .addDisplayLore("")
-                .addDisplayLore("<purple>A cheat cheat menu of all your available keys.")
-                .addDisplayLore("<gray><bold>Right click to get 8 keys.")
-                .addDisplayLore("<gray><bold>Left click to get 1 key.").build();
+                .addDisplayLore("<red>A cheat sheet menu of all your available keys.")
+                .addDisplayLore("<gold>Right click to get <bold><red>8</bold> <gold>keys.")
+                .addDisplayLore("<gold>Left click to get <bold><red>1</bold> <gold>key.").build();
 
         gui.setItem(49, getItem(button));
 
@@ -76,16 +77,18 @@ public class CrateAdminMenu extends InventoryBuilder {
                         player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1f, 1f);
 
                         placeholders.put("{keytype}", KeyType.physical_key.getFriendlyName());
+                        placeholders.put("{amount}", "1");
 
                         player.sendActionBar(Messages.obtaining_keys.getMessage(placeholders, player));
                     }
 
-                    case SHIFT_LEFT -> {
+                    case RIGHT -> {
                         this.userManager.addKeys(player.getUniqueId(), key.getKeyName(), key.isVirtual(), 8);
 
                         player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1f, 1f);
 
                         placeholders.put("{keytype}", KeyType.physical_key.getFriendlyName());
+                        placeholders.put("{amount}", "8");
 
                         player.sendActionBar(Messages.obtaining_keys.getMessage(placeholders, player));
                     }

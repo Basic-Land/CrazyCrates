@@ -59,7 +59,7 @@ public abstract class CrateBuilder extends BukkitRunnable {
         this.player = player;
         this.size = size;
 
-        this.builder = new CratePrizeMenu(crate, player, size, crate.getPreviewName());
+        this.builder = new CratePrizeMenu(crate.getPreviewName(), size, player, crate);
         this.inventory = this.builder.build().getGui().getInventory();
     }
 
@@ -86,7 +86,7 @@ public abstract class CrateBuilder extends BukkitRunnable {
         this.player = player;
         this.size = size;
 
-        this.builder = new CratePrizeMenu(crate, player, size, crateName);
+        this.builder = new CratePrizeMenu(crateName, size, player, crate);
         this.inventory = this.builder.build().getGui().getInventory();
     }
 
@@ -114,7 +114,7 @@ public abstract class CrateBuilder extends BukkitRunnable {
         this.player = player;
         this.size = size;
 
-        this.builder = new CratePrizeMenu(crate, player, size, crate.getPreviewName());
+        this.builder = new CratePrizeMenu(crate.getPreviewName(), size, player, crate);
         this.inventory = this.builder.build().getGui().getInventory();
     }
 
