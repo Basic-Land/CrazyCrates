@@ -25,6 +25,8 @@ dependencies {
 
     compileOnly(libs.oraxen)
 
+    compileOnly ("org.projectlombok:lombok:1.18.26")
+    annotationProcessor ("org.projectlombok:lombok:1.18.26")
     compileOnly(fileTree("libs").include("*.jar"))
 }
 

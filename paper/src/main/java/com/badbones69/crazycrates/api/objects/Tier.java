@@ -2,6 +2,7 @@ package com.badbones69.crazycrates.api.objects;
 
 import com.badbones69.crazycrates.api.enums.PersistentKeys;
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
+import cz.basicland.blibs.spigot.utils.item.CustomItemStack;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -17,7 +18,7 @@ public class Tier {
     private final String name;
     private final List<String> lore;
     private final String coloredName;
-    private final int chance;
+    private final double chance;
     private final int slot;
 
     public Tier(String tier, ConfigurationSection section) {
@@ -33,6 +34,16 @@ public class Tier {
         this.maxRange = section.getInt("MaxRange", 100);
 
         this.slot = section.getInt("Slot");
+    }
+
+    public Tier(String tier, double chance, int slot, CustomItemStack stack) {
+        this.name = tier;
+        this.coloredName = stack.getTitle();
+        this.lore = stack.getLore();
+        this.item = new ItemBuilder(stack.getStack());
+        this.chance = chance;
+        this.maxRange = 100;
+        this.slot = slot;
     }
     
     /**
@@ -59,7 +70,7 @@ public class Tier {
     /**
      * @return the chance of being picked.
      */
-    public int getChance() {
+    public double getChance() {
         return this.chance;
     }
     

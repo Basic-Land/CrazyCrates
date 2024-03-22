@@ -2,61 +2,58 @@ package com.badbones69.crazycrates.tasks.crates;
 
 import ch.jalu.configme.SettingsManager;
 import com.Zrips.CMI.Modules.ModuleHandling.CMIModule;
+import com.badbones69.crazycrates.CrazyCratesPaper;
+import com.badbones69.crazycrates.api.ChestManager;
 import com.badbones69.crazycrates.api.FileManager;
 import com.badbones69.crazycrates.api.FileManager.Files;
 import com.badbones69.crazycrates.api.builders.CrateBuilder;
-import com.badbones69.crazycrates.api.objects.other.BrokeLocation;
-import com.badbones69.crazycrates.api.ChestManager;
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
-import com.badbones69.crazycrates.api.utils.MiscUtils;
-import com.badbones69.crazycrates.tasks.crates.types.*;
-import com.badbones69.crazycrates.tasks.crates.types.CasinoCrate;
-import com.badbones69.crazycrates.tasks.crates.types.CsgoCrate;
-import org.apache.commons.lang.WordUtils;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.permissions.Permission;
-import org.bukkit.permissions.PermissionDefault;
-import org.bukkit.persistence.PersistentDataContainer;
-import us.crazycrew.crazycrates.api.enums.types.CrateType;
-import us.crazycrew.crazycrates.api.enums.types.KeyType;
-import com.badbones69.crazycrates.api.enums.PersistentKeys;
-import org.bukkit.scheduler.BukkitTask;
-import us.crazycrew.crazycrates.platform.config.ConfigManager;
-import us.crazycrew.crazycrates.platform.config.impl.ConfigKeys;
 import com.badbones69.crazycrates.api.builders.types.CrateMainMenu;
 import com.badbones69.crazycrates.api.enums.Messages;
-import com.badbones69.crazycrates.support.holograms.HologramManager;
+import com.badbones69.crazycrates.api.enums.PersistentKeys;
 import com.badbones69.crazycrates.api.objects.Crate;
-import com.badbones69.crazycrates.api.objects.other.CrateLocation;
 import com.badbones69.crazycrates.api.objects.Prize;
 import com.badbones69.crazycrates.api.objects.Tier;
+import com.badbones69.crazycrates.api.objects.gacha.PlayerDataManager;
+import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
+import com.badbones69.crazycrates.api.objects.gacha.gacha.GachaSystem;
+import com.badbones69.crazycrates.api.objects.other.BrokeLocation;
+import com.badbones69.crazycrates.api.objects.other.CrateLocation;
+import com.badbones69.crazycrates.api.utils.ItemUtils;
+import com.badbones69.crazycrates.api.utils.MiscUtils;
+import com.badbones69.crazycrates.support.PluginSupport;
+import com.badbones69.crazycrates.support.holograms.HologramManager;
+import com.badbones69.crazycrates.support.holograms.types.CMIHologramsSupport;
+import com.badbones69.crazycrates.support.holograms.types.DecentHologramsSupport;
+import com.badbones69.crazycrates.support.holograms.types.HolographicDisplaysSupport;
+import com.badbones69.crazycrates.tasks.crates.types.*;
+import cz.basicland.blibs.shared.dataholder.Config;
+import lombok.Getter;
+import org.apache.commons.lang.WordUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionDefault;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import us.crazycrew.crazycrates.api.crates.CrateHologram;
 import us.crazycrew.crazycrates.api.crates.quadcrates.CrateSchematic;
-import com.badbones69.crazycrates.CrazyCratesPaper;
-import com.badbones69.crazycrates.support.holograms.types.CMIHologramsSupport;
-import com.badbones69.crazycrates.support.holograms.types.DecentHologramsSupport;
-import com.badbones69.crazycrates.support.holograms.types.HolographicDisplaysSupport;
-import com.badbones69.crazycrates.support.PluginSupport;
-import com.badbones69.crazycrates.api.utils.ItemUtils;
+import us.crazycrew.crazycrates.api.enums.types.CrateType;
+import us.crazycrew.crazycrates.api.enums.types.KeyType;
+import us.crazycrew.crazycrates.platform.config.ConfigManager;
+import us.crazycrew.crazycrates.platform.config.impl.ConfigKeys;
+
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.TimerTask;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 
 public class CrateManager {
@@ -73,6 +70,10 @@ public class CrateManager {
     private final Map<UUID, Location> cratesInUse = new HashMap<>();
     private final List<String> brokeCrates = new ArrayList<>();
     private final List<Crate> crates = new ArrayList<>();
+    @Getter
+    private PlayerDataManager playerDataManager;
+    @Getter
+    private final GachaSystem gachaSystem = new GachaSystem();;
 
     private HologramManager holograms;
 
@@ -142,7 +143,7 @@ public class CrateManager {
                 Player player = this.plugin.getServer().getPlayer(uuid);
 
                 if (player != null) {
-                    this.plugin.getInventoryManager().openNewCratePreview(player, crate);
+                    this.plugin.getInventoryManager().openNewCratePreview(player, crate, CrateType.hasTiers(crate.getCrateType()));
                 }
             }
 
@@ -193,10 +194,17 @@ public class CrateManager {
                 int maxMassOpen = file.getInt("Crate.Max-Mass-Open", 10);
                 int requiredKeys = file.getInt("Crate.RequiredKeys", 0);
 
-                ConfigurationSection section = file.getConfigurationSection("Crate.Tiers");
+                ConfigurationSection gachaSection = file.getConfigurationSection("Crate.Gacha");
+                CrateSettings crateSettings = null;
+                if (gachaSection != null) {
+                    Config config = Config.loadFromString(file.saveToString());
+                    crateSettings = new CrateSettings(config, crateName, prizes, tiers);
+                }
 
-                if (file.contains("Crate.Tiers") && section != null) {
-                    for (String tier : section.getKeys(false)) {
+                ConfigurationSection tiersSection = file.getConfigurationSection("Crate.Tiers");
+
+                if (file.contains("Crate.Tiers") && tiersSection != null) {
+                    for (String tier : tiersSection.getKeys(false)) {
                         String path = "Crate.Tiers." + tier;
 
                         ConfigurationSection tierSection = file.getConfigurationSection(path);
@@ -207,7 +215,7 @@ public class CrateManager {
                     }
                 }
 
-                boolean isTiersEmpty = crateType == CrateType.cosmic || crateType == CrateType.casino;
+                boolean isTiersEmpty = CrateType.hasTiers(crateType);
 
                 if (isTiersEmpty && tiers.isEmpty()) {
                     this.brokeCrates.add(crateName);
@@ -259,10 +267,8 @@ public class CrateManager {
 
                 List<String> prizeMessage = file.contains("Crate.Prize-Message") ? file.getStringList("Crate.Prize-Message") : Collections.emptyList();
 
-                List<String> prizeCommands = file.contains("Crate.Prize-Commands") ? file.getStringList("Crate.Prize-Commands") : Collections.emptyList();
-
                 CrateHologram holo = new CrateHologram(file.getBoolean("Crate.Hologram.Toggle"), file.getDouble("Crate.Hologram.Height", 0.0), file.getInt("Crate.Hologram.Range", 8), file.getStringList("Crate.Hologram.Message"));
-                addCrate(new Crate(crateName, previewName, crateType, getKey(file), file.getString("Crate.PhysicalKey.Name"), prizes, file, newPlayersKeys, tiers, maxMassOpen, requiredKeys, prizeMessage, prizeCommands, holo));
+                addCrate(new Crate(crateName, previewName, crateType, getKey(file), file.getString("Crate.PhysicalKey.Name"), prizes, file, newPlayersKeys, tiers, maxMassOpen, requiredKeys, prizeMessage, holo, crateSettings));
 
                 Permission doesExist = this.plugin.getServer().getPluginManager().getPermission("crazycrates.open." + crateName);
 
@@ -281,7 +287,9 @@ public class CrateManager {
             }
         }
 
-        addCrate(new Crate("Menu", "Menu", CrateType.menu, new ItemStack(Material.AIR), "", new ArrayList<>(), null, 0, null, 0, 0, Collections.emptyList(), Collections.emptyList(), null));
+        addCrate(new Crate("Menu", "Menu", CrateType.menu, new ItemStack(Material.AIR), "", new ArrayList<>(), null, 0, null, 0, 0, Collections.emptyList(), null, null));
+
+        this.playerDataManager = new PlayerDataManager(getCrates().stream().map(Crate::getCrateSettings).filter(Objects::nonNull).toList());
 
         if (MiscUtils.isLogging()) {
             List.of(
@@ -413,6 +421,7 @@ public class CrateManager {
             case roulette -> crateBuilder = new RouletteCrate(crate, player, 45);
             case war -> crateBuilder = new WarCrate(crate, player, 9);
             case cosmic -> crateBuilder = new CosmicCrate(crate, player, 27);
+            case gacha -> crateBuilder = new GachaCrate(crate, player, 45);
             case quad_crate -> {
                 if (virtualCrate) {
                     Map<String, String> placeholders = new HashMap<>();
@@ -928,12 +937,9 @@ public class CrateManager {
      * @return a crate if is a key from a crate otherwise null if it is not.
      */
     public Crate getCrateFromKey(ItemStack item) {
-        if (!item.hasItemMeta() && !MiscUtils.legacyChecks()) return null;
+        if (!item.hasItemMeta()) return null;
 
         ItemMeta itemMeta = item.getItemMeta();
-
-        // If null, return.
-        if (itemMeta == null) return null;
 
         if (!itemMeta.getPersistentDataContainer().has(PersistentKeys.crate_key.getNamespacedKey())) {
             return getCrateNameFromOldKey(itemMeta);

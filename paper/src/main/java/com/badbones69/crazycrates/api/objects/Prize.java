@@ -1,8 +1,9 @@
 package com.badbones69.crazycrates.api.objects;
 
-import com.badbones69.crazycrates.api.enums.PersistentKeys;
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
+import com.badbones69.crazycrates.api.enums.PersistentKeys;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
+import cz.basicland.blibs.spigot.utils.item.CustomItemStack;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -14,8 +15,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.trim.TrimMaterial;
 import org.bukkit.inventory.meta.trim.TrimPattern;
-import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -77,6 +78,31 @@ public class Prize {
         }
 
         this.displayItem = display();
+    }
+
+    public Prize(String prizeName, String prizeNumber, String crateName, Tier tier, CustomItemStack stack) {
+        this.section = null;
+
+        this.prizeNumber = prizeNumber;
+
+        this.crateName = crateName;
+
+        this.builders = Collections.singletonList(new ItemBuilder(stack.getStack()));
+
+        this.tiers = Collections.singletonList(tier);
+
+        this.alternativePrize = null;
+
+        this.prizeName = prizeName;
+        this.maxRange = 100;
+        this.chance = 100;
+        this.firework = false;
+
+        this.messages = Collections.emptyList();
+        this.commands = Collections.emptyList();
+
+        this.permissions = Collections.emptyList();
+        this.displayItem = new ItemBuilder(stack.getStack());
     }
 
     /**

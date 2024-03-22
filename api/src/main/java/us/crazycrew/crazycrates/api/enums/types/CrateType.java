@@ -55,7 +55,8 @@ public enum CrateType {
     /**
      * Definitely going to war over what you win.
      */
-    war("War");
+    war("War"),
+    gacha("Gacha");
     
     private final String name;
 
@@ -80,6 +81,10 @@ public enum CrateType {
         }
 
         return null;
+    }
+
+    public static boolean hasTiers(CrateType type) {
+        return type == cosmic || type == casino || type == gacha;
     }
 
     /**

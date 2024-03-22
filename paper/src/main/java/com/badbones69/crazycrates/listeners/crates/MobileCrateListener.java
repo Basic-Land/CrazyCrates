@@ -22,8 +22,6 @@ import org.jetbrains.annotations.NotNull;
 import us.crazycrew.crazycrates.api.enums.types.CrateType;
 import com.badbones69.crazycrates.api.utils.ItemUtils;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
-import us.crazycrew.crazycrates.platform.config.ConfigManager;
-import us.crazycrew.crazycrates.platform.config.impl.ConfigKeys;
 
 public class MobileCrateListener implements Listener {
 
@@ -45,7 +43,7 @@ public class MobileCrateListener implements Listener {
 
         if (item.getType() == Material.AIR) return;
 
-        if (!item.hasItemMeta() && !MiscUtils.legacyChecks()) return;
+        if (!item.hasItemMeta()) return;
 
         ItemMeta itemMeta = item.getItemMeta();
 
@@ -57,7 +55,7 @@ public class MobileCrateListener implements Listener {
 
         if (crate.getCrateType() != CrateType.crate_on_the_go) return;
 
-        if (!ItemUtils.isSimilar(item, crate)) return;
+        if (!this.crateManager.isKeyFromCrate(item, crate)) return;
 
         event.setCancelled(true);
 

@@ -51,11 +51,11 @@ public class WonderCrate extends CrateBuilder {
             return;
         }
 
-        final List<String> slots = new ArrayList<>();
+        final List<Integer> slots = new ArrayList<>();
 
         for (int index = 0; index < getSize(); index++) {
             Prize prize = getCrate().pickPrize(getPlayer());
-            slots.add(String.valueOf(index));
+            slots.add(index);
 
             setItem(index, prize.getDisplayItem(getPlayer()));
         }
@@ -76,8 +76,8 @@ public class WonderCrate extends CrateBuilder {
             @Override
             public void run() {
                 if (this.time >= 2 && this.full <= 65) {
-                    slots.remove(this.slot1 + "");
-                    slots.remove(this.slot2 + "");
+                    slots.remove((Object) this.slot1);
+                    slots.remove((Object) this.slot2);
 
                     other.add(this.slot1);
                     other.add(this.slot2);
@@ -87,9 +87,9 @@ public class WonderCrate extends CrateBuilder {
                     setItem(this.slot1, material);
                     setItem(this.slot2, material);
 
-                    for (String slot : slots) {
+                    for (int slot : slots) {
                         this.prize = getCrate().pickPrize(getPlayer());
-                        setItem(Integer.parseInt(slot), this.prize.getDisplayItem(getPlayer()));
+                        setItem(slot, this.prize.getDisplayItem(getPlayer()));
                     }
 
                     this.slot1++;

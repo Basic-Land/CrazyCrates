@@ -392,7 +392,6 @@ public class MigrationManager {
                 .replaceAll("%world%", "{world}")
                 .replaceAll("%crate%", "{crate}")
                 .replaceAll("%key%", "{key}")
-                .replaceAll("%keys%", "{keys}")
                 .replaceAll("%cratetype%", "{cratetype}")
                 .replaceAll("%player%", "{player}")
                 .replaceAll("%prize%", "{prize}")

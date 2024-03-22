@@ -17,7 +17,6 @@ import com.badbones69.crazycrates.api.utils.MsgUtils;
 import java.util.List;
 import static java.util.regex.Matcher.quoteReplacement;
 
-@SuppressWarnings("ALL")
 public abstract class InventoryBuilder implements InventoryHolder {
 
     @NotNull

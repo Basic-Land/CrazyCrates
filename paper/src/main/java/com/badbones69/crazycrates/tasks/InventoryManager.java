@@ -101,10 +101,10 @@ public class InventoryManager {
 
     private final Map<UUID, Crate> crateViewers = new HashMap<>();
 
-    public void openNewCratePreview(Player player, Crate crate) {
+    public void openNewCratePreview(Player player, Crate crate, boolean isTierPreview) {
         this.crateViewers.put(player.getUniqueId(), crate);
 
-        if (crate.isPreviewTierToggle()) {
+        if (isTierPreview) {
             player.openInventory(crate.getTierPreview(player));
             return;
         }

@@ -6,6 +6,7 @@ jars
 common/build
 paper/build
 api/build
+paper/libs/bLibs-2.0.0-WIP.jar
 
 common/.gradle
 api/.gradle

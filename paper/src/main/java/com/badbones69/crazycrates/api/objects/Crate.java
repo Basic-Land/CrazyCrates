@@ -3,6 +3,7 @@ package com.badbones69.crazycrates.api.objects;
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.builders.types.CrateTierMenu;
 import com.badbones69.crazycrates.api.enums.PersistentKeys;
+import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.tasks.crates.effects.SoundEffect;
 import org.bukkit.SoundCategory;
 import org.bukkit.configuration.ConfigurationSection;
@@ -36,7 +37,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 
 public class Crate {
-    
+
+    private final CrateSettings crateSettings;
     private AbstractCrateManager manager;
     private final String name;
     private final String keyName;
@@ -79,8 +81,6 @@ public class Crate {
     private final int requiredKeys;
     private final List<String> prizeMessage;
 
-    private final List<String> prizeCommands;
-
     /**
      * @param name The name of the crate.
      * @param crateType The crate type of the crate.
@@ -88,9 +88,10 @@ public class Crate {
      * @param prizes The prizes that can be won.
      * @param file The crate file.
      */
-    public Crate(String name, String previewName, CrateType crateType, ItemStack key, String keyName, List<Prize> prizes, FileConfiguration file, int newPlayerKeys, List<Tier> tiers, int maxMassOpen, int requiredKeys, List<String> prizeMessage, List<String> prizeCommands, CrateHologram hologram) {
-        this.keyNoNBT = ItemBuilder.convertItemStack(key).build();
+    public Crate(String name, String previewName, CrateType crateType, ItemStack key, String keyName, List<Prize> prizes, FileConfiguration file, int newPlayerKeys, List<Tier> tiers, int maxMassOpen, int requiredKeys, List<String> prizeMessage, CrateHologram hologram, CrateSettings crateSetting) {
+        this.crateSettings = crateSetting;
         this.keyBuilder = ItemBuilder.convertItemStack(key).setCrateName(name);
+        this.keyNoNBT = this.keyBuilder.build();
         this.keyName = keyName;
 
         this.file = file;
@@ -99,7 +100,6 @@ public class Crate {
         this.maxMassOpen = maxMassOpen;
         this.requiredKeys = requiredKeys;
         this.prizeMessage = prizeMessage;
-        this.prizeCommands = prizeCommands;
         this.prizes = prizes;
         this.crateType = crateType;
         this.preview = getPreviewItems();
@@ -231,10 +231,6 @@ public class Crate {
 
     public List<String> getPrizeMessage() {
         return this.prizeMessage;
-    }
-
-    public List<String> getPrizeCommands() {
-        return this.prizeCommands;
     }
 
     /**
@@ -661,7 +657,9 @@ public class Crate {
             if (this.file.contains(path + ".Editor-Items")) this.file.getList(path + ".Editor-Items").forEach(listItem -> items.add((ItemStack) listItem));
         }
 
-        saveFile(items, path);
+        if (crateSettings == null) {
+            saveFile(items, path);
+        }
     }
     
     /**
@@ -804,5 +802,9 @@ public class Crate {
 
             sound.play(player, location);
         }
+    }
+
+    public CrateSettings getCrateSettings() {
+        return crateSettings;
     }
 }

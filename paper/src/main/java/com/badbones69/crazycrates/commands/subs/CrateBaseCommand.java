@@ -367,7 +367,7 @@ public class CrateBaseCommand extends BaseCommand {
         }
 
         this.inventoryManager.addViewer(player);
-        this.inventoryManager.openNewCratePreview(player, crate);
+        this.inventoryManager.openNewCratePreview(player, crate, CrateType.hasTiers(crate.getCrateType()));
     }
 
     @SubCommand("open-others")

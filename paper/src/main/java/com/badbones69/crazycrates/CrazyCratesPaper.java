@@ -149,6 +149,7 @@ public class CrazyCratesPaper extends JavaPlugin {
                 new CrateAdminMenu.CrateAdminListener(),
                 new CrateMainMenu.CrateMenuListener(),
                 new CrateTierMenu.CrateTierListener(),
+                new CratePreviewMenu.ItemMenuListener(),
 
                 // Other listeners.
                 new BrokeLocationsListener(),

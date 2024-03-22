@@ -9,3 +9,5 @@ description: '${description}'
 website: '${website}'
 
 softdepend: [CMI, DecentHolograms, HolographicDisplays, PlaceholderAPI, ItemsAdder, Oraxen]
+depend:
+  - bLibs
