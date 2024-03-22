@@ -18,10 +18,9 @@ import us.crazycrew.crazycrates.platform.config.impl.ConfigKeys;
 
 public class CommandReload extends BaseCommand {
 
-    private final @NotNull InventoryManager inventoryManager = null;
-    private final @NotNull CrateManager crateManager = null;
+    private final @NotNull CrateManager crateManager = this.plugin.getCrateManager();
     private final @NotNull FileManager fileManager = this.plugin.getFileManager();
-    private final @NotNull MetricsManager metrics = null;
+    private final @NotNull MetricsManager metrics = this.plugin.getMetrics();
 
     @Command("reload")
     @Permission(value = "crazycrates.reload", def = PermissionDefault.OP)
@@ -31,7 +30,7 @@ public class CommandReload extends BaseCommand {
         MiscUtils.cleanFiles();
         MiscUtils.loadFiles();
 
-        boolean isEnabled = this.config.getProperty(ConfigKeys.toggle_metrics);
+        boolean isEnabled = MiscUtils.toggleMetrics();
 
         if (!isEnabled) {
             this.metrics.stop();
@@ -42,15 +41,18 @@ public class CommandReload extends BaseCommand {
         // Close previews
         if (this.config.getProperty(ConfigKeys.take_out_of_preview)) {
             this.plugin.getServer().getOnlinePlayers().forEach(player -> {
-                if (this.inventoryManager.inCratePreview(player)) {
+                //todo() update this to use something in triumph gui
+                /*if (this.inventoryManager.inCratePreview(player)) {
                     this.inventoryManager.closeCratePreview(player);
 
                     if (this.config.getProperty(ConfigKeys.send_preview_taken_out_message)) {
                         player.sendMessage(Messages.reloaded_forced_out_of_preview.getMessage(player));
                     }
-                }
+                }*/
             });
         }
+
+        this.fileManager.reloadStaticFile("locations.yml");
 
         //this.fileManager.reloadAllFiles();
         //this.fileManager.setup(false);

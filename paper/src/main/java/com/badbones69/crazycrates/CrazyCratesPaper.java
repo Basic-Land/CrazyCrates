@@ -6,9 +6,13 @@ import com.badbones69.crazycrates.platform.crates.CrateManager;
 import com.badbones69.crazycrates.platform.crates.KeyManager;
 import com.badbones69.crazycrates.platform.crates.UserManager;
 import com.badbones69.crazycrates.platform.utils.MiscUtils;
+import com.badbones69.crazycrates.support.metrics.MetricsManager;
 import com.ryderbelserion.cluster.ClusterFactory;
 import com.ryderbelserion.cluster.api.files.FileManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import us.crazycrew.crazycrates.platform.config.ConfigManager;
+import us.crazycrew.crazycrates.platform.config.impl.ConfigKeys;
+
 import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
@@ -21,6 +25,8 @@ public class CrazyCratesPaper extends JavaPlugin {
     private KeyManager keyManager;
     private CrateManager crateManager;
     private UserManager userManager;
+
+    private MetricsManager metrics;
 
     @Override
     public void onLoad() {
@@ -59,6 +65,13 @@ public class CrazyCratesPaper extends JavaPlugin {
         this.userManager = new UserManager();
 
         CommandManager.load();
+
+        // Load metrics.
+        if (MiscUtils.toggleMetrics()) {
+            this.metrics = new MetricsManager();
+
+            this.metrics.start();
+        }
     }
 
     @Override
@@ -84,5 +97,9 @@ public class CrazyCratesPaper extends JavaPlugin {
 
     public UserManager getUserManager() {
         return this.userManager;
+    }
+
+    public MetricsManager getMetrics() {
+        return this.metrics;
     }
 }

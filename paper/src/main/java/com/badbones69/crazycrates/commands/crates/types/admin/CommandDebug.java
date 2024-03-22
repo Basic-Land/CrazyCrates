@@ -13,12 +13,12 @@ import org.jetbrains.annotations.NotNull;
 
 public class CommandDebug extends BaseCommand {
 
-    private final @NotNull CrateManager crateManager = null;
+    private final @NotNull CrateManager crateManager = this.plugin.getCrateManager();
 
     @Command("debug")
     @Permission(value = "crazycrates.debug", def = PermissionDefault.OP)
     public void debug(Player player, @Suggestion("crates") String crateName) {
-        Crate crate = null;
+        Crate crate = this.crateManager.getCrate(crateName);
 
         if (crate == null) {
             player.sendMessage(Messages.not_a_crate.getMessage("{crate}", crateName, player));

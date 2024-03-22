@@ -16,7 +16,7 @@ import java.util.Collections;
 
 public class CommandList extends BaseCommand {
 
-    private final @NotNull CrateManager crateManager = null;
+    private final @NotNull CrateManager crateManager = this.plugin.getCrateManager();
 
     @Command("list")
     @Permission(value = "crazycrates.list", def = PermissionDefault.OP)
@@ -28,7 +28,7 @@ public class CommandList extends BaseCommand {
 
         StringBuilder brokeCratesBuilder = new StringBuilder();
 
-        //this.crateManager.getBrokenCrates().forEach(crate -> brokeCratesBuilder.append("&c").append(crate).append(".yml&8,"));
+        this.crateManager.getBrokenCrates().forEach(crate -> brokeCratesBuilder.append("&c").append(crate).append(".yml&8,"));
 
         brokeCrates = brokeCratesBuilder.toString();
 
@@ -40,7 +40,8 @@ public class CommandList extends BaseCommand {
         sender.sendMessage(MsgUtils.color("&c[ID]&8, &c[Crate]&8, &c[World]&8, &c[X]&8, &c[Y]&8, &c[Z]"));
         int line = 1;
 
-        for (CrateLocation loc : new ArrayList<CrateLocation>()) {
+        //todo() add crate locations
+        /*for (CrateLocation loc : new ArrayList<CrateLocation>()) {
             Crate crate = loc.getCrate();
             String world = loc.getLocation().getWorld().getName();
 
@@ -50,6 +51,6 @@ public class CommandList extends BaseCommand {
 
             sender.sendMessage(MsgUtils.color("&8[&b" + line + "&8]: " + "&c" + loc.getID() + "&8, &c" + crate.getName() + "&8, &c" + world + "&8, &c" + x + "&8, &c" + y + "&8, &c" + z));
             line++;
-        }
+        }*/
     }
 }

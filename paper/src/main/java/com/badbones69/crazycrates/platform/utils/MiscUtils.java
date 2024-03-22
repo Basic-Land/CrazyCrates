@@ -343,6 +343,10 @@ public class MiscUtils {
         return ConfigManager.getConfig().getProperty(ConfigKeys.use_different_random);
     }
 
+    public static boolean toggleMetrics() {
+        return ConfigManager.getConfig().getProperty(ConfigKeys.toggle_metrics);
+    }
+
     public static void registerPermissions() {
         Arrays.stream(Permissions.values()).toList().forEach(permission -> {
             Permission newPermission = new Permission(

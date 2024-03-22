@@ -110,4 +110,8 @@ public class CrateManager {
     public Set<Crate> getCrates() {
         return Collections.unmodifiableSet(this.crates);
     }
+
+    public Set<String> getBrokenCrates() {
+        return Collections.unmodifiableSet(this.brokenCrates);
+    }
 }

@@ -1,6 +1,7 @@
 package com.badbones69.crazycrates.support.metrics;
 
 import com.badbones69.crazycrates.CrazyCratesPaper;
+import com.badbones69.crazycrates.platform.crates.CrateManager;
 import com.badbones69.crazycrates.platform.utils.MiscUtils;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.AdvancedPie;
@@ -16,6 +17,8 @@ import java.util.Map;
 public class MetricsManager {
 
     private final @NotNull CrazyCratesPaper plugin = JavaPlugin.getPlugin(CrazyCratesPaper.class);
+
+    private final @NotNull CrateManager crateManager = this.plugin.getCrateManager();
 
     private Metrics metrics;
 
@@ -33,11 +36,11 @@ public class MetricsManager {
         this.metrics.addCustomChart(new AdvancedPie("crate_types", () -> {
             Map<String, Integer> values = new HashMap<>();
 
-            /*plugin.getCrateManager().getCrates().forEach(crate -> {
+            this.crateManager.getCrates().forEach(crate -> {
                 CrateType crateType = crate.getCrateType();
 
-                values.put(crateType.getName(), plugin.getCrateManager().getCrates().stream().filter(type -> type.getCrateType() == crateType).toList().size());
-            });*/
+                values.put(crateType.getName(), this.crateManager.getCrates().stream().filter(type -> type.getCrateType() == crateType).toList().size());
+            });
 
             return values;
         }));
