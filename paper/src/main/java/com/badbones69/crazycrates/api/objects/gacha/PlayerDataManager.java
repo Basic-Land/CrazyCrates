@@ -104,6 +104,10 @@ public class PlayerDataManager {
             return null;
         }
 
+        if (!hasPlayerData(playerName)) {
+            addBlankPlayerData(playerName);
+        }
+
         return connection.query("SELECT " + name + " FROM PlayerData WHERE playerName = ?", playerName).thenApply(rs -> {
             try {
                 if (rs.next()) {

@@ -87,7 +87,7 @@ public class Prize {
 
         this.crateName = crateName;
 
-        this.builders = Collections.singletonList(new ItemBuilder(stack.getStack()));
+        this.builders = Collections.singletonList(new ItemBuilder(stack.getStack().clone()));
 
         this.tiers = Collections.singletonList(tier);
 
@@ -102,7 +102,7 @@ public class Prize {
         this.commands = Collections.emptyList();
 
         this.permissions = Collections.emptyList();
-        this.displayItem = new ItemBuilder(stack.getStack());
+        this.displayItem = new ItemBuilder(stack.getStack().clone());
     }
 
     /**

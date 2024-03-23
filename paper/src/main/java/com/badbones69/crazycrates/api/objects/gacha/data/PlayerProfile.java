@@ -2,6 +2,7 @@ package com.badbones69.crazycrates.api.objects.gacha.data;
 
 import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 import com.badbones69.crazycrates.api.objects.gacha.util.Rarity;
+import com.badbones69.crazycrates.api.objects.gacha.util.ResultType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,7 +15,7 @@ public class PlayerProfile implements Serializable {
     private static final long serialVersionUID = 5987691544175538612L;
     @Getter
     private final String playerName;
-    private final Map<Rarity, Pair<Integer, Boolean>> map = new HashMap<>();
+    private final Map<Rarity, Pair<Integer, ResultType>> map = new HashMap<>();
     private final int extraRewardPity;
     @Getter
     private boolean nextLegendaryLimited;
@@ -24,21 +25,21 @@ public class PlayerProfile implements Serializable {
     private final List<Result> history = new ArrayList<>();
     @Setter
     @Getter
-    private String chosenReward = "";
+    private Pair<String, String> chosenReward = new Pair<>("", "");
 
     public PlayerProfile(String playerName, Collection<Rarity> rarities, int extraRewardPity) {
         this.playerName = playerName;
         this.extraRewardPity = extraRewardPity;
         for (Rarity rarity : rarities) {
-            map.put(rarity, new Pair<>(0, true));
+            map.put(rarity, new Pair<>(0, ResultType.WON));
         }
     }
 
-    public Pair<Integer, Boolean> getPity(Rarity rarity) {
+    public Pair<Integer, ResultType> getPity(Rarity rarity) {
         return map.get(rarity);
     }
 
-    public void setPity(Rarity rarity, int newValue, boolean value) {
+    public void setPity(Rarity rarity, int newValue, ResultType value) {
         map.put(rarity, new Pair<>(newValue, value));
     }
 

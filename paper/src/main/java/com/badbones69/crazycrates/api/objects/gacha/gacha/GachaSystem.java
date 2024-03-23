@@ -8,47 +8,36 @@ import com.badbones69.crazycrates.api.objects.gacha.data.RaritySettings;
 import com.badbones69.crazycrates.api.objects.gacha.data.Result;
 import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 import com.badbones69.crazycrates.api.objects.gacha.util.Rarity;
+import com.badbones69.crazycrates.api.objects.gacha.util.ResultType;
 import cz.basicland.blibs.spigot.utils.item.CustomItemStack;
 
 import java.util.*;
 
 public class GachaSystem {
-    private final Map<Rarity, RaritySettings> rarityMap = new LinkedHashMap<>();
     private final Random random = new Random(System.nanoTime() * new Random(System.nanoTime()).nextLong());
 
     public GachaSystem() {
-        rarityMap.put(Rarity.COMMON, new RaritySettings(1, false, -1, 100, 1, -1, true, -1));     //70% - incl. guarantee - 53,2%
-        //rarityMap.put("uncommon", new Rarity    (5, false, -1, 30,  5,  -1, true, -1));     //16% - incl. guarantee - 25,3%
-        //rarityMap.put("rare", new Rarity        (10, true, 50, 10.6,  9,  56, true, -1));   //8,9% - incl. guarantee - 14,7%
-        //rarityMap.put("epic", new Rarity        (40, true, 60, 5.1, 35, 12, false, 80));    //4,5% - incl. guarantee - 5,3%
-        rarityMap.put(Rarity.EPIC, new RaritySettings(10, true, 50, 5.1, 9, 56.1, true, -1));    //4,5% - incl. guarantee - 5,3%
-        rarityMap.put(Rarity.LEGENDARY, new RaritySettings(90, true, 50, 0.6, 74, 6, false, 100));    //0,6% - incl. guarantee - 1.6%
     }
 
     public Result getResult(PlayerProfile playerProfile, CrateSettings itemSet) {
+        if (itemSet == null) throw new IllegalArgumentException("ItemSet cannot be null");
+
         playerProfile.incrementTotalPity();
         double roll = random.nextDouble(100);
         double chance5050 = random.nextDouble(100);
         Rarity finalRarity = Rarity.COMMON;
-        boolean final5050 = true;
+        ResultType final5050 = ResultType.WON;
 
-        Map<Rarity, RaritySettings> rarityMap;
-
-        if (itemSet == null) {
-            rarityMap = this.rarityMap;
-        } else {
-            rarityMap = itemSet.getRarityMap();
-        }
+        Map<Rarity, RaritySettings> rarityMap = itemSet.getRarityMap();
 
         for (Map.Entry<Rarity, RaritySettings> entry : rarityMap.entrySet()) {
-
             Rarity rarity = entry.getKey();
             RaritySettings raritySettings = entry.getValue();
 
-            Pair<Integer, Boolean> pair = playerProfile.getPity(rarity);
+            Pair<Integer, ResultType> pair = playerProfile.getPity(rarity);
 
             int currentRarityPity = pair.first() + 1;
-            boolean last5050 = pair.second();
+            ResultType last5050 = pair.second();
 
             boolean softPityUse = raritySettings.softPityGen(currentRarityPity);
             double softPity = raritySettings.calculateSoftPityChance(currentRarityPity);
@@ -56,15 +45,15 @@ public class GachaSystem {
             if (roll <= raritySettings.baseChance() || (softPityUse && softPity >= roll) || currentRarityPity >= raritySettings.pity()) {
                 finalRarity = rarity;
                 if (raritySettings.is5050Enabled()) {
-                    if (!last5050) final5050 = true;
-                    else final5050 = chance5050 <= raritySettings.get5050Chance();
+                    if (last5050.equals(ResultType.LOST)) final5050 = ResultType.GUARANTEED;
+                    else final5050 = chance5050 <= raritySettings.get5050Chance() ? ResultType.WON : ResultType.LOST;
                 }
             }
 
             playerProfile.setPity(rarity, currentRarityPity, last5050);
         }
 
-        Pair<Integer, Boolean> pair = playerProfile.getPity(finalRarity);
+        Pair<Integer, ResultType> pair = playerProfile.getPity(finalRarity);
         playerProfile.setPity(finalRarity, 0, final5050);
 
         return new Result(finalRarity, final5050, pair.first());
@@ -80,16 +69,20 @@ public class GachaSystem {
     public Result rollOverrideSet(PlayerProfile playerProfile, CrateSettings itemSet, CustomItemStack wantedItem) {
         Result result = getResult(playerProfile, itemSet);
 
-        if (result.isLegendary() && !result.isWon5050()) {
-            Set<CustomItemStack> set = itemSet.getStandard().get(Rarity.LEGENDARY);
-            set.addAll(itemSet.getLimited().get(Rarity.LEGENDARY));
-            set.remove(wantedItem);
-            result.setItem(set.stream().skip(random.nextInt(set.size())).findFirst().orElse(null));
-            return result;
+        if (result.isLegendary()) {
+            if (result.isWon5050()) {
+                result.setItem(wantedItem);
+            } else {
+                Set<CustomItemStack> set = itemSet.getBoth(Rarity.LEGENDARY);
+                set.remove(wantedItem);
+                result.setItem(pickRandomPrice(result, null, set));
+            }
         } else {
             result.setItem(pickRandomPrice(result, itemSet, null));
         }
+
         playerProfile.addHistory(result);
+
         return result;
     }
 
@@ -100,46 +93,43 @@ public class GachaSystem {
     }
 
     public Result rollWithFatePoint(PlayerProfile playerProfile, CrateSettings itemSet, CustomItemStack wantedItem) {
-        System.out.println("chosen reward: " + playerProfile.getChosenReward());
-        System.out.println("fate point: " + playerProfile.getFatePoint());
-        System.out.println("next legendary limited: " + playerProfile.isNextLegendaryLimited());
-
         Result result = getResult(playerProfile, itemSet);
 
         if (result.isLegendary()) {
             if (playerProfile.getFatePoint() >= itemSet.getFatePointAmount()) {
                 result.setItem(wantedItem);
+                result.setWon5050(ResultType.GUARANTEED);
+
                 playerProfile.resetFatePoint();
                 playerProfile.resetNextLegendaryLimited();
-                playerProfile.addHistory(result);
 
+                playerProfile.addHistory(result);
                 return result;
             }
 
             double chanceLimited = random.nextDouble(10000);
-            System.out.println("chance limited: " + chanceLimited / 10000 * 100 + "%");
 
             if (chanceLimited <= 7500 || playerProfile.isNextLegendaryLimited()) {
                 double chanceWanted = random.nextDouble(10000);
-                System.out.println("chance wanted: " + chanceWanted / 10000 * 100 + "%");
 
                 if (chanceWanted <= 5000) {
                     result.setItem(wantedItem);
+                    result.setWon5050(ResultType.WON);
                     playerProfile.resetFatePoint();
                 } else {
-                    result.setItem(pickRandomPrice(result, null, itemSet.getLimited().get(result.getRarity())));
-                    if (result.getItem().equals(wantedItem)) {
-                        playerProfile.resetFatePoint();
-                        playerProfile.resetNextLegendaryLimited();
-                        playerProfile.addHistory(result);
+                    Set<CustomItemStack> limited = new HashSet<>(itemSet.getLimited().get(Rarity.LEGENDARY));
+                    limited.remove(wantedItem);
 
-                        return result;
-                    }
+                    result.setItem(pickRandomPrice(result, null, limited));
+                    result.setWon5050(ResultType.WON_OF_RATE_UP);
+
                     playerProfile.incrementFatePoint();
                 }
                 playerProfile.resetNextLegendaryLimited();
             } else {
                 result.setItem(pickRandomPrice(result, null, itemSet.getStandard().get(result.getRarity())));
+                result.setWon5050(ResultType.LOST);
+
                 playerProfile.setNextLegendaryLimited();
                 playerProfile.incrementFatePoint();
             }

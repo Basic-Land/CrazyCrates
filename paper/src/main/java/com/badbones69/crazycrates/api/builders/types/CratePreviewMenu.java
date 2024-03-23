@@ -9,6 +9,7 @@ import com.badbones69.crazycrates.api.objects.gacha.PlayerDataManager;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.api.objects.gacha.data.PlayerProfile;
 import com.badbones69.crazycrates.api.objects.gacha.gacha.GachaType;
+import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 import com.badbones69.crazycrates.api.objects.gacha.util.Rarity;
 import com.badbones69.crazycrates.tasks.InventoryManager;
 import cz.basicland.blibs.spigot.utils.item.CustomItemStack;
@@ -288,9 +289,10 @@ public class CratePreviewMenu extends InventoryBuilder {
                 PlayerProfile playerProfile = playerDataManager.getPlayerProfile(player.getName(), crateSettings);
 
                 String itemName = customItemStack.getString("itemName");
+                String type = customItemStack.getString("type");
                 System.out.println("Chosen reward: " + itemName);
 
-                playerProfile.setChosenReward(itemName);
+                playerProfile.setChosenReward(new Pair<>(type, itemName));
                 playerDataManager.savePlayerProfile(player.getName(), crateSettings, playerProfile);
                 player.openInventory(crate.getTierPreview(player));
             }

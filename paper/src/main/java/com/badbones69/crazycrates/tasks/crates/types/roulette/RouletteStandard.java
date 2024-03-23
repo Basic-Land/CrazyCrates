@@ -96,7 +96,6 @@ public class RouletteStandard extends BukkitRunnable {
                 }
             } else {
                 if (MiscUtils.slowSpin(46, 9).contains(this.time)) {
-                    System.out.println("time: " + time);
                     setGlass();
                     builder.setItem(22, pickPrize().getDisplayItem(player));
 
