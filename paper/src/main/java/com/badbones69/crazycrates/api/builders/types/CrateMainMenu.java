@@ -203,7 +203,7 @@ public class CrateMainMenu extends InventoryBuilder {
                     player.closeInventory();
 
                     this.inventoryManager.addViewer(player);
-                    this.inventoryManager.openNewCratePreview(player, crate, CrateType.hasTiers(crate.getCrateType()));
+                    this.inventoryManager.openNewCratePreview(player, crate);
                 } else {
                     player.sendMessage(Messages.preview_disabled.getMessage("{crate}", crate.getName(), player));
                 }
