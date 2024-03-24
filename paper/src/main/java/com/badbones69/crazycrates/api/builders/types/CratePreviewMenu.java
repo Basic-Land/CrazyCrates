@@ -173,7 +173,7 @@ public class CratePreviewMenu extends InventoryBuilder {
 
                     crate.playSound(player, player.getLocation(), "click-sound","UI_BUTTON_CLICK", SoundCategory.PLAYERS);
 
-                    if (CrateType.hasTiers(crate.getCrateType())) {
+                    if (crate.isPreviewTierToggle()) {
                         player.openInventory(crate.getTierPreview(player));
 
                         return;
