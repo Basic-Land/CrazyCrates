@@ -2,6 +2,7 @@ package com.badbones69.crazycrates.tasks;
 
 import ch.jalu.configme.SettingsManager;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
+import org.bukkit.Bukkit;
 import us.crazycrew.crazycrates.api.enums.types.CrateType;
 import us.crazycrew.crazycrates.api.enums.types.KeyType;
 import us.crazycrew.crazycrates.platform.config.ConfigManager;
@@ -205,8 +206,8 @@ public class BukkitUserManager extends UserManager {
                         items.add(player.getEquipment().getItemInMainHand());
                         items.add(player.getEquipment().getItemInOffHand());
                     } else {
+                        items.add(player.getEquipment().getItemInOffHand());
                         items.addAll(Arrays.asList(player.getInventory().getContents()));
-                        items.remove(player.getEquipment().getItemInOffHand());
                     }
 
                     for (ItemStack item : items) {
@@ -239,7 +240,7 @@ public class BukkitUserManager extends UserManager {
                             int keyAmount = item.getAmount();
 
                             if ((takeAmount - keyAmount) >= 0) {
-                                player.getEquipment().setItemInOffHand(new ItemStack(Material.AIR, 1));
+                                player.getEquipment().setItemInOffHand(null);
                                 takeAmount -= keyAmount;
 
                                 if (crate.getCrateType() == CrateType.cosmic) addOpenedCrate(player.getUniqueId(), amount, crate.getName());

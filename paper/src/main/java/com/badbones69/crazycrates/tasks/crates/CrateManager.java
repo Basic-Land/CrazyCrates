@@ -143,7 +143,7 @@ public class CrateManager {
                 Player player = this.plugin.getServer().getPlayer(uuid);
 
                 if (player != null) {
-                    this.plugin.getInventoryManager().openNewCratePreview(player, crate, CrateType.hasTiers(crate.getCrateType()));
+                    this.plugin.getInventoryManager().openNewCratePreview(player, crate);
                 }
             }
 
@@ -194,17 +194,10 @@ public class CrateManager {
                 int maxMassOpen = file.getInt("Crate.Max-Mass-Open", 10);
                 int requiredKeys = file.getInt("Crate.RequiredKeys", 0);
 
-                ConfigurationSection gachaSection = file.getConfigurationSection("Crate.Gacha");
-                CrateSettings crateSettings = null;
-                if (gachaSection != null) {
-                    Config config = Config.loadFromString(file.saveToString());
-                    crateSettings = new CrateSettings(config, crateName, prizes, tiers);
-                }
+                ConfigurationSection section = file.getConfigurationSection("Crate.Tiers");
 
-                ConfigurationSection tiersSection = file.getConfigurationSection("Crate.Tiers");
-
-                if (file.contains("Crate.Tiers") && tiersSection != null) {
-                    for (String tier : tiersSection.getKeys(false)) {
+                if (file.contains("Crate.Tiers") && section != null) {
+                    for (String tier : section.getKeys(false)) {
                         String path = "Crate.Tiers." + tier;
 
                         ConfigurationSection tierSection = file.getConfigurationSection(path);
@@ -215,7 +208,7 @@ public class CrateManager {
                     }
                 }
 
-                boolean isTiersEmpty = CrateType.hasTiers(crateType);
+                boolean isTiersEmpty = crateType == CrateType.cosmic || crateType == CrateType.casino;
 
                 if (isTiersEmpty && tiers.isEmpty()) {
                     this.brokeCrates.add(crateName);
@@ -267,8 +260,10 @@ public class CrateManager {
 
                 List<String> prizeMessage = file.contains("Crate.Prize-Message") ? file.getStringList("Crate.Prize-Message") : Collections.emptyList();
 
+                List<String> prizeCommands = file.contains("Crate.Prize-Commands") ? file.getStringList("Crate.Prize-Commands") : Collections.emptyList();
+
                 CrateHologram holo = new CrateHologram(file.getBoolean("Crate.Hologram.Toggle"), file.getDouble("Crate.Hologram.Height", 0.0), file.getInt("Crate.Hologram.Range", 8), file.getStringList("Crate.Hologram.Message"));
-                addCrate(new Crate(crateName, previewName, crateType, getKey(file), file.getString("Crate.PhysicalKey.Name"), prizes, file, newPlayersKeys, tiers, maxMassOpen, requiredKeys, prizeMessage, holo, crateSettings));
+                addCrate(new Crate(crateName, previewName, crateType, getKey(file), file.getString("Crate.PhysicalKey.Name"), prizes, file, newPlayersKeys, tiers, maxMassOpen, requiredKeys, prizeMessage, prizeCommands, holo));
 
                 Permission doesExist = this.plugin.getServer().getPluginManager().getPermission("crazycrates.open." + crateName);
 
@@ -287,9 +282,7 @@ public class CrateManager {
             }
         }
 
-        addCrate(new Crate("Menu", "Menu", CrateType.menu, new ItemStack(Material.AIR), "", new ArrayList<>(), null, 0, null, 0, 0, Collections.emptyList(), null, null));
-
-        this.playerDataManager = new PlayerDataManager(getCrates().stream().map(Crate::getCrateSettings).filter(Objects::nonNull).toList());
+        addCrate(new Crate("Menu"));
 
         if (MiscUtils.isLogging()) {
             List.of(
@@ -421,7 +414,6 @@ public class CrateManager {
             case roulette -> crateBuilder = new RouletteCrate(crate, player, 45);
             case war -> crateBuilder = new WarCrate(crate, player, 9);
             case cosmic -> crateBuilder = new CosmicCrate(crate, player, 27);
-            case gacha -> crateBuilder = new GachaCrate(crate, player, 45);
             case quad_crate -> {
                 if (virtualCrate) {
                     Map<String, String> placeholders = new HashMap<>();
@@ -937,9 +929,12 @@ public class CrateManager {
      * @return a crate if is a key from a crate otherwise null if it is not.
      */
     public Crate getCrateFromKey(ItemStack item) {
-        if (!item.hasItemMeta()) return null;
+        if (!item.hasItemMeta() && !MiscUtils.legacyChecks()) return null;
 
         ItemMeta itemMeta = item.getItemMeta();
+
+        // If null, return.
+        if (itemMeta == null) return null;
 
         if (!itemMeta.getPersistentDataContainer().has(PersistentKeys.crate_key.getNamespacedKey())) {
             return getCrateNameFromOldKey(itemMeta);
