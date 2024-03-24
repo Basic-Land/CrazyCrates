@@ -107,7 +107,7 @@ public class CrateControlListener implements Listener {
     public void onRightClick(PlayerInteractEvent event) {
         Player player = event.getPlayer();
 
-        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK || event.getHand() == EquipmentSlot.OFF_HAND) return;
 
         Block clickedBlock = event.getClickedBlock();
 
@@ -123,7 +123,7 @@ public class CrateControlListener implements Listener {
         // If crate is null, return.
         if (crate == null) return;
 
-        boolean isKey = event.getHand() == EquipmentSlot.OFF_HAND ? ItemUtils.isSimilar(player.getInventory().getItemInOffHand(), crate) : ItemUtils.isSimilar(player.getInventory().getItemInMainHand(), crate);
+        boolean isKey = this.crateManager.isKey(player.getInventory().getItemInMainHand()) || this.crateManager.isKey(player.getInventory().getItemInOffHand());
 
         if (isKey) {
             event.setCancelled(true);

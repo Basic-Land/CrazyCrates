@@ -291,6 +291,8 @@ public class CrateManager {
 
         addCrate(new Crate("Menu"));
 
+        this.playerDataManager = new PlayerDataManager(getCrates().stream().map(Crate::getCrateSettings).filter(Objects::nonNull).toList());
+
         if (MiscUtils.isLogging()) {
             List.of(
                     "All crate information has been loaded.",
