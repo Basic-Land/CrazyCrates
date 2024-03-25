@@ -10,9 +10,13 @@ import cz.basicland.blibs.spigot.utils.item.CustomItemStack;
 import cz.basicland.blibs.spigot.utils.item.ItemUtils;
 import lombok.Getter;
 import lombok.ToString;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 @Getter
 @ToString
@@ -68,25 +72,39 @@ public class CrateSettings {
 
             List<String> lore = new ArrayList<>();
 
-            lore.add("&fPity: &e" + raritySettings.pity());
-            lore.add("&fBase Chance: &e" + raritySettings.baseChance() + "&f%");
+            lore.add("");
+            lore.add("");
+            lore.add("&8│ &fPity: &e" + raritySettings.pity());
+            lore.add("&8│ &fZákladní šance: &e" + raritySettings.baseChance() + "&f%");
 
-            lore.add("&f50/50 is: &e" + (raritySettings.is5050Enabled() ? "Enabled" : "Disabled"));
+            lore.add("&8│ &f50/50 je: &e" + (raritySettings.is5050Enabled() ? "Zapnutá" : "Vypnutá"));
             if (raritySettings.is5050Enabled()) {
-                lore.add("&f50/50 Chance: &e" + raritySettings.get5050Chance() + "&f% to win");
+                lore.add("&8│ &f50/50 Šance: &e" + raritySettings.get5050Chance() + "&f% na výhru");
             }
 
             if (raritySettings.softPityFrom() != 1) {
-                lore.add("&fSoft Pity: &e" + raritySettings.softPityFrom() + " &fpulls");
+                lore.add("&8│ &fSoft pity začíná od: &e" + raritySettings.softPityFrom() + " &fotevření");
                 if (raritySettings.staticFormula()) {
-                    lore.add("&fSoft Pity from &e" + raritySettings.softPityFrom() + "&f and above is &e" + raritySettings.softPityFormula() + "&f%");
+                    lore.add("&8│ &fa od &e" + raritySettings.softPityFrom() + "&f a výše je &e" + raritySettings.softPityFormula() + "&f%");
                 } else {
-                    lore.add("&fSoft Pity from &e" + raritySettings.softPityFrom() + "&f increases by &e" + raritySettings.softPityFormula() + "&f% each time");
+                    lore.add("&8│ &fSoft pity od &e" + raritySettings.softPityFrom() + "&f se zvyšuje o &e" + raritySettings.softPityFormula() + "&f% pokaždém otevření");
                 }
                 if (raritySettings.softPityLimit() != -1) {
-                    lore.add("&fSoft Pity Limit: &e" + raritySettings.softPityLimit() + "&f%");
+                    lore.add("&8│ &fMaximální šance pro soft pity je &e" + raritySettings.softPityLimit() + "&f%");
                 }
             }
+            lore.add("");
+
+            int maxSize = 0;
+            for (String s : lore) {
+                if (s.length() > maxSize) {
+                    maxSize = s.length();
+                }
+            }
+
+            lore.set(1, "&8┌" + "─".repeat(maxSize / 2));
+            lore.set(lore.size() - 1, "&8└" + "─".repeat(maxSize / 2));
+
 
             tierStack.lore(lore);
 
@@ -139,5 +157,21 @@ public class CrateSettings {
         HashSet<CustomItemStack> customItemStacks = new HashSet<>(standard.get(rarity));
         customItemStacks.addAll(limited.get(rarity));
         return customItemStacks;
+    }
+
+    private TextColor[] generateColors(Color start, Color end, int colorCount) {
+        int rStep = (end.getRed() - start.getRed()) / (colorCount - 1);
+        int gStep = (end.getGreen() - start.getGreen()) / (colorCount - 1);
+        int bStep = (end.getBlue() - start.getBlue()) / (colorCount - 1);
+
+        TextColor[] colors = new TextColor[colorCount];
+        for (int i = 0; i < colorCount; i++) {
+            int r = start.getRed() + (i * rStep);
+            int g = start.getGreen() + (i * gStep);
+            int b = start.getBlue() + (i * bStep);
+            colors[i] = TextColor.color(r, g, b);
+        }
+
+        return colors;
     }
 }

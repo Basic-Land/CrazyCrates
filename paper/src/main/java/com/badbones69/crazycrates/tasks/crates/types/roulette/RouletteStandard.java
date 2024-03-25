@@ -34,9 +34,8 @@ public class RouletteStandard extends BukkitRunnable {
         this.inventory = builder.getInventory();
         this.prize = prize;
         this.multi = multi;
-        if (multi) {
-            slots = new int[]{6,16,25,34,42,38,28,19,10,2,22};
-        } else slots = new int[]{22};
+        if (multi) slots = new int[]{6, 16, 25, 34, 42, 38, 28, 19, 10, 2, 22};
+        else slots = new int[]{22};
     }
     private int full = 0;
     private int time = 1;

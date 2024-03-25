@@ -3,20 +3,28 @@ package com.badbones69.crazycrates.api.objects.gacha;
 import com.badbones69.crazycrates.CrazyCratesPaper;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.api.objects.gacha.data.PlayerProfile;
+import com.badbones69.crazycrates.api.objects.gacha.data.RaritySettings;
+import com.badbones69.crazycrates.api.objects.gacha.data.Result;
 import com.badbones69.crazycrates.api.objects.gacha.util.Rarity;
 import cz.basicland.blibs.shared.databases.hikari.DatabaseConnection;
 import cz.basicland.blibs.spigot.BLibs;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.bukkit.entity.Player;
 
+import java.awt.*;
 import java.io.*;
 import java.sql.SQLException;
-import java.util.Base64;
-import java.util.HashSet;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
 
 public class PlayerDataManager {
     private final DatabaseConnection connection;
     private final List<CrateSettings> crateSettings;
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
     public PlayerDataManager(List<CrateSettings> crateSettings) {
         CrazyCratesPaper plugin = CrazyCratesPaper.get();
@@ -123,6 +131,35 @@ public class PlayerDataManager {
 
     public CrateSettings getCrateSettings(String crateName) {
         return crateSettings.stream().filter(crate -> crate.getName().equals(crateName)).findFirst().orElse(null);
+    }
+
+    public void sendHistory(Player player, int pageNumber, CrateSettings crateSettings) {
+        PlayerProfile profile = getPlayerProfile(player.getName(), crateSettings);
+        List<Result> historyList = profile.getHistory();
+
+        int startIndex = (pageNumber - 1) * 10;
+        int endIndex = Math.min(startIndex + 10, historyList.size());
+
+        for (int i = startIndex; i < endIndex; i++) {
+            Result history = historyList.get(i);
+            Rarity rarity = history.getRarity();
+
+            Component component = Component.text()
+                    .append(LegacyComponentSerializer.legacy('&').deserialize(history.getItemName()))
+                        .append(Component.text(" - ", NamedTextColor.GRAY)
+                                .append(Component.text(rarity.name(), rarity.getColor())))
+                    .appendNewline()
+                    .append(Component.text("- čas: ", NamedTextColor.GRAY)
+                            .append(Component.text(dateFormat.format(history.getTimestamp()), NamedTextColor.GOLD)))
+                    .appendNewline()
+                    .append(Component.text("- pity: ", NamedTextColor.GRAY)
+                            .append(Component.text(history.getPity(), NamedTextColor.GREEN))
+                            .append(Component.text(", 50/50: ", NamedTextColor.GRAY)
+                                    .append(Component.text(history.getWon5050().name(), NamedTextColor.GOLD))))
+                    .appendNewline()
+                    .build();
+            player.sendMessage(component);
+        }
     }
 
     private String serializeProfile(PlayerProfile profile) {

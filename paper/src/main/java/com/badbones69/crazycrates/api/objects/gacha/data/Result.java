@@ -20,7 +20,7 @@ public class Result implements Serializable {
     private ResultType won5050;
     private final int pity;
     private final long timestamp = System.currentTimeMillis();
-    @Setter
+    private String itemName;
     private transient CustomItemStack item;
 
     public Result(Rarity rarity, ResultType won5050, int pity) {
@@ -35,5 +35,10 @@ public class Result implements Serializable {
 
     public boolean isWon5050() {
         return won5050 == ResultType.WON || won5050 == ResultType.GUARANTEED || won5050 == ResultType.WON_OF_RATE_UP;
+    }
+
+    public void setItem(CustomItemStack item) {
+        this.item = item;
+        this.itemName = item.getTitle();
     }
 }
