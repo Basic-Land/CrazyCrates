@@ -2,6 +2,10 @@ package com.badbones69.crazycrates.commands.subs;
 
 import ch.jalu.configme.SettingsManager;
 import com.badbones69.crazycrates.api.objects.Crate;
+import com.badbones69.crazycrates.api.objects.gacha.PlayerDataManager;
+import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
+import com.badbones69.crazycrates.api.objects.gacha.data.PlayerProfile;
+import com.badbones69.crazycrates.api.objects.gacha.data.Result;
 import com.badbones69.crazycrates.api.objects.other.CrateLocation;
 import com.badbones69.crazycrates.api.objects.Prize;
 import com.badbones69.crazycrates.api.PrizeManager;
@@ -48,10 +52,8 @@ import com.badbones69.crazycrates.api.utils.FileUtils;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
 import com.badbones69.crazycrates.api.utils.MsgUtils;
 import us.crazycrew.crazycrates.api.users.UserManager;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
@@ -217,6 +219,13 @@ public class CrateBaseCommand extends BaseCommand {
         }
 
         crate.getPrizes().forEach(prize -> PrizeManager.givePrize(player, prize, crate));
+    }
+
+    @SubCommand("history")
+    public void history(Player player, @Suggestion("crates") String crateName, @ArgName("page") int page) {
+        PlayerDataManager playerDataManager = crateManager.getPlayerDataManager();
+        CrateSettings crateSettings = playerDataManager.getCrateSettings(crateName);
+        playerDataManager.sendHistory(player, page, crateSettings);
     }
 
     @SubCommand("save")

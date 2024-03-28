@@ -3,28 +3,31 @@ package com.badbones69.crazycrates.api.objects.gacha;
 import com.badbones69.crazycrates.CrazyCratesPaper;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.api.objects.gacha.data.PlayerProfile;
-import com.badbones69.crazycrates.api.objects.gacha.data.RaritySettings;
 import com.badbones69.crazycrates.api.objects.gacha.data.Result;
+import com.badbones69.crazycrates.api.objects.gacha.util.HSLColor;
 import com.badbones69.crazycrates.api.objects.gacha.util.Rarity;
 import cz.basicland.blibs.shared.databases.hikari.DatabaseConnection;
 import cz.basicland.blibs.spigot.BLibs;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.entity.Player;
 
-import java.awt.*;
 import java.io.*;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Base64;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class PlayerDataManager {
     private final DatabaseConnection connection;
     private final List<CrateSettings> crateSettings;
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+    private final int historyPerPage = 5;
 
     public PlayerDataManager(List<CrateSettings> crateSettings) {
         CrazyCratesPaper plugin = CrazyCratesPaper.get();
@@ -137,12 +140,41 @@ public class PlayerDataManager {
         PlayerProfile profile = getPlayerProfile(player.getName(), crateSettings);
         List<Result> historyList = profile.getHistory();
 
-        int startIndex = (pageNumber - 1) * 10;
-        int endIndex = Math.min(startIndex + 10, historyList.size());
+        if (historyList.isEmpty()) {
+            player.sendMessage(Component.text("Nemáte žádnou historii otevření krabice " + crateSettings.getName(), NamedTextColor.RED));
+            return;
+        }
+
+        if (pageNumber <= 0) {
+            pageNumber = 1;
+        }
+
+        int size = historyList.size();
+
+        int startIndex = (pageNumber - 1) * historyPerPage;
+        int endIndex = Math.min(startIndex + historyPerPage, size);
+        int maxPage = (size / historyPerPage) + 1;
+
+        Component header = Component.text()
+                .appendNewline()
+                .append(Component.text("Historie otevření ", NamedTextColor.GOLD))
+                .append(Component.text(crateSettings.getName(), NamedTextColor.AQUA))
+                .append(Component.text(" crate", NamedTextColor.GOLD))
+                .appendNewline()
+                .append(Component.text("Strana " + pageNumber + "/" + maxPage, NamedTextColor.GRAY))
+                .appendNewline()
+                .build();
+        player.sendMessage(header);
 
         for (int i = startIndex; i < endIndex; i++) {
             Result history = historyList.get(i);
             Rarity rarity = history.getRarity();
+
+            int maxPity = crateSettings.getRarityMap().get(rarity).pity();
+            int pity = history.getPity();
+
+            float hue = 119.978f - (1.33345f * Math.min(pity, maxPity));
+            int color = new HSLColor(hue, 100f, 60f).getRGB().getRGB();
 
             Component component = Component.text()
                     .append(LegacyComponentSerializer.legacy('&').deserialize(history.getItemName()))
@@ -153,13 +185,25 @@ public class PlayerDataManager {
                             .append(Component.text(dateFormat.format(history.getTimestamp()), NamedTextColor.GOLD)))
                     .appendNewline()
                     .append(Component.text("- pity: ", NamedTextColor.GRAY)
-                            .append(Component.text(history.getPity(), NamedTextColor.GREEN))
+                            .append(Component.text(history.getPity(), TextColor.color(color)))
                             .append(Component.text(", 50/50: ", NamedTextColor.GRAY)
                                     .append(Component.text(history.getWon5050().name(), NamedTextColor.GOLD))))
                     .appendNewline()
                     .build();
             player.sendMessage(component);
         }
+
+        int pageMinus = pageNumber - 1;
+        int pagePlus = pageNumber + 1;
+
+        Component pages = Component.text()
+                .append(Component.text("Předchozí", NamedTextColor.GRAY).clickEvent(ClickEvent.runCommand("/cc history " + crateSettings.getName() + " " + (pageMinus <= 0 ? maxPage : pageMinus)))
+                        .hoverEvent(Component.text("Předchozí stránka", NamedTextColor.GRAY)))
+                .append(Component.text(" | ", NamedTextColor.GRAY))
+                .append(Component.text("Další", NamedTextColor.GRAY).clickEvent(ClickEvent.changePage("/cc history " + crateSettings.getName() + " " + (pagePlus > maxPage ? 1 : pagePlus)))
+                        .hoverEvent(Component.text("Další stránka", NamedTextColor.GRAY)))
+                .build();
+        player.sendMessage(pages);
     }
 
     private String serializeProfile(PlayerProfile profile) {

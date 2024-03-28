@@ -97,13 +97,6 @@ public class GachaCrate extends CrateBuilder {
 
         addCrateTask(new RouletteStandard(this, items, getPlayer().isSneaking()).runTaskTimer(this.plugin, 2, 2));
 
-        String crateName = getCrate().getName();
-        int size = playerProfile.getHistory().size() - 1;
-
-        for (int i = 1; i < size; i++) {
-            playerDataManager.sendHistory(getPlayer(), i, crateSettings);
-        }
-
         playerDataManager.savePlayerProfile(playerName, crateSettings, playerProfile);
     }
 
