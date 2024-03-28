@@ -20,7 +20,7 @@ public class Result implements Serializable {
     private ResultType won5050;
     private final int pity;
     private final long timestamp = System.currentTimeMillis();
-    private String itemName;
+    private String itemName, itemConfigName;
     private transient CustomItemStack item;
 
     public Result(Rarity rarity, ResultType won5050, int pity) {
@@ -39,6 +39,8 @@ public class Result implements Serializable {
 
     public void setItem(CustomItemStack item) {
         this.item = item;
+        if (item == null) return;
+        this.itemConfigName = item.getString("itemName");
         this.itemName = item.getTitle();
     }
 }

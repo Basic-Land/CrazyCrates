@@ -3,17 +3,28 @@ package com.badbones69.crazycrates.api.objects.gacha;
 import com.badbones69.crazycrates.CrazyCratesPaper;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.api.objects.gacha.data.PlayerProfile;
+import com.badbones69.crazycrates.api.objects.gacha.data.RaritySettings;
 import com.badbones69.crazycrates.api.objects.gacha.data.Result;
 import com.badbones69.crazycrates.api.objects.gacha.util.HSLColor;
+import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 import com.badbones69.crazycrates.api.objects.gacha.util.Rarity;
+import com.badbones69.crazycrates.api.objects.gacha.util.ResultType;
+import cz.basicland.blibs.impl.xseries.XMaterial;
 import cz.basicland.blibs.shared.databases.hikari.DatabaseConnection;
 import cz.basicland.blibs.spigot.BLibs;
+import cz.basicland.blibs.spigot.utils.item.CustomItemStack;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.nbt.api.BinaryTagHolder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.io.*;
 import java.sql.SQLException;
@@ -139,6 +150,7 @@ public class PlayerDataManager {
     public void sendHistory(Player player, int pageNumber, CrateSettings crateSettings) {
         PlayerProfile profile = getPlayerProfile(player.getName(), crateSettings);
         List<Result> historyList = profile.getHistory();
+        TextColor color = TextColor.fromHexString("#de7a00");
 
         if (historyList.isEmpty()) {
             player.sendMessage(Component.text("Nemáte žádnou historii otevření krabice " + crateSettings.getName(), NamedTextColor.RED));
@@ -153,42 +165,26 @@ public class PlayerDataManager {
 
         int startIndex = (pageNumber - 1) * historyPerPage;
         int endIndex = Math.min(startIndex + historyPerPage, size);
-        int maxPage = (size / historyPerPage) + 1;
+        int maxPage = (size / historyPerPage) + (size % historyPerPage == 0 ? 0 : 1);
 
         Component header = Component.text()
                 .appendNewline()
-                .append(Component.text("Historie otevření ", NamedTextColor.GOLD))
+                .append(Component.text("Historie otevření ", color))
                 .append(Component.text(crateSettings.getName(), NamedTextColor.AQUA))
-                .append(Component.text(" crate", NamedTextColor.GOLD))
-                .appendNewline()
-                .append(Component.text("Strana " + pageNumber + "/" + maxPage, NamedTextColor.GRAY))
+                .append(Component.text(" crate", color))
                 .appendNewline()
                 .build();
         player.sendMessage(header);
 
         for (int i = startIndex; i < endIndex; i++) {
-            Result history = historyList.get(i);
+            Result history = historyList.get(size - i - 1);
             Rarity rarity = history.getRarity();
 
-            int maxPity = crateSettings.getRarityMap().get(rarity).pity();
-            int pity = history.getPity();
-
-            float hue = 119.978f - (1.33345f * Math.min(pity, maxPity));
-            int color = new HSLColor(hue, 100f, 60f).getRGB().getRGB();
-
             Component component = Component.text()
-                    .append(LegacyComponentSerializer.legacy('&').deserialize(history.getItemName()))
+                    .append(Component.text("» ", NamedTextColor.DARK_GRAY, TextDecoration.BOLD))
+                    .append(LegacyComponentSerializer.legacy('&').deserialize(history.getItemName()).hoverEvent(showItem(getItem(history, rarity, crateSettings))))
                         .append(Component.text(" - ", NamedTextColor.GRAY)
-                                .append(Component.text(rarity.name(), rarity.getColor())))
-                    .appendNewline()
-                    .append(Component.text("- čas: ", NamedTextColor.GRAY)
-                            .append(Component.text(dateFormat.format(history.getTimestamp()), NamedTextColor.GOLD)))
-                    .appendNewline()
-                    .append(Component.text("- pity: ", NamedTextColor.GRAY)
-                            .append(Component.text(history.getPity(), TextColor.color(color)))
-                            .append(Component.text(", 50/50: ", NamedTextColor.GRAY)
-                                    .append(Component.text(history.getWon5050().name(), NamedTextColor.GOLD))))
-                    .appendNewline()
+                                .append(Component.text(rarity.name(), rarity.getColor()).hoverEvent(HoverEvent.showText(getHoverText(history, crateSettings)))))
                     .build();
             player.sendMessage(component);
         }
@@ -197,13 +193,57 @@ public class PlayerDataManager {
         int pagePlus = pageNumber + 1;
 
         Component pages = Component.text()
-                .append(Component.text("Předchozí", NamedTextColor.GRAY).clickEvent(ClickEvent.runCommand("/cc history " + crateSettings.getName() + " " + (pageMinus <= 0 ? maxPage : pageMinus)))
+                .appendNewline()
+                .append(Component.text("<<<<", NamedTextColor.DARK_GRAY, TextDecoration.BOLD).clickEvent(ClickEvent.runCommand("/cc history " + crateSettings.getName() + " " + (pageMinus <= 0 ? maxPage : pageMinus)))
                         .hoverEvent(Component.text("Předchozí stránka", NamedTextColor.GRAY)))
-                .append(Component.text(" | ", NamedTextColor.GRAY))
-                .append(Component.text("Další", NamedTextColor.GRAY).clickEvent(ClickEvent.changePage("/cc history " + crateSettings.getName() + " " + (pagePlus > maxPage ? 1 : pagePlus)))
+                .append(Component.text(" Strana " + pageNumber + "/" + maxPage + " ", color))
+                .append(Component.text(">>>>", NamedTextColor.DARK_GRAY, TextDecoration.BOLD).clickEvent(ClickEvent.runCommand("/cc history " + crateSettings.getName() + " " + (pagePlus > maxPage ? 1 : pagePlus)))
                         .hoverEvent(Component.text("Další stránka", NamedTextColor.GRAY)))
                 .build();
         player.sendMessage(pages);
+    }
+
+    private CustomItemStack getItem(Result history, Rarity rarity, CrateSettings crateSettings) {
+        Set<Pair<String, CustomItemStack>> items = history.isWon5050() ? crateSettings.getLimited().get(rarity) : crateSettings.getStandard().get(rarity);
+
+        CustomItemStack item = items.stream().filter(pair -> pair.first().equals(history.getItemConfigName())).findFirst().map(Pair::second).orElse(null);
+        if (item == null) {
+            System.out.println("Error: Item " + history.getItemConfigName() + " does not exist.");
+            item = new CustomItemStack(XMaterial.AIR);
+        }
+
+        return item;
+    }
+
+    private HoverEvent<HoverEvent.ShowItem> showItem(CustomItemStack itemStack) {
+        ItemStack stack = itemStack.getStack();
+        NamespacedKey key = stack.getType().getKey();
+        Key itemKey = Key.key(key.getNamespace(),key.getKey());
+        int itemCount = itemStack.getAmount();
+        BinaryTagHolder tag = BinaryTagHolder.binaryTagHolder(itemStack.getNBTToString());
+        return HoverEvent.showItem(HoverEvent.ShowItem.showItem(itemKey, itemCount, tag));
+    }
+
+    private Component getHoverText(Result history, CrateSettings crateSettings) {
+        RaritySettings raritySettings = crateSettings.getRarityMap().get(history.getRarity());
+        int maxPity = raritySettings.pity();
+        int pity = history.getPity();
+
+        float hue = 119.978f - (1.33345f * Math.min(pity, maxPity));
+        int color = new HSLColor(hue, 100f, 60f).getRGB().getRGB();
+        ResultType won5050 = history.getWon5050();
+
+        return Component.text()
+                .append(Component.text("- čas: ", NamedTextColor.GRAY)
+                .append(Component.text(dateFormat.format(history.getTimestamp()), NamedTextColor.GOLD)))
+                .appendNewline()
+                .append(Component.text("- pity: ", NamedTextColor.GRAY)
+                        .append(Component.text(history.getPity(), TextColor.color(color))))
+                .append(raritySettings.is5050Enabled() ?
+                        Component.newline().append(Component.text("- 50/50: ", NamedTextColor.GRAY))
+                                .append(Component.text(won5050.name(), won5050.getColor())) :
+                        Component.empty())
+                .build();
     }
 
     private String serializeProfile(PlayerProfile profile) {

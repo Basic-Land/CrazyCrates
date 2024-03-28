@@ -10,13 +10,9 @@ import cz.basicland.blibs.spigot.utils.item.CustomItemStack;
 import cz.basicland.blibs.spigot.utils.item.ItemUtils;
 import lombok.Getter;
 import lombok.ToString;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 
-import java.awt.*;
 import java.util.*;
-import java.util.List;
 
 @Getter
 @ToString
@@ -24,8 +20,8 @@ public class CrateSettings {
     private final String name;
     private final boolean fatePointEnabled, overrideEnabled, extraRewardEnabled;
     private final int fatePointAmount, bonusPity;
-    private final Map<Rarity, Set<CustomItemStack>> standard = new HashMap<>();
-    private final Map<Rarity, Set<CustomItemStack>> limited = new HashMap<>();
+    private final Map<Rarity, Set<Pair<String, CustomItemStack>>> standard = new HashMap<>();
+    private final Map<Rarity, Set<Pair<String, CustomItemStack>>> limited = new HashMap<>();
     private final Map<Rarity, RaritySettings> rarityMap = new LinkedHashMap<>();
     private final Map<String, CustomItemStack> extraRewards = new HashMap<>();
     private final GachaType gachaType;
@@ -118,7 +114,7 @@ public class CrateSettings {
                 CustomItemStack customItemStack = ItemUtils.get(config, path + "." + itemPath);
                 customItemStack.setString("type", "standard");
                 customItemStack.setString("itemName", itemPath);
-                standard.computeIfAbsent(rarity, k -> new HashSet<>()).add(customItemStack);
+                standard.computeIfAbsent(rarity, k -> new HashSet<>()).add(new Pair<>(itemPath, customItemStack));
                 prizes.add(new Prize(customItemStack.getTitle(), itemPath, name, tier, customItemStack));
             }
 
@@ -128,50 +124,42 @@ public class CrateSettings {
                 CustomItemStack customItemStack = ItemUtils.get(config, path + "." + itemPath);
                 customItemStack.setString("type", "limited");
                 customItemStack.setString("itemName", itemPath);
-                limited.computeIfAbsent(rarity, k -> new HashSet<>()).add(customItemStack);
+                limited.computeIfAbsent(rarity, k -> new HashSet<>()).add(new Pair<>(itemPath, customItemStack));
                 prizes.add(new Prize(customItemStack.getTitle(), itemPath, name, tier, customItemStack));
             }
             slot += 2;
         }
     }
 
-    public CustomItemStack find(boolean isLimited, boolean all, Pair<String, String> itemValues) {
+    public CustomItemStack findLegendary(boolean isLimited, boolean all, Pair<String, String> itemValues) {
         Rarity rarity = Rarity.LEGENDARY;
         if (all) {
-            Set<CustomItemStack> temp = getBoth(rarity);
+            Set<Pair<String, CustomItemStack>> temp = getBoth(rarity);
             return temp.stream().filter(item -> {
-                String itemName = item.getString("itemName");
-                String type = item.getString("type");
+                String itemName = item.first();
+                String type = item.second().getString("type");
                 return itemValues.first().equals(type) && itemValues.second().equals(itemName);
-            }).findFirst().orElse(null);
+            }).findFirst().map(Pair::second).orElse(null);
         }
 
         if (isLimited) {
-            return limited.get(rarity).stream().filter(item -> item.getString("itemName").equals(itemValues.second())).findFirst().orElse(null);
+            return getLegendaryLimited().stream().filter(item -> item.first().equals(itemValues.second())).map(Pair::second).findFirst().orElse(null);
         } else {
-            return standard.get(rarity).stream().filter(item -> item.getString("itemName").equals(itemValues.second())).findFirst().orElse(null);
+            return getLegendaryStandard().stream().filter(item -> item.first().equals(itemValues.second())).map(Pair::second).findFirst().orElse(null);
         }
     }
 
-    public Set<CustomItemStack> getBoth(Rarity rarity) {
-        HashSet<CustomItemStack> customItemStacks = new HashSet<>(standard.get(rarity));
+    public Set<Pair<String, CustomItemStack>> getBoth(Rarity rarity) {
+        HashSet<Pair<String, CustomItemStack>> customItemStacks = new HashSet<>(standard.get(rarity));
         customItemStacks.addAll(limited.get(rarity));
         return customItemStacks;
     }
 
-    private TextColor[] generateColors(Color start, Color end, int colorCount) {
-        int rStep = (end.getRed() - start.getRed()) / (colorCount - 1);
-        int gStep = (end.getGreen() - start.getGreen()) / (colorCount - 1);
-        int bStep = (end.getBlue() - start.getBlue()) / (colorCount - 1);
+    public Set<Pair<String, CustomItemStack>> getLegendaryStandard() {
+        return standard.get(Rarity.LEGENDARY);
+    }
 
-        TextColor[] colors = new TextColor[colorCount];
-        for (int i = 0; i < colorCount; i++) {
-            int r = start.getRed() + (i * rStep);
-            int g = start.getGreen() + (i * gStep);
-            int b = start.getBlue() + (i * bStep);
-            colors[i] = TextColor.color(r, g, b);
-        }
-
-        return colors;
+    public Set<Pair<String, CustomItemStack>> getLegendaryLimited() {
+        return limited.get(Rarity.LEGENDARY);
     }
 }

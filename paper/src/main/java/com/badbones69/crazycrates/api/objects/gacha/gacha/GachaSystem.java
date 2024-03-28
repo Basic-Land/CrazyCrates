@@ -12,6 +12,7 @@ import com.badbones69.crazycrates.api.objects.gacha.util.ResultType;
 import cz.basicland.blibs.spigot.utils.item.CustomItemStack;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class GachaSystem {
     private final Random random = new Random(System.nanoTime() * new Random(System.nanoTime()).nextLong());
@@ -73,7 +74,7 @@ public class GachaSystem {
             if (result.isWon5050()) {
                 result.setItem(wantedItem);
             } else {
-                Set<CustomItemStack> set = itemSet.getBoth(Rarity.LEGENDARY);
+                Set<CustomItemStack> set = itemSet.getBoth(Rarity.LEGENDARY).stream().map(Pair::second).collect(Collectors.toSet());
                 set.remove(wantedItem);
                 result.setItem(pickRandomPrice(result, null, set));
             }
@@ -117,7 +118,7 @@ public class GachaSystem {
                     result.setWon5050(ResultType.WON);
                     playerProfile.resetFatePoint();
                 } else {
-                    Set<CustomItemStack> limited = new HashSet<>(itemSet.getLimited().get(Rarity.LEGENDARY));
+                    Set<CustomItemStack> limited = itemSet.getLegendaryLimited().stream().map(Pair::second).collect(Collectors.toSet());
                     limited.remove(wantedItem);
 
                     result.setItem(pickRandomPrice(result, null, limited));
@@ -127,7 +128,7 @@ public class GachaSystem {
                 }
                 playerProfile.resetNextLegendaryLimited();
             } else {
-                result.setItem(pickRandomPrice(result, null, itemSet.getStandard().get(result.getRarity())));
+                result.setItem(pickRandomPrice(result, null, itemSet.getLegendaryStandard().stream().map(Pair::second).collect(Collectors.toSet())));
                 result.setWon5050(ResultType.LOST);
 
                 playerProfile.setNextLegendaryLimited();
@@ -148,8 +149,8 @@ public class GachaSystem {
 
         if (itemSet == null) return null;
 
-        Map<Rarity, Set<CustomItemStack>> map = result.isWon5050() ? itemSet.getLimited() : itemSet.getStandard();
-        Set<CustomItemStack> set = map.get(result.getRarity());
+        Map<Rarity, Set<Pair<String, CustomItemStack>>> map = result.isWon5050() ? itemSet.getLimited() : itemSet.getStandard();
+        Set<CustomItemStack> set = map.get(result.getRarity()).stream().map(Pair::second).collect(Collectors.toSet());
         return set.stream().skip(random.nextInt(set.size())).findFirst().orElse(null);
     }
 }

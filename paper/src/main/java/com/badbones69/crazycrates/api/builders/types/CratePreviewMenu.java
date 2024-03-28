@@ -222,7 +222,7 @@ public class CratePreviewMenu extends InventoryBuilder {
                     case NORMAL:
                         return;
                     case FATE_POINT:
-                        if (crate.getCrateSettings().getStandard().get(Rarity.LEGENDARY).stream().map(stack -> stack.getString("itemName")).anyMatch(itemName::equals) && standard) {
+                        if (crate.getCrateSettings().getLegendaryStandard().stream().map(Pair::second).map(stack -> stack.getString("itemName")).anyMatch(itemName::equals) && standard) {
                             return;
                         }
                         break;

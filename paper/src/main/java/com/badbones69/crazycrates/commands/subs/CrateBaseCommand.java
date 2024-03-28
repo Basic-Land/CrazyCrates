@@ -222,7 +222,8 @@ public class CrateBaseCommand extends BaseCommand {
     }
 
     @SubCommand("history")
-    public void history(Player player, @Suggestion("crates") String crateName, @ArgName("page") int page) {
+    public void history(Player player, @Suggestion("crates") String crateName, @Optional @Suggestion("numbers") Integer page) {
+        if (page == null) page = 1;
         PlayerDataManager playerDataManager = crateManager.getPlayerDataManager();
         CrateSettings crateSettings = playerDataManager.getCrateSettings(crateName);
         playerDataManager.sendHistory(player, page, crateSettings);

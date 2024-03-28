@@ -72,7 +72,7 @@ public class GachaCrate extends CrateBuilder {
 
         List<ItemStack> items = new ArrayList<>();
 
-        CustomItemStack stack = crateSettings.find(gachaType.equals(GachaType.FATE_POINT), gachaType.equals(GachaType.OVERRIDE), chosenReward);
+        CustomItemStack stack = crateSettings.findLegendary(gachaType.equals(GachaType.FATE_POINT), gachaType.equals(GachaType.OVERRIDE), chosenReward);
 
         while (amount-- > 0) {
             Result result = switch (gachaType) {
