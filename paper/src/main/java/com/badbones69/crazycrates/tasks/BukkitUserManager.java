@@ -174,7 +174,7 @@ public class BukkitUserManager extends UserManager {
         for (ItemStack item : player.getOpenInventory().getBottomInventory().getContents()) {
             if (item == null || item.getType() == Material.AIR) continue;
 
-            if (!item.hasItemMeta() && !MiscUtils.legacyChecks()) continue;
+            if (!item.hasItemMeta() && !ConfigManager.getConfig().getProperty(ConfigKeys.use_old_key_checks)) continue;
 
             if (ItemUtils.isSimilar(item, crate)) keys += item.getAmount();
         }
@@ -202,18 +202,17 @@ public class BukkitUserManager extends UserManager {
             case physical_key -> {
                 int takeAmount = amount;
 
-                try {
-                    List<ItemStack> items = new ArrayList<>();
+                List<ItemStack> items = new ArrayList<>();
 
-                    if (checkHand) {
-                        items.add(player.getEquipment().getItemInMainHand());
-                        items.add(player.getEquipment().getItemInOffHand());
-                    } else {
-                        items.add(player.getEquipment().getItemInOffHand());
-                        items.addAll(Arrays.asList(player.getInventory().getContents()));
-                    }
+                if (checkHand) {
+                    items.add(player.getEquipment().getItemInMainHand());
+                    items.add(player.getEquipment().getItemInOffHand());
+                } else {
+                    items.addAll(Arrays.asList(player.getInventory().getContents()));
+                }
 
-                    for (ItemStack item : items) {
+                for (ItemStack item : items) {
+                    if (item != null) {
                         if (ItemUtils.isSimilar(item, crate)) {
                             int keyAmount = item.getAmount();
 
@@ -234,34 +233,30 @@ public class BukkitUserManager extends UserManager {
                             if (takeAmount <= 0) return true;
                         }
                     }
+                }
 
-                    // This needs to be done as player.getInventory().removeItem(ItemStack); does NOT remove from the offhand.
-                    if (takeAmount > 0) {
-                        ItemStack item = player.getEquipment().getItemInOffHand();
+                // This needs to be done as player.getInventory().removeItem(ItemStack); does NOT remove from the offhand.
+                if (takeAmount > 0) {
+                    ItemStack item = player.getEquipment().getItemInOffHand();
 
-                        if (ItemUtils.isSimilar(item, crate)) {
-                            int keyAmount = item.getAmount();
+                    if (ItemUtils.isSimilar(item, crate)) {
+                        int keyAmount = item.getAmount();
 
-                            if ((takeAmount - keyAmount) >= 0) {
-                                player.getEquipment().setItemInOffHand(null);
-                                takeAmount -= keyAmount;
+                        if ((takeAmount - keyAmount) >= 0) {
+                            player.getEquipment().setItemInOffHand(null);
+                            takeAmount -= keyAmount;
 
-                                if (crate.getCrateType() == CrateType.cosmic) addOpenedCrate(player.getUniqueId(), amount, crate.getName());
-                            } else {
-                                item.setAmount(keyAmount - takeAmount);
+                            if (crate.getCrateType() == CrateType.cosmic) addOpenedCrate(player.getUniqueId(), amount, crate.getName());
+                        } else {
+                            item.setAmount(keyAmount - takeAmount);
 
-                                if (crate.getCrateType() == CrateType.cosmic) addOpenedCrate(player.getUniqueId(), amount, crate.getName());
+                            if (crate.getCrateType() == CrateType.cosmic) addOpenedCrate(player.getUniqueId(), amount, crate.getName());
 
-                                takeAmount = 0;
-                            }
-
-                            if (takeAmount <= 0) return true;
+                            takeAmount = 0;
                         }
-                    }
-                } catch (Exception exception) {
-                    MiscUtils.failedToTakeKey(player, crateName);
 
-                    return false;
+                        if (takeAmount <= 0) return true;
+                    }
                 }
             }
 
@@ -290,7 +285,7 @@ public class BukkitUserManager extends UserManager {
             }
         }
 
-        MiscUtils.failedToTakeKey(player, crateName);
+        MiscUtils.failedToTakeKey(player, crate.getName());
 
         return false;
     }
