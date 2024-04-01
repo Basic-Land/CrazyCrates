@@ -2,12 +2,12 @@ package com.badbones69.crazycrates.tasks.crates.types;
 
 import com.badbones69.crazycrates.api.builders.CrateBuilder;
 import com.badbones69.crazycrates.api.objects.Crate;
-import com.badbones69.crazycrates.api.objects.gacha.PlayerDataManager;
+import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.api.objects.gacha.data.PlayerProfile;
 import com.badbones69.crazycrates.api.objects.gacha.data.Result;
 import com.badbones69.crazycrates.api.objects.gacha.gacha.GachaSystem;
-import com.badbones69.crazycrates.api.objects.gacha.gacha.GachaType;
+import com.badbones69.crazycrates.api.objects.gacha.enums.GachaType;
 import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
 import com.badbones69.crazycrates.tasks.BukkitUserManager;
@@ -27,7 +27,7 @@ public class GachaCrate extends CrateBuilder {
     private final CrateManager crateManager = this.plugin.getCrateManager();
     @NotNull
     private final BukkitUserManager userManager = this.plugin.getUserManager();
-    private final PlayerDataManager playerDataManager = crateManager.getPlayerDataManager();
+    private final DatabaseManager playerDataManager = crateManager.getDatabaseManager();
     private final GachaSystem gachaSystem = crateManager.getGachaSystem();
 
     public GachaCrate(Crate crate, Player player, int size) {
@@ -45,10 +45,10 @@ public class GachaCrate extends CrateBuilder {
         CrateSettings crateSettings = playerDataManager.getCrateSettings(getCrate().getName());
 
         PlayerProfile playerProfile = playerDataManager.getPlayerProfile(playerName, crateSettings);
-        Pair<String, String> chosenReward = playerProfile.getChosenReward();
+        Pair<Integer, String> chosenReward = playerProfile.getChosenReward();
         GachaType gachaType = crateSettings.getGachaType();
 
-        if (!gachaType.equals(GachaType.NORMAL) && (chosenReward == null || chosenReward.first().isEmpty() || chosenReward.second().isEmpty())) {
+        if (!gachaType.equals(GachaType.NORMAL) && (chosenReward == null || chosenReward.first().equals(-1) || chosenReward.second().isEmpty())) {
             getPlayer().sendMessage("§cYou have not chosen a reward yet. Please choose a reward using menu");
             crateManager.removePlayerFromOpeningList(getPlayer());
             return;

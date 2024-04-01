@@ -14,7 +14,7 @@ import com.badbones69.crazycrates.api.enums.PersistentKeys;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.Prize;
 import com.badbones69.crazycrates.api.objects.Tier;
-import com.badbones69.crazycrates.api.objects.gacha.PlayerDataManager;
+import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.api.objects.gacha.gacha.GachaSystem;
 import com.badbones69.crazycrates.api.objects.other.BrokeLocation;
@@ -27,7 +27,6 @@ import com.badbones69.crazycrates.support.holograms.types.CMIHologramsSupport;
 import com.badbones69.crazycrates.support.holograms.types.DecentHologramsSupport;
 import com.badbones69.crazycrates.support.holograms.types.HolographicDisplaysSupport;
 import com.badbones69.crazycrates.tasks.crates.types.*;
-import cz.basicland.blibs.shared.dataholder.Config;
 import lombok.Getter;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Location;
@@ -71,7 +70,7 @@ public class CrateManager {
     private final List<String> brokeCrates = new ArrayList<>();
     private final List<Crate> crates = new ArrayList<>();
     @Getter
-    private PlayerDataManager playerDataManager;
+    private DatabaseManager databaseManager;
     @Getter
     private final GachaSystem gachaSystem = new GachaSystem();;
 
@@ -197,8 +196,7 @@ public class CrateManager {
                 ConfigurationSection gachaSection = file.getConfigurationSection("Crate.Gacha");
                 CrateSettings crateSettings = null;
                 if (gachaSection != null) {
-                    Config config = Config.loadFromString(file.saveToString());
-                    crateSettings = new CrateSettings(config, crateName, prizes, tiers);
+                    crateSettings = new CrateSettings(file, crateName);
                 }
 
                 ConfigurationSection section = file.getConfigurationSection("Crate.Tiers");
@@ -215,7 +213,7 @@ public class CrateManager {
                     }
                 }
 
-                boolean isTiersEmpty = CrateType.hasTiers(crateType);
+                boolean isTiersEmpty = crateType == CrateType.cosmic || crateType == CrateType.casino;
 
                 if (isTiersEmpty && tiers.isEmpty()) {
                     this.brokeCrates.add(crateName);
@@ -291,7 +289,8 @@ public class CrateManager {
 
         addCrate(new Crate("Menu"));
 
-        this.playerDataManager = new PlayerDataManager(getCrates().stream().map(Crate::getCrateSettings).filter(Objects::nonNull).toList());
+        this.databaseManager = new DatabaseManager(getCrates());
+
 
         if (MiscUtils.isLogging()) {
             List.of(

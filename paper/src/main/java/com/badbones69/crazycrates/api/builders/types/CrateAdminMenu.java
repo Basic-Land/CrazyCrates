@@ -95,28 +95,17 @@ public class CrateAdminMenu extends InventoryBuilder {
             placeholders.put("{key}", crate.getKeyName());
 
             switch (clickType) {
-                case LEFT -> {
-                    ItemStack key = crate.getKey(player);
-
-                    player.getInventory().addItem(key);
-
-                    player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1f, 1f);
-
-                    placeholders.put("{keytype}", KeyType.physical_key.getFriendlyName());
-
-                    player.sendActionBar(Messages.obtaining_keys.getMessage(placeholders, player));
-                }
-
-                case RIGHT -> {
-                    this.userManager.addKeys(1, player.getUniqueId(), crate.getName(), KeyType.virtual_key);
-
-                    player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1f, 1f);
-
-                    placeholders.put("{keytype}", KeyType.physical_key.getFriendlyName());
-
-                    player.sendActionBar(Messages.obtaining_keys.getMessage(placeholders, player));
+                case LEFT -> player.getInventory().addItem(crate.getKey(player));
+                case RIGHT -> this.userManager.addKeys(1, player.getUniqueId(), crate.getName(), KeyType.virtual_key);
+                default -> {
+                    return;
                 }
             }
+            player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1f, 1f);
+
+            placeholders.put("{keytype}", KeyType.physical_key.getFriendlyName());
+
+            player.sendActionBar(Messages.obtaining_keys.getMessage(placeholders, player));
         }
     }
 }

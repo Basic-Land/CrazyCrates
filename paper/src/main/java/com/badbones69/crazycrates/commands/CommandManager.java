@@ -1,5 +1,6 @@
 package com.badbones69.crazycrates.commands;
 
+import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.other.CrateLocation;
 import com.badbones69.crazycrates.commands.relations.ArgumentRelations;
 import com.badbones69.crazycrates.commands.relations.MiscRelations;
@@ -12,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import com.badbones69.crazycrates.CrazyCratesPaper;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class CommandManager {
@@ -66,6 +68,10 @@ public class CommandManager {
 
             return numbers;
         });
+
+        this.bukkitCommandManager.registerSuggestion(SuggestionKey.of("types"), (sender, context) -> List.of("LIMITED", "STANDARD", "EXTRA_REWARD"));
+
+        this.bukkitCommandManager.registerSuggestion(SuggestionKey.of("rarities"), (sender, context) -> Arrays.stream(Rarity.values()).map(Enum::name).toList());
 
         this.bukkitCommandManager.registerArgument(CrateBaseCommand.CustomPlayer.class, (sender, context) -> new CrateBaseCommand.CustomPlayer(context));
 

@@ -1,8 +1,8 @@
 package com.badbones69.crazycrates.api.objects.gacha.data;
 
 import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
-import com.badbones69.crazycrates.api.objects.gacha.util.Rarity;
-import com.badbones69.crazycrates.api.objects.gacha.util.ResultType;
+import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
+import com.badbones69.crazycrates.api.objects.gacha.enums.ResultType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,17 +15,18 @@ public class PlayerProfile implements Serializable {
     private static final long serialVersionUID = 5987691544175538612L;
     @Getter
     private final String playerName;
-    private final Map<Rarity, Pair<Integer, ResultType>> map = new HashMap<>();
     private final int extraRewardPity;
+    private final Map<Rarity, Pair<Integer, ResultType>> map = new HashMap<>();
+    @Getter
+    private final List<Result> history = new ArrayList<>();
+
     @Getter
     private boolean nextLegendaryLimited;
     @Getter
     private int fatePoint, totalPity;
-    @Getter
-    private final List<Result> history = new ArrayList<>();
     @Setter
     @Getter
-    private Pair<String, String> chosenReward = new Pair<>("", "");
+    private Pair<Integer, String> chosenReward = new Pair<>(-1, "");
 
     public PlayerProfile(String playerName, Collection<Rarity> rarities, int extraRewardPity) {
         this.playerName = playerName;

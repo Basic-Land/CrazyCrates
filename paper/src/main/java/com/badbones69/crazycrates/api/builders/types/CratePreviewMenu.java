@@ -2,17 +2,14 @@ package com.badbones69.crazycrates.api.builders.types;
 
 import ch.jalu.configme.SettingsManager;
 import com.badbones69.crazycrates.CrazyCratesPaper;
+import com.badbones69.crazycrates.api.builders.InventoryBuilder;
+import com.badbones69.crazycrates.api.builders.types.items.CratePickPrizeMenu;
 import com.badbones69.crazycrates.api.enums.PersistentKeys;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.Tier;
-import com.badbones69.crazycrates.api.objects.gacha.PlayerDataManager;
-import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
-import com.badbones69.crazycrates.api.objects.gacha.data.PlayerProfile;
-import com.badbones69.crazycrates.api.objects.gacha.gacha.GachaType;
-import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
-import com.badbones69.crazycrates.api.objects.gacha.util.Rarity;
+import com.badbones69.crazycrates.api.objects.gacha.enums.GachaType;
+import com.badbones69.crazycrates.api.objects.gacha.util.ItemData;
 import com.badbones69.crazycrates.tasks.InventoryManager;
-import cz.basicland.blibs.spigot.utils.item.CustomItemStack;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import org.bukkit.Material;
 import org.bukkit.SoundCategory;
@@ -25,10 +22,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.jetbrains.annotations.NotNull;
+import us.crazycrew.crazycrates.api.enums.types.CrateType;
 import us.crazycrew.crazycrates.platform.config.ConfigManager;
 import us.crazycrew.crazycrates.platform.config.impl.ConfigKeys;
-import com.badbones69.crazycrates.api.builders.InventoryBuilder;
-import us.crazycrew.crazycrates.api.enums.types.CrateType;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -215,14 +212,14 @@ public class CratePreviewMenu extends InventoryBuilder {
             if (crate.getCrateType() == CrateType.gacha && holder.tier.getName().equals("legendary")) {
                 GachaType gachaType = crate.getCrateSettings().getGachaType();
                 NBT nbt = new NBT(item);
-                String itemName = nbt.getString("itemName");
-                System.out.println("Item name: " + itemName);
+                Integer itemID = nbt.getInteger("itemID");
+                System.out.println("Item type: " + itemID);
                 boolean standard = nbt.getString("type").equals("standard");
                 switch (gachaType) {
                     case NORMAL:
                         return;
                     case FATE_POINT:
-                        if (crate.getCrateSettings().getLegendaryStandard().stream().map(Pair::second).map(stack -> stack.getString("itemName")).anyMatch(itemName::equals) && standard) {
+                        if (crate.getCrateSettings().getLegendaryStandard().stream().map(ItemData::id).anyMatch(itemID::equals) && standard) {
                             return;
                         }
                         break;
@@ -230,71 +227,7 @@ public class CratePreviewMenu extends InventoryBuilder {
                         break;
                 }
 
-                player.openInventory(new ItemMenu(player, item, crate).build().getInventory());
-            }
-        }
-    }
-
-    public static class ItemMenu extends InventoryBuilder {
-        private final ItemStack item;
-
-        public ItemMenu(Player player, ItemStack item, Crate crate) {
-            super(crate, player, 9, "Item Menu");
-            this.item = item;
-        }
-
-        @Override
-        public InventoryBuilder build() {
-            ItemStack back = new CustomItemStack(Material.RED_STAINED_GLASS_PANE).title("Back").getStack();
-            ItemStack save = new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE).title("Save").getStack();
-            for (int i = 0; i < 9; i++) {
-                if (i < 4) getInventory().setItem(i, back);
-                else if (i == 4) getInventory().setItem(i, item);
-                else getInventory().setItem(i, save);
-            }
-            return this;
-        }
-    }
-
-    public static class ItemMenuListener implements Listener {
-        @EventHandler
-        public void onInventoryClick(InventoryClickEvent event) {
-            Inventory inventory = event.getInventory();
-
-            if (!(inventory.getHolder(false) instanceof ItemMenu holder)) return;
-
-            event.setCancelled(true);
-
-            Player player = holder.getPlayer();
-            Crate crate = holder.getCrate();
-            CrateSettings crateSettings = crate.getCrateSettings();
-
-            ItemStack item = event.getCurrentItem();
-
-            if (item == null || item.getType() == Material.AIR) return;
-
-            if (!item.hasItemMeta()) return;
-
-            ItemStack picked = inventory.getItem(4);
-            if (picked == null || picked.getType() == Material.AIR) return;
-
-            CustomItemStack customItemStack = new CustomItemStack(picked);
-
-            if (event.getSlot() < 4) {
-                // Open the previous menu
-                player.openInventory(crate.getTierPreview(player));
-            } else if (event.getSlot() > 4) {
-                // Retrieve the player's profile and save the chosen reward
-                PlayerDataManager playerDataManager = CrazyCratesPaper.get().getCrateManager().getPlayerDataManager();
-                PlayerProfile playerProfile = playerDataManager.getPlayerProfile(player.getName(), crateSettings);
-
-                String itemName = customItemStack.getString("itemName");
-                String type = customItemStack.getString("type");
-                System.out.println("Chosen reward: " + itemName);
-
-                playerProfile.setChosenReward(new Pair<>(type, itemName));
-                playerDataManager.savePlayerProfile(player.getName(), crateSettings, playerProfile);
-                player.openInventory(crate.getTierPreview(player));
+                player.openInventory(new CratePickPrizeMenu(player, item, crate).build().getInventory());
             }
         }
     }

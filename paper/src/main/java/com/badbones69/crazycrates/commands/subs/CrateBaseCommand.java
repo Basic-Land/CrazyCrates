@@ -1,15 +1,15 @@
 package com.badbones69.crazycrates.commands.subs;
 
 import ch.jalu.configme.SettingsManager;
+import com.badbones69.crazycrates.api.builders.types.items.ItemAddMenu;
 import com.badbones69.crazycrates.api.objects.Crate;
-import com.badbones69.crazycrates.api.objects.gacha.PlayerDataManager;
+import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
-import com.badbones69.crazycrates.api.objects.gacha.data.PlayerProfile;
-import com.badbones69.crazycrates.api.objects.gacha.data.Result;
+import com.badbones69.crazycrates.api.objects.gacha.data.RaritySettings;
+import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.other.CrateLocation;
 import com.badbones69.crazycrates.api.objects.Prize;
 import com.badbones69.crazycrates.api.PrizeManager;
-import com.badbones69.crazycrates.support.metrics.MetricsManager;
 import com.badbones69.crazycrates.tasks.InventoryManager;
 import dev.triumphteam.cmd.core.annotation.ArgName;
 import dev.triumphteam.cmd.core.annotation.Command;
@@ -29,7 +29,6 @@ import us.crazycrew.crazycrates.platform.config.ConfigManager;
 import us.crazycrew.crazycrates.platform.config.impl.ConfigKeys;
 import com.badbones69.crazycrates.CrazyCratesPaper;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
-import com.badbones69.crazycrates.api.EventManager;
 import com.badbones69.crazycrates.api.FileManager;
 import com.badbones69.crazycrates.api.FileManager.Files;
 import com.badbones69.crazycrates.api.events.PlayerPrizeEvent;
@@ -221,9 +220,34 @@ public class CrateBaseCommand extends BaseCommand {
     @SubCommand("history")
     public void history(Player player, @Suggestion("crates") String crateName, @Optional @Suggestion("numbers") Integer page) {
         if (page == null) page = 1;
-        PlayerDataManager playerDataManager = crateManager.getPlayerDataManager();
+        DatabaseManager playerDataManager = crateManager.getDatabaseManager();
         CrateSettings crateSettings = playerDataManager.getCrateSettings(crateName);
-        playerDataManager.sendHistory(player, page, crateSettings);
+        playerDataManager.getHistory().sendHistory(player, page, crateSettings);
+    }
+
+    @SubCommand("additems")
+    @Permission(value = "crazycrates.command.admin.additems", def = PermissionDefault.OP)
+    public void addItems(Player player, @Suggestion("crates") String crateName, @Suggestion("rarities") String rarity, @Suggestion("types") String type) {
+        Crate crate = this.crateManager.getCrateFromName(crateName);
+
+        if (crate == null || crate.getCrateSettings() == null) {
+            player.sendMessage(Messages.not_a_crate.getMessage("{crate}", crateName, player));
+            return;
+        }
+
+        CrateSettings crateSettings = crate.getCrateSettings();
+        Rarity crateRarity = Rarity.getRarity(rarity.toUpperCase());
+        if (crateRarity == null) {
+            return;
+        }
+
+        RaritySettings raritySettings = crateSettings.getRarityMap().get(crateRarity);
+        if (raritySettings == null) {
+            return;
+        }
+
+        ItemAddMenu inventory = new ItemAddMenu(player, 54, "&c&lAdd Items", crate, crateRarity, type);
+        player.openInventory(inventory.build().getInventory());
     }
 
     @SubCommand("save")

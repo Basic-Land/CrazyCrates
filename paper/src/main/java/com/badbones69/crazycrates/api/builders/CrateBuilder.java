@@ -63,7 +63,7 @@ public abstract class CrateBuilder extends BukkitRunnable {
      * @param crate crate opened by player.
      * @param player player opening crate.
      * @param size size of inventory.
-     * @param crateName crate name of crate.
+     * @param crateName crate type of crate.
      */
     public CrateBuilder(Crate crate, Player player, int size, String crateName) {
         Preconditions.checkNotNull(crate, "Crate can't be null.");
@@ -288,7 +288,7 @@ public abstract class CrateBuilder extends BukkitRunnable {
      *
      * @param slot slot to set at.
      * @param material material to use.
-     * @param name name of item.
+     * @param name type of item.
      * @param lore lore of item.
      */
     public void setItem(int slot, Material material, String name, List<String> lore) {
@@ -302,7 +302,7 @@ public abstract class CrateBuilder extends BukkitRunnable {
      *
      * @param slot slot to set at.
      * @param material material to use.
-     * @param name name of item.
+     * @param name type of item.
      */
     public void setItem(int slot, Material material, String name) {
         ItemBuilder builder = new ItemBuilder(new ItemStack(material)).setName(name).setTarget(getPlayer());

@@ -1,4 +1,4 @@
-package com.badbones69.crazycrates.api.objects.gacha.gacha;
+package com.badbones69.crazycrates.api.objects.gacha.enums;
 
 public enum GachaType {
     NORMAL,

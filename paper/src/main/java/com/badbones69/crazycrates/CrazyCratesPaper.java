@@ -1,9 +1,8 @@
 package com.badbones69.crazycrates;
 
-import com.badbones69.crazycrates.api.builders.types.CrateAdminMenu;
-import com.badbones69.crazycrates.api.builders.types.CrateMainMenu;
-import com.badbones69.crazycrates.api.builders.types.CratePreviewMenu;
-import com.badbones69.crazycrates.api.builders.types.CrateTierMenu;
+import com.badbones69.crazycrates.api.builders.types.*;
+import com.badbones69.crazycrates.api.builders.types.items.CratePickPrizeMenu;
+import com.badbones69.crazycrates.api.builders.types.items.ItemAddMenu;
 import com.badbones69.crazycrates.api.utils.FileUtils;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
 import com.badbones69.crazycrates.api.utils.MsgUtils;
@@ -148,7 +147,8 @@ public class CrazyCratesPaper extends JavaPlugin {
                 new CrateAdminMenu.CrateAdminListener(),
                 new CrateMainMenu.CrateMenuListener(),
                 new CrateTierMenu.CrateTierListener(),
-                new CratePreviewMenu.ItemMenuListener(),
+                new CratePickPrizeMenu.PickPrizeListener(),
+                new ItemAddMenu.ItemsAddListener(),
 
                 // Other listeners.
                 new BrokeLocationsListener(),

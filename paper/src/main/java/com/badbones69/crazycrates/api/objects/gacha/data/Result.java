@@ -1,7 +1,7 @@
 package com.badbones69.crazycrates.api.objects.gacha.data;
 
-import com.badbones69.crazycrates.api.objects.gacha.util.Rarity;
-import com.badbones69.crazycrates.api.objects.gacha.util.ResultType;
+import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
+import com.badbones69.crazycrates.api.objects.gacha.enums.ResultType;
 import cz.basicland.blibs.spigot.utils.item.CustomItemStack;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,7 +20,8 @@ public class Result implements Serializable {
     private ResultType won5050;
     private final int pity;
     private final long timestamp = System.currentTimeMillis();
-    private String itemName, itemConfigName;
+    private String itemName;
+    private int itemID;
     private transient CustomItemStack item;
 
     public Result(Rarity rarity, ResultType won5050, int pity) {
@@ -40,7 +41,7 @@ public class Result implements Serializable {
     public void setItem(CustomItemStack item) {
         this.item = item;
         if (item == null) return;
-        this.itemConfigName = item.getString("itemName");
+        this.itemID = item.getInteger("itemID");
         this.itemName = item.getTitle();
     }
 }

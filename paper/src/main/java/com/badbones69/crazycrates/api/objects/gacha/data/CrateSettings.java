@@ -1,18 +1,23 @@
 package com.badbones69.crazycrates.api.objects.gacha.data;
 
+import com.badbones69.crazycrates.CrazyCratesPaper;
 import com.badbones69.crazycrates.api.objects.Prize;
 import com.badbones69.crazycrates.api.objects.Tier;
-import com.badbones69.crazycrates.api.objects.gacha.gacha.GachaType;
+import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
+import com.badbones69.crazycrates.api.objects.gacha.enums.GachaType;
+import com.badbones69.crazycrates.api.objects.gacha.util.ItemData;
 import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
-import com.badbones69.crazycrates.api.objects.gacha.util.Rarity;
-import cz.basicland.blibs.shared.dataholder.Config;
+import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import cz.basicland.blibs.spigot.utils.item.CustomItemStack;
-import cz.basicland.blibs.spigot.utils.item.ItemUtils;
 import lombok.Getter;
 import lombok.ToString;
 import org.bukkit.Material;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Getter
 @ToString
@@ -20,13 +25,15 @@ public class CrateSettings {
     private final String name;
     private final boolean fatePointEnabled, overrideEnabled, extraRewardEnabled;
     private final int fatePointAmount, bonusPity;
-    private final Map<Rarity, Set<Pair<String, CustomItemStack>>> standard = new HashMap<>();
-    private final Map<Rarity, Set<Pair<String, CustomItemStack>>> limited = new HashMap<>();
+
+    private final Set<ItemData> standard = new HashSet<>();
+    private final Set<ItemData> limited = new HashSet<>();
+    private final Set<ItemData> extraRewards = new HashSet<>();
+
     private final Map<Rarity, RaritySettings> rarityMap = new LinkedHashMap<>();
-    private final Map<String, CustomItemStack> extraRewards = new HashMap<>();
     private final GachaType gachaType;
 
-    public CrateSettings(Config config, String name, List<Prize> prizes, List<Tier> tiers) {
+    public CrateSettings(FileConfiguration config, String name) {
         String path = "Crate.Gacha.settings";
 
         this.name = name;
@@ -38,17 +45,10 @@ public class CrateSettings {
         this.extraRewardEnabled = config.getBoolean(path + ".extra-reward.enabled");
         this.bonusPity = config.getInt(path + ".extra-reward.pity");
 
-        for (String itemPath : config.getKeys(path + ".extra-reward.items")) {
-            CustomItemStack customItemStack = ItemUtils.get(config, path + ".extra-reward.items." + itemPath);
-            extraRewards.put(itemPath, customItemStack);
-        }
-
-        int slot = 20;
-
         for (Rarity rarity : Rarity.values()) {
             String rarityName = rarity.name().toLowerCase();
             path = "Crate.Gacha.rarity." + rarityName;
-            if (!config.exists(path)) continue;
+            if (!config.isConfigurationSection(path)) continue;
 
             RaritySettings raritySettings = new RaritySettings(
                     config.getInt(path + ".pity"),
@@ -62,104 +62,141 @@ public class CrateSettings {
             );
 
             rarityMap.put(rarity, raritySettings);
+        }
+    }
 
-            CustomItemStack tierStack = new CustomItemStack(Material.CHEST);
-            tierStack.title(rarity.name());
+    public void loadItems(FileConfiguration config, List<Prize> prizes, List<Tier> tiers, DatabaseManager databaseManager) {
+        String path = "Crate.Gacha.settings";
+        String tableName = "ExtraRewards";
 
-            List<String> lore = new ArrayList<>();
+        databaseManager.getItems(tableName, config.getIntegerList(path + ".extra-reward.items"))
+                .forEach(item -> extraRewards.add(new ItemData(item.first(), Rarity.EXTRA_REWARD, "EXTRA", new CustomItemStack(item.second()))));
 
-            lore.add("");
-            lore.add("");
-            lore.add("&8│ &fPity: &e" + raritySettings.pity());
-            lore.add("&8│ &fZákladní šance: &e" + raritySettings.baseChance() + "&f%");
+        int slot = 20;
 
-            lore.add("&8│ &f50/50 je: &e" + (raritySettings.is5050Enabled() ? "Zapnutá" : "Vypnutá"));
-            if (raritySettings.is5050Enabled()) {
-                lore.add("&8│ &f50/50 Šance: &e" + raritySettings.get5050Chance() + "&f% na výhru");
-            }
+        for (Map.Entry<Rarity, RaritySettings> entry : rarityMap.entrySet()) {
+            Rarity rarity = entry.getKey();
+            String rarityName = rarity.name().toLowerCase();
+            RaritySettings raritySettings = entry.getValue();
 
-            if (raritySettings.softPityFrom() != 1) {
-                lore.add("&8│ &fSoft pity začíná od: &e" + raritySettings.softPityFrom() + " &fotevření");
-                if (raritySettings.staticFormula()) {
-                    lore.add("&8│ &fa od &e" + raritySettings.softPityFrom() + "&f a výše je &e" + raritySettings.softPityFormula() + "&f%");
-                } else {
-                    lore.add("&8│ &fSoft pity od &e" + raritySettings.softPityFrom() + "&f se zvyšuje o &e" + raritySettings.softPityFormula() + "&f% pokaždém otevření");
-                }
-                if (raritySettings.softPityLimit() != -1) {
-                    lore.add("&8│ &fMaximální šance pro soft pity je &e" + raritySettings.softPityLimit() + "&f%");
-                }
-            }
-            lore.add("");
-
-            int maxSize = 0;
-            for (String s : lore) {
-                if (s.length() > maxSize) {
-                    maxSize = s.length();
-                }
-            }
-
-            lore.set(1, "&8┌" + "─".repeat(maxSize / 2));
-            lore.set(lore.size() - 1, "&8└" + "─".repeat(maxSize / 2));
-
-
-            tierStack.lore(lore);
+            CustomItemStack tierStack = getCustomItemStack(rarity, raritySettings);
 
             Tier tier = new Tier(rarityName, raritySettings.baseChance(), slot, tierStack);
 
             tiers.add(tier);
 
             path = "Crate.Gacha.standard." + rarityName;
-
-            for (String itemPath : config.getKeys(path)) {
-                CustomItemStack customItemStack = ItemUtils.get(config, path + "." + itemPath);
-                customItemStack.setString("type", "standard");
-                customItemStack.setString("itemName", itemPath);
-                standard.computeIfAbsent(rarity, k -> new HashSet<>()).add(new Pair<>(itemPath, customItemStack));
-                prizes.add(new Prize(customItemStack.getTitle(), itemPath, name, tier, customItemStack));
+            tableName = "StandardItems";
+            List<Pair<Integer, ItemStack>> items = databaseManager.getItems(tableName, config.getIntegerList(path));
+            for (Pair<Integer, ItemStack> item : items) {
+                CustomItemStack itemStack = new CustomItemStack(item.second());
+                itemStack.setString("type", "standard");
+                itemStack.setInteger("itemID", item.first());
+                standard.add(new ItemData(item.first(), rarity, "STANDARD", itemStack));
+                prizes.add(new Prize(itemStack.getTitle(), item.first().toString(), name, tier, itemStack));
             }
 
             path = "Crate.Gacha.limited." + rarityName;
-
-            for (String itemPath : config.getKeys(path)) {
-                CustomItemStack customItemStack = ItemUtils.get(config, path + "." + itemPath);
-                customItemStack.setString("type", "limited");
-                customItemStack.setString("itemName", itemPath);
-                limited.computeIfAbsent(rarity, k -> new HashSet<>()).add(new Pair<>(itemPath, customItemStack));
-                prizes.add(new Prize(customItemStack.getTitle(), itemPath, name, tier, customItemStack));
+            tableName = "LimitedItems";
+            items = databaseManager.getItems(tableName, config.getIntegerList(path));
+            for (Pair<Integer, ItemStack> item : items) {
+                CustomItemStack itemStack = new CustomItemStack(item.second());
+                itemStack.setString("type", "limited");
+                itemStack.setInteger("itemID", item.first());
+                limited.add(new ItemData(item.first(), rarity, "LIMITED", itemStack));
+                prizes.add(new Prize(itemStack.getTitle(), item.first().toString(), name, tier, itemStack));
             }
+
             slot += 2;
         }
     }
 
-    public CustomItemStack findLegendary(boolean isLimited, boolean all, Pair<String, String> itemValues) {
+    public void addItem(String type, int id, Rarity rarity, ItemStack stack) {
+        CustomItemStack customItemStack = new CustomItemStack(stack);
+
+        customItemStack.setString("type", type);
+        customItemStack.setInteger("itemID", id);
+
+        ItemData itemData = new ItemData(id, rarity, type, customItemStack);
+
+        switch (type.toLowerCase()) {
+            case "standard" -> standard.add(itemData);
+            case "limited" -> limited.add(itemData);
+            case "extra_reward" -> extraRewards.add(itemData);
+        }
+    }
+
+    @NotNull
+    private static CustomItemStack getCustomItemStack(Rarity rarity, RaritySettings raritySettings) {
+        CustomItemStack tierStack = new CustomItemStack(Material.CHEST);
+        tierStack.title(rarity.name());
+
+        List<String> lore = new ArrayList<>();
+
+        lore.add("");
+        lore.add("");
+        lore.add("&8│ &fPity: &e" + raritySettings.pity());
+        lore.add("&8│ &fZákladní šance: &e" + raritySettings.baseChance() + "&f%");
+
+        lore.add("&8│ &f50/50 je: &e" + (raritySettings.is5050Enabled() ? "Zapnutá" : "Vypnutá"));
+        if (raritySettings.is5050Enabled()) {
+            lore.add("&8│ &f50/50 Šance: &e" + raritySettings.get5050Chance() + "&f% na výhru");
+        }
+
+        if (raritySettings.softPityFrom() != 1) {
+            lore.add("&8│ &fSoft pity začíná od: &e" + raritySettings.softPityFrom() + " &fotevření");
+            if (raritySettings.staticFormula()) {
+                lore.add("&8│ &fa od &e" + raritySettings.softPityFrom() + "&f a výše je &e" + raritySettings.softPityFormula() + "&f%");
+            } else {
+                lore.add("&8│ &fSoft pity od &e" + raritySettings.softPityFrom() + "&f se zvyšuje o &e" + raritySettings.softPityFormula() + "&f% pokaždém otevření");
+            }
+            if (raritySettings.softPityLimit() != -1) {
+                lore.add("&8│ &fMaximální šance pro soft pity je &e" + raritySettings.softPityLimit() + "&f%");
+            }
+        }
+        lore.add("");
+
+        int maxSize = 0;
+        for (String s : lore) {
+            if (s.length() > maxSize) {
+                maxSize = s.length();
+            }
+        }
+
+        lore.set(1, "&8┌" + "─".repeat(maxSize / 2));
+        lore.set(lore.size() - 1, "&8└" + "─".repeat(maxSize / 2));
+
+
+        tierStack.lore(lore);
+        return tierStack;
+    }
+
+    public CustomItemStack findLegendary(boolean isLimited, boolean all, Pair<Integer, String> itemValues) {
         Rarity rarity = Rarity.LEGENDARY;
         if (all) {
-            Set<Pair<String, CustomItemStack>> temp = getBoth(rarity);
-            return temp.stream().filter(item -> {
-                String itemName = item.first();
-                String type = item.second().getString("type");
-                return itemValues.first().equals(type) && itemValues.second().equals(itemName);
-            }).findFirst().map(Pair::second).orElse(null);
+            Set<ItemData> temp = getBoth(rarity);
+            return temp.stream().filter(item -> Objects.equals(item.id(), itemValues.first())).map(ItemData::itemStack).findFirst().orElse(null);
         }
 
         if (isLimited) {
-            return getLegendaryLimited().stream().filter(item -> item.first().equals(itemValues.second())).map(Pair::second).findFirst().orElse(null);
+            return getLegendaryLimited().stream().filter(item -> Objects.equals(item.id(), itemValues.first())).map(ItemData::itemStack).findFirst().orElse(null);
         } else {
-            return getLegendaryStandard().stream().filter(item -> item.first().equals(itemValues.second())).map(Pair::second).findFirst().orElse(null);
+            return getLegendaryStandard().stream().filter(item -> Objects.equals(item.id(), itemValues.first())).map(ItemData::itemStack).findFirst().orElse(null);
         }
     }
 
-    public Set<Pair<String, CustomItemStack>> getBoth(Rarity rarity) {
-        HashSet<Pair<String, CustomItemStack>> customItemStacks = new HashSet<>(standard.get(rarity));
-        customItemStacks.addAll(limited.get(rarity));
-        return customItemStacks;
+    public Set<ItemData> getBoth(Rarity rarity) {
+        HashSet<ItemData> temp = new HashSet<>(standard);
+        temp.addAll(limited);
+        temp.removeIf(item -> item.rarity() != rarity);
+        return temp;
     }
 
-    public Set<Pair<String, CustomItemStack>> getLegendaryStandard() {
-        return standard.get(Rarity.LEGENDARY);
+    public Set<ItemData> getLegendaryStandard() {
+        return standard.stream().filter(item -> item.rarity() == Rarity.LEGENDARY && item.type().equals("STANDARD")).collect(Collectors.toSet());
     }
 
-    public Set<Pair<String, CustomItemStack>> getLegendaryLimited() {
-        return limited.get(Rarity.LEGENDARY);
+    public Set<ItemData> getLegendaryLimited() {
+        return limited.stream().filter(item -> item.rarity() == Rarity.LEGENDARY && item.type().equals("LIMITED")).collect(Collectors.toSet());
     }
 }
