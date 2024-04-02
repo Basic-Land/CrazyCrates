@@ -1,39 +1,34 @@
 package com.badbones69.crazycrates.api.objects;
 
+import com.badbones69.crazycrates.CrazyCratesPaper;
+import com.badbones69.crazycrates.api.FileManager;
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
+import com.badbones69.crazycrates.api.builders.types.CratePreviewMenu;
 import com.badbones69.crazycrates.api.builders.types.CrateTierMenu;
 import com.badbones69.crazycrates.api.enums.PersistentKeys;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
+import com.badbones69.crazycrates.api.utils.MiscUtils;
+import com.badbones69.crazycrates.api.utils.MsgUtils;
+import com.badbones69.crazycrates.tasks.InventoryManager;
 import com.badbones69.crazycrates.tasks.crates.effects.SoundEffect;
-import lombok.Getter;
-import com.ryderbelserion.cluster.utils.DyeUtils;
-import org.bukkit.Color;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Particle;
-import org.bukkit.Registry;
-import org.bukkit.SoundCategory;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
-import us.crazycrew.crazycrates.api.enums.types.CrateType;
-import com.badbones69.crazycrates.CrazyCratesPaper;
-import com.badbones69.crazycrates.api.FileManager;
-import com.badbones69.crazycrates.tasks.crates.other.CosmicCrateManager;
 import com.badbones69.crazycrates.tasks.crates.other.AbstractCrateManager;
-import org.jetbrains.annotations.NotNull;
-import us.crazycrew.crazycrates.api.crates.CrateHologram;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import com.badbones69.crazycrates.tasks.crates.other.CosmicCrateManager;
+import com.ryderbelserion.cluster.utils.DyeUtils;
+import lombok.Getter;
+import org.bukkit.*;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import com.badbones69.crazycrates.tasks.InventoryManager;
-import com.badbones69.crazycrates.api.builders.types.CratePreviewMenu;
-import com.badbones69.crazycrates.api.utils.MiscUtils;
-import com.badbones69.crazycrates.api.utils.MsgUtils;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.NotNull;
+import us.crazycrew.crazycrates.api.crates.CrateHologram;
+import us.crazycrew.crazycrates.api.enums.types.CrateType;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -651,9 +646,12 @@ public class Crate {
      * @param items list of items
      * @param path the path in the config.
      */
-    private void saveFile(List<ItemStack> items, String path) {
+    public void saveFile(List<ItemStack> items, String path) {
         this.file.set(path + ".Editor-Items", items);
+        saveFile();
+    }
 
+    public void saveFile() {
         File crates = new File(this.plugin.getDataFolder(), "crates");
 
         File crateFile = new File(crates, this.name + ".yml");

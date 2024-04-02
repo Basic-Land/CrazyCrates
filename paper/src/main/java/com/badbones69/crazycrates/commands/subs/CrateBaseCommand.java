@@ -7,6 +7,7 @@ import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.api.objects.gacha.data.RaritySettings;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
+import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.api.objects.other.CrateLocation;
 import com.badbones69.crazycrates.api.objects.Prize;
 import com.badbones69.crazycrates.api.PrizeManager;
@@ -246,7 +247,7 @@ public class CrateBaseCommand extends BaseCommand {
             return;
         }
 
-        ItemAddMenu inventory = new ItemAddMenu(player, 54, "&c&lAdd Items", crate, crateRarity, type);
+        ItemAddMenu inventory = new ItemAddMenu(player, 54, "&c&lAdd Items", crate, crateRarity, RewardType.fromString(type));
         player.openInventory(inventory.build().getInventory());
     }
 

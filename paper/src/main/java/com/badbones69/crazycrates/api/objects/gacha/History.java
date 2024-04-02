@@ -110,7 +110,7 @@ public class History {
     private HoverEvent<HoverEvent.ShowItem> showItem(CustomItemStack itemStack) {
         ItemStack stack = itemStack.getStack();
         NamespacedKey key = stack.getType().getKey();
-        Key itemKey = Key.key(key.getNamespace(),key.getKey());
+        Key itemKey = Key.key(key.getNamespace(), key.getKey());
         int itemCount = itemStack.getAmount();
         BinaryTagHolder tag = BinaryTagHolder.binaryTagHolder(itemStack.getNBTToString());
         return HoverEvent.showItem(HoverEvent.ShowItem.showItem(itemKey, itemCount, tag));
@@ -118,10 +118,9 @@ public class History {
 
     private Component getHoverText(Result history, CrateSettings crateSettings) {
         RaritySettings raritySettings = crateSettings.getRarityMap().get(history.getRarity());
-        int maxPity = raritySettings.pity();
         int pity = history.getPity();
 
-        float hue = 119.978f - (1.33345f * Math.min(pity, maxPity));
+        float hue = 119.978f - (1.33345f * pity);
         int color = new HSLColor(hue, 100f, 60f).getRGB().getRGB();
         ResultType won5050 = history.getWon5050();
 

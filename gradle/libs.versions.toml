@@ -5,7 +5,7 @@ shadow = { id = "com.github.johnrengelman.shadow", version = "8.1.1" }
 [versions]
 kyori = "4.16.0"
 bundle = "1.20.4-R0.1-SNAPSHOT"
-cluster = "1.0-SNAPSHOT"
+cluster = "6.4"
 
 [libraries]
 simple-yaml = { group = "com.github.Carleslc.Simple-YAML", name = "Simple-Yaml", version = "1.8.4" }

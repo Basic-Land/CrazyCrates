@@ -6,6 +6,7 @@ import com.badbones69.crazycrates.api.objects.Prize;
 import com.badbones69.crazycrates.api.objects.Tier;
 import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
 import com.badbones69.crazycrates.api.objects.gacha.enums.GachaType;
+import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.api.objects.gacha.util.ItemData;
 import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
@@ -69,9 +70,11 @@ public class CrateSettings {
     public void loadItems(FileConfiguration config, List<Prize> prizes, List<Tier> tiers, DatabaseManager databaseManager) {
         String path = "Crate.Gacha.settings";
         String tableName = "ExtraRewards";
+        RewardType type = RewardType.EXTRA_REWARD;
 
-        databaseManager.getItems(tableName, config.getIntegerList(path + ".extra-reward.items"))
-                .forEach(item -> extraRewards.add(new ItemData(item.first(), Rarity.EXTRA_REWARD, "EXTRA", new CustomItemStack(item.second()))));
+        for (Pair<Integer, ItemStack> pair : databaseManager.getItems(tableName, config.getIntegerList(path + ".extra-reward.items"))) {
+            extraRewards.add(new ItemData(pair.first(), Rarity.EXTRA_REWARD, type, new CustomItemStack(pair.second())));
+        }
 
         int slot = 20;
 
@@ -88,42 +91,46 @@ public class CrateSettings {
 
             path = "Crate.Gacha.standard." + rarityName;
             tableName = "StandardItems";
+            type = RewardType.STANDARD;
+
             List<Pair<Integer, ItemStack>> items = databaseManager.getItems(tableName, config.getIntegerList(path));
-            for (Pair<Integer, ItemStack> item : items) {
-                CustomItemStack itemStack = new CustomItemStack(item.second());
-                itemStack.setString("type", "standard");
-                itemStack.setInteger("itemID", item.first());
-                standard.add(new ItemData(item.first(), rarity, "STANDARD", itemStack));
-                prizes.add(new Prize(itemStack.getTitle(), item.first().toString(), name, tier, itemStack));
-            }
+
+            addItems(prizes, type, rarity, tier, items, standard);
 
             path = "Crate.Gacha.limited." + rarityName;
             tableName = "LimitedItems";
+            type = RewardType.LIMITED;
+
             items = databaseManager.getItems(tableName, config.getIntegerList(path));
-            for (Pair<Integer, ItemStack> item : items) {
-                CustomItemStack itemStack = new CustomItemStack(item.second());
-                itemStack.setString("type", "limited");
-                itemStack.setInteger("itemID", item.first());
-                limited.add(new ItemData(item.first(), rarity, "LIMITED", itemStack));
-                prizes.add(new Prize(itemStack.getTitle(), item.first().toString(), name, tier, itemStack));
-            }
+
+            addItems(prizes, type, rarity, tier, items, limited);
 
             slot += 2;
         }
     }
 
-    public void addItem(String type, int id, Rarity rarity, ItemStack stack, Crate crate) {
+    private void addItems(List<Prize> prizes, RewardType type, Rarity rarity, Tier tier, List<Pair<Integer, ItemStack>> items, Set<ItemData> limited) {
+        for (Pair<Integer, ItemStack> item : items) {
+            CustomItemStack itemStack = new CustomItemStack(item.second());
+            itemStack.setString("type", type.name());
+            itemStack.setInteger("itemID", item.first());
+            limited.add(new ItemData(item.first(), rarity, type, itemStack));
+            prizes.add(new Prize(itemStack.getTitle(), item.first().toString(), name, tier, itemStack));
+        }
+    }
+
+    public void addItem(RewardType type, int id, Rarity rarity, ItemStack stack, Crate crate) {
         CustomItemStack customItemStack = new CustomItemStack(stack);
 
-        customItemStack.setString("type", type);
+        customItemStack.setString("type", type.name());
         customItemStack.setInteger("itemID", id);
 
         ItemData itemData = new ItemData(id, rarity, type, customItemStack);
 
-        switch (type.toLowerCase()) {
-            case "standard" -> standard.add(itemData);
-            case "limited" -> limited.add(itemData);
-            case "extra_reward" -> extraRewards.add(itemData);
+        switch (type) {
+            case STANDARD -> standard.add(itemData);
+            case LIMITED -> limited.add(itemData);
+            case EXTRA_REWARD -> extraRewards.add(itemData);
         }
 
         crate.getPrizes().add(new Prize(customItemStack.getTitle(), String.valueOf(id), name, crate.getTier(rarity.name().toLowerCase()), customItemStack));
@@ -196,10 +203,12 @@ public class CrateSettings {
     }
 
     public Set<ItemData> getLegendaryStandard() {
-        return standard.stream().filter(item -> item.rarity() == Rarity.LEGENDARY && item.type().equals("STANDARD")).collect(Collectors.toSet());
+        RewardType type = RewardType.STANDARD;
+        return standard.stream().filter(item -> item.rarity() == Rarity.LEGENDARY && item.type().equals(type)).collect(Collectors.toSet());
     }
 
     public Set<ItemData> getLegendaryLimited() {
-        return limited.stream().filter(item -> item.rarity() == Rarity.LEGENDARY && item.type().equals("LIMITED")).collect(Collectors.toSet());
+        RewardType type = RewardType.LIMITED;
+        return limited.stream().filter(item -> item.rarity() == Rarity.LEGENDARY && item.type().equals(type)).collect(Collectors.toSet());
     }
 }

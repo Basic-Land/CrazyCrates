@@ -8,6 +8,7 @@ import com.badbones69.crazycrates.api.enums.PersistentKeys;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.Tier;
 import com.badbones69.crazycrates.api.objects.gacha.enums.GachaType;
+import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.api.objects.gacha.util.ItemData;
 import com.badbones69.crazycrates.tasks.InventoryManager;
 import cz.basicland.blibs.spigot.utils.item.NBT;
@@ -214,7 +215,7 @@ public class CratePreviewMenu extends InventoryBuilder {
                 NBT nbt = new NBT(item);
                 Integer itemID = nbt.getInteger("itemID");
                 System.out.println("Item type: " + itemID);
-                boolean standard = nbt.getString("type").equals("standard");
+                boolean standard = nbt.getString("type").equals(RewardType.STANDARD.name());
                 switch (gachaType) {
                     case NORMAL:
                         return;

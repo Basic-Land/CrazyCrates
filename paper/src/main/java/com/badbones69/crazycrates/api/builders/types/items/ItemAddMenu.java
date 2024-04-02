@@ -7,7 +7,7 @@ import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
-import com.badbones69.crazycrates.tasks.crates.CrateManager;
+import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import cz.basicland.blibs.spigot.utils.item.DBItemStack;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -19,16 +19,16 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
 public class ItemAddMenu extends InventoryBuilder {
     private final Crate crate;
     private final Rarity rarity;
-    private final String type;
+    private final RewardType type;
 
-    public ItemAddMenu(Player player, int size, String title, Crate crate, Rarity rarity, String type) {
+    public ItemAddMenu(Player player, int size, String title, Crate crate, Rarity rarity, RewardType type) {
         super(player, size, title);
         this.crate = crate;
         this.rarity = rarity;
@@ -73,17 +73,15 @@ public class ItemAddMenu extends InventoryBuilder {
         }
 
         private void saveItems(ItemStack[] items, ItemAddMenu holder) {
-            System.out.println("Saving items");
             Crate crate = holder.crate;
             Rarity rarity = holder.rarity;
-            String type = holder.type;
+            RewardType type = holder.type;
             CrateSettings crateSettings = crate.getCrateSettings();
 
-            String tableName = switch (type.toLowerCase()) {
-                case "standard" -> "StandardItems";
-                case "limited" -> "LimitedItems";
-                case "extra_reward" -> "ExtraRewards";
-                default -> null;
+            String tableName = switch (type) {
+                case STANDARD -> "StandardItems";
+                case LIMITED -> "LimitedItems";
+                case EXTRA_REWARD -> "ExtraRewards";
             };
             for (ItemStack item : items) {
                 if (item == null || item.getType() == Material.AIR) continue;
@@ -94,15 +92,15 @@ public class ItemAddMenu extends InventoryBuilder {
                     crateSettings.addItem(type, id, rarity, item, crate);
 
                     String path;
-                    if (type.equalsIgnoreCase("extra_reward")) {
+                    if (type.equals(RewardType.EXTRA_REWARD)) {
                         path = "Crate.Gacha.extra-reward.items";
                     } else {
-                        path = "Crate.Gacha." + type.toLowerCase() + "." + rarity.name().toLowerCase();
+                        path = "Crate.Gacha." + type.name().toLowerCase() + "." + rarity.name().toLowerCase();
                     }
 
-                    Set<Integer> ids = new HashSet<>(crate.getFile().getIntegerList(path));
+                    Set<Integer> ids = new LinkedHashSet<>(crate.getFile().getIntegerList(path));
                     ids.add(id);
-                    crate.getFile().set(path, ids);
+                    crate.getFile().set(path, List.of(ids.toArray(new Integer[0])));
                     crate.saveFile();
                 } catch (IOException e) {
                     throw new RuntimeException(e);

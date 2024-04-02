@@ -95,14 +95,18 @@ public class CrateManager {
 
             // Profit?
             List<Prize> prizes = new ArrayList<>();
+            List<Tier> tierPrizes = new ArrayList<>();
+
+            ConfigurationSection gachaSection = file.getConfigurationSection("Crate.Gacha");
+            if (gachaSection != null) {
+                crate.getCrateSettings().loadItems(file, prizes, tierPrizes, this.databaseManager);
+            }
 
             ConfigurationSection prizesSection = file.getConfigurationSection("Crate.Prizes");
 
             if (prizesSection != null) {
                 for (String prize : prizesSection.getKeys(false)) {
                     ConfigurationSection prizeSection = prizesSection.getConfigurationSection(prize);
-
-                    List<Tier> tierPrizes = new ArrayList<>();
 
                     if (prizeSection != null) {
                         for (String tier : prizeSection.getStringList("Tiers")) {
