@@ -1,6 +1,7 @@
 package com.badbones69.crazycrates.api.objects.gacha.data;
 
 import com.badbones69.crazycrates.CrazyCratesPaper;
+import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.Prize;
 import com.badbones69.crazycrates.api.objects.Tier;
 import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
@@ -111,7 +112,7 @@ public class CrateSettings {
         }
     }
 
-    public void addItem(String type, int id, Rarity rarity, ItemStack stack) {
+    public void addItem(String type, int id, Rarity rarity, ItemStack stack, Crate crate) {
         CustomItemStack customItemStack = new CustomItemStack(stack);
 
         customItemStack.setString("type", type);
@@ -124,6 +125,8 @@ public class CrateSettings {
             case "limited" -> limited.add(itemData);
             case "extra_reward" -> extraRewards.add(itemData);
         }
+
+        crate.getPrizes().add(new Prize(customItemStack.getTitle(), String.valueOf(id), name, crate.getTier(rarity.name().toLowerCase()), customItemStack));
     }
 
     @NotNull

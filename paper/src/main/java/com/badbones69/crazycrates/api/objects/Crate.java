@@ -631,7 +631,10 @@ public class Crate {
      */
     private void saveFile(List<ItemStack> items, String path) {
         this.file.set(path + ".Editor-Items", items);
+        saveFile();
+    }
 
+    public void saveFile() {
         File crates = new File(this.plugin.getDataFolder(), "crates");
 
         File crateFile = new File(crates, this.name + ".yml");

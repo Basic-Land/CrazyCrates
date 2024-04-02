@@ -19,6 +19,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class ItemAddMenu extends InventoryBuilder {
     private final Crate crate;
@@ -86,7 +89,21 @@ public class ItemAddMenu extends InventoryBuilder {
                 if (item == null || item.getType() == Material.AIR) continue;
                 try {
                     int id = databaseManager.addItem(tableName, DBItemStack.encodeItem(item));
-                    crateSettings.addItem(type, id, rarity, item);
+                    if (id == -1) continue;
+
+                    crateSettings.addItem(type, id, rarity, item, crate);
+
+                    String path;
+                    if (type.equalsIgnoreCase("extra_reward")) {
+                        path = "Crate.Gacha.extra-reward.items";
+                    } else {
+                        path = "Crate.Gacha." + type.toLowerCase() + "." + rarity.name().toLowerCase();
+                    }
+
+                    Set<Integer> ids = new HashSet<>(crate.getFile().getIntegerList(path));
+                    ids.add(id);
+                    crate.getFile().set(path, ids);
+                    crate.saveFile();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
