@@ -6,6 +6,11 @@ import com.badbones69.crazycrates.api.enums.PersistentKeys;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.tasks.crates.effects.SoundEffect;
 import lombok.Getter;
+import com.ryderbelserion.cluster.utils.DyeUtils;
+import org.bukkit.Color;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Particle;
+import org.bukkit.Registry;
 import org.bukkit.SoundCategory;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -57,6 +62,9 @@ public class Crate {
     private ItemBuilder previewTierBorderItem;
     private int previewTierCrateRows;
     private int previewTierMaxSlots;
+
+    private Color color;
+    private Particle particle;
 
     private final CrateType crateType;
     private FileConfiguration file;
@@ -134,11 +142,25 @@ public class Crate {
         setTierPreviewRows(file != null ? file.getInt("Crate.tier-preview.rows", 5) : 5);
         this.previewTierMaxSlots = this.previewTierCrateRows * 9;
 
+        if (crateType == CrateType.quad_crate) {
+            this.particle = Registry.PARTICLE_TYPE.get(NamespacedKey.minecraft(file != null ? file.getString("Crate.particles.type", "dust") : "dust"));
+
+            this.color = DyeUtils.getColor(file != null ? file.getString("Crate.particles.color", "235,64,52") : "235,64,52");
+        }
+
         this.hologram = hologram != null ? hologram : new CrateHologram();
 
         if (crateType == CrateType.cosmic) {
             if (this.file != null) this.manager = new CosmicCrateManager(this.file);
         }
+    }
+
+    public Color getColor() {
+        return this.color;
+    }
+
+    public Particle getParticle() {
+        return this.particle;
     }
 
     public Crate(String name) {
@@ -631,10 +653,7 @@ public class Crate {
      */
     private void saveFile(List<ItemStack> items, String path) {
         this.file.set(path + ".Editor-Items", items);
-        saveFile();
-    }
 
-    public void saveFile() {
         File crates = new File(this.plugin.getDataFolder(), "crates");
 
         File crateFile = new File(crates, this.name + ".yml");
