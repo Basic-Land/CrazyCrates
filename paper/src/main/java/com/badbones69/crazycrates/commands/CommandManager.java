@@ -1,22 +1,22 @@
 package com.badbones69.crazycrates.commands;
 
+import com.badbones69.crazycrates.CrazyCratesPaper;
+import com.badbones69.crazycrates.api.objects.Crate;
+import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
+import com.badbones69.crazycrates.api.objects.gacha.data.RaritySettings;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
-import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.api.objects.other.CrateLocation;
 import com.badbones69.crazycrates.commands.relations.ArgumentRelations;
 import com.badbones69.crazycrates.commands.relations.MiscRelations;
-import com.badbones69.crazycrates.commands.subs.CrateBaseCommand;
 import com.badbones69.crazycrates.commands.subs.BaseKeyCommand;
+import com.badbones69.crazycrates.commands.subs.CrateBaseCommand;
 import dev.triumphteam.cmd.bukkit.BukkitCommandManager;
 import dev.triumphteam.cmd.core.suggestion.SuggestionKey;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import com.badbones69.crazycrates.CrazyCratesPaper;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Stream;
+
+import java.util.*;
 
 public class CommandManager {
 
@@ -71,9 +71,38 @@ public class CommandManager {
             return numbers;
         });
 
-        this.bukkitCommandManager.registerSuggestion(SuggestionKey.of("types"), (sender, context) -> Arrays.stream(RewardType.values()).map(Enum::name).toList());
+        this.bukkitCommandManager.registerSuggestion(SuggestionKey.of("types"), (sender, context) -> {
+            String subCommand = context.getSubCommand();
+            if (subCommand.equalsIgnoreCase("additems")) {
+                Crate crate = this.plugin.getCrateManager().getCrateFromName(context.getArgs().get(0));
+                CrateSettings crateSettings = crate.getCrateSettings();
+                if (crateSettings == null) return Collections.emptyList();
+                if (context.getArgs().get(1).equalsIgnoreCase("EXTRA_REWARD")) {
+                    return Collections.singletonList("EXTRA_REWARD");
+                } else {
+                    RaritySettings raritySettings = crateSettings.getRarityMap().get(Rarity.valueOf(context.getArgs().get(1)));
+                    if (raritySettings.is5050Enabled()) {
+                        return List.of("LIMITED", "STANDARD");
+                    } else {
+                        return Collections.singletonList("LIMITED");
+                    }
+                }
+            }
+            return Collections.emptyList();
+        });
 
-        this.bukkitCommandManager.registerSuggestion(SuggestionKey.of("rarities"), (sender, context) -> Arrays.stream(Rarity.values()).map(Enum::name).toList());
+        this.bukkitCommandManager.registerSuggestion(SuggestionKey.of("rarities"), (sender, context) -> {
+            String subCommand = context.getSubCommand();
+            if (subCommand.equalsIgnoreCase("additems")) {
+                Crate crate = this.plugin.getCrateManager().getCrateFromName(context.getArgs().get(0));
+                CrateSettings crateSettings = crate.getCrateSettings();
+                if (crateSettings == null) return Collections.emptyList();
+                Set<Rarity> rarityMap = new HashSet<>(crateSettings.getRarityMap().keySet());
+                rarityMap.add(Rarity.EXTRA_REWARD);
+                return rarityMap.stream().map(Enum::name).toList();
+            }
+            return Collections.emptyList();
+        });
 
         this.bukkitCommandManager.registerArgument(CrateBaseCommand.CustomPlayer.class, (sender, context) -> new CrateBaseCommand.CustomPlayer(context));
 
