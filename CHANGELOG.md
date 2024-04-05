@@ -13,8 +13,6 @@ Older keys will still work temporarily but please get your players to trade your
 ## Removed:
 * Temporarily disabled logging keys to console/file due to a weird issue with keys not being taken, The section handling logging is pending re-write
 
-
-
 ## Additions:
 * Added extra placeholders to all messages. The messages.yml will update with new comments showing what each message can use.
 * Add config.yml/messages.yml to `examples` folder which auto-generate on reload.
