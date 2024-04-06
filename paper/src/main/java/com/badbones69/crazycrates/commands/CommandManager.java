@@ -5,6 +5,7 @@ import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.api.objects.gacha.data.RaritySettings;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
+import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.api.objects.other.CrateLocation;
 import com.badbones69.crazycrates.commands.relations.ArgumentRelations;
 import com.badbones69.crazycrates.commands.relations.MiscRelations;
@@ -88,7 +89,7 @@ public class CommandManager {
                     }
                 }
             }
-            return Collections.emptyList();
+            return Arrays.stream(RewardType.values()).map(Enum::name).toList();
         });
 
         this.bukkitCommandManager.registerSuggestion(SuggestionKey.of("rarities"), (sender, context) -> {

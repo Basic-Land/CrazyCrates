@@ -3,6 +3,7 @@ package com.badbones69.crazycrates;
 import com.badbones69.crazycrates.api.builders.types.*;
 import com.badbones69.crazycrates.api.builders.types.items.CratePickPrizeMenu;
 import com.badbones69.crazycrates.api.builders.types.items.ItemAddMenu;
+import com.badbones69.crazycrates.api.builders.types.items.ItemPreview;
 import com.badbones69.crazycrates.api.utils.FileUtils;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
 import com.badbones69.crazycrates.api.utils.MsgUtils;
@@ -25,7 +26,6 @@ import com.badbones69.crazycrates.tasks.BukkitUserManager;
 import com.badbones69.crazycrates.tasks.InventoryManager;
 import com.badbones69.crazycrates.tasks.MigrationManager;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
-import com.ryderbelserion.cluster.ClusterFactory;
 import net.minecraft.server.dedicated.DedicatedServer;
 import org.bukkit.plugin.java.JavaPlugin;
 import com.badbones69.crazycrates.api.FileManager;
@@ -150,6 +150,7 @@ public class CrazyCratesPaper extends JavaPlugin {
                 new CrateTierMenu.CrateTierListener(),
                 new CratePickPrizeMenu.PickPrizeListener(),
                 new ItemAddMenu.ItemsAddListener(),
+                new ItemPreview.ItemPreviewListener(),
 
                 // Other listeners.
                 new BrokeLocationsListener(),

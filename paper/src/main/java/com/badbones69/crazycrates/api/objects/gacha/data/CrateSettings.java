@@ -13,6 +13,7 @@ import cz.basicland.blibs.spigot.utils.item.CustomItemStack;
 import lombok.Getter;
 import lombok.ToString;
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
 @Getter
 @ToString
 public class CrateSettings {
-    private final String name;
+    private final String crateName;
     private final boolean fatePointEnabled, overrideEnabled, extraRewardEnabled;
     private final int fatePointAmount, bonusPity;
 
@@ -34,10 +35,10 @@ public class CrateSettings {
     private final Map<Rarity, RaritySettings> rarityMap = new LinkedHashMap<>();
     private final GachaType gachaType;
 
-    public CrateSettings(FileConfiguration config, String name) {
+    public CrateSettings(FileConfiguration config, String crateName) {
         String path = "Crate.Gacha.settings";
 
-        this.name = name;
+        this.crateName = crateName;
         this.fatePointEnabled = config.getBoolean(path + ".fate-point.enabled");
         this.fatePointAmount = config.getInt(path + ".fate-point.amount");
         this.overrideEnabled = config.getBoolean(path + ".override");
@@ -66,13 +67,21 @@ public class CrateSettings {
         }
     }
 
-    public void loadItems(FileConfiguration config, List<Prize> prizes, List<Tier> tiers, DatabaseManager databaseManager) {
+    public void loadItems(Crate crate, List<Prize> prizes, DatabaseManager databaseManager) {
+        FileConfiguration config = crate.getFile();
+        List<Tier> tiers = crate.getTiers();
+        boolean emptyTiers = tiers.isEmpty();
+
         String path = "Crate.Gacha.settings";
         String tableName = "ExtraRewards";
         RewardType type = RewardType.EXTRA_REWARD;
+        ConfigurationSection section = config.getConfigurationSection(path + ".extra-reward.items");
 
-        for (Pair<Integer, ItemStack> pair : databaseManager.getItems(tableName, config.getIntegerList(path + ".extra-reward.items"))) {
-            extraRewards.add(new ItemData(pair.first(), Rarity.EXTRA_REWARD, type, new CustomItemStack(pair.second())));
+        if (section != null) {
+            for (String key : section.getKeys(false)) {
+                Pair<Integer, ItemStack> pair = databaseManager.getItemManager().getItemFromCache(tableName, Integer.parseInt(key));
+                extraRewards.add(new ItemData(pair.first(), Rarity.EXTRA_REWARD, type, new CustomItemStack(pair.second()), Collections.emptyList(), Collections.emptyList()));
+            }
         }
 
         int slot = 20;
@@ -84,38 +93,54 @@ public class CrateSettings {
 
             CustomItemStack tierStack = getCustomItemStack(rarity, raritySettings);
 
-            Tier tier = new Tier(rarityName, raritySettings.baseChance(), slot, tierStack);
-
-            tiers.add(tier);
+            Tier tier;
+            if (emptyTiers) {
+                tier = new Tier(rarityName, raritySettings.baseChance(), slot, tierStack);
+                tiers.add(tier);
+            } else {
+                tier = tiers.stream().filter(t -> t.getName().equals(rarityName)).findFirst().orElseThrow();
+            }
 
             path = "Crate.Gacha.standard." + rarityName;
             tableName = "StandardItems";
             type = RewardType.STANDARD;
 
-            List<Pair<Integer, ItemStack>> items = databaseManager.getItems(tableName, config.getIntegerList(path));
-
-            addItems(prizes, type, rarity, tier, items, standard);
+            addItems(prizes, databaseManager, config, path, tableName, type, rarity, tier, standard);
 
             path = "Crate.Gacha.limited." + rarityName;
             tableName = "LimitedItems";
             type = RewardType.LIMITED;
 
-            items = databaseManager.getItems(tableName, config.getIntegerList(path));
-
-            addItems(prizes, type, rarity, tier, items, limited);
+            addItems(prizes, databaseManager, config, path, tableName, type, rarity, tier, limited);
 
             slot += 2;
         }
     }
 
-    private void addItems(List<Prize> prizes, RewardType type, Rarity rarity, Tier tier, List<Pair<Integer, ItemStack>> items, Set<ItemData> limited) {
-        for (Pair<Integer, ItemStack> item : items) {
-            CustomItemStack itemStack = new CustomItemStack(item.second());
-            itemStack.setString("type", type.name());
-            itemStack.setInteger("itemID", item.first());
-            limited.add(new ItemData(item.first(), rarity, type, itemStack));
-            prizes.add(new Prize(itemStack.getTitle(), item.first().toString(), name, tier, itemStack));
+    private void addItems(List<Prize> prizes, DatabaseManager databaseManager, FileConfiguration config, String path, String tableName, RewardType type, Rarity rarity, Tier tier, Set<ItemData> itemSet) {
+        ConfigurationSection section = config.getConfigurationSection(path);
+        if (section == null) return;
+        for (String key : section.getKeys(false)) {
+            if (key.equals("list")) {
+                for (String id : config.getStringList(path + ".list")) {
+                    item(id, databaseManager, tableName, type, rarity, tier, itemSet, prizes, config, path);
+                }
+                continue;
+            }
+            item(key, databaseManager, tableName, type, rarity, tier, itemSet, prizes, config, path);
         }
+    }
+
+    private void item(String key, DatabaseManager databaseManager, String tableName, RewardType type, Rarity rarity, Tier tier, Set<ItemData> itemSet, List<Prize> prizes, FileConfiguration config, String path) {
+        int id = Integer.parseInt(key);
+        CustomItemStack stack = new CustomItemStack(databaseManager.getItemManager().getItemFromCache(tableName, id).second());
+        stack.setString("type", type.name());
+        stack.setInteger("itemID", id);
+        List<String> commands = config.getStringList(path + "." + key + ".commands");
+        List<String> messages = config.getStringList(path + "." + key + ".messages");
+        ItemData data = new ItemData(id, rarity, type, stack, commands, messages);
+        itemSet.add(data);
+        prizes.add(new Prize(key, crateName, tier, stack, commands, messages));
     }
 
     public void addItem(RewardType type, int id, Rarity rarity, ItemStack stack, Crate crate) {
@@ -124,7 +149,7 @@ public class CrateSettings {
         customItemStack.setString("type", type.name());
         customItemStack.setInteger("itemID", id);
 
-        ItemData itemData = new ItemData(id, rarity, type, customItemStack);
+        ItemData itemData = new ItemData(id, rarity, type, customItemStack, Collections.emptyList(), Collections.emptyList());
 
         switch (type) {
             case STANDARD -> standard.add(itemData);
@@ -132,7 +157,7 @@ public class CrateSettings {
             case EXTRA_REWARD -> extraRewards.add(itemData);
         }
 
-        crate.getPrizes().add(new Prize(customItemStack.getTitle(), String.valueOf(id), name, crate.getTier(rarity.name().toLowerCase()), customItemStack));
+        crate.getPrizes().add(new Prize(String.valueOf(id), crateName, crate.getTier(rarity.name().toLowerCase()), customItemStack, Collections.emptyList(), Collections.emptyList()));
     }
 
     @NotNull
@@ -180,17 +205,17 @@ public class CrateSettings {
         return tierStack;
     }
 
-    public CustomItemStack findLegendary(boolean isLimited, boolean all, Pair<Integer, String> itemValues) {
+    public ItemData findLegendary(boolean isLimited, boolean all, Pair<Integer, String> itemValues) {
         Rarity rarity = Rarity.LEGENDARY;
         if (all) {
             Set<ItemData> temp = getBoth(rarity);
-            return temp.stream().filter(item -> Objects.equals(item.id(), itemValues.first())).map(ItemData::itemStack).findFirst().orElse(null);
+            return temp.stream().filter(item -> Objects.equals(item.id(), itemValues.first())).findFirst().orElse(null);
         }
 
         if (isLimited) {
-            return getLegendaryLimited().stream().filter(item -> Objects.equals(item.id(), itemValues.first())).map(ItemData::itemStack).findFirst().orElse(null);
+            return getLegendaryLimited().stream().filter(item -> Objects.equals(item.id(), itemValues.first())).findFirst().orElse(null);
         } else {
-            return getLegendaryStandard().stream().filter(item -> Objects.equals(item.id(), itemValues.first())).map(ItemData::itemStack).findFirst().orElse(null);
+            return getLegendaryStandard().stream().filter(item -> Objects.equals(item.id(), itemValues.first())).findFirst().orElse(null);
         }
     }
 

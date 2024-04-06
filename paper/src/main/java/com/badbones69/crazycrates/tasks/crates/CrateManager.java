@@ -99,7 +99,7 @@ public class CrateManager {
 
             ConfigurationSection gachaSection = file.getConfigurationSection("Crate.Gacha");
             if (gachaSection != null) {
-                crate.getCrateSettings().loadItems(file, prizes, tierPrizes, this.databaseManager);
+                crate.getCrateSettings().loadItems(crate, prizes, databaseManager);
             }
 
             ConfigurationSection prizesSection = file.getConfigurationSection("Crate.Prizes");

@@ -6,11 +6,10 @@ import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.api.objects.gacha.data.PlayerProfile;
 import com.badbones69.crazycrates.api.objects.gacha.data.RaritySettings;
 import com.badbones69.crazycrates.api.objects.gacha.data.Result;
-import com.badbones69.crazycrates.api.objects.gacha.util.ItemData;
-import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.enums.ResultType;
-import cz.basicland.blibs.spigot.utils.item.CustomItemStack;
+import com.badbones69.crazycrates.api.objects.gacha.util.ItemData;
+import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -63,24 +62,24 @@ public class GachaSystem {
 
     public Result roll(PlayerProfile playerProfile, CrateSettings itemSet) {
         Result result = getResult(playerProfile, itemSet);
-        result.setItem(pickRandomPrice(result, itemSet, null));
+        result.setItemData(pickRandomPrice(result, itemSet, null));
         playerProfile.addHistory(result);
         return result;
     }
 
-    public Result rollOverrideSet(PlayerProfile playerProfile, CrateSettings itemSet, CustomItemStack wantedItem) {
+    public Result rollOverrideSet(PlayerProfile playerProfile, CrateSettings itemSet, ItemData wantedItem) {
         Result result = getResult(playerProfile, itemSet);
 
         if (result.isLegendary()) {
             if (result.isWon5050()) {
-                result.setItem(wantedItem);
+                result.setItemData(wantedItem);
             } else {
-                Set<CustomItemStack> set = itemSet.getBoth(Rarity.LEGENDARY).stream().map(ItemData::itemStack).collect(Collectors.toSet());
+                Set<ItemData> set = new HashSet<>(itemSet.getBoth(Rarity.LEGENDARY));
                 set.remove(wantedItem);
-                result.setItem(pickRandomPrice(result, null, set));
+                result.setItemData(pickRandomPrice(result, null, set));
             }
         } else {
-            result.setItem(pickRandomPrice(result, itemSet, null));
+            result.setItemData(pickRandomPrice(result, itemSet, null));
         }
 
         playerProfile.addHistory(result);
@@ -94,12 +93,12 @@ public class GachaSystem {
         return prizes.stream().skip(random.nextInt(prizes.size())).findFirst().orElse(null);
     }
 
-    public Result rollWithFatePoint(PlayerProfile playerProfile, CrateSettings itemSet, CustomItemStack wantedItem) {
+    public Result rollWithFatePoint(PlayerProfile playerProfile, CrateSettings itemSet, ItemData wantedItem) {
         Result result = getResult(playerProfile, itemSet);
 
         if (result.isLegendary()) {
             if (playerProfile.getFatePoint() >= itemSet.getFatePointAmount()) {
-                result.setItem(wantedItem);
+                result.setItemData(wantedItem);
                 result.setWon5050(ResultType.GUARANTEED);
 
                 playerProfile.resetFatePoint();
@@ -115,35 +114,35 @@ public class GachaSystem {
                 double chanceWanted = random.nextDouble(10000);
 
                 if (chanceWanted <= 5000) {
-                    result.setItem(wantedItem);
+                    result.setItemData(wantedItem);
                     result.setWon5050(ResultType.WON);
                     playerProfile.resetFatePoint();
                 } else {
-                    Set<CustomItemStack> limited = itemSet.getLegendaryLimited().stream().map(ItemData::itemStack).collect(Collectors.toSet());
+                    Set<ItemData> limited = new HashSet<>(itemSet.getLegendaryLimited());
                     limited.remove(wantedItem);
 
-                    result.setItem(pickRandomPrice(result, null, limited));
+                    result.setItemData(pickRandomPrice(result, null, limited));
                     result.setWon5050(ResultType.WON_OF_RATE_UP);
 
                     playerProfile.incrementFatePoint();
                 }
                 playerProfile.resetNextLegendaryLimited();
             } else {
-                result.setItem(pickRandomPrice(result, null, itemSet.getLegendaryStandard().stream().map(ItemData::itemStack).collect(Collectors.toSet())));
+                result.setItemData(pickRandomPrice(result, null, new HashSet<>(itemSet.getLegendaryStandard())));
                 result.setWon5050(ResultType.LOST);
 
                 playerProfile.setNextLegendaryLimited();
                 playerProfile.incrementFatePoint();
             }
         } else {
-            result.setItem(pickRandomPrice(result, itemSet, null));
+            result.setItemData(pickRandomPrice(result, itemSet, null));
         }
 
         playerProfile.addHistory(result);
         return result;
     }
 
-    private CustomItemStack pickRandomPrice(Result result, CrateSettings itemSet, Set<CustomItemStack> overrideSet) {
+    private ItemData pickRandomPrice(Result result, CrateSettings itemSet, Set<ItemData> overrideSet) {
         random.setSeed(System.nanoTime() * new Random(System.nanoTime()).nextLong());
         if (overrideSet != null)
             return overrideSet.stream().skip(random.nextInt(overrideSet.size())).findFirst().orElse(null);
@@ -151,7 +150,7 @@ public class GachaSystem {
         if (itemSet == null) return null;
 
         Set<ItemData> itemData = result.isWon5050() ? itemSet.getLimited() : itemSet.getStandard();
-        Set<CustomItemStack> set = itemData.stream().filter(item -> item.rarity() == result.getRarity()).map(ItemData::itemStack).collect(Collectors.toSet());
+        Set<ItemData> set = itemData.stream().filter(item -> item.rarity() == result.getRarity()).collect(Collectors.toSet());
         return set.stream().skip(random.nextInt(set.size())).findFirst().orElse(null);
     }
 }

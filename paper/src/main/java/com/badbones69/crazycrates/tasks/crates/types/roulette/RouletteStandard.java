@@ -5,6 +5,7 @@ import com.badbones69.crazycrates.api.PrizeManager;
 import com.badbones69.crazycrates.api.builders.CrateBuilder;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.Prize;
+import com.badbones69.crazycrates.api.objects.gacha.util.ItemData;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
 import cz.basicland.blibs.spigot.utils.item.ItemUtils;
@@ -23,11 +24,11 @@ public class RouletteStandard extends BukkitRunnable {
     private final Crate crate;
     private final Player player;
     private final Inventory inventory;
-    private final List<ItemStack> prize;
+    private final List<ItemData> prize;
     private final boolean multi;
     private final int[] slots;
 
-    public RouletteStandard(CrateBuilder builder, List<ItemStack> prize, boolean multi) {
+    public RouletteStandard(CrateBuilder builder, List<ItemData> prize, boolean multi) {
         this.builder = builder;
         this.crate = builder.getCrate();
         this.player = builder.getPlayer();
@@ -73,7 +74,7 @@ public class RouletteStandard extends BukkitRunnable {
         if (this.full > 16) {
             if (multi) {
                 if (longSpin != 10) {
-                    ItemStack item = prize.get(longSpin);
+                    ItemStack item = prize.get(longSpin).itemStack().getStack();
 
                     if (slowSpin.contains(time + 1)) {
                         builder.setItem(22, item);
@@ -102,7 +103,7 @@ public class RouletteStandard extends BukkitRunnable {
                 }
 
                 if (time == 22 && prize != null) {
-                    builder.setItem(22, prize.get(0));
+                    builder.setItem(22, prize.get(0).itemStack().getStack());
                 }
 
                 this.time++;
@@ -136,7 +137,10 @@ public class RouletteStandard extends BukkitRunnable {
         crateManager.endCrate(player);
 
         if (prize != null) {
-            ItemUtils.giveOrDrop(player, prize.toArray(new ItemStack[0]));
+            for (ItemData itemData : prize) {
+                Prize prize = new Prize(itemData.id().toString(), crate.getName(), null, itemData.itemStack(), itemData.messages(), itemData.commands());
+                PrizeManager.givePrize(player, prize, crate);
+            }
         } else {
             ItemStack item = inventory.getItem(22);
 

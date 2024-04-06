@@ -44,7 +44,7 @@ public class History {
         TextColor color = TextColor.fromHexString("#de7a00");
 
         if (historyList.isEmpty()) {
-            player.sendMessage(Component.text("Nemáte žádnou historii otevření " + crateSettings.getName() + " crate", NamedTextColor.RED));
+            player.sendMessage(Component.text("Nemáte žádnou historii otevření " + crateSettings.getCrateName() + " crate", NamedTextColor.RED));
             return;
         }
 
@@ -61,7 +61,7 @@ public class History {
         Component header = Component.text()
                 .appendNewline()
                 .append(Component.text("Historie otevření ", color))
-                .append(Component.text(crateSettings.getName(), NamedTextColor.AQUA))
+                .append(Component.text(crateSettings.getCrateName(), NamedTextColor.AQUA))
                 .append(Component.text(" crate", color))
                 .appendNewline()
                 .build();
@@ -85,10 +85,10 @@ public class History {
 
         Component pages = Component.text()
                 .appendNewline()
-                .append(Component.text("<<<<", NamedTextColor.DARK_GRAY, TextDecoration.BOLD).clickEvent(ClickEvent.runCommand("/cc history " + crateSettings.getName() + " " + (pageMinus <= 0 ? maxPage : pageMinus)))
+                .append(Component.text("<<<<", NamedTextColor.DARK_GRAY, TextDecoration.BOLD).clickEvent(ClickEvent.runCommand("/cc history " + crateSettings.getCrateName() + " " + (pageMinus <= 0 ? maxPage : pageMinus)))
                         .hoverEvent(Component.text("Předchozí stránka", NamedTextColor.GRAY)))
                 .append(Component.text(" Strana " + pageNumber + "/" + maxPage + " ", color))
-                .append(Component.text(">>>>", NamedTextColor.DARK_GRAY, TextDecoration.BOLD).clickEvent(ClickEvent.runCommand("/cc history " + crateSettings.getName() + " " + (pagePlus > maxPage ? 1 : pagePlus)))
+                .append(Component.text(">>>>", NamedTextColor.DARK_GRAY, TextDecoration.BOLD).clickEvent(ClickEvent.runCommand("/cc history " + crateSettings.getCrateName() + " " + (pagePlus > maxPage ? 1 : pagePlus)))
                         .hoverEvent(Component.text("Další stránka", NamedTextColor.GRAY)))
                 .build();
         player.sendMessage(pages);

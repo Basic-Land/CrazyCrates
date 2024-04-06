@@ -80,7 +80,7 @@ public class Prize {
         this.displayItem = display();
     }
 
-    public Prize(String prizeName, String prizeNumber, String crateName, Tier tier, CustomItemStack stack) {
+    public Prize(String prizeNumber, String crateName, Tier tier, CustomItemStack stack, List<String> messages, List<String> commands) {
         this.section = null;
 
         this.prizeNumber = prizeNumber;
@@ -93,13 +93,13 @@ public class Prize {
 
         this.alternativePrize = null;
 
-        this.prizeName = prizeName;
+        this.prizeName = stack.getTitle();
         this.maxRange = 100;
         this.chance = 100;
         this.firework = false;
 
-        this.messages = Collections.emptyList();
-        this.commands = Collections.emptyList();
+        this.messages = messages;
+        this.commands = commands;
 
         this.permissions = Collections.emptyList();
         this.displayItem = new ItemBuilder(stack.getStack().clone());

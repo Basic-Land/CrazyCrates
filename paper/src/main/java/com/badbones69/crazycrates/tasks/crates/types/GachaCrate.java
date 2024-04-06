@@ -8,6 +8,7 @@ import com.badbones69.crazycrates.api.objects.gacha.data.PlayerProfile;
 import com.badbones69.crazycrates.api.objects.gacha.data.Result;
 import com.badbones69.crazycrates.api.objects.gacha.gacha.GachaSystem;
 import com.badbones69.crazycrates.api.objects.gacha.enums.GachaType;
+import com.badbones69.crazycrates.api.objects.gacha.util.ItemData;
 import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
 import com.badbones69.crazycrates.tasks.BukkitUserManager;
@@ -70,29 +71,22 @@ public class GachaCrate extends CrateBuilder {
             return;
         }
 
-        List<ItemStack> items = new ArrayList<>();
+        List<ItemData> items = new ArrayList<>();
 
-        CustomItemStack stack = crateSettings.findLegendary(gachaType.equals(GachaType.FATE_POINT), gachaType.equals(GachaType.OVERRIDE), chosenReward);
+        ItemData itemData = crateSettings.findLegendary(gachaType.equals(GachaType.FATE_POINT), gachaType.equals(GachaType.OVERRIDE), chosenReward);
+        if (itemData == null && !gachaType.equals(GachaType.NORMAL)) {
+            throw new IllegalStateException("Chosen reward not found");
+        }
 
         while (amount-- > 0) {
             Result result = switch (gachaType) {
                 case NORMAL -> gachaSystem.roll(playerProfile, crateSettings);
-                case FATE_POINT -> {
-                    if (stack == null) {
-                        throw new IllegalStateException("Chosen reward not found");
-                    }
-                    yield gachaSystem.rollWithFatePoint(playerProfile, crateSettings, stack);
-                }
-                case OVERRIDE -> {
-                    if (stack == null) {
-                        throw new IllegalStateException("Chosen reward not found");
-                    }
-                    yield gachaSystem.rollOverrideSet(playerProfile, crateSettings, stack);
-                }
+                case FATE_POINT -> gachaSystem.rollWithFatePoint(playerProfile, crateSettings, itemData);
+                case OVERRIDE -> gachaSystem.rollOverrideSet(playerProfile, crateSettings, itemData);
             };
 
             System.out.println(result);
-            items.add(result.getItem().getStack());
+            items.add(result.getItemData());
         }
 
         addCrateTask(new RouletteStandard(this, items, getPlayer().isSneaking()).runTaskTimer(this.plugin, 2, 2));

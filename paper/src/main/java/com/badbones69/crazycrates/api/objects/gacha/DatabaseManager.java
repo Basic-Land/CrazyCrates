@@ -5,12 +5,9 @@ import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.api.objects.gacha.data.PlayerProfile;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
-import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 import cz.basicland.blibs.shared.databases.hikari.DatabaseConnection;
 import cz.basicland.blibs.spigot.BLibs;
-import cz.basicland.blibs.spigot.utils.item.DBItemStack;
 import lombok.Getter;
-import org.bukkit.inventory.ItemStack;
 
 import java.io.*;
 import java.sql.SQLException;
@@ -21,16 +18,21 @@ public class DatabaseManager {
     private final List<CrateSettings> crateSettings;
     @Getter
     private final History history;
+    @Getter
+    private final ItemManager itemManager;
 
     public DatabaseManager(List<Crate> crateList) {
-        this.connection = BLibs.getApi().getDatabaseHandler().loadSQLite(CrazyCratesPaper.get(), "gamba", "crates.db");
-        this.crateSettings = crateList.stream().map(Crate::getCrateSettings).filter(Objects::nonNull).toList();
-        this.history = new History(this);
+        connection = BLibs.getApi().getDatabaseHandler().loadSQLite(CrazyCratesPaper.get(), "gamba", "crates.db");
+        crateSettings = crateList.stream().map(Crate::getCrateSettings).filter(Objects::nonNull).toList();
         createCrateTable();
+
+        history = new History(this);
+        itemManager = new ItemManager(connection);
+
         for (Crate crate : crateList) {
             CrateSettings settings = crate.getCrateSettings();
             if (settings == null) continue;
-            settings.loadItems(crate.getFile(), crate.getPrizes(), crate.getTiers(), this);
+            settings.loadItems(crate, crate.getPrizes(), this);
         }
     }
 
@@ -60,7 +62,7 @@ public class DatabaseManager {
                 columnNames.remove("playerName");
 
                 crateSettings.forEach(crate -> {
-                    String name = crate.getName();
+                    String name = crate.getCrateName();
                     Set<Rarity> rarities = crate.getRarityMap().keySet();
                     int bonusPity = crate.getBonusPity();
 
@@ -86,7 +88,7 @@ public class DatabaseManager {
     public void addBlankPlayerData(String playerName) {
         StringBuilder query = new StringBuilder("INSERT INTO PlayerData(playerName");
         for (CrateSettings crateSettings : crateSettings) {
-            query.append(", ").append(crateSettings.getName());
+            query.append(", ").append(crateSettings.getCrateName());
         }
         query.append(") VALUES('").append(playerName).append("'");
         for (CrateSettings crateSettings : crateSettings) {
@@ -99,7 +101,7 @@ public class DatabaseManager {
     }
 
     public void savePlayerProfile(String playerName, CrateSettings crateName, PlayerProfile profile) {
-        String name = crateName.getName();
+        String name = crateName.getCrateName();
         if (!crateSettings.contains(crateName)) {
             System.out.println("Error: Crate " + name + " does not exist.");
             return;
@@ -110,7 +112,7 @@ public class DatabaseManager {
     }
 
     public PlayerProfile getPlayerProfile(String playerName, CrateSettings crateName) {
-        String name = crateName.getName();
+        String name = crateName.getCrateName();
         if (!crateSettings.contains(crateName)) {
             System.out.println("Error: Crate " + name + " does not exist.");
             return null;
@@ -134,51 +136,7 @@ public class DatabaseManager {
     }
 
     public CrateSettings getCrateSettings(String crateName) {
-        return crateSettings.stream().filter(crate -> crate.getName().equals(crateName)).findFirst().orElse(null);
-    }
-
-    public List<Pair<Integer, ItemStack>> getItems(String table, List<Integer> ids) {
-        return connection.query("SELECT * FROM " + table + " WHERE id IN (" + String.join(",", Collections.nCopies(ids.size(), "?")) + ")", ids.toArray()).thenApply(rs -> {
-            List<Pair<Integer, ItemStack>> items = new ArrayList<>();
-            try {
-                while (rs.next()) {
-                    int id = rs.getInt("id");
-                    ItemStack item = DBItemStack.decodeItem(rs.getString("itemStack"));
-                    items.add(new Pair<>(id, item));
-                }
-            } catch (SQLException | IOException | ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-            return items;
-        }).join();
-    }
-
-    @SuppressWarnings("unchecked")
-    public Optional<ItemStack> getItem(String table, int id) {
-        return (Optional<ItemStack>) connection.query("SELECT itemStack FROM " + table + " WHERE id = ?", id).thenApply(rs -> {
-            try {
-                if (rs.next()) {
-                    return Optional.of(DBItemStack.decodeItem(rs.getString("itemStack")));
-                }
-            } catch (SQLException | IOException | ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-            return Optional.empty();
-        }).join();
-    }
-
-    public int addItem(String table, String item) {
-        connection.update("INSERT INTO " + table + "(itemStack) VALUES(?)", item).join();
-        return connection.query("SELECT last_insert_rowid()").thenApply(rs -> {
-            try {
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            return -1;
-        }).join();
+        return crateSettings.stream().filter(crate -> crate.getCrateName().equals(crateName)).findFirst().orElse(null);
     }
 
     private String serializeProfile(PlayerProfile profile) {
