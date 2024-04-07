@@ -60,7 +60,9 @@ public class CrateSettings {
                     config.getInt(path + ".soft-pity.from"),
                     config.getDouble(path + ".soft-pity.formula"),
                     config.getBoolean(path + ".soft-pity.static"),
-                    config.getInt(path + ".soft-pity.limit")
+                    config.getInt(path + ".soft-pity.limit"),
+                    config.getInt(path + ".mysticTokens"),
+                    config.getInt(path + ".stellarShards")
             );
 
             rarityMap.put(rarity, raritySettings);
@@ -73,14 +75,13 @@ public class CrateSettings {
         boolean emptyTiers = tiers.isEmpty();
 
         String path = "Crate.Gacha.settings";
-        String tableName = "ExtraRewards";
         RewardType type = RewardType.EXTRA_REWARD;
         ConfigurationSection section = config.getConfigurationSection(path + ".extra-reward.items");
 
         if (section != null) {
             for (String key : section.getKeys(false)) {
-                Pair<Integer, ItemStack> pair = databaseManager.getItemManager().getItemFromCache(tableName, Integer.parseInt(key));
-                extraRewards.add(new ItemData(pair.first(), Rarity.EXTRA_REWARD, type, new CustomItemStack(pair.second()), Collections.emptyList(), Collections.emptyList()));
+                Pair<Integer, ItemStack> pair = databaseManager.getItemManager().getItemFromCache(type, Integer.parseInt(key));
+                extraRewards.add(new ItemData(pair.first(), Rarity.EXTRA_REWARD, type, new CustomItemStack(pair.second()), true, Collections.emptyList(), Collections.emptyList()));
             }
         }
 
@@ -102,45 +103,44 @@ public class CrateSettings {
             }
 
             path = "Crate.Gacha.standard." + rarityName;
-            tableName = "StandardItems";
             type = RewardType.STANDARD;
 
-            addItems(prizes, databaseManager, config, path, tableName, type, rarity, tier, standard);
+            addItems(prizes, databaseManager, config, path, type, rarity, tier, standard);
 
             path = "Crate.Gacha.limited." + rarityName;
-            tableName = "LimitedItems";
             type = RewardType.LIMITED;
 
-            addItems(prizes, databaseManager, config, path, tableName, type, rarity, tier, limited);
+            addItems(prizes, databaseManager, config, path, type, rarity, tier, limited);
 
             slot += 2;
         }
     }
 
-    private void addItems(List<Prize> prizes, DatabaseManager databaseManager, FileConfiguration config, String path, String tableName, RewardType type, Rarity rarity, Tier tier, Set<ItemData> itemSet) {
+    private void addItems(List<Prize> prizes, DatabaseManager databaseManager, FileConfiguration config, String path, RewardType type, Rarity rarity, Tier tier, Set<ItemData> itemSet) {
         ConfigurationSection section = config.getConfigurationSection(path);
         if (section == null) return;
         for (String key : section.getKeys(false)) {
             if (key.equals("list")) {
                 for (String id : config.getStringList(path + ".list")) {
-                    item(id, databaseManager, tableName, type, rarity, tier, itemSet, prizes, config, path);
+                    item(id, databaseManager, type, rarity, tier, itemSet, prizes, config, path);
                 }
                 continue;
             }
-            item(key, databaseManager, tableName, type, rarity, tier, itemSet, prizes, config, path);
+            item(key, databaseManager, type, rarity, tier, itemSet, prizes, config, path);
         }
     }
 
-    private void item(String key, DatabaseManager databaseManager, String tableName, RewardType type, Rarity rarity, Tier tier, Set<ItemData> itemSet, List<Prize> prizes, FileConfiguration config, String path) {
+    private void item(String key, DatabaseManager databaseManager, RewardType type, Rarity rarity, Tier tier, Set<ItemData> itemSet, List<Prize> prizes, FileConfiguration config, String path) {
         int id = Integer.parseInt(key);
-        CustomItemStack stack = new CustomItemStack(databaseManager.getItemManager().getItemFromCache(tableName, id).second());
+        CustomItemStack stack = new CustomItemStack(databaseManager.getItemManager().getItemFromCache(type, id).second());
         stack.setString("type", type.name());
         stack.setInteger("itemID", id);
         List<String> commands = config.getStringList(path + "." + key + ".commands");
         List<String> messages = config.getStringList(path + "." + key + ".messages");
-        ItemData data = new ItemData(id, rarity, type, stack, commands, messages);
+        boolean give = config.getBoolean(path + "." + key + ".give", true);
+        ItemData data = new ItemData(id, rarity, type, stack, give, commands, messages);
         itemSet.add(data);
-        prizes.add(new Prize(key, crateName, tier, stack, commands, messages));
+        prizes.add(new Prize(key, crateName, tier, stack, give, commands, messages));
     }
 
     public void addItem(RewardType type, int id, Rarity rarity, ItemStack stack, Crate crate) {
@@ -149,7 +149,7 @@ public class CrateSettings {
         customItemStack.setString("type", type.name());
         customItemStack.setInteger("itemID", id);
 
-        ItemData itemData = new ItemData(id, rarity, type, customItemStack, Collections.emptyList(), Collections.emptyList());
+        ItemData itemData = new ItemData(id, rarity, type, customItemStack, true, Collections.emptyList(), Collections.emptyList());
 
         switch (type) {
             case STANDARD -> standard.add(itemData);
@@ -157,7 +157,7 @@ public class CrateSettings {
             case EXTRA_REWARD -> extraRewards.add(itemData);
         }
 
-        crate.getPrizes().add(new Prize(String.valueOf(id), crateName, crate.getTier(rarity.name().toLowerCase()), customItemStack, Collections.emptyList(), Collections.emptyList()));
+        crate.getPrizes().add(new Prize(String.valueOf(id), crateName, crate.getTier(rarity.name().toLowerCase()), customItemStack, true, Collections.emptyList(), Collections.emptyList()));
     }
 
     @NotNull

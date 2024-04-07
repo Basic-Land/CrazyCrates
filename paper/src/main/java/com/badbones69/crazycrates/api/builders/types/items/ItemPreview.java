@@ -6,6 +6,8 @@ import com.badbones69.crazycrates.api.objects.gacha.ItemManager;
 import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 import com.google.common.collect.Lists;
+import cz.basicland.blibs.spigot.utils.item.NBT;
+import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,25 +19,22 @@ import org.bukkit.inventory.ItemStack;
 import java.util.List;
 
 public class ItemPreview extends InventoryBuilder {
-    private final String tableName;
-    private final ItemManager itemManager;
-    private int page;
+    private final List<Pair<Integer, ItemStack>> items;
+    @Getter
+    private final RewardType type;
+    private int page = 0;
 
     public ItemPreview(Player player, int size, String title, RewardType type) {
         super(player, size, title);
-        tableName = switch (type) {
-            case STANDARD -> "StandardItems";
-            case LIMITED -> "LimitedItems";
-            case EXTRA_REWARD -> "ExtraRewards";
-        };
-
-        this.itemManager = CrazyCratesPaper.get().getCrateManager().getDatabaseManager().getItemManager();
-        this.page = 0;
+        this.type = type;
+        ItemManager itemManager = CrazyCratesPaper.get().getCrateManager().getDatabaseManager().getItemManager();
+        items = itemManager.getAllItemsFromCache(type).entrySet().stream()
+                .map(entry -> new Pair<>(entry.getKey(), entry.getValue()))
+                .toList();
     }
 
     @Override
     public InventoryBuilder build() {
-        List<ItemStack> items = itemManager.getAllItems(tableName).values().stream().toList();
         int totalPages = (int) Math.ceil((double) items.size() / getSize());
 
         // Clear the inventory
@@ -43,18 +42,21 @@ public class ItemPreview extends InventoryBuilder {
 
         // Add items to the inventory
         int i = 0;
-        for (ItemStack item : Lists.partition(items, 45).get(page)) {
-            getInventory().setItem(i++, item);
+        for (Pair<Integer, ItemStack> item : Lists.partition(items, 45).get(page)) {
+            ItemStack itemStack = item.second();
+            NBT nbt = new NBT(itemStack);
+            nbt.setInteger("itemID", item.first());
+            getInventory().setItem(i++, itemStack);
         }
 
         // Add page navigation items
         if (page > 0) {
             // Add previous page item
-            getInventory().setItem(getSize() - 9, new ItemStack(Material.ARROW)); // Replace with your own item
+            getInventory().setItem(getSize() - 9, new ItemStack(Material.ARROW));
         }
         if (page < totalPages - 1) {
             // Add next page item
-            getInventory().setItem(getSize() - 1, new ItemStack(Material.ARROW)); // Replace with your own item
+            getInventory().setItem(getSize() - 1, new ItemStack(Material.ARROW));
         }
 
         return this;
@@ -67,6 +69,7 @@ public class ItemPreview extends InventoryBuilder {
 
             if (!(inventory.getHolder(false) instanceof ItemPreview holder)) return;
 
+            Player player = holder.getPlayer();
             int slot = event.getSlot();
             event.setCancelled(true);
 
@@ -74,12 +77,12 @@ public class ItemPreview extends InventoryBuilder {
                 // Previous page
                 holder.page--;
                 holder.build();
-            } else if (slot == holder.getSize() - 1 && holder.page < (int) Math.ceil((double) holder.itemManager.getAllItems(holder.tableName).size() / holder.getSize()) - 1) {
+            } else if (slot == holder.getSize() - 1 && holder.page < (int) Math.ceil((double) holder.items.size() / holder.getSize()) - 1) {
                 // Next page
                 holder.page++;
                 holder.build();
-            } else {
-
+            } else if (slot < holder.getSize() - 9 && slot >= 0) {
+                player.openInventory(new ItemEdit(holder, player, 27, "Edit Item", event.getCurrentItem()).build().getInventory());
             }
         }
     }

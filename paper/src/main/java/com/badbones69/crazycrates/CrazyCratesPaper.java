@@ -3,7 +3,9 @@ package com.badbones69.crazycrates;
 import com.badbones69.crazycrates.api.builders.types.*;
 import com.badbones69.crazycrates.api.builders.types.items.CratePickPrizeMenu;
 import com.badbones69.crazycrates.api.builders.types.items.ItemAddMenu;
+import com.badbones69.crazycrates.api.builders.types.items.ItemEdit;
 import com.badbones69.crazycrates.api.builders.types.items.ItemPreview;
+import com.badbones69.crazycrates.api.objects.gacha.BaseProfileManager;
 import com.badbones69.crazycrates.api.utils.FileUtils;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
 import com.badbones69.crazycrates.api.utils.MsgUtils;
@@ -64,7 +66,7 @@ public class CrazyCratesPaper extends JavaPlugin {
     private BukkitUserManager userManager;
     private CrateManager crateManager;
     private FileManager fileManager;
-
+    private BaseProfileManager baseProfileManager;
     private MetricsManager metrics;
 
     @Override
@@ -142,6 +144,8 @@ public class CrazyCratesPaper extends JavaPlugin {
             this.metrics.start();
         }
 
+        baseProfileManager = new BaseProfileManager();
+
         List.of(
                 // Menu listeners.
                 new CratePreviewMenu.CratePreviewListener(),
@@ -151,6 +155,7 @@ public class CrazyCratesPaper extends JavaPlugin {
                 new CratePickPrizeMenu.PickPrizeListener(),
                 new ItemAddMenu.ItemsAddListener(),
                 new ItemPreview.ItemPreviewListener(),
+                new ItemEdit.ItemEditListener(),
 
                 // Other listeners.
                 new BrokeLocationsListener(),
@@ -161,7 +166,8 @@ public class CrazyCratesPaper extends JavaPlugin {
                 new QuadCrateListener(),
                 new CrateOpenListener(),
                 new WarCrateListener(),
-                new MiscListener()
+                new MiscListener(),
+                baseProfileManager
         ).forEach(listener -> getServer().getPluginManager().registerEvents(listener, this));
 
         if (MiscUtils.isLogging()) {
@@ -190,6 +196,7 @@ public class CrazyCratesPaper extends JavaPlugin {
     public void onDisable() {
         // Cancel the timer task.
         if (this.timer != null) this.timer.cancel();
+        if (this.baseProfileManager != null) this.baseProfileManager.save();
 
         // Clean up any mess we may have left behind.
         if (this.crateManager != null) {
@@ -239,5 +246,10 @@ public class CrazyCratesPaper extends JavaPlugin {
     @NotNull
     public Timer getTimer() {
         return this.timer;
+    }
+
+    @NotNull
+    public BaseProfileManager getBaseProfileManager() {
+        return this.baseProfileManager;
     }
 }

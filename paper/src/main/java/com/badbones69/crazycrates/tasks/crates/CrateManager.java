@@ -72,7 +72,7 @@ public class CrateManager {
     @Getter
     private DatabaseManager databaseManager;
     @Getter
-    private final GachaSystem gachaSystem = new GachaSystem();;
+    private final GachaSystem gachaSystem = new GachaSystem();
 
     private HologramManager holograms;
 

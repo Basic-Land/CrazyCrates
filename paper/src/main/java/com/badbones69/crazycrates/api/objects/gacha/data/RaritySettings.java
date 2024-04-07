@@ -1,7 +1,7 @@
 package com.badbones69.crazycrates.api.objects.gacha.data;
 
 public record RaritySettings(int pity, boolean is5050Enabled, double chanceFor5050, double baseChance, int softPityFrom,
-                             double softPityFormula, boolean staticFormula, int softPityLimit) {
+                             double softPityFormula, boolean staticFormula, int softPityLimit, int mysticTokens, int stellarShards) {
     public double get5050Chance() {
         return is5050Enabled ? chanceFor5050 : 100;
     }

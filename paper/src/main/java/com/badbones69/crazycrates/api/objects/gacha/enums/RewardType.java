@@ -1,9 +1,18 @@
 package com.badbones69.crazycrates.api.objects.gacha.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum RewardType {
-    STANDARD,
-    LIMITED,
-    EXTRA_REWARD;
+    STANDARD("StandardItems"),
+    LIMITED("LimitedItems"),
+    EXTRA_REWARD("ExtraRewards");
+
+    private final String tableName;
+
+    RewardType(String tableName) {
+        this.tableName = tableName;
+    }
 
     public static RewardType fromString(String string) {
         for (RewardType rewardType : values()) {

@@ -72,16 +72,10 @@ public class ItemAddMenu extends InventoryBuilder {
             RewardType type = holder.type;
             CrateSettings crateSettings = crate.getCrateSettings();
 
-            String tableName = switch (type) {
-                case STANDARD -> "StandardItems";
-                case LIMITED -> "LimitedItems";
-                case EXTRA_REWARD -> "ExtraRewards";
-            };
-
             for (ItemStack item : items) {
                 if (item == null || item.getType() == Material.AIR) continue;
 
-                int id = databaseManager.getItemManager().addItem(tableName, item);
+                int id = databaseManager.getItemManager().addItem(type, item);
                 if (id == -1) continue;
 
                 crateSettings.addItem(type, id, rarity, item, crate);

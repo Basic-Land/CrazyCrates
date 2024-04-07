@@ -1,5 +1,6 @@
 package com.badbones69.crazycrates.api.objects.gacha;
 
+import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 import cz.basicland.blibs.shared.databases.hikari.DatabaseConnection;
 import cz.basicland.blibs.spigot.utils.item.DBItemStack;
@@ -79,12 +80,11 @@ public class ItemManager {
      * @param ids The IDs of the items to retrieve.
      * @return A list of pairs, where each pair consists of an item ID and an ItemStack.
      */
-    public Map<Integer, ItemStack> getItemsFromCache(String table, List<Integer> ids) {
+    public Map<Integer, ItemStack> getItemsFromCache(RewardType table, List<Integer> ids) {
         return switch (table) {
-            case "StandardItems" -> get(standardItems, ids);
-            case "LimitedItems" -> get(limitedItems, ids);
-            case "ExtraRewards" -> get(extraRewards, ids);
-            default -> null;
+            case STANDARD -> get(standardItems, ids);
+            case LIMITED -> get(limitedItems, ids);
+            case EXTRA_REWARD -> get(extraRewards, ids);
         };
     }
 
@@ -99,15 +99,21 @@ public class ItemManager {
      * @param id The ID of the item to retrieve.
      * @return A pair consisting of the item ID and an ItemStack, or null if the item is not found.
      */
-    public Pair<Integer, ItemStack> getItemFromCache(String table, int id) {
+    public Pair<Integer, ItemStack> getItemFromCache(RewardType table, int id) {
         Map<Integer, ItemStack> items = switch (table) {
-            case "StandardItems" -> standardItems;
-            case "LimitedItems" -> limitedItems;
-            case "ExtraRewards" -> extraRewards;
-            default -> null;
+            case STANDARD -> standardItems;
+            case LIMITED -> limitedItems;
+            case EXTRA_REWARD -> extraRewards;
         };
-        if (items == null) return null;
         return new Pair<>(id, items.get(id));
+    }
+
+    public Map<Integer, ItemStack> getAllItemsFromCache(RewardType table) {
+        return switch (table) {
+            case STANDARD -> standardItems;
+            case LIMITED -> limitedItems;
+            case EXTRA_REWARD -> extraRewards;
+        };
     }
 
     /**
@@ -117,9 +123,9 @@ public class ItemManager {
      * @param item The ItemStack to add.
      * @return The ID of the added item, or -1 if the item could not be added.
      */
-    public int addItem(String table, ItemStack item) {
+    public int addItem(RewardType table, ItemStack item) {
         try {
-            connection.update("INSERT INTO " + table + "(itemStack) VALUES(?)", DBItemStack.encodeItem(item)).join();
+            connection.update("INSERT INTO " + table.getTableName() + "(itemStack) VALUES(?)", DBItemStack.encodeItem(item)).join();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -138,9 +144,9 @@ public class ItemManager {
         if (id == -1) return id;
 
         switch (table) {
-            case "StandardItems" -> standardItems.put(id, item);
-            case "LimitedItems" -> limitedItems.put(id, item);
-            case "ExtraRewards" -> extraRewards.put(id, item);
+            case STANDARD -> standardItems.put(id, item);
+            case LIMITED -> limitedItems.put(id, item);
+            case EXTRA_REWARD -> extraRewards.put(id, item);
         }
 
         return id;

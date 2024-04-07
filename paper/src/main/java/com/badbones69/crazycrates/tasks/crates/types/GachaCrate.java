@@ -3,9 +3,8 @@ package com.badbones69.crazycrates.tasks.crates.types;
 import com.badbones69.crazycrates.api.builders.CrateBuilder;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
-import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
-import com.badbones69.crazycrates.api.objects.gacha.data.PlayerProfile;
-import com.badbones69.crazycrates.api.objects.gacha.data.Result;
+import com.badbones69.crazycrates.api.objects.gacha.data.*;
+import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.gacha.GachaSystem;
 import com.badbones69.crazycrates.api.objects.gacha.enums.GachaType;
 import com.badbones69.crazycrates.api.objects.gacha.util.ItemData;
@@ -22,6 +21,7 @@ import us.crazycrew.crazycrates.api.enums.types.KeyType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class GachaCrate extends CrateBuilder {
     @NotNull
@@ -46,6 +46,8 @@ public class GachaCrate extends CrateBuilder {
         CrateSettings crateSettings = playerDataManager.getCrateSettings(getCrate().getName());
 
         PlayerProfile playerProfile = playerDataManager.getPlayerProfile(playerName, crateSettings);
+        PlayerBaseProfile baseProfile = this.plugin.getBaseProfileManager().getPlayerBaseProfile(playerName);
+
         Pair<Integer, String> chosenReward = playerProfile.getChosenReward();
         GachaType gachaType = crateSettings.getGachaType();
 
@@ -78,6 +80,8 @@ public class GachaCrate extends CrateBuilder {
             throw new IllegalStateException("Chosen reward not found");
         }
 
+        Map<Rarity, RaritySettings> rarityMap = crateSettings.getRarityMap();
+
         while (amount-- > 0) {
             Result result = switch (gachaType) {
                 case NORMAL -> gachaSystem.roll(playerProfile, crateSettings);
@@ -86,6 +90,15 @@ public class GachaCrate extends CrateBuilder {
             };
 
             System.out.println(result);
+
+
+            Rarity rarity = result.getRarity();
+            int stellarShards = rarityMap.get(rarity).stellarShards();
+            int mysticTokens = rarityMap.get(rarity).mysticTokens();
+
+            baseProfile.addMysticTokens(mysticTokens);
+            baseProfile.addStellarShards(stellarShards);
+
             items.add(result.getItemData());
         }
 

@@ -3,6 +3,7 @@ package com.badbones69.crazycrates.api.objects.gacha;
 import com.badbones69.crazycrates.CrazyCratesPaper;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
+import com.badbones69.crazycrates.api.objects.gacha.data.PlayerBaseProfile;
 import com.badbones69.crazycrates.api.objects.gacha.data.PlayerProfile;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import cz.basicland.blibs.shared.databases.hikari.DatabaseConnection;
@@ -37,7 +38,7 @@ public class DatabaseManager {
     }
 
     private void createCrateTable() {
-        connection.update("CREATE TABLE IF NOT EXISTS PlayerData(playerName VARCHAR(16) PRIMARY KEY)").join();
+        connection.update("CREATE TABLE IF NOT EXISTS PlayerData(playerName VARCHAR(16) PRIMARY KEY, baseData VARCHAR NULL)").join();
         connection.update("CREATE TABLE IF NOT EXISTS StandardItems(id INTEGER PRIMARY KEY AUTOINCREMENT, itemStack VARCHAR NULL)").join();
         connection.update("CREATE TABLE IF NOT EXISTS LimitedItems(id INTEGER PRIMARY KEY AUTOINCREMENT, itemStack VARCHAR NULL)").join();
         connection.update("CREATE TABLE IF NOT EXISTS ExtraRewards(id INTEGER PRIMARY KEY AUTOINCREMENT, itemStack VARCHAR NULL)").join();
@@ -60,6 +61,7 @@ public class DatabaseManager {
                     columnNames.add(rs.getString("name"));
                 }
                 columnNames.remove("playerName");
+                columnNames.remove("baseData");
 
                 crateSettings.forEach(crate -> {
                     String name = crate.getCrateName();
@@ -86,11 +88,12 @@ public class DatabaseManager {
     }
 
     public void addBlankPlayerData(String playerName) {
-        StringBuilder query = new StringBuilder("INSERT INTO PlayerData(playerName");
+        StringBuilder query = new StringBuilder("INSERT INTO PlayerData(playerName, baseData");
         for (CrateSettings crateSettings : crateSettings) {
             query.append(", ").append(crateSettings.getCrateName());
         }
         query.append(") VALUES('").append(playerName).append("'");
+        query.append(", '").append(serializeProfile(new PlayerBaseProfile(playerName))).append("'");
         for (CrateSettings crateSettings : crateSettings) {
             PlayerProfile profile = new PlayerProfile(playerName, crateSettings.getRarityMap().keySet(), crateSettings.getBonusPity());
             query.append(", '").append(serializeProfile(profile)).append("'");
@@ -135,11 +138,34 @@ public class DatabaseManager {
         }).join();
     }
 
+    public PlayerBaseProfile getPlayerBaseProfile(String playerName) {
+        if (!hasPlayerData(playerName)) {
+            addBlankPlayerData(playerName);
+        }
+
+        return connection.query("SELECT baseData FROM PlayerData WHERE playerName = ?", playerName).thenApply(rs -> {
+            try {
+                if (rs.next()) {
+                    String profileString = rs.getString("baseData");
+                    return deserializeBaseProfile(profileString);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }).join();
+    }
+
+    public void savePlayerBaseProfile(String playerName, PlayerBaseProfile profile) {
+        String profileString = serializeProfile(profile);
+        connection.update("UPDATE PlayerData SET baseData = ? WHERE playerName = ?", profileString, playerName);
+    }
+
     public CrateSettings getCrateSettings(String crateName) {
         return crateSettings.stream().filter(crate -> crate.getCrateName().equals(crateName)).findFirst().orElse(null);
     }
 
-    private String serializeProfile(PlayerProfile profile) {
+    private String serializeProfile(Object profile) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(baos);
@@ -153,11 +179,19 @@ public class DatabaseManager {
     }
 
     private PlayerProfile deserializeProfile(String profileString) {
+        return (PlayerProfile) deserialize(profileString);
+    }
+
+    private PlayerBaseProfile deserializeBaseProfile(String profileString) {
+        return (PlayerBaseProfile) deserialize(profileString);
+    }
+
+    private Object deserialize(String profileString) {
         try {
             byte[] bytes = Base64.getDecoder().decode(profileString);
             ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
             ObjectInputStream ois = new ObjectInputStream(bais);
-            return (PlayerProfile) ois.readObject();
+            return ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
             return null;

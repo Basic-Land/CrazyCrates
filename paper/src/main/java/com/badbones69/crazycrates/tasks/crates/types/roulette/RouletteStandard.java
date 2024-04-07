@@ -125,11 +125,7 @@ public class RouletteStandard extends BukkitRunnable {
     }
 
     private Prize pickPrize() {
-        if (prize == null) {
-            return crate.pickPrize(player);
-        } else {
-            return crateManager.getGachaSystem().pickPrize(crate);
-        }
+        return crate.pickPrize(player);
     }
 
     private void endTask() {
@@ -138,7 +134,7 @@ public class RouletteStandard extends BukkitRunnable {
 
         if (prize != null) {
             for (ItemData itemData : prize) {
-                Prize prize = new Prize(itemData.id().toString(), crate.getName(), null, itemData.itemStack(), itemData.messages(), itemData.commands());
+                Prize prize = new Prize(itemData.id().toString(), crate.getName(), null, itemData.itemStack(), itemData.give(), itemData.messages(), itemData.commands());
                 PrizeManager.givePrize(player, prize, crate);
             }
         } else {
@@ -149,6 +145,8 @@ public class RouletteStandard extends BukkitRunnable {
                 PrizeManager.givePrize(player, crate, prize);
             }
         }
+
+        player.sendMessage(plugin.getBaseProfileManager().getPlayerBaseProfile(player.getName()).toString());
 
         crateManager.removePlayerFromOpeningList(player);
 

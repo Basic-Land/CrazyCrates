@@ -80,14 +80,14 @@ public class Prize {
         this.displayItem = display();
     }
 
-    public Prize(String prizeNumber, String crateName, Tier tier, CustomItemStack stack, List<String> messages, List<String> commands) {
+    public Prize(String prizeNumber, String crateName, Tier tier, CustomItemStack stack, boolean give, List<String> messages, List<String> commands) {
         this.section = null;
 
         this.prizeNumber = prizeNumber;
 
         this.crateName = crateName;
 
-        this.builders = Collections.singletonList(new ItemBuilder(stack.getStack().clone()));
+        this.builders = give ? Collections.singletonList(new ItemBuilder(stack.getStack().clone())) : Collections.emptyList();
 
         this.tiers = Collections.singletonList(tier);
 
