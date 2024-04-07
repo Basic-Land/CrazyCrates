@@ -18,11 +18,14 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import com.badbones69.crazycrates.CrazyCrates;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CommandManager {
 
     @NotNull
-    private final CrazyCratesPaper plugin = CrazyCratesPaper.get();
+    private final CrazyCrates plugin = CrazyCrates.get();
 
     @NotNull
     private final BukkitCommandManager<CommandSender> bukkitCommandManager = this.plugin.getCommandManager();

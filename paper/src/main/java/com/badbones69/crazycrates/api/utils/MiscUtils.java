@@ -23,7 +23,7 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
-import com.badbones69.crazycrates.CrazyCratesPaper;
+import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.enums.PersistentKeys;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,7 +35,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class MiscUtils {
 
     @NotNull
-    private static final CrazyCratesPaper plugin = CrazyCratesPaper.get();
+    private static final CrazyCrates plugin = CrazyCrates.get();
 
     public static void sendCommand(String command) {
         Server server = plugin.getServer();
@@ -69,6 +69,10 @@ public class MiscUtils {
         Server server = plugin.getServer();
 
         server.getScheduler().scheduleSyncDelayedTask(plugin, firework::detonate, 3);
+    }
+
+    public static String location(Location location) {
+        return location.getWorld().getUID() + "," + location.getBlockX() + "," + location.getBlockY() + "," + location.getBlockZ();
     }
 
     /**

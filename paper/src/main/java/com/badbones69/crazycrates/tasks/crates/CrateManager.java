@@ -7,11 +7,30 @@ import com.badbones69.crazycrates.api.ChestManager;
 import com.badbones69.crazycrates.api.FileManager;
 import com.badbones69.crazycrates.api.FileManager.Files;
 import com.badbones69.crazycrates.api.builders.CrateBuilder;
+import com.badbones69.crazycrates.api.objects.other.BrokeLocation;
+import com.badbones69.crazycrates.api.ChestManager;
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
+import com.badbones69.crazycrates.api.utils.MiscUtils;
+import com.badbones69.crazycrates.tasks.crates.types.*;
+import com.badbones69.crazycrates.tasks.crates.types.CasinoCrate;
+import com.badbones69.crazycrates.tasks.crates.types.CsgoCrate;
+import org.apache.commons.lang.WordUtils;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionDefault;
+import org.bukkit.persistence.PersistentDataContainer;
+import us.crazycrew.crazycrates.api.enums.types.CrateType;
+import us.crazycrew.crazycrates.api.enums.types.KeyType;
+import com.badbones69.crazycrates.api.enums.PersistentKeys;
+import org.bukkit.scheduler.BukkitTask;
+import us.crazycrew.crazycrates.platform.config.ConfigManager;
+import us.crazycrew.crazycrates.platform.config.impl.ConfigKeys;
 import com.badbones69.crazycrates.api.builders.types.CrateMainMenu;
 import com.badbones69.crazycrates.api.enums.Messages;
 import com.badbones69.crazycrates.api.enums.PersistentKeys;
 import com.badbones69.crazycrates.api.objects.Crate;
+import com.badbones69.crazycrates.api.objects.other.CrateLocation;
 import com.badbones69.crazycrates.api.objects.Prize;
 import com.badbones69.crazycrates.api.objects.Tier;
 import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
@@ -51,14 +70,26 @@ import us.crazycrew.crazycrates.api.enums.types.KeyType;
 import us.crazycrew.crazycrates.platform.config.ConfigManager;
 import us.crazycrew.crazycrates.platform.config.impl.ConfigKeys;
 
+import com.badbones69.crazycrates.CrazyCrates;
+import com.badbones69.crazycrates.support.holograms.types.CMIHologramsSupport;
+import com.badbones69.crazycrates.support.holograms.types.DecentHologramsSupport;
+import com.badbones69.crazycrates.support.PluginSupport;
+import com.badbones69.crazycrates.api.utils.ItemUtils;
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.TimerTask;
+import java.util.UUID;
 import java.util.logging.Level;
 
 public class CrateManager {
 
     @NotNull
-    private final CrazyCratesPaper plugin = CrazyCratesPaper.get();
+    private final CrazyCrates plugin = CrazyCrates.get();
 
     @NotNull
     private final FileManager fileManager = this.plugin.getFileManager();
@@ -164,9 +195,6 @@ public class CrateManager {
         } else if (PluginSupport.CMI.isPluginEnabled() && CMIModule.holograms.isEnabled()) {
             this.holograms = new CMIHologramsSupport();
             if (MiscUtils.isLogging()) this.plugin.getLogger().info("CMI Hologram support has been enabled.");
-        } else if (PluginSupport.HOLOGRAPHIC_DISPLAYS.isPluginEnabled()) {
-            this.holograms = new HolographicDisplaysSupport();
-            if (MiscUtils.isLogging()) this.plugin.getLogger().info("Holographic Displays support has been enabled.");
         } else if (MiscUtils.isLogging()) this.plugin.getLogger().warning("No holograms plugin were found. If using CMI, make sure holograms module is enabled.");
     }
 
@@ -179,7 +207,7 @@ public class CrateManager {
         purge();
 
         // Removes all holograms so that they can be replaced.
-        if (this.holograms != null && !this.holograms.isMapEmpty()) {
+        if (this.holograms != null && !this.holograms.isEmpty()) {
             this.holograms.removeAllHolograms();
         }
 
@@ -331,7 +359,7 @@ public class CrateManager {
                         this.crateLocations.add(new CrateLocation(locationName, crate, location));
 
                         if (this.holograms != null) {
-                            this.holograms.createHologram(location.getBlock(), crate);
+                            this.holograms.createHologram(location, crate);
                         }
 
                         loadedAmount++;
@@ -861,7 +889,7 @@ public class CrateManager {
 
         addLocation(new CrateLocation(id, crate, location));
 
-        if (this.holograms != null) this.holograms.createHologram(location.getBlock(), crate);
+        if (this.holograms != null) this.holograms.createHologram(location, crate);
     }
 
     /**
@@ -884,7 +912,7 @@ public class CrateManager {
         if (location != null) {
             removeLocation(location);
 
-            if (this.holograms != null) this.holograms.removeHologram(location.getLocation().getBlock());
+            if (this.holograms != null) this.holograms.removeHologram(location.getLocation());
         }
     }
 
@@ -1306,7 +1334,7 @@ public class CrateManager {
         if (!useQuickCrateAgain) {
             HologramManager handler = this.plugin.getCrateManager().getHolograms();
 
-            if (handler != null && crate != null) handler.createHologram(location.getBlock(), crate);
+            if (handler != null && crate != null) handler.createHologram(location, crate);
         }
     }
 

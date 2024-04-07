@@ -1,7 +1,5 @@
 package com.badbones69.crazycrates.api.objects;
 
-import com.badbones69.crazycrates.CrazyCratesPaper;
-import com.badbones69.crazycrates.api.FileManager;
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.builders.types.CratePreviewMenu;
 import com.badbones69.crazycrates.api.builders.types.CrateTierMenu;
@@ -17,6 +15,18 @@ import com.ryderbelserion.cluster.utils.DyeUtils;
 import lombok.Getter;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
+import us.crazycrew.crazycrates.api.enums.types.CrateType;
+import com.badbones69.crazycrates.CrazyCrates;
+import com.badbones69.crazycrates.api.FileManager;
+import com.badbones69.crazycrates.tasks.crates.other.CosmicCrateManager;
+import com.badbones69.crazycrates.tasks.crates.other.AbstractCrateManager;
+import org.jetbrains.annotations.NotNull;
+import us.crazycrew.crazycrates.api.crates.CrateHologram;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -572,7 +582,7 @@ public class Crate {
 
         return getPrize(container.get(PersistentKeys.crate_prize.getNamespacedKey(), PersistentDataType.STRING));
     }
-
+    
     /**
      * @return true if new players get keys and false if they do not.
      */

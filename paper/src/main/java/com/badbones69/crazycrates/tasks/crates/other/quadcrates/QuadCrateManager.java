@@ -3,7 +3,7 @@ package com.badbones69.crazycrates.tasks.crates.other.quadcrates;
 import org.bukkit.SoundCategory;
 import us.crazycrew.crazycrates.platform.config.ConfigManager;
 import us.crazycrew.crazycrates.platform.config.impl.ConfigKeys;
-import com.badbones69.crazycrates.CrazyCratesPaper;
+import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
 import com.badbones69.crazycrates.api.enums.Messages;
@@ -29,7 +29,7 @@ import java.util.Map;
 public class QuadCrateManager {
 
     @NotNull
-    private final CrazyCratesPaper plugin = CrazyCratesPaper.get();
+    private final CrazyCrates plugin = CrazyCrates.get();
 
     @NotNull
     private final CrateManager crateManager = this.plugin.getCrateManager();
@@ -178,7 +178,7 @@ public class QuadCrateManager {
             return;
         }
 
-        if (this.crateManager.getHolograms() != null) this.crateManager.getHolograms().removeHologram(this.spawnLocation.getBlock());
+        if (this.crateManager.getHolograms() != null) this.crateManager.getHolograms().removeHologram(this.spawnLocation);
 
         // Shove other players away from the player opening the crate.
         shovePlayers.forEach(entity -> entity.getLocation().toVector().subtract(this.spawnLocation.clone().toVector()).normalize().setY(1));
@@ -272,7 +272,7 @@ public class QuadCrateManager {
                 // Restore the old blocks.
                 oldBlocks.keySet().forEach(location -> oldBlocks.get(location).update(true, false));
 
-                if (crate.getHologram().isEnabled() && crateManager.getHolograms() != null) crateManager.getHolograms().createHologram(spawnLocation.getBlock(), crate);
+                if (crate.getHologram().isEnabled() && crateManager.getHolograms() != null) crateManager.getHolograms().createHologram(spawnLocation, crate);
 
                 // End the crate.
                 crateManager.endCrate(player);
