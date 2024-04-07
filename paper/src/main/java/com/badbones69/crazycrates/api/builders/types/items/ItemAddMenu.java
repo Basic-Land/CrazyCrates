@@ -1,6 +1,6 @@
 package com.badbones69.crazycrates.api.builders.types.items;
 
-import com.badbones69.crazycrates.CrazyCratesPaper;
+import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.builders.InventoryBuilder;
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.objects.Crate;
@@ -43,7 +43,7 @@ public class ItemAddMenu extends InventoryBuilder {
     }
 
     public static class ItemsAddListener implements Listener {
-        private final DatabaseManager databaseManager = CrazyCratesPaper.get().getCrateManager().getDatabaseManager();
+        private final DatabaseManager databaseManager = CrazyCrates.get().getCrateManager().getDatabaseManager();
         @EventHandler
         public void onInventoryClick(InventoryClickEvent event) {
             Inventory inventory = event.getInventory();

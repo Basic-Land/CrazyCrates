@@ -1,7 +1,6 @@
 package com.badbones69.crazycrates.api.builders.types;
 
 import ch.jalu.configme.SettingsManager;
-import com.badbones69.crazycrates.CrazyCratesPaper;
 import com.badbones69.crazycrates.api.builders.InventoryBuilder;
 import com.badbones69.crazycrates.api.builders.types.items.CratePickPrizeMenu;
 import com.badbones69.crazycrates.CrazyCrates;

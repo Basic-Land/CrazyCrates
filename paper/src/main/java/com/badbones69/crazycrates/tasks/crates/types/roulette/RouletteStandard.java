@@ -1,6 +1,6 @@
 package com.badbones69.crazycrates.tasks.crates.types.roulette;
 
-import com.badbones69.crazycrates.CrazyCratesPaper;
+import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.PrizeManager;
 import com.badbones69.crazycrates.api.builders.CrateBuilder;
 import com.badbones69.crazycrates.api.objects.Crate;
@@ -43,7 +43,7 @@ public class RouletteStandard extends BukkitRunnable {
     private int even = 0;
     private int open = 0;
     private int longSpin = 0;
-    private final CrazyCratesPaper plugin = CrazyCratesPaper.get();
+    private final CrazyCrates plugin = CrazyCrates.get();
     private final CrateManager crateManager = plugin.getCrateManager();
     private final List<Integer> slowSpin = MiscUtils.slowSpin(55, 10);
 

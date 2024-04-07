@@ -1,6 +1,6 @@
 package com.badbones69.crazycrates.api.objects.gacha;
 
-import com.badbones69.crazycrates.CrazyCratesPaper;
+import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.objects.gacha.data.PlayerBaseProfile;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -17,7 +17,7 @@ public class BaseProfileManager implements Listener {
     private final ConcurrentHashMap<String, PlayerBaseProfile> profilesCache = new ConcurrentHashMap<>();
 
     public BaseProfileManager() {
-        this.databaseManager = CrazyCratesPaper.get().getCrateManager().getDatabaseManager();
+        this.databaseManager = CrazyCrates.get().getCrateManager().getDatabaseManager();
         startSavingTask();
     }
 
@@ -42,7 +42,7 @@ public class BaseProfileManager implements Listener {
     }
 
     public void startSavingTask() {
-        Bukkit.getScheduler().runTaskTimerAsynchronously(CrazyCratesPaper.get(), () -> {
+        Bukkit.getScheduler().runTaskTimerAsynchronously(CrazyCrates.get(), () -> {
             for (Map.Entry<String, PlayerBaseProfile> entry : profilesCache.entrySet()) {
                 databaseManager.savePlayerBaseProfile(entry.getKey(), entry.getValue());
             }

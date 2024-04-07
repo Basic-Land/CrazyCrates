@@ -1,6 +1,6 @@
 package com.badbones69.crazycrates.api.builders.types.items;
 
-import com.badbones69.crazycrates.CrazyCratesPaper;
+import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.builders.InventoryBuilder;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
@@ -65,7 +65,7 @@ public class CratePickPrizeMenu extends InventoryBuilder {
                 player.openInventory(crate.getTierPreview(player));
             } else if (event.getSlot() > 4) {
                 // Retrieve the player's profile and save the chosen reward
-                DatabaseManager playerDataManager = CrazyCratesPaper.get().getCrateManager().getDatabaseManager();
+                DatabaseManager playerDataManager = CrazyCrates.get().getCrateManager().getDatabaseManager();
                 PlayerProfile playerProfile = playerDataManager.getPlayerProfile(player.getName(), crateSettings);
 
                 Integer itemID = customItemStack.getInteger("itemID");

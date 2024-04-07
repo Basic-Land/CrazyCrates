@@ -1,6 +1,6 @@
 package com.badbones69.crazycrates.api.objects.gacha;
 
-import com.badbones69.crazycrates.CrazyCratesPaper;
+import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.api.objects.gacha.data.PlayerBaseProfile;
@@ -23,7 +23,7 @@ public class DatabaseManager {
     private final ItemManager itemManager;
 
     public DatabaseManager(List<Crate> crateList) {
-        connection = BLibs.getApi().getDatabaseHandler().loadSQLite(CrazyCratesPaper.get(), "gamba", "crates.db");
+        connection = BLibs.getApi().getDatabaseHandler().loadSQLite(CrazyCrates.get(), "gamba", "crates.db");
         crateSettings = crateList.stream().map(Crate::getCrateSettings).filter(Objects::nonNull).toList();
         createCrateTable();
 
