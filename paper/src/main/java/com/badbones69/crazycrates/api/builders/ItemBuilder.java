@@ -4,33 +4,22 @@ import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.enums.PersistentKeys;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
 import com.badbones69.crazycrates.api.utils.MsgUtils;
-import com.badbones69.crazycrates.support.PluginSupport;
 import com.badbones69.crazycrates.support.SkullCreator;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.ryderbelserion.vital.api.enums.Support;
 import com.ryderbelserion.vital.utils.DyeUtils;
+import cz.basicland.blibs.spigot.utils.item.NBT;
 import io.th0rgal.oraxen.api.OraxenItems;
 import me.clip.placeholderapi.PlaceholderAPI;
-import net.minecraft.nbt.TagParser;
 import org.bukkit.*;
 import org.bukkit.block.Banner;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.block.banner.PatternType;
-import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ArmorMeta;
-import org.bukkit.inventory.meta.BannerMeta;
-import org.bukkit.inventory.meta.BlockStateMeta;
-import org.bukkit.inventory.meta.Damageable;
-import org.bukkit.inventory.meta.EnchantmentStorageMeta;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.LeatherArmorMeta;
-import org.bukkit.inventory.meta.MapMeta;
-import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.inventory.meta.*;
 import org.bukkit.inventory.meta.trim.ArmorTrim;
 import org.bukkit.inventory.meta.trim.TrimMaterial;
 import org.bukkit.inventory.meta.trim.TrimPattern;
@@ -42,11 +31,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.NotNull;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -328,15 +314,11 @@ public class ItemBuilder {
         if (this.itemStack.getType() != Material.AIR) {
             // If item data is not empty. We ignore all other options and simply return.
             if (!this.itemData.isEmpty()) {
-                net.minecraft.world.item.ItemStack nmsItem = CraftItemStack.asNMSCopy(getItemStack());
+                NBT nbt = new NBT(getItemStack());
 
-                try {
-                    nmsItem.setTag(TagParser.parseTag(this.itemData));
-                } catch (CommandSyntaxException exception) {
-                    this.plugin.getLogger().log(Level.WARNING, "Failed to set nms tag.", exception);
-                }
+                nbt.merge(null, this.itemData);
 
-                return CraftItemStack.asBukkitCopy(nmsItem);
+                return getItemStack();
             }
 
             this.itemStack.setAmount(this.itemAmount);

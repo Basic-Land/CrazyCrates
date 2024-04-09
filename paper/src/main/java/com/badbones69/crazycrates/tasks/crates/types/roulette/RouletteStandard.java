@@ -8,7 +8,7 @@ import com.badbones69.crazycrates.api.objects.Prize;
 import com.badbones69.crazycrates.api.objects.gacha.util.ItemData;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
-import cz.basicland.blibs.spigot.utils.item.ItemUtils;
+import cz.basicland.blibs.spigot.utils.item.CustomItemStack;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -135,7 +135,10 @@ public class RouletteStandard extends BukkitRunnable {
 
         if (prize != null) {
             for (ItemData itemData : prize) {
-                Prize prize = new Prize(itemData.id().toString(), crate.getName(), null, itemData.itemStack(), itemData.give(), itemData.messages(), itemData.commands());
+                CustomItemStack item = itemData.itemStack();
+                item.removeNBT("itemID");
+                item.removeNBT("type");
+                Prize prize = new Prize(itemData.id().toString(), crate.getName(), null, item, itemData.give(), itemData.messages(), itemData.commands());
                 PrizeManager.givePrize(player, prize, crate);
             }
         } else {

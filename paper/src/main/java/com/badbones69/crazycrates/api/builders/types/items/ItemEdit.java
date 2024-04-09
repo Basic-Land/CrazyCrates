@@ -2,10 +2,9 @@ package com.badbones69.crazycrates.api.builders.types.items;
 
 import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.builders.InventoryBuilder;
+import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
-import cz.basicland.blibs.spigot.utils.item.CustomItemStack;
 import cz.basicland.blibs.spigot.utils.item.DBItemStack;
-import cz.basicland.blibs.spigot.utils.item.ItemUtils;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -35,11 +34,15 @@ public class ItemEdit extends InventoryBuilder {
 
     @Override
     public InventoryBuilder build() {
-        getInventory().setItem(10, new CustomItemStack(Material.PLAYER_HEAD).base64("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjMyY2E2NjA1NmI3Mjg2M2U5OGY3ZjMyYmQ3ZDk0YzdhMGQ3OTZhZjY5MWM5YWMzYTkxMzYzMzEzNTIyODhmOSJ9fX0=").title("Current Item").getStack());
+        ItemStack head = new ItemBuilder().setMaterial(Material.PLAYER_HEAD).setPlayerName("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjMyY2E2NjA1NmI3Mjg2M2U5OGY3ZjMyYmQ3ZDk0YzdhMGQ3OTZhZjY5MWM5YWMzYTkxMzYzMzEzNTIyODhmOSJ9fX0=").setName("Current Item").build();
+        ItemStack back = new ItemBuilder().setMaterial(Material.RED_STAINED_GLASS_PANE).setName("Back").build();
+        ItemStack save = new ItemBuilder().setMaterial(Material.GREEN_STAINED_GLASS_PANE).setName("Save").build();
+        ItemStack glass = new ItemBuilder().setMaterial(Material.LIGHT_GRAY_STAINED_GLASS_PANE).setName("&7").build();
+
+        getInventory().setItem(10, head);
         getInventory().setItem(11, itemStack);
-        getInventory().setItem(18, new CustomItemStack(Material.RED_STAINED_GLASS_PANE).title("Back").getStack());
-        getInventory().setItem(26, new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE).title("Save").getStack());
-        ItemStack glass = ItemUtils.blankItem(Material.LIGHT_GRAY_STAINED_GLASS_PANE).getStack();
+        getInventory().setItem(18, back);
+        getInventory().setItem(26, save);
         for (int i = 0; i < getSize(); i++) {
             if (slots.contains(i)) continue;
             getInventory().setItem(i, glass);
@@ -64,7 +67,13 @@ public class ItemEdit extends InventoryBuilder {
             if (slot != 15) {
                 event.setCancelled(true);
                 switch (slot) {
-                    case 11 -> player.getInventory().addItem(holder.itemStack);
+                    case 11 -> {
+                        ItemStack clone = holder.itemStack.clone();
+                        NBT nbt = new NBT(clone);
+                        nbt.remove("itemID");
+                        nbt.remove("type");
+                        player.getInventory().addItem(clone);
+                    }
                     case 18 -> player.openInventory(holder.preview.build().getInventory());
                     case 26 -> {
                         ItemStack stack = inventory.getItem(15);

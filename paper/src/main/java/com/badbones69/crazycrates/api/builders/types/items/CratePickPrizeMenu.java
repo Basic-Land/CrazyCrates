@@ -2,12 +2,13 @@ package com.badbones69.crazycrates.api.builders.types.items;
 
 import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.builders.InventoryBuilder;
+import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.api.objects.gacha.data.PlayerProfile;
 import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
-import cz.basicland.blibs.spigot.utils.item.CustomItemStack;
+import cz.basicland.blibs.spigot.utils.item.NBT;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -27,8 +28,8 @@ public class CratePickPrizeMenu extends InventoryBuilder {
 
     @Override
     public InventoryBuilder build() {
-        ItemStack back = new CustomItemStack(Material.RED_STAINED_GLASS_PANE).title("Back").getStack();
-        ItemStack save = new CustomItemStack(Material.GREEN_STAINED_GLASS_PANE).title("Save").getStack();
+        ItemStack back = new ItemBuilder().setMaterial(Material.RED_STAINED_GLASS_PANE).setName("Back").build();
+        ItemStack save = new ItemBuilder().setMaterial(Material.GREEN_STAINED_GLASS_PANE).setName("Save").build();
         for (int i = 0; i < 9; i++) {
             if (i < 4) getInventory().setItem(i, back);
             else if (i == 4) getInventory().setItem(i, item);
@@ -59,7 +60,7 @@ public class CratePickPrizeMenu extends InventoryBuilder {
             ItemStack picked = inventory.getItem(4);
             if (picked == null || picked.getType() == Material.AIR) return;
 
-            CustomItemStack customItemStack = new CustomItemStack(picked);
+            NBT nbt = new NBT(picked);
 
             if (event.getSlot() < 4) {
                 // Open the previous menu
@@ -69,9 +70,9 @@ public class CratePickPrizeMenu extends InventoryBuilder {
                 DatabaseManager playerDataManager = JavaPlugin.getPlugin(CrazyCrates.class).getCrateManager().getDatabaseManager();
                 PlayerProfile playerProfile = playerDataManager.getPlayerProfile(player.getName(), crateSettings);
 
-                Integer itemID = customItemStack.getInteger("itemID");
+                Integer itemID = nbt.getInteger("itemID");
                 if (itemID == null) return;
-                String type = customItemStack.getString("type");
+                String type = nbt.getString("type");
                 System.out.println("Chosen reward: " + itemID);
 
                 playerProfile.setChosenReward(new Pair<>(itemID, type));
