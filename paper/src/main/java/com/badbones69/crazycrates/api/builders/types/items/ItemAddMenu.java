@@ -16,6 +16,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class ItemAddMenu extends InventoryBuilder {
     }
 
     public static class ItemsAddListener implements Listener {
-        private final DatabaseManager databaseManager = CrazyCrates.get().getCrateManager().getDatabaseManager();
+        private final DatabaseManager databaseManager = JavaPlugin.getPlugin(CrazyCrates.class).getCrateManager().getDatabaseManager();
         @EventHandler
         public void onInventoryClick(InventoryClickEvent event) {
             Inventory inventory = event.getInventory();

@@ -32,7 +32,6 @@ dependencies {
 
     compileOnly ("org.projectlombok:lombok:1.18.26")
     annotationProcessor ("org.projectlombok:lombok:1.18.26")
-    compileOnly(fileTree("libs").include("*.jar"))
     compileOnly(libs.vault) {
         exclude("org.bukkit", "bukkit")
     }

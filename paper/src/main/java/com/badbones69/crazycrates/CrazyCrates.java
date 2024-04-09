@@ -29,6 +29,7 @@ import com.badbones69.crazycrates.tasks.MigrationManager;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
 import com.ryderbelserion.vital.VitalPlugin;
 import com.ryderbelserion.vital.api.enums.Support;
+import lombok.Getter;
 import net.minecraft.server.dedicated.DedicatedServer;
 import org.bukkit.plugin.java.JavaPlugin;
 import com.badbones69.crazycrates.api.FileManager;
@@ -56,6 +57,7 @@ public class CrazyCrates extends JavaPlugin {
     private BukkitUserManager userManager;
     private CrateManager crateManager;
     private FileManager fileManager;
+    @Getter
     private BaseProfileManager baseProfileManager;
     private MetricsManager metrics;
 

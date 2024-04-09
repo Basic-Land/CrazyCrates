@@ -9,6 +9,7 @@ import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import cz.basicland.blibs.shared.databases.hikari.DatabaseConnection;
 import cz.basicland.blibs.spigot.BLibs;
 import lombok.Getter;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.*;
 import java.sql.SQLException;
@@ -23,7 +24,7 @@ public class DatabaseManager {
     private final ItemManager itemManager;
 
     public DatabaseManager(List<Crate> crateList) {
-        connection = BLibs.getApi().getDatabaseHandler().loadSQLite(CrazyCrates.get(), "gamba", "crates.db");
+        connection = BLibs.getApi().getDatabaseHandler().loadSQLite(JavaPlugin.getPlugin(CrazyCrates.class), "gamba", "crates.db");
         crateSettings = crateList.stream().map(Crate::getCrateSettings).filter(Objects::nonNull).toList();
         createCrateTable();
 

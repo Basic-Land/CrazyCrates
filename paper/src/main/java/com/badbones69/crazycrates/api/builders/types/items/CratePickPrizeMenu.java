@@ -15,6 +15,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class CratePickPrizeMenu extends InventoryBuilder {
     private final ItemStack item;
@@ -65,7 +66,7 @@ public class CratePickPrizeMenu extends InventoryBuilder {
                 player.openInventory(crate.getTierPreview(player));
             } else if (event.getSlot() > 4) {
                 // Retrieve the player's profile and save the chosen reward
-                DatabaseManager playerDataManager = CrazyCrates.get().getCrateManager().getDatabaseManager();
+                DatabaseManager playerDataManager = JavaPlugin.getPlugin(CrazyCrates.class).getCrateManager().getDatabaseManager();
                 PlayerProfile playerProfile = playerDataManager.getPlayerProfile(player.getName(), crateSettings);
 
                 Integer itemID = customItemStack.getInteger("itemID");

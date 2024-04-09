@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Arrays;
@@ -43,7 +44,7 @@ public class RouletteStandard extends BukkitRunnable {
     private int even = 0;
     private int open = 0;
     private int longSpin = 0;
-    private final CrazyCrates plugin = CrazyCrates.get();
+    private final CrazyCrates plugin = JavaPlugin.getPlugin(CrazyCrates.class);
     private final CrateManager crateManager = plugin.getCrateManager();
     private final List<Integer> slowSpin = MiscUtils.slowSpin(55, 10);
 

@@ -1,5 +1,10 @@
 package com.badbones69.crazycrates.commands;
 
+import com.badbones69.crazycrates.api.objects.Crate;
+import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
+import com.badbones69.crazycrates.api.objects.gacha.data.RaritySettings;
+import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
+import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.api.objects.other.CrateLocation;
 import com.badbones69.crazycrates.commands.relations.ArgumentRelations;
 import com.badbones69.crazycrates.commands.relations.MiscRelations;
@@ -13,8 +18,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import com.badbones69.crazycrates.CrazyCrates;
-import java.util.ArrayList;
-import java.util.List;
+
+import java.util.*;
 
 public class CommandManager {
 
@@ -68,10 +73,10 @@ public class CommandManager {
             return numbers;
         });
 
-        this.bukkitCommandManager.registerSuggestion(SuggestionKey.of("types"), (sender, context) -> {
+        commandManager.registerSuggestion(SuggestionKey.of("types"), (sender, context) -> {
             String subCommand = context.getSubCommand();
             if (subCommand.equalsIgnoreCase("additems")) {
-                Crate crate = this.plugin.getCrateManager().getCrateFromName(context.getArgs().get(0));
+                Crate crate = plugin.getCrateManager().getCrateFromName(context.getArgs().get(0));
                 CrateSettings crateSettings = crate.getCrateSettings();
                 if (crateSettings == null) return Collections.emptyList();
                 if (context.getArgs().get(1).equalsIgnoreCase("EXTRA_REWARD")) {
@@ -88,10 +93,10 @@ public class CommandManager {
             return Arrays.stream(RewardType.values()).map(Enum::name).toList();
         });
 
-        this.bukkitCommandManager.registerSuggestion(SuggestionKey.of("rarities"), (sender, context) -> {
+        commandManager.registerSuggestion(SuggestionKey.of("rarities"), (sender, context) -> {
             String subCommand = context.getSubCommand();
             if (subCommand.equalsIgnoreCase("additems")) {
-                Crate crate = this.plugin.getCrateManager().getCrateFromName(context.getArgs().get(0));
+                Crate crate = plugin.getCrateManager().getCrateFromName(context.getArgs().get(0));
                 CrateSettings crateSettings = crate.getCrateSettings();
                 if (crateSettings == null) return Collections.emptyList();
                 Set<Rarity> rarityMap = new HashSet<>(crateSettings.getRarityMap().keySet());
@@ -101,7 +106,6 @@ public class CommandManager {
             return Collections.emptyList();
         });
 
-        this.bukkitCommandManager.registerArgument(CrateBaseCommand.CustomPlayer.class, (sender, context) -> new CrateBaseCommand.CustomPlayer(context));
         commandManager.registerArgument(CrateBaseCommand.CustomPlayer.class, (sender, context) -> new CrateBaseCommand.CustomPlayer(context));
 
         commandManager.registerCommand(new CrateBaseCommand());

@@ -15,6 +15,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
 import java.util.List;
@@ -72,7 +73,7 @@ public class ItemEdit extends InventoryBuilder {
                         Integer id = nbt.getInteger("itemID");
                         if (id == null || id == 0) return;
                         try {
-                            CrazyCrates.get().getCrateManager().getDatabaseManager().getItemManager().updateItem(holder.type.getTableName(), id, DBItemStack.encodeItem(stack));
+                            JavaPlugin.getPlugin(CrazyCrates.class).getCrateManager().getDatabaseManager().getItemManager().updateItem(holder.type.getTableName(), id, DBItemStack.encodeItem(stack));
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }

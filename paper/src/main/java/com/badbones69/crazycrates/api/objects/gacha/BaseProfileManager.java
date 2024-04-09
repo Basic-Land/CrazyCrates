@@ -8,16 +8,18 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class BaseProfileManager implements Listener {
     private final DatabaseManager databaseManager;
+    private final CrazyCrates plugin = JavaPlugin.getPlugin(CrazyCrates.class);
     private final ConcurrentHashMap<String, PlayerBaseProfile> profilesCache = new ConcurrentHashMap<>();
 
     public BaseProfileManager() {
-        this.databaseManager = CrazyCrates.get().getCrateManager().getDatabaseManager();
+        this.databaseManager = plugin.getCrateManager().getDatabaseManager();
         startSavingTask();
     }
 
@@ -42,7 +44,7 @@ public class BaseProfileManager implements Listener {
     }
 
     public void startSavingTask() {
-        Bukkit.getScheduler().runTaskTimerAsynchronously(CrazyCrates.get(), () -> {
+        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
             for (Map.Entry<String, PlayerBaseProfile> entry : profilesCache.entrySet()) {
                 databaseManager.savePlayerBaseProfile(entry.getKey(), entry.getValue());
             }

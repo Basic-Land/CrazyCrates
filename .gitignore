@@ -5,9 +5,10 @@ build
 
 api/.gradle
 api/build
-paper/libs/bLibs-2.0.0-WIP.jar
+libs/compile/bLibs-2.0.0-WIP.jar
 
 paper/.gradle
 paper/build
+paper/run
 
 jars

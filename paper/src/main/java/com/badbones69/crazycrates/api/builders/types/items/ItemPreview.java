@@ -15,6 +15,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class ItemPreview extends InventoryBuilder {
     public ItemPreview(Player player, int size, String title, RewardType type) {
         super(player, size, title);
         this.type = type;
-        ItemManager itemManager = CrazyCrates.get().getCrateManager().getDatabaseManager().getItemManager();
+        ItemManager itemManager = JavaPlugin.getPlugin(CrazyCrates.class).getCrateManager().getDatabaseManager().getItemManager();
         items = itemManager.getAllItemsFromCache(type).entrySet().stream()
                 .map(entry -> new Pair<>(entry.getKey(), entry.getValue()))
                 .toList();
