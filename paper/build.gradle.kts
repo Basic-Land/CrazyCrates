@@ -1,28 +1,26 @@
 plugins {
-    `paper-plugin`
-
-    id("io.papermc.paperweight.userdev")
-
     alias(libs.plugins.run.paper)
     alias(libs.plugins.shadow)
 }
 
-val mcVersion: String = providers.gradleProperty("mcVersion").get()
+val mcVersion = libs.versions.bundle.get()
 
 dependencies {
-    paperweight.paperDevBundle(libs.versions.bundle)
+    compileOnly(fileTree("$rootDir/libs/compile").include("*.jar"))
 
-    implementation(projects.api)
+    paperweight.paperDevBundle(mcVersion)
 
-    implementation(libs.cluster.paper)
+    implementation(project(":api"))
 
-    implementation(libs.triumph.cmds)
+    implementation(libs.bundles.triumph)
 
-    implementation(libs.config.me) {
-        exclude(group = "org.yaml", module = "snakeyaml")
-    }
+    implementation(libs.config.me)
 
     implementation(libs.metrics)
+
+    implementation(libs.vital)
+
+    compileOnly(libs.head.database.api)
 
     compileOnly(libs.decent.holograms)
 
@@ -35,6 +33,9 @@ dependencies {
     compileOnly ("org.projectlombok:lombok:1.18.26")
     annotationProcessor ("org.projectlombok:lombok:1.18.26")
     compileOnly(fileTree("libs").include("*.jar"))
+    compileOnly(libs.vault) {
+        exclude("org.bukkit", "bukkit")
+    }
 }
 
 tasks {
@@ -50,12 +51,15 @@ tasks {
         dependsOn(reobfJar)
     }
 
+    reobfJar {
+        outputJar = rootProject.layout.buildDirectory.file("$rootDir/jars/paper/${rootProject.name}-${rootProject.version}.jar")
+    }
+
     shadowJar {
         listOf(
-            "com.ryderbelserion.cluster.paper",
-            "de.tr7zw.changeme.nbtapi",
-            "dev.triumphteam.cmd",
-            "org.bstats"
+            "dev.triumphteam",
+            "org.bstats",
+            "ch.jalu"
         ).forEach {
             relocate(it, "libs.$it")
         }
@@ -64,7 +68,7 @@ tasks {
     processResources {
         val properties = hashMapOf(
             "name" to rootProject.name,
-            "version" to project.version,
+            "version" to rootProject.version,
             "group" to rootProject.group,
             "description" to rootProject.description,
             "apiVersion" to providers.gradleProperty("apiVersion").get(),
