@@ -73,6 +73,15 @@ public class ItemAddMenu extends InventoryBuilder {
             RewardType type = holder.type;
             CrateSettings crateSettings = crate.getCrateSettings();
 
+            String path;
+            if (type.equals(RewardType.EXTRA_REWARD)) {
+                path = "Crate.Gacha.extra-reward.items";
+            } else {
+                path = "Crate.Gacha." + type.name().toLowerCase() + "." + rarity.name().toLowerCase() + ".list";
+            }
+
+            List<Integer> ids = crate.getFile().getIntegerList(path);
+
             for (ItemStack item : items) {
                 if (item == null || item.getType() == Material.AIR) continue;
 
@@ -81,18 +90,11 @@ public class ItemAddMenu extends InventoryBuilder {
 
                 crateSettings.addItem(type, id, rarity, item, crate);
 
-                String path;
-                if (type.equals(RewardType.EXTRA_REWARD)) {
-                    path = "Crate.Gacha.extra-reward.items";
-                } else {
-                    path = "Crate.Gacha." + type.name().toLowerCase() + "." + rarity.name().toLowerCase() + ".list";
-                }
-
-                List<Integer> ids = crate.getFile().getIntegerList(path);
                 ids.add(id);
-                crate.getFile().set(path, ids);
-                crate.saveFile();
             }
+
+            crate.getFile().set(path, ids);
+            crate.saveFile();
         }
     }
 }

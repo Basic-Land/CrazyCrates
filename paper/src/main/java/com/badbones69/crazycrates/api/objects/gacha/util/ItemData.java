@@ -2,21 +2,16 @@ package com.badbones69.crazycrates.api.objects.gacha.util;
 
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
-import cz.basicland.blibs.spigot.utils.item.CustomItemStack;
+import org.bukkit.inventory.ItemStack;
 
-import java.util.List;
-
-public record ItemData(Integer id, Rarity rarity, RewardType type, CustomItemStack itemStack, boolean give, List<String> commands, List<String> messages) {
+public record ItemData(String rewardName, Rarity rarity, RewardType type, ItemStack itemStack) {
     @Override
     public String toString() {
         return "ItemData{" +
-                "id=" + id +
+                "rewardName='" + rewardName + '\'' +
                 ", rarity=" + rarity +
                 ", type=" + type +
                 ", itemStack=" + itemStack +
-                ", give=" + give +
-                ", commands=" + commands +
-                ", messages=" + messages +
                 '}';
     }
 }

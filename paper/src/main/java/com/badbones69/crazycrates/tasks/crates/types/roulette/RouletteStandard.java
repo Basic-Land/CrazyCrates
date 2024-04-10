@@ -5,10 +5,8 @@ import com.badbones69.crazycrates.api.PrizeManager;
 import com.badbones69.crazycrates.api.builders.CrateBuilder;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.Prize;
-import com.badbones69.crazycrates.api.objects.gacha.util.ItemData;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
-import cz.basicland.blibs.spigot.utils.item.CustomItemStack;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -25,11 +23,11 @@ public class RouletteStandard extends BukkitRunnable {
     private final Crate crate;
     private final Player player;
     private final Inventory inventory;
-    private final List<ItemData> prize;
+    private final List<Prize> prize;
     private final boolean multi;
     private final int[] slots;
 
-    public RouletteStandard(CrateBuilder builder, List<ItemData> prize, boolean multi) {
+    public RouletteStandard(CrateBuilder builder, List<Prize> prize, boolean multi) {
         this.builder = builder;
         this.crate = builder.getCrate();
         this.player = builder.getPlayer();
@@ -75,7 +73,7 @@ public class RouletteStandard extends BukkitRunnable {
         if (this.full > 16) {
             if (multi) {
                 if (longSpin != 10) {
-                    ItemStack item = prize.get(longSpin).itemStack().getStack();
+                    ItemStack item = prize.get(longSpin).getDisplayItem();
 
                     if (slowSpin.contains(time + 1)) {
                         builder.setItem(22, item);
@@ -104,7 +102,7 @@ public class RouletteStandard extends BukkitRunnable {
                 }
 
                 if (time == 22 && prize != null) {
-                    builder.setItem(22, prize.get(0).itemStack().getStack());
+                    builder.setItem(22, prize.get(0).getDisplayItem());
                 }
 
                 this.time++;
@@ -134,12 +132,13 @@ public class RouletteStandard extends BukkitRunnable {
         crateManager.endCrate(player);
 
         if (prize != null) {
-            for (ItemData itemData : prize) {
-                CustomItemStack item = itemData.itemStack();
-                item.removeNBT("itemID");
-                item.removeNBT("type");
-                Prize prize = new Prize(itemData.id().toString(), crate.getName(), null, item, itemData.give(), itemData.messages(), itemData.commands());
-                PrizeManager.givePrize(player, prize, crate);
+            for (Prize itemData : prize) {
+                for (Prize prize : crate.getPrizes()) {
+                    if (prize.getPrizeNumber().equals(itemData.getPrizeNumber())) {
+                        PrizeManager.givePrize(player, prize, crate);
+                        break;
+                    }
+                }
             }
         } else {
             ItemStack item = inventory.getItem(22);

@@ -2,13 +2,12 @@ package com.badbones69.crazycrates.tasks.crates.types;
 
 import com.badbones69.crazycrates.api.builders.CrateBuilder;
 import com.badbones69.crazycrates.api.objects.Crate;
+import com.badbones69.crazycrates.api.objects.Prize;
 import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
 import com.badbones69.crazycrates.api.objects.gacha.data.*;
 import com.badbones69.crazycrates.api.objects.gacha.enums.GachaType;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.gacha.GachaSystem;
-import com.badbones69.crazycrates.api.objects.gacha.util.ItemData;
-import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
 import com.badbones69.crazycrates.tasks.BukkitUserManager;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
@@ -46,16 +45,16 @@ public class GachaCrate extends CrateBuilder {
         PlayerProfile playerProfile = playerDataManager.getPlayerProfile(playerName, crateSettings);
         PlayerBaseProfile baseProfile = this.plugin.getBaseProfileManager().getPlayerBaseProfile(playerName);
 
-        Pair<Integer, String> chosenReward = playerProfile.getChosenReward();
+        String chosenReward = playerProfile.getChosenReward();
         GachaType gachaType = crateSettings.getGachaType();
 
-        if (!gachaType.equals(GachaType.NORMAL) && (chosenReward == null || chosenReward.first().equals(-1) || chosenReward.second().isEmpty())) {
+        if (!gachaType.equals(GachaType.NORMAL) && (chosenReward == null || chosenReward.isEmpty())) {
             getPlayer().sendMessage("§cYou have not chosen a reward yet. Please choose a reward using menu");
             crateManager.removePlayerFromOpeningList(getPlayer());
             return;
         }
 
-        System.out.println("Chosen reward: " + chosenReward.first() + " " + chosenReward.second());
+        System.out.println("Chosen reward: " + chosenReward);
 
         int amount = getPlayer().isSneaking() ? 1000 : 1;
 
@@ -71,10 +70,11 @@ public class GachaCrate extends CrateBuilder {
             return;
         }
 
-        List<ItemData> items = new ArrayList<>();
+        List<Prize> items = new ArrayList<>();
 
-        ItemData itemData = crateSettings.findLegendary(gachaType.equals(GachaType.FATE_POINT), gachaType.equals(GachaType.OVERRIDE), chosenReward);
-        if (itemData == null && !gachaType.equals(GachaType.NORMAL)) {
+        Prize prize = crateSettings.findLegendary(chosenReward);
+
+        if (prize == null && !gachaType.equals(GachaType.NORMAL)) {
             throw new IllegalStateException("Chosen reward not found");
         }
 
@@ -83,12 +83,11 @@ public class GachaCrate extends CrateBuilder {
         while (amount-- > 0) {
             Result result = switch (gachaType) {
                 case NORMAL -> gachaSystem.roll(playerProfile, crateSettings);
-                case FATE_POINT -> gachaSystem.rollWithFatePoint(playerProfile, crateSettings, itemData);
-                case OVERRIDE -> gachaSystem.rollOverrideSet(playerProfile, crateSettings, itemData);
+                case FATE_POINT -> gachaSystem.rollWithFatePoint(playerProfile, crateSettings, prize);
+                case OVERRIDE -> gachaSystem.rollOverrideSet(playerProfile, crateSettings, prize);
             };
 
             System.out.println(result);
-
 
             Rarity rarity = result.getRarity();
             int stellarShards = rarityMap.get(rarity).stellarShards();
@@ -97,7 +96,7 @@ public class GachaCrate extends CrateBuilder {
             baseProfile.addMysticTokens(mysticTokens);
             baseProfile.addStellarShards(stellarShards);
 
-            items.add(result.getItemData());
+            items.add(result.getPrize());
         }
 
         addCrateTask(new RouletteStandard(this, items, getPlayer().isSneaking()).runTaskTimer(this.plugin, 2, 2));

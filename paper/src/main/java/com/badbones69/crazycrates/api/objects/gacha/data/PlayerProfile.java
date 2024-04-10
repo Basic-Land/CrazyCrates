@@ -1,8 +1,8 @@
 package com.badbones69.crazycrates.api.objects.gacha.data;
 
-import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.enums.ResultType;
+import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,7 +26,7 @@ public class PlayerProfile implements Serializable {
     private int fatePoint, totalPity;
     @Setter
     @Getter
-    private Pair<Integer, String> chosenReward = new Pair<>(-1, "");
+    private String chosenReward = null;
 
     public PlayerProfile(String playerName, Collection<Rarity> rarities, int extraRewardPity) {
         this.playerName = playerName;

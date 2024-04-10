@@ -1,9 +1,10 @@
 package com.badbones69.crazycrates.api.objects.gacha.data;
 
+import com.badbones69.crazycrates.api.builders.ItemBuilder;
+import com.badbones69.crazycrates.api.objects.Prize;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.enums.ResultType;
-import com.badbones69.crazycrates.api.objects.gacha.util.ItemData;
-import cz.basicland.blibs.spigot.utils.item.CustomItemStack;
+import cz.basicland.blibs.spigot.utils.item.NBT;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -22,8 +23,8 @@ public class Result implements Serializable {
     private final int pity;
     private final long timestamp = System.currentTimeMillis();
     private String itemName;
-    private int itemID;
-    private transient ItemData itemData;
+    private String rewardName;
+    private transient Prize prize;
 
     public Result(Rarity rarity, ResultType won5050, int pity) {
         this.rarity = rarity;
@@ -39,12 +40,13 @@ public class Result implements Serializable {
         return won5050 == ResultType.WON || won5050 == ResultType.GUARANTEED || won5050 == ResultType.WON_OF_RATE_UP;
     }
 
-    public void setItemData(ItemData itemData) {
-        this.itemData = itemData;
-        if (itemData == null) return;
-        CustomItemStack item = itemData.itemStack();
-        this.itemID = item.getInteger("itemID");
-        this.itemName = item.getTitle();
+    public void setItemData(Prize prize) {
+        this.prize = prize;
+        if (prize == null) return;
+        ItemBuilder item = prize.getDisplayItemBuilder();
+        NBT nbt = new NBT(item.getItemStack());
+        this.rewardName = nbt.getString("rewardName");
+        this.itemName = item.getName();
         if (itemName.isEmpty()) {
             itemName = itemName(item.getMaterial().name());
         }

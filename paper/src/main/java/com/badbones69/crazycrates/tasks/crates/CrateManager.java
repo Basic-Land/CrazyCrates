@@ -192,12 +192,6 @@ public class CrateManager {
                 int maxMassOpen = file.getInt("Crate.Max-Mass-Open", 10);
                 int requiredKeys = file.getInt("Crate.RequiredKeys", 0);
 
-                ConfigurationSection gachaSection = file.getConfigurationSection("Crate.Gacha");
-                CrateSettings crateSettings = null;
-                if (gachaSection != null) {
-                    crateSettings = new CrateSettings(file, crateName);
-                }
-
                 ConfigurationSection section = file.getConfigurationSection("Crate.Tiers");
 
                 if (file.contains("Crate.Tiers") && section != null) {
@@ -267,7 +261,7 @@ public class CrateManager {
                 List<String> prizeCommands = file.contains("Crate.Prize-Commands") ? file.getStringList("Crate.Prize-Commands") : Collections.emptyList();
 
                 CrateHologram holo = new CrateHologram(file.getBoolean("Crate.Hologram.Toggle"), file.getDouble("Crate.Hologram.Height", 0.0), file.getInt("Crate.Hologram.Range", 8), file.getStringList("Crate.Hologram.Message"));
-                addCrate(new Crate(crateName, previewName, crateType, getKey(file), file.getString("Crate.PhysicalKey.Name"), prizes, file, newPlayersKeys, tiers, maxMassOpen, requiredKeys, prizeMessage, prizeCommands, holo, crateSettings));
+                addCrate(new Crate(crateName, previewName, crateType, getKey(file), file.getString("Crate.PhysicalKey.Name"), prizes, file, newPlayersKeys, tiers, maxMassOpen, requiredKeys, prizeMessage, prizeCommands, holo));
 
                 Permission doesExist = this.plugin.getServer().getPluginManager().getPermission("crazycrates.open." + crateName);
 

@@ -7,7 +7,6 @@ import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.api.objects.gacha.data.PlayerProfile;
-import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -70,12 +69,11 @@ public class CratePickPrizeMenu extends InventoryBuilder {
                 DatabaseManager playerDataManager = JavaPlugin.getPlugin(CrazyCrates.class).getCrateManager().getDatabaseManager();
                 PlayerProfile playerProfile = playerDataManager.getPlayerProfile(player.getName(), crateSettings);
 
-                Integer itemID = nbt.getInteger("itemID");
-                if (itemID == null) return;
-                String type = nbt.getString("type");
-                System.out.println("Chosen reward: " + itemID);
+                String rewardName = nbt.getString("rewardName");
 
-                playerProfile.setChosenReward(new Pair<>(itemID, type));
+                System.out.println("Chosen reward: " + rewardName);
+
+                playerProfile.setChosenReward(rewardName);
                 playerDataManager.savePlayerProfile(player.getName(), crateSettings, playerProfile);
                 player.openInventory(crate.getTierPreview(player));
             }

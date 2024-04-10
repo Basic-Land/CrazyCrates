@@ -70,8 +70,7 @@ public class ItemEdit extends InventoryBuilder {
                     case 11 -> {
                         ItemStack clone = holder.itemStack.clone();
                         NBT nbt = new NBT(clone);
-                        nbt.remove("itemID");
-                        nbt.remove("type");
+                        nbt.remove("rewardName");
                         player.getInventory().addItem(clone);
                     }
                     case 18 -> player.openInventory(holder.preview.build().getInventory());
@@ -79,10 +78,11 @@ public class ItemEdit extends InventoryBuilder {
                         ItemStack stack = inventory.getItem(15);
                         if (stack == null || stack.getType() == Material.AIR) return;
                         NBT nbt = new NBT(holder.itemStack);
-                        Integer id = nbt.getInteger("itemID");
-                        if (id == null || id == 0) return;
+                        String[] rewardName = nbt.getString("rewardName").split("_");
+                        int id = Integer.parseInt(rewardName[0]);
+                        if (id == 0) return;
                         try {
-                            JavaPlugin.getPlugin(CrazyCrates.class).getCrateManager().getDatabaseManager().getItemManager().updateItem(holder.type.getTableName(), id, DBItemStack.encodeItem(stack));
+                            JavaPlugin.getPlugin(CrazyCrates.class).getCrateManager().getDatabaseManager().getItemManager().updateItem(holder.type, id, DBItemStack.encodeItem(stack));
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }

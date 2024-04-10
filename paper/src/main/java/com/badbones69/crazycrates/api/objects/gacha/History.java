@@ -1,5 +1,6 @@
 package com.badbones69.crazycrates.api.objects.gacha;
 
+import com.badbones69.crazycrates.api.objects.Prize;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.api.objects.gacha.data.PlayerProfile;
 import com.badbones69.crazycrates.api.objects.gacha.data.RaritySettings;
@@ -8,9 +9,7 @@ import com.badbones69.crazycrates.api.objects.gacha.enums.GachaType;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.enums.ResultType;
 import com.badbones69.crazycrates.api.objects.gacha.util.HSLColor;
-import com.badbones69.crazycrates.api.objects.gacha.util.ItemData;
-import cz.basicland.blibs.impl.xseries.XMaterial;
-import cz.basicland.blibs.spigot.utils.item.CustomItemStack;
+import cz.basicland.blibs.spigot.utils.item.NBT;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.api.BinaryTagHolder;
 import net.kyori.adventure.text.Component;
@@ -20,6 +19,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -94,25 +94,25 @@ public class History {
         player.sendMessage(pages);
     }
 
-    private CustomItemStack getItem(Result history, Rarity rarity, CrateSettings crateSettings) {
-        Set<ItemData> items = crateSettings.getGachaType().equals(GachaType.OVERRIDE) ? crateSettings.getBoth(rarity) : new HashSet<>(history.isWon5050() ? crateSettings.getLimited() : crateSettings.getStandard());
-        items.removeIf(item -> item.rarity() != rarity || item.id() != history.getItemID());
+    private ItemStack getItem(Result history, Rarity rarity, CrateSettings crateSettings) {
+        Set<Prize> items = crateSettings.getGachaType().equals(GachaType.OVERRIDE) ? crateSettings.getBoth(rarity) : new HashSet<>(history.isWon5050() ? crateSettings.getLimited() : crateSettings.getStandard());
+        items.removeIf(item -> item.getRarity() != rarity || !item.getPrizeNumber().equals(history.getRewardName()));
 
-        CustomItemStack item = items.stream().findFirst().map(ItemData::itemStack).orElse(null);
+        ItemStack item = items.stream().findFirst().map(Prize::getDisplayItem).orElse(null);
         if (item == null) {
-            System.out.println("Error: Item with id: " + history.getItemID() + " does not exist, rarity: " + rarity + " 5050: " + history.isWon5050());
-            item = new CustomItemStack(XMaterial.BARRIER);
+            System.out.println("Error: Item with rewardName: " + history.getRewardName() + " does not exist, rarity: " + rarity + " 5050: " + history.isWon5050());
+            item = new ItemStack(Material.BARRIER);
         }
 
         return item;
     }
 
-    private HoverEvent<HoverEvent.ShowItem> showItem(CustomItemStack itemStack) {
-        ItemStack stack = itemStack.getStack();
-        NamespacedKey key = stack.getType().getKey();
+    private HoverEvent<HoverEvent.ShowItem> showItem(ItemStack itemStack) {
+        NBT nbt = new NBT(itemStack);
+        NamespacedKey key = itemStack.getType().getKey();
         Key itemKey = Key.key(key.getNamespace(), key.getKey());
         int itemCount = itemStack.getAmount();
-        BinaryTagHolder tag = BinaryTagHolder.binaryTagHolder(itemStack.getNBTToString());
+        BinaryTagHolder tag = BinaryTagHolder.binaryTagHolder(nbt.getNBTToString());
         return HoverEvent.showItem(HoverEvent.ShowItem.showItem(itemKey, itemCount, tag));
     }
 

@@ -2,8 +2,10 @@ package com.badbones69.crazycrates.api.objects;
 
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.enums.PersistentKeys;
+import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
+import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
-import cz.basicland.blibs.spigot.utils.item.CustomItemStack;
+import lombok.Getter;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -39,6 +41,10 @@ public class Prize {
     private List<Tier> tiers = new ArrayList<>();
     private final List<ItemBuilder> builders;
     private Prize alternativePrize;
+    @Getter
+    private Rarity rarity;
+    @Getter
+    private RewardType type;
 
     private final ConfigurationSection section;
 
@@ -80,20 +86,21 @@ public class Prize {
         this.displayItem = display();
     }
 
-    public Prize(String prizeNumber, String crateName, Tier tier, CustomItemStack stack, boolean give, List<String> messages, List<String> commands) {
+    public Prize(String prizeNumber, String crateName, Tier tier, ItemStack stack, boolean give, List<String> messages, List<String> commands, Rarity rarity, RewardType type) {
         this.section = null;
-
+        this.rarity = rarity;
+        this.type = type;
         this.prizeNumber = prizeNumber;
 
         this.crateName = crateName;
 
-        this.builders = give ? Collections.singletonList(new ItemBuilder(stack.getStack().clone())) : Collections.emptyList();
+        this.builders = give ? Collections.singletonList(new ItemBuilder(stack.clone())) : Collections.emptyList();
 
         this.tiers = Collections.singletonList(tier);
 
         this.alternativePrize = null;
 
-        this.prizeName = stack.getTitle();
+        this.prizeName = stack.getItemMeta().getDisplayName();
         this.maxRange = 100;
         this.chance = 100;
         this.firework = false;
@@ -102,7 +109,7 @@ public class Prize {
         this.commands = commands;
 
         this.permissions = Collections.emptyList();
-        this.displayItem = new ItemBuilder(stack.getStack().clone());
+        this.displayItem = new ItemBuilder(stack.clone());
     }
 
     /**

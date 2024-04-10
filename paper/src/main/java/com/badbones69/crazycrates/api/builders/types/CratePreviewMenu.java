@@ -1,15 +1,15 @@
 package com.badbones69.crazycrates.api.builders.types;
 
 import ch.jalu.configme.SettingsManager;
+import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.builders.InventoryBuilder;
 import com.badbones69.crazycrates.api.builders.types.items.CratePickPrizeMenu;
-import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.enums.PersistentKeys;
 import com.badbones69.crazycrates.api.objects.Crate;
+import com.badbones69.crazycrates.api.objects.Prize;
 import com.badbones69.crazycrates.api.objects.Tier;
 import com.badbones69.crazycrates.api.objects.gacha.enums.GachaType;
 import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
-import com.badbones69.crazycrates.api.objects.gacha.util.ItemData;
 import com.badbones69.crazycrates.tasks.InventoryManager;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import org.bukkit.Material;
@@ -211,14 +211,14 @@ public class CratePreviewMenu extends InventoryBuilder {
             if (crate.getCrateType() == CrateType.gacha && holder.tier.getName().equals("legendary")) {
                 GachaType gachaType = crate.getCrateSettings().getGachaType();
                 NBT nbt = new NBT(item);
-                Integer itemID = nbt.getInteger("itemID");
-                System.out.println("Item type: " + itemID);
-                boolean standard = nbt.getString("type").equals(RewardType.STANDARD.name());
+                String rewardName = nbt.getString("rewardName");
+                System.out.println("Item type: " + rewardName);
+                boolean standard = rewardName.split("_")[1].equals(RewardType.STANDARD.name());
                 switch (gachaType) {
                     case NORMAL:
                         return;
                     case FATE_POINT:
-                        if (crate.getCrateSettings().getLegendaryStandard().stream().map(ItemData::id).anyMatch(itemID::equals) && standard) {
+                        if (crate.getCrateSettings().getLegendaryStandard().stream().map(Prize::getPrizeNumber).anyMatch(rewardName::equals) && standard) {
                             return;
                         }
                         break;

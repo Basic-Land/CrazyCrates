@@ -4,8 +4,8 @@ import lombok.Getter;
 
 @Getter
 public enum RewardType {
-    STANDARD("StandardItems"),
-    LIMITED("LimitedItems"),
+    STANDARD("AllItems"),
+    LIMITED("AllItems"),
     EXTRA_REWARD("ExtraRewards");
 
     private final String tableName;

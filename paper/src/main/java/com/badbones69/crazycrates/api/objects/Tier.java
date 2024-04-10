@@ -1,13 +1,13 @@
 package com.badbones69.crazycrates.api.objects;
 
-import com.badbones69.crazycrates.api.enums.PersistentKeys;
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
-import cz.basicland.blibs.spigot.utils.item.CustomItemStack;
+import com.badbones69.crazycrates.api.enums.PersistentKeys;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -36,11 +36,11 @@ public class Tier {
         this.slot = section.getInt("Slot");
     }
 
-    public Tier(String tier, double chance, int slot, CustomItemStack stack) {
+    public Tier(String tier, double chance, int slot, ItemBuilder stack) {
         this.name = tier;
-        this.coloredName = stack.getTitle();
-        this.lore = stack.getLore();
-        this.item = new ItemBuilder(stack.getStack());
+        this.coloredName = stack.getName();
+        this.lore = stack.getUpdatedLore();
+        this.item = stack;
         this.chance = chance;
         this.maxRange = 100;
         this.slot = slot;

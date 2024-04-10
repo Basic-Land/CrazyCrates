@@ -1,6 +1,5 @@
 package com.badbones69.crazycrates.api.objects.gacha.gacha;
 
-import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.Prize;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.api.objects.gacha.data.PlayerProfile;
@@ -8,10 +7,12 @@ import com.badbones69.crazycrates.api.objects.gacha.data.RaritySettings;
 import com.badbones69.crazycrates.api.objects.gacha.data.Result;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.enums.ResultType;
-import com.badbones69.crazycrates.api.objects.gacha.util.ItemData;
 import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class GachaSystem {
@@ -67,14 +68,14 @@ public class GachaSystem {
         return result;
     }
 
-    public Result rollOverrideSet(PlayerProfile playerProfile, CrateSettings itemSet, ItemData wantedItem) {
+    public Result rollOverrideSet(PlayerProfile playerProfile, CrateSettings itemSet, Prize wantedItem) {
         Result result = getResult(playerProfile, itemSet);
 
         if (result.isLegendary()) {
             if (result.isWon5050()) {
                 result.setItemData(wantedItem);
             } else {
-                Set<ItemData> set = new HashSet<>(itemSet.getBoth(Rarity.LEGENDARY));
+                Set<Prize> set = itemSet.getBoth(Rarity.LEGENDARY);
                 set.remove(wantedItem);
                 result.setItemData(pickRandomPrice(result, null, set));
             }
@@ -87,13 +88,7 @@ public class GachaSystem {
         return result;
     }
 
-    public Prize pickPrize(Crate crate) {
-        List<Prize> prizes = new ArrayList<>(crate.getPrizes());
-        Collections.shuffle(prizes);
-        return prizes.stream().skip(random.nextInt(prizes.size())).findFirst().orElse(null);
-    }
-
-    public Result rollWithFatePoint(PlayerProfile playerProfile, CrateSettings itemSet, ItemData wantedItem) {
+    public Result rollWithFatePoint(PlayerProfile playerProfile, CrateSettings itemSet, Prize wantedItem) {
         Result result = getResult(playerProfile, itemSet);
 
         if (result.isLegendary()) {
@@ -118,7 +113,7 @@ public class GachaSystem {
                     result.setWon5050(ResultType.WON);
                     playerProfile.resetFatePoint();
                 } else {
-                    Set<ItemData> limited = new HashSet<>(itemSet.getLegendaryLimited());
+                    Set<Prize> limited = new HashSet<>(itemSet.getLegendaryLimited());
                     limited.remove(wantedItem);
 
                     result.setItemData(pickRandomPrice(result, null, limited));
@@ -128,7 +123,7 @@ public class GachaSystem {
                 }
                 playerProfile.resetNextLegendaryLimited();
             } else {
-                result.setItemData(pickRandomPrice(result, null, new HashSet<>(itemSet.getLegendaryStandard())));
+                result.setItemData(pickRandomPrice(result, null, itemSet.getLegendaryStandard()));
                 result.setWon5050(ResultType.LOST);
 
                 playerProfile.setNextLegendaryLimited();
@@ -142,15 +137,15 @@ public class GachaSystem {
         return result;
     }
 
-    private ItemData pickRandomPrice(Result result, CrateSettings itemSet, Set<ItemData> overrideSet) {
+    private Prize pickRandomPrice(Result result, CrateSettings itemSet, Set<Prize> overrideSet) {
         random.setSeed(System.nanoTime() * new Random(System.nanoTime()).nextLong());
         if (overrideSet != null)
             return overrideSet.stream().skip(random.nextInt(overrideSet.size())).findFirst().orElse(null);
 
         if (itemSet == null) return null;
 
-        Set<ItemData> itemData = result.isWon5050() ? itemSet.getLimited() : itemSet.getStandard();
-        Set<ItemData> set = itemData.stream().filter(item -> item.rarity() == result.getRarity()).collect(Collectors.toSet());
+        Set<Prize> itemData = result.isWon5050() ? itemSet.getLimited() : itemSet.getStandard();
+        Set<Prize> set = itemData.stream().filter(item -> item.getRarity() == result.getRarity()).collect(Collectors.toSet());
         return set.stream().skip(random.nextInt(set.size())).findFirst().orElse(null);
     }
 }

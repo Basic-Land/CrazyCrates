@@ -93,8 +93,14 @@ public class Crate {
      * @param file The crate file.
      */
 
-    public Crate(String name, String previewName, CrateType crateType, ItemStack key, String keyName, List<Prize> prizes, FileConfiguration file, int newPlayerKeys, List<Tier> tiers, int maxMassOpen, int requiredKeys, List<String> prizeMessage, List<String> prizeCommands, CrateHologram hologram, CrateSettings crateSettings) {
+    public Crate(String name, String previewName, CrateType crateType, ItemStack key, String keyName, List<Prize> prizes, FileConfiguration file, int newPlayerKeys, List<Tier> tiers, int maxMassOpen, int requiredKeys, List<String> prizeMessage, List<String> prizeCommands, CrateHologram hologram) {
+        ConfigurationSection gachaSection = file.getConfigurationSection("Crate.Gacha");
+        CrateSettings crateSettings = null;
+        if (gachaSection != null) {
+            crateSettings = new CrateSettings(file, name, this);
+        }
         this.crateSettings = crateSettings;
+
         this.emptyKey = ItemBuilder.convertItemStack(key);
         this.keyBuilder = ItemBuilder.convertItemStack(key).setCrateName(name);
         this.keyName = keyName;
