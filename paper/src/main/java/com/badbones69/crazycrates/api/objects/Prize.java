@@ -5,6 +5,7 @@ import com.badbones69.crazycrates.api.enums.PersistentKeys;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
+import cz.basicland.blibs.spigot.utils.item.NBT;
 import lombok.Getter;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Material;
@@ -94,7 +95,11 @@ public class Prize {
 
         this.crateName = crateName;
 
-        this.builders = give ? Collections.singletonList(new ItemBuilder(stack.clone())) : Collections.emptyList();
+        ItemStack itemStack = stack.clone();
+        NBT nbt = new NBT(itemStack);
+        nbt.remove("rewardName");
+
+        this.builders = give ? Collections.singletonList(new ItemBuilder(itemStack)) : Collections.emptyList();
 
         this.tiers = Collections.singletonList(tier);
 

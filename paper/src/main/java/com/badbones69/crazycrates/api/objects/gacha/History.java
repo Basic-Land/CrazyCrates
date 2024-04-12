@@ -8,6 +8,7 @@ import com.badbones69.crazycrates.api.objects.gacha.data.Result;
 import com.badbones69.crazycrates.api.objects.gacha.enums.GachaType;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.enums.ResultType;
+import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.api.objects.gacha.util.HSLColor;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import net.kyori.adventure.key.Key;
@@ -100,8 +101,13 @@ public class History {
 
         ItemStack item = items.stream().findFirst().map(Prize::getDisplayItem).orElse(null);
         if (item == null) {
-            System.out.println("Error: Item with rewardName: " + history.getRewardName() + " does not exist, rarity: " + rarity + " 5050: " + history.isWon5050());
-            item = new ItemStack(Material.BARRIER);
+            String[] split = history.getRewardName().split("_");
+            int id = Integer.parseInt(split[0]);
+
+            item = playerDataManager.getItemManager().getItemFromCache(RewardType.LIMITED, id).second();
+            if (item == null) {
+                throw new NullPointerException("Item with rewardName: " + history.getRewardName() + " does not exist, rarity: " + rarity + " 5050: " + history.isWon5050());
+            }
         }
 
         return item;

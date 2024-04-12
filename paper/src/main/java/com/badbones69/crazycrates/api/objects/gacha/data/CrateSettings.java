@@ -160,6 +160,7 @@ public class CrateSettings {
 
         if (type == RewardType.EXTRA_REWARD) {
             extraRewards.add(itemData);
+            return;
         }
 
         crate.getPrizes().add(new Prize(rewardName, crateName, crate.getTier(rarity.name().toLowerCase()), stack, true, Collections.emptyList(), Collections.emptyList(), rarity, type));
@@ -208,6 +209,14 @@ public class CrateSettings {
 
         tierStack.setLore(lore);
         return tierStack;
+    }
+
+    public List<Integer> getAllIDs() {
+        return crate.getPrizes().stream().map(prize -> prize.getPrizeNumber().split("_")[0]).map(Integer::parseInt).toList();
+    }
+
+    public List<Integer> getIDsFromRarityType(Rarity rarity, RewardType type) {
+        return crate.getPrizes().stream().filter(prize -> prize.getRarity() == rarity && prize.getType() == type).map(prize -> prize.getPrizeNumber().split("_")[0]).map(Integer::parseInt).toList();
     }
 
     public Prize findLegendary(String chosenReward) {

@@ -25,11 +25,11 @@ public class ItemEdit extends InventoryBuilder {
     private final RewardType type;
     private final List<Integer> slots = List.of(10, 11, 15, 18, 26);
 
-    public ItemEdit(ItemPreview preview, Player player, int size, String title, ItemStack itemStack) {
+    public ItemEdit(ItemPreview preview, Player player, int size, String title, ItemStack itemStack, RewardType type) {
         super(preview.getCrate(), player, size, title);
         this.preview = preview;
         this.itemStack = itemStack;
-        this.type = preview.getType();
+        this.type = type;
     }
 
     @Override

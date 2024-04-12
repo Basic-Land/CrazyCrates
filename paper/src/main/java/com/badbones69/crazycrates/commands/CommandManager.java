@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import com.badbones69.crazycrates.CrazyCrates;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class CommandManager {
 
@@ -104,6 +105,19 @@ public class CommandManager {
                 return rarityMap.stream().map(Enum::name).toList();
             }
             return Collections.emptyList();
+        });
+
+        commandManager.registerSuggestion(SuggestionKey.of("both"), (sender, context) -> {
+            List<String> collect = plugin.getCrateManager().getCrates().stream()
+                    .filter(crate -> crate.getCrateSettings() != null)
+                    .map(Crate::getName)
+                    .collect(Collectors.toList());
+
+            Arrays.stream(RewardType.values())
+                    .map(Enum::name)
+                    .forEach(collect::add);
+
+            return collect;
         });
 
         commandManager.registerArgument(CrateBaseCommand.CustomPlayer.class, (sender, context) -> new CrateBaseCommand.CustomPlayer(context));

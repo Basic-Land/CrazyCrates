@@ -40,7 +40,7 @@ public class DatabaseManager {
 
     private void createCrateTable() {
         connection.update("CREATE TABLE IF NOT EXISTS PlayerData(playerName VARCHAR(16) PRIMARY KEY, baseData VARCHAR NULL)").join();
-        connection.update("CREATE TABLE IF NOT EXISTS AllItems(id INTEGER PRIMARY KEY AUTOINCREMENT, rewardType VARCHAR NULL, itemStack VARCHAR NULL)").join();
+        connection.update("CREATE TABLE IF NOT EXISTS AllItems(id INTEGER PRIMARY KEY AUTOINCREMENT, itemStack VARCHAR NULL)").join();
         connection.update("CREATE TABLE IF NOT EXISTS ExtraRewards(id INTEGER PRIMARY KEY AUTOINCREMENT, itemStack VARCHAR NULL)").join();
 
         Set<String> playernames = new HashSet<>();

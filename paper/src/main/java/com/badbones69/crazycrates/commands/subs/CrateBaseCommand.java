@@ -3,6 +3,7 @@ package com.badbones69.crazycrates.commands.subs;
 import ch.jalu.configme.SettingsManager;
 import com.badbones69.crazycrates.api.builders.types.items.ItemAddMenu;
 import com.badbones69.crazycrates.api.builders.types.items.ItemPreview;
+import com.badbones69.crazycrates.api.builders.types.items.RaritiesMenu;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
@@ -231,12 +232,15 @@ public class CrateBaseCommand extends BaseCommand {
 
     @SubCommand("edititems")
     @Permission(value = "crazycrates.command.admin.edititems", def = PermissionDefault.OP)
-    public void editItems(Player player, @Suggestion("types") String type) {
+    public void editItems(Player player, @Suggestion("both") String type) {
         RewardType rewardType = RewardType.fromString(type);
-        if (rewardType == null) {
+        Crate crate = this.crateManager.getCrateFromName(type);
+        if (crate == null) {
+            player.openInventory(new ItemPreview(player, 54, "&c&lEdit Items", rewardType).build().getInventory());
             return;
         }
-        player.openInventory(new ItemPreview(player, 54, "&c&lEdit Items", rewardType).build().getInventory());
+
+        player.openInventory(new RaritiesMenu(crate, player, 27, "Rarities of " + crate.getName()).build().getInventory());
     }
 
     @SubCommand("save")

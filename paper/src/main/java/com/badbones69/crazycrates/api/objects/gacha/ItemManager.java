@@ -16,8 +16,8 @@ import java.util.Map;
 
 public class ItemManager {
     private final DatabaseConnection connection;
-    private final Map<Pair<Integer, RewardType>, ItemStack> allItems = new HashMap<>();
-    private final Map<Pair<Integer, RewardType>, ItemStack> extraRewards = new HashMap<>();
+    private final Map<Integer, ItemStack> allItems = new HashMap<>();
+    private final Map<Integer, ItemStack> extraRewards = new HashMap<>();
 
     /**
      * Constructor for the ItemManager class.
@@ -36,7 +36,7 @@ public class ItemManager {
      * @param table The name of the table to retrieve items from.
      * @return A list of pairs, where each pair consists of an item ID and an ItemStack.
      */
-    public Map<Pair<Integer, RewardType>, ItemStack> getAllItems(String table) {
+    public Map<Integer, ItemStack> getAllItems(String table) {
         return connection.query("SELECT * FROM " + table).thenApply(this::items).join();
     }
 
@@ -47,7 +47,7 @@ public class ItemManager {
      * @param ids The IDs of the items to retrieve.
      * @return A list of pairs, where each pair consists of an item ID and an ItemStack.
      */
-    public Map<Pair<Integer, RewardType>, ItemStack> getItems(String table, List<Integer> ids) {
+    public Map<Integer, ItemStack> getItems(String table, List<Integer> ids) {
         return connection.query("SELECT * FROM " + table + " WHERE rewardName IN (" + String.join(",", Collections.nCopies(ids.size(), "?")) + ")", ids.toArray()).thenApply(this::items).join();
     }
 
@@ -57,14 +57,13 @@ public class ItemManager {
      * @param rs The ResultSet to convert.
      * @return A list of pairs, where each pair consists of an item ID and an ItemStack.
      */
-    private Map<Pair<Integer, RewardType>, ItemStack> items(ResultSet rs) {
-        Map<Pair<Integer, RewardType>, ItemStack> items = new HashMap<>();
+    private Map<Integer, ItemStack> items(ResultSet rs) {
+        Map<Integer, ItemStack> items = new HashMap<>();
         try {
             while (rs.next()) {
                 int id = rs.getInt("id");
-                RewardType type = RewardType.valueOf(rs.getString("rewardType"));
                 ItemStack item = DBItemStack.decodeItem(rs.getString("itemStack"));
-                items.put(new Pair<>(id, type), item);
+                items.put(id, item);
             }
         } catch (SQLException | IOException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -81,17 +80,16 @@ public class ItemManager {
      */
     public Map<Integer, ItemStack> getItemsFromCache(RewardType table, List<Integer> ids) {
         return switch (table) {
-            case STANDARD -> get(allItems, ids, RewardType.STANDARD);
-            case LIMITED -> get(allItems, ids, RewardType.LIMITED);
-            case EXTRA_REWARD -> get(extraRewards, ids, RewardType.STANDARD);
+            case STANDARD, LIMITED -> get(allItems, ids);
+            case EXTRA_REWARD -> get(extraRewards, ids);
         };
     }
 
-    private Map<Integer, ItemStack> get(Map<Pair<Integer, RewardType>, ItemStack> map, List<Integer> ids, RewardType type) {
+    private Map<Integer, ItemStack> get(Map<Integer, ItemStack> map, List<Integer> ids) {
         return map.entrySet().stream().filter(e -> {
-            Pair<Integer, RewardType> key = e.getKey();
-            return key.second() == type && (ids.isEmpty() || ids.contains(e.getKey().first()));
-        }).collect(HashMap::new, (m, e) -> m.put(e.getKey().first(), e.getValue()), HashMap::putAll);
+            Integer key = e.getKey();
+            return (ids.isEmpty() || ids.contains(key));
+        }).collect(HashMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), HashMap::putAll);
     }
 
     /**
@@ -103,16 +101,16 @@ public class ItemManager {
      */
     public Pair<Integer, ItemStack> getItemFromCache(RewardType table, int id) {
         Map<Integer, ItemStack> items = switch (table) {
-            case STANDARD, LIMITED -> get(allItems, List.of(id), table);
-            case EXTRA_REWARD -> get(extraRewards, List.of(id), table);
+            case STANDARD, LIMITED -> get(allItems, List.of(id));
+            case EXTRA_REWARD -> get(extraRewards, List.of(id));
         };
         return new Pair<>(id, items.get(id));
     }
 
     public Map<Integer, ItemStack> getAllItemsFromCache(RewardType table) {
         return switch (table) {
-            case STANDARD, LIMITED -> get(allItems, List.of(), table);
-            case EXTRA_REWARD -> get(extraRewards, List.of(), table);
+            case STANDARD, LIMITED -> get(allItems, List.of());
+            case EXTRA_REWARD -> get(extraRewards, List.of());
         };
     }
 
@@ -125,7 +123,7 @@ public class ItemManager {
      */
     public int addItem(RewardType table, ItemStack item) {
         try {
-            connection.update("INSERT INTO " + table.getTableName() + "(rewardType,itemStack) VALUES(?,?)", table.name(), DBItemStack.encodeItem(item)).join();
+            connection.update("INSERT INTO " + table.getTableName() + "(itemStack) VALUES(?)", DBItemStack.encodeItem(item)).join();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -144,8 +142,8 @@ public class ItemManager {
         if (id == -1) return id;
 
         switch (table) {
-            case STANDARD, LIMITED -> allItems.put(new Pair<>(id, table), item);
-            case EXTRA_REWARD -> extraRewards.put(new Pair<>(id, table), item);
+            case STANDARD, LIMITED -> allItems.put(id, item);
+            case EXTRA_REWARD -> extraRewards.put(id, item);
         }
 
         return id;
@@ -159,6 +157,6 @@ public class ItemManager {
      * @param item The new ItemStack to replace the old one.
      */
     public void updateItem(RewardType rewardType, int id, String item) {
-        connection.update("UPDATE " + rewardType.getTableName() + " SET itemStack = ? WHERE id = ? AND rewardType = ?", item, id, rewardType.name());
+        connection.update("UPDATE " + rewardType.getTableName() + " SET itemStack = ? WHERE id = ?", item, id);
     }
 }

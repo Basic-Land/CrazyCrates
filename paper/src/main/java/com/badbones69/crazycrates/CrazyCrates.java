@@ -1,10 +1,7 @@
 package com.badbones69.crazycrates;
 
 import com.badbones69.crazycrates.api.builders.types.*;
-import com.badbones69.crazycrates.api.builders.types.items.CratePickPrizeMenu;
-import com.badbones69.crazycrates.api.builders.types.items.ItemAddMenu;
-import com.badbones69.crazycrates.api.builders.types.items.ItemEdit;
-import com.badbones69.crazycrates.api.builders.types.items.ItemPreview;
+import com.badbones69.crazycrates.api.builders.types.items.*;
 import com.badbones69.crazycrates.api.objects.gacha.BaseProfileManager;
 import com.badbones69.crazycrates.api.utils.FileUtils;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
@@ -152,6 +149,7 @@ public class CrazyCrates extends JavaPlugin {
                 new ItemAddMenu.ItemsAddListener(),
                 new ItemPreview.ItemPreviewListener(),
                 new ItemEdit.ItemEditListener(),
+                new RaritiesMenu.RaritiesMenuListener(),
 
                 // Other listeners.
                 new BrokeLocationsListener(),
