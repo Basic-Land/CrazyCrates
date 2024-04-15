@@ -88,11 +88,11 @@ public class GachaSystem {
         return result;
     }
 
-    public Result rollWithFatePoint(PlayerProfile playerProfile, CrateSettings itemSet, Prize wantedItem) {
-        Result result = getResult(playerProfile, itemSet);
+    public Result rollWithFatePoint(PlayerProfile playerProfile, CrateSettings crateSettings, Prize wantedItem) {
+        Result result = getResult(playerProfile, crateSettings);
 
         if (result.isLegendary()) {
-            if (playerProfile.getFatePoint() >= itemSet.getFatePointAmount()) {
+            if (playerProfile.getFatePoint() >= crateSettings.getFatePointAmount()) {
                 result.setItemData(wantedItem);
                 result.setWon5050(ResultType.GUARANTEED);
 
@@ -113,7 +113,7 @@ public class GachaSystem {
                     result.setWon5050(ResultType.WON);
                     playerProfile.resetFatePoint();
                 } else {
-                    Set<Prize> limited = new HashSet<>(itemSet.getLegendaryLimited());
+                    Set<Prize> limited = new HashSet<>(crateSettings.getLegendaryLimited());
                     limited.remove(wantedItem);
 
                     result.setItemData(pickRandomPrice(result, null, limited));
@@ -123,14 +123,14 @@ public class GachaSystem {
                 }
                 playerProfile.resetNextLegendaryLimited();
             } else {
-                result.setItemData(pickRandomPrice(result, null, itemSet.getLegendaryStandard()));
+                result.setItemData(pickRandomPrice(result, null, crateSettings.getLegendaryStandard()));
                 result.setWon5050(ResultType.LOST);
 
                 playerProfile.setNextLegendaryLimited();
                 playerProfile.incrementFatePoint();
             }
         } else {
-            result.setItemData(pickRandomPrice(result, itemSet, null));
+            result.setItemData(pickRandomPrice(result, crateSettings, null));
         }
 
         playerProfile.addHistory(result);

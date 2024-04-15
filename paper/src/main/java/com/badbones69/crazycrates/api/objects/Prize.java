@@ -99,7 +99,7 @@ public class Prize {
         NBT nbt = new NBT(itemStack);
         nbt.remove("rewardName");
 
-        this.builders = give ? Collections.singletonList(new ItemBuilder(itemStack)) : Collections.emptyList();
+        this.builders = give ? Collections.singletonList(new ItemBuilder(itemStack).setAmount(itemStack.getAmount())) : Collections.emptyList();
 
         this.tiers = Collections.singletonList(tier);
 

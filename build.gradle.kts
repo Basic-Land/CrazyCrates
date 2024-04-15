@@ -57,7 +57,7 @@ subprojects {
 tasks {
     assemble {
         doFirst {
-            delete("$rootDir/jars")
+            delete("$rootDir/jars/paper/${project.name}.jar")
         }
     }
 }

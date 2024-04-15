@@ -67,7 +67,7 @@ public class CratePickPrizeMenu extends InventoryBuilder {
             } else if (event.getSlot() > 4) {
                 // Retrieve the player's profile and save the chosen reward
                 DatabaseManager playerDataManager = JavaPlugin.getPlugin(CrazyCrates.class).getCrateManager().getDatabaseManager();
-                PlayerProfile playerProfile = playerDataManager.getPlayerProfile(player.getName(), crateSettings);
+                PlayerProfile playerProfile = playerDataManager.getPlayerProfile(player.getName(), crateSettings, false);
 
                 String rewardName = nbt.getString("rewardName");
 

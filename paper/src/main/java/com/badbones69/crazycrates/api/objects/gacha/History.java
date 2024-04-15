@@ -10,6 +10,7 @@ import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.enums.ResultType;
 import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.api.objects.gacha.util.HSLColor;
+import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.api.BinaryTagHolder;
@@ -20,7 +21,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -39,8 +39,14 @@ public class History {
         this.playerDataManager = playerDataManager;
     }
 
-    public void sendHistory(Player player, int pageNumber, CrateSettings crateSettings) {
-        PlayerProfile profile = playerDataManager.getPlayerProfile(player.getName(), crateSettings);
+    public void sendHistory(Player player, String target, int pageNumber, CrateSettings crateSettings) {
+        PlayerProfile profile = playerDataManager.getPlayerProfile(target, crateSettings, true);
+
+        if (profile == null) {
+            player.sendMessage(Component.text("Hráč " + target + " nemá žádnou historii otevření " + crateSettings.getCrateName() + " crate", NamedTextColor.RED));
+            return;
+        }
+
         List<Result> historyList = profile.getHistory();
         TextColor color = TextColor.fromHexString("#de7a00");
 
@@ -84,15 +90,51 @@ public class History {
         int pageMinus = pageNumber - 1;
         int pagePlus = pageNumber + 1;
 
+        String cmd = player.getName().equals(target) ? "/cc history " + crateSettings.getCrateName() + " " : "/cc adminhistory " + crateSettings.getCrateName() + " " + target + " ";
+
         Component pages = Component.text()
                 .appendNewline()
-                .append(Component.text("<<<<", NamedTextColor.DARK_GRAY, TextDecoration.BOLD).clickEvent(ClickEvent.runCommand("/cc history " + crateSettings.getCrateName() + " " + (pageMinus <= 0 ? maxPage : pageMinus)))
+                .append(Component.text("<<<<", NamedTextColor.DARK_GRAY, TextDecoration.BOLD).clickEvent(ClickEvent.runCommand(cmd + (pageMinus <= 0 ? maxPage : pageMinus)))
                         .hoverEvent(Component.text("Předchozí stránka", NamedTextColor.GRAY)))
                 .append(Component.text(" Strana " + pageNumber + "/" + maxPage + " ", color))
-                .append(Component.text(">>>>", NamedTextColor.DARK_GRAY, TextDecoration.BOLD).clickEvent(ClickEvent.runCommand("/cc history " + crateSettings.getCrateName() + " " + (pagePlus > maxPage ? 1 : pagePlus)))
+                .append(Component.text(">>>>", NamedTextColor.DARK_GRAY, TextDecoration.BOLD).clickEvent(ClickEvent.runCommand(cmd + (pagePlus > maxPage ? 1 : pagePlus)))
                         .hoverEvent(Component.text("Další stránka", NamedTextColor.GRAY)))
                 .build();
         player.sendMessage(pages);
+    }
+
+    public void sendPity(Player player, String target, CrateSettings crateSettings) {
+        PlayerProfile profile = playerDataManager.getPlayerProfile(target, crateSettings, true);
+
+        if (profile == null) {
+            player.sendMessage(Component.text("Hráč " + target + " nemá žádnou historii otevření " + crateSettings.getCrateName() + " crate", NamedTextColor.RED));
+            return;
+        }
+
+        Component header = Component.text()
+                .appendNewline()
+                .append(Component.text("Pity pro ", NamedTextColor.GRAY))
+                .append(Component.text(crateSettings.getCrateName(), NamedTextColor.AQUA))
+                .append(Component.text(" crate", NamedTextColor.GRAY))
+                .appendNewline()
+                .build();
+        player.sendMessage(header);
+
+        crateSettings.getRarityMap().keySet().forEach(rarity -> {
+            Pair<Integer, ResultType> pair = profile.getPity(rarity);
+            int pity = pair.first();
+            ResultType won5050 = pair.second();
+            int color = getColor(pity);
+
+            Component component = Component.text()
+                    .append(Component.text(rarity.name(), rarity.getColor()))
+                    .append(Component.text(" pity: ", NamedTextColor.GRAY))
+                    .append(Component.text(pity, TextColor.color(color)))
+                    .append(Component.text(" last 50/50: ", NamedTextColor.GRAY))
+                    .append(Component.text(won5050.name(), won5050.getColor()))
+                    .build();
+            player.sendMessage(component);
+        });
     }
 
     private ItemStack getItem(Result history, Rarity rarity, CrateSettings crateSettings) {
@@ -124,10 +166,8 @@ public class History {
 
     private Component getHoverText(Result history, CrateSettings crateSettings) {
         RaritySettings raritySettings = crateSettings.getRarityMap().get(history.getRarity());
-        int pity = history.getPity();
 
-        float hue = 119.978f - (1.33345f * pity);
-        int color = new HSLColor(hue, 100f, 60f).getRGB().getRGB();
+        int color = getColor(history.getPity());
         ResultType won5050 = history.getWon5050();
 
         return Component.text()
@@ -141,5 +181,10 @@ public class History {
                                 .append(Component.text(won5050.name(), won5050.getColor())) :
                         Component.empty())
                 .build();
+    }
+
+    private int getColor(int pity) {
+        float hue = 119.978f - (1.33345f * pity);
+        return new HSLColor(hue, 100f, 60f).getRGB().getRGB();
     }
 }

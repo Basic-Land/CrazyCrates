@@ -114,7 +114,7 @@ public class DatabaseManager {
         connection.update("UPDATE PlayerData SET " + name + " = ? WHERE playerName = ?", profileString, playerName);
     }
 
-    public PlayerProfile getPlayerProfile(String playerName, CrateSettings crateName) {
+    public PlayerProfile getPlayerProfile(String playerName, CrateSettings crateName, boolean override) {
         String name = crateName.getCrateName();
         if (!crateSettings.contains(crateName)) {
             System.out.println("Error: Crate " + name + " does not exist.");
@@ -122,7 +122,11 @@ public class DatabaseManager {
         }
 
         if (!hasPlayerData(playerName)) {
-            addBlankPlayerData(playerName);
+            if (!override) {
+                addBlankPlayerData(playerName);
+            } else {
+                return null;
+            }
         }
 
         return connection.query("SELECT " + name + " FROM PlayerData WHERE playerName = ?", playerName).thenApply(rs -> {

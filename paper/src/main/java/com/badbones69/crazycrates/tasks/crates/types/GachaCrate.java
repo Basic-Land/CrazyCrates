@@ -42,7 +42,7 @@ public class GachaCrate extends CrateBuilder {
         String playerName = getPlayer().getName();
         CrateSettings crateSettings = playerDataManager.getCrateSettings(getCrate().getName());
 
-        PlayerProfile playerProfile = playerDataManager.getPlayerProfile(playerName, crateSettings);
+        PlayerProfile playerProfile = playerDataManager.getPlayerProfile(playerName, crateSettings, false);
         PlayerBaseProfile baseProfile = this.plugin.getBaseProfileManager().getPlayerBaseProfile(playerName);
 
         String chosenReward = playerProfile.getChosenReward();

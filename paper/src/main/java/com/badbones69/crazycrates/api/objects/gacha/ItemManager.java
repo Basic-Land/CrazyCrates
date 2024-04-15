@@ -86,10 +86,7 @@ public class ItemManager {
     }
 
     private Map<Integer, ItemStack> get(Map<Integer, ItemStack> map, List<Integer> ids) {
-        return map.entrySet().stream().filter(e -> {
-            Integer key = e.getKey();
-            return (ids.isEmpty() || ids.contains(key));
-        }).collect(HashMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), HashMap::putAll);
+        return map.entrySet().stream().filter(e -> (ids.isEmpty() || ids.contains(e.getKey()))).collect(HashMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), HashMap::putAll);
     }
 
     /**
@@ -101,16 +98,16 @@ public class ItemManager {
      */
     public Pair<Integer, ItemStack> getItemFromCache(RewardType table, int id) {
         Map<Integer, ItemStack> items = switch (table) {
-            case STANDARD, LIMITED -> get(allItems, List.of(id));
-            case EXTRA_REWARD -> get(extraRewards, List.of(id));
+            case STANDARD, LIMITED -> allItems;
+            case EXTRA_REWARD -> extraRewards;
         };
         return new Pair<>(id, items.get(id));
     }
 
     public Map<Integer, ItemStack> getAllItemsFromCache(RewardType table) {
         return switch (table) {
-            case STANDARD, LIMITED -> get(allItems, List.of());
-            case EXTRA_REWARD -> get(extraRewards, List.of());
+            case STANDARD, LIMITED -> allItems;
+            case EXTRA_REWARD -> extraRewards;
         };
     }
 

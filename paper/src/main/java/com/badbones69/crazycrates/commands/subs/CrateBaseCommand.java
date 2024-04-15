@@ -197,12 +197,40 @@ public class CrateBaseCommand extends BaseCommand {
         crate.getPrizes().forEach(prize -> PrizeManager.givePrize(player, prize, crate));
     }
 
+    @SubCommand("adminhistory")
+    @Permission(value = "crazycrates.command.admin.history", def = PermissionDefault.OP)
+    public void adminHistory(Player player, @Suggestion("crates") String crateName, @Suggestion("online-players") CustomPlayer target, @Optional @Suggestion("numbers") Integer page) {
+        if (page == null) page = 1;
+        DatabaseManager playerDataManager = crateManager.getDatabaseManager();
+        CrateSettings crateSettings = playerDataManager.getCrateSettings(crateName);
+
+        playerDataManager.getHistory().sendHistory(player, target.getOfflinePlayer().getName(), page, crateSettings);
+    }
+
     @SubCommand("history")
+    @Permission(value = "crazycrates.command.player.history", def = PermissionDefault.TRUE)
     public void history(Player player, @Suggestion("crates") String crateName, @Optional @Suggestion("numbers") Integer page) {
         if (page == null) page = 1;
         DatabaseManager playerDataManager = crateManager.getDatabaseManager();
         CrateSettings crateSettings = playerDataManager.getCrateSettings(crateName);
-        playerDataManager.getHistory().sendHistory(player, page, crateSettings);
+        playerDataManager.getHistory().sendHistory(player, player.getName(), page, crateSettings);
+    }
+
+
+    @SubCommand("adminpity")
+    @Permission(value = "crazycrates.command.player.history", def = PermissionDefault.TRUE)
+    public void adminPity(Player player, @Suggestion("crates") String crateName, @Suggestion("online-players") CustomPlayer target) {
+        DatabaseManager playerDataManager = crateManager.getDatabaseManager();
+        CrateSettings crateSettings = playerDataManager.getCrateSettings(crateName);
+        playerDataManager.getHistory().sendPity(player, target.getOfflinePlayer().getName(), crateSettings);
+    }
+
+    @SubCommand("pity")
+    @Permission(value = "crazycrates.command.player.history", def = PermissionDefault.TRUE)
+    public void pity(Player player, @Suggestion("crates") String crateName) {
+        DatabaseManager playerDataManager = crateManager.getDatabaseManager();
+        CrateSettings crateSettings = playerDataManager.getCrateSettings(crateName);
+        playerDataManager.getHistory().sendPity(player, player.getName(), crateSettings);
     }
 
     @SubCommand("additems")
