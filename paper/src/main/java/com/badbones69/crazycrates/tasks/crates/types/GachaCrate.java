@@ -80,6 +80,9 @@ public class GachaCrate extends CrateBuilder {
 
         Map<Rarity, RaritySettings> rarityMap = crateSettings.getRarityMap();
 
+        int stellarShards = 0;
+        int mysticTokens = 0;
+
         while (amount-- > 0) {
             Result result = switch (gachaType) {
                 case NORMAL -> gachaSystem.roll(playerProfile, crateSettings);
@@ -90,14 +93,14 @@ public class GachaCrate extends CrateBuilder {
             System.out.println(result);
 
             Rarity rarity = result.getRarity();
-            int stellarShards = rarityMap.get(rarity).stellarShards();
-            int mysticTokens = rarityMap.get(rarity).mysticTokens();
-
-            baseProfile.addMysticTokens(mysticTokens);
-            baseProfile.addStellarShards(stellarShards);
+            stellarShards += rarityMap.get(rarity).stellarShards();
+            mysticTokens += rarityMap.get(rarity).mysticTokens();
 
             items.add(result.getPrize());
         }
+
+        baseProfile.addMysticTokens(mysticTokens);
+        baseProfile.addStellarShards(stellarShards);
 
         addCrateTask(new RouletteStandard(this, items, getPlayer().isSneaking()).runTaskTimer(this.plugin, 2, 2));
 

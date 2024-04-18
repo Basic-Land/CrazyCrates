@@ -8,7 +8,7 @@ rootProject.description = "Create unlimited crates with multiple crate types to 
 tasks {
     assemble {
         doFirst {
-            delete("$rootDir/jars/paper/${project.name}.jar")
+            delete("$rootDir/jars/" + "${rootProject.name}-${rootProject.version}.jar")
         }
     }
 }

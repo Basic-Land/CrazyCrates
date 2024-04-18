@@ -39,7 +39,7 @@ public class ItemPreview extends InventoryBuilder {
         this.raritiesMenu = null;
         this.leftClick = true;
         ItemManager itemManager = JavaPlugin.getPlugin(CrazyCrates.class).getCrateManager().getDatabaseManager().getItemManager();
-        items = itemManager.getAllItemsFromCache(type).entrySet().stream()
+        items = itemManager.getAllItemsFromCache().entrySet().stream()
                 .map(entry -> new Pair<>(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
     }
@@ -52,7 +52,7 @@ public class ItemPreview extends InventoryBuilder {
         this.editing = true;
         this.rarity = rarity;
         ItemManager itemManager = JavaPlugin.getPlugin(CrazyCrates.class).getCrateManager().getDatabaseManager().getItemManager();
-        items = itemManager.getAllItemsFromCache(type).entrySet().stream()
+        items = itemManager.getAllItemsFromCache().entrySet().stream()
                 .filter(entry -> leftClick != ids.contains(entry.getKey()))
                 .map(entry -> new Pair<>(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());

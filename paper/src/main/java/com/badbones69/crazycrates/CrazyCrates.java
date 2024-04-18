@@ -1,6 +1,10 @@
 package com.badbones69.crazycrates;
 
-import com.badbones69.crazycrates.api.builders.types.*;
+import com.badbones69.crazycrates.api.FileManager;
+import com.badbones69.crazycrates.api.builders.types.CrateAdminMenu;
+import com.badbones69.crazycrates.api.builders.types.CrateMainMenu;
+import com.badbones69.crazycrates.api.builders.types.CratePreviewMenu;
+import com.badbones69.crazycrates.api.builders.types.CrateTierMenu;
 import com.badbones69.crazycrates.api.builders.types.items.*;
 import com.badbones69.crazycrates.api.objects.gacha.BaseProfileManager;
 import com.badbones69.crazycrates.api.utils.FileUtils;
@@ -10,11 +14,7 @@ import com.badbones69.crazycrates.commands.CommandManager;
 import com.badbones69.crazycrates.listeners.BrokeLocationsListener;
 import com.badbones69.crazycrates.listeners.CrateControlListener;
 import com.badbones69.crazycrates.listeners.MiscListener;
-import com.badbones69.crazycrates.listeners.crates.CosmicCrateListener;
-import com.badbones69.crazycrates.listeners.crates.CrateOpenListener;
-import com.badbones69.crazycrates.listeners.crates.MobileCrateListener;
-import com.badbones69.crazycrates.listeners.crates.QuadCrateListener;
-import com.badbones69.crazycrates.listeners.crates.WarCrateListener;
+import com.badbones69.crazycrates.listeners.crates.*;
 import com.badbones69.crazycrates.listeners.other.EntityDamageListener;
 import com.badbones69.crazycrates.support.holograms.HologramManager;
 import com.badbones69.crazycrates.support.metrics.MetricsManager;
@@ -23,20 +23,19 @@ import com.badbones69.crazycrates.tasks.BukkitUserManager;
 import com.badbones69.crazycrates.tasks.InventoryManager;
 import com.badbones69.crazycrates.tasks.MigrationManager;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
-import com.ryderbelserion.vital.VitalPlugin;
-import com.ryderbelserion.vital.api.enums.Support;
-import lombok.Getter;
 import com.ryderbelserion.vital.VitalPaper;
 import com.ryderbelserion.vital.enums.Support;
+import lombok.Getter;
 import net.minecraft.server.dedicated.DedicatedServer;
 import org.bukkit.plugin.java.JavaPlugin;
-import com.badbones69.crazycrates.api.FileManager;
 import org.jetbrains.annotations.NotNull;
 import us.crazycrew.crazycrates.platform.Server;
 import us.crazycrew.crazycrates.platform.config.ConfigManager;
 import us.crazycrew.crazycrates.platform.config.impl.ConfigKeys;
+
 import java.util.List;
 import java.util.Timer;
+
 import static com.badbones69.crazycrates.api.utils.MiscUtils.isLogging;
 import static com.badbones69.crazycrates.api.utils.MiscUtils.registerPermissions;
 
@@ -148,6 +147,7 @@ public class CrazyCrates extends JavaPlugin {
                 new ItemPreview.ItemPreviewListener(),
                 new ItemEdit.ItemEditListener(),
                 new RaritiesMenu.RaritiesMenuListener(),
+                new BonusPityMenu.BonusPityListener(),
 
                 // Other listeners.
                 new BrokeLocationsListener(),

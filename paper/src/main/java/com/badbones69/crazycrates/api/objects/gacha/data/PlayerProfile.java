@@ -15,6 +15,7 @@ public class PlayerProfile implements Serializable {
     private static final long serialVersionUID = 5987691544175538612L;
     @Getter
     private final String playerName;
+    @Getter
     private final int extraRewardPity;
     private final Map<Rarity, Pair<Integer, ResultType>> map = new HashMap<>();
     @Getter

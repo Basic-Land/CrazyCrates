@@ -1,9 +1,13 @@
 package com.badbones69.crazycrates.api.objects.gacha;
 
+import com.badbones69.crazycrates.CrazyCrates;
+import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
+import com.badbones69.crazycrates.tasks.crates.CrateManager;
 import cz.basicland.blibs.shared.databases.hikari.DatabaseConnection;
 import cz.basicland.blibs.spigot.utils.item.DBItemStack;
+import me.ztowne13.customcrates.crates.options.CReward;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.IOException;
@@ -17,7 +21,6 @@ import java.util.Map;
 public class ItemManager {
     private final DatabaseConnection connection;
     private final Map<Integer, ItemStack> allItems = new HashMap<>();
-    private final Map<Integer, ItemStack> extraRewards = new HashMap<>();
 
     /**
      * Constructor for the ItemManager class.
@@ -27,7 +30,26 @@ public class ItemManager {
     public ItemManager(DatabaseConnection connection) {
         this.connection = connection;
         allItems.putAll(getAllItems("AllItems"));
-        extraRewards.putAll(getAllItems("ExtraRewards"));
+        convertItems();
+    }
+
+    private void convertItems() {
+        CrazyCrates plugin = CrazyCrates.getPlugin(CrazyCrates.class);
+        CrateManager crateManager = plugin.getCrateManager();
+
+        Crate crate = crateManager.getCrateFromName("AllItems");
+
+        if (crate == null) return;
+
+        CReward.getAllRewards().forEach((id, reward) -> {
+            ItemStack item = reward.getSaveBuilder().getStack();
+            String rewardName = reward.getRewardName();
+            double chance = reward.getChance();
+            List<String> commands = reward.getCommands();
+            boolean give = reward.isGiveDisplayItem();
+
+            crate.addEditorItem(rewardName, item, chance, commands, give);
+        });
     }
 
     /**
@@ -79,10 +101,7 @@ public class ItemManager {
      * @return A list of pairs, where each pair consists of an item ID and an ItemStack.
      */
     public Map<Integer, ItemStack> getItemsFromCache(RewardType table, List<Integer> ids) {
-        return switch (table) {
-            case STANDARD, LIMITED -> get(allItems, ids);
-            case EXTRA_REWARD -> get(extraRewards, ids);
-        };
+        return get(allItems, ids);
     }
 
     private Map<Integer, ItemStack> get(Map<Integer, ItemStack> map, List<Integer> ids) {
@@ -92,23 +111,15 @@ public class ItemManager {
     /**
      * Retrieves a specific item from the cache based on its ID.
      *
-     * @param table The name of the table to retrieve the item from.
      * @param id The ID of the item to retrieve.
      * @return A pair consisting of the item ID and an ItemStack, or null if the item is not found.
      */
-    public Pair<Integer, ItemStack> getItemFromCache(RewardType table, int id) {
-        Map<Integer, ItemStack> items = switch (table) {
-            case STANDARD, LIMITED -> allItems;
-            case EXTRA_REWARD -> extraRewards;
-        };
-        return new Pair<>(id, items.get(id));
+    public Pair<Integer, ItemStack> getItemFromCache(int id) {
+        return new Pair<>(id, allItems.get(id));
     }
 
-    public Map<Integer, ItemStack> getAllItemsFromCache(RewardType table) {
-        return switch (table) {
-            case STANDARD, LIMITED -> allItems;
-            case EXTRA_REWARD -> extraRewards;
-        };
+    public Map<Integer, ItemStack> getAllItemsFromCache() {
+        return allItems;
     }
 
     /**
@@ -138,10 +149,7 @@ public class ItemManager {
 
         if (id == -1) return id;
 
-        switch (table) {
-            case STANDARD, LIMITED -> allItems.put(id, item);
-            case EXTRA_REWARD -> extraRewards.put(id, item);
-        }
+        allItems.put(id, item);
 
         return id;
     }

@@ -146,7 +146,7 @@ public class History {
             String[] split = history.getRewardName().split("_");
             int id = Integer.parseInt(split[0]);
 
-            item = playerDataManager.getItemManager().getItemFromCache(RewardType.LIMITED, id).second();
+            item = playerDataManager.getItemManager().getItemFromCache(id).second();
             if (item == null) {
                 throw new NullPointerException("Item with rewardName: " + history.getRewardName() + " does not exist, rarity: " + rarity + " 5050: " + history.isWon5050());
             }

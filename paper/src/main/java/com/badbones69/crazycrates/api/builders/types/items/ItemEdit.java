@@ -1,6 +1,5 @@
 package com.badbones69.crazycrates.api.builders.types.items;
 
-import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.builders.InventoryBuilder;
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
@@ -14,7 +13,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
 import java.util.List;
@@ -82,7 +80,7 @@ public class ItemEdit extends InventoryBuilder {
                         int id = Integer.parseInt(rewardName[0]);
                         if (id == 0) return;
                         try {
-                            JavaPlugin.getPlugin(CrazyCrates.class).getCrateManager().getDatabaseManager().getItemManager().updateItem(holder.type, id, DBItemStack.encodeItem(stack));
+                            holder.plugin.getCrateManager().getDatabaseManager().getItemManager().updateItem(holder.type, id, DBItemStack.encodeItem(stack));
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }

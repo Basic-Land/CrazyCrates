@@ -3,10 +3,13 @@ package com.badbones69.crazycrates.api.builders.types;
 import ch.jalu.configme.SettingsManager;
 import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.builders.InventoryBuilder;
+import com.badbones69.crazycrates.api.builders.ItemBuilder;
+import com.badbones69.crazycrates.api.builders.types.items.BonusPityMenu;
 import com.badbones69.crazycrates.api.enums.PersistentKeys;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.Tier;
 import org.bukkit.plugin.java.JavaPlugin;
+import us.crazycrew.crazycrates.api.enums.types.CrateType;
 import us.crazycrew.crazycrates.platform.config.ConfigManager;
 import us.crazycrew.crazycrates.platform.config.impl.ConfigKeys;
 import com.badbones69.crazycrates.tasks.InventoryManager;
@@ -60,6 +63,11 @@ public class CrateTierMenu extends InventoryBuilder {
         }
 
         if (this.inventoryManager.inCratePreview(getPlayer()) && this.config.getProperty(ConfigKeys.enable_crate_menu)) getInventory().setItem(getCrate().getAbsolutePreviewItemPosition(4), this.inventoryManager.getMenuButton(getPlayer()));
+
+        if (getCrate().getCrateType() == CrateType.gacha) {
+            ItemBuilder item = new ItemBuilder().setMaterial(Material.PLAYER_HEAD).setName("&a&lBonus pity prize").addLore("&7Click to preview/pick a prize");
+            getInventory().setItem(getSize() - 1, item.build());
+        }
     }
 
     public static class CrateTierListener implements Listener {
@@ -121,6 +129,11 @@ public class CrateTierMenu extends InventoryBuilder {
                 Inventory cratePreviewMenu = crate.getPreview(player, this.inventoryManager.getPage(player), true, tier);
 
                 player.openInventory(cratePreviewMenu);
+            }
+
+            if (event.getSlot() == holder.getSize() - 1) {
+                crate.playSound(player, player.getLocation(), "click-sound", "UI_BUTTON_CLICK", SoundCategory.PLAYERS);
+                player.openInventory(new BonusPityMenu(crate, player, 36, "&a&lBonus pity prize").build().getInventory());
             }
         }
     }

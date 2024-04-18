@@ -1,6 +1,5 @@
 package com.badbones69.crazycrates.api.builders.types.items;
 
-import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.builders.InventoryBuilder;
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.objects.Crate;
@@ -15,10 +14,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 
 public class CratePickPrizeMenu extends InventoryBuilder {
     private final ItemStack item;
+    private final DatabaseManager databaseManager = plugin.getCrateManager().getDatabaseManager();
 
     public CratePickPrizeMenu(Player player, ItemStack item, Crate crate) {
         super(crate, player, 9, "Item Menu");
@@ -66,15 +65,14 @@ public class CratePickPrizeMenu extends InventoryBuilder {
                 player.openInventory(crate.getTierPreview(player));
             } else if (event.getSlot() > 4) {
                 // Retrieve the player's profile and save the chosen reward
-                DatabaseManager playerDataManager = JavaPlugin.getPlugin(CrazyCrates.class).getCrateManager().getDatabaseManager();
-                PlayerProfile playerProfile = playerDataManager.getPlayerProfile(player.getName(), crateSettings, false);
+                PlayerProfile playerProfile = holder.databaseManager.getPlayerProfile(player.getName(), crateSettings, false);
 
                 String rewardName = nbt.getString("rewardName");
 
                 System.out.println("Chosen reward: " + rewardName);
 
                 playerProfile.setChosenReward(rewardName);
-                playerDataManager.savePlayerProfile(player.getName(), crateSettings, playerProfile);
+                holder.databaseManager.savePlayerProfile(player.getName(), crateSettings, playerProfile);
                 player.openInventory(crate.getTierPreview(player));
             }
         }

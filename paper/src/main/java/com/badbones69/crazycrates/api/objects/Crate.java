@@ -13,15 +13,9 @@ import com.badbones69.crazycrates.tasks.InventoryManager;
 import com.badbones69.crazycrates.tasks.crates.effects.SoundEffect;
 import com.badbones69.crazycrates.tasks.crates.other.AbstractCrateManager;
 import com.badbones69.crazycrates.tasks.crates.other.CosmicCrateManager;
-import com.ryderbelserion.vital.utils.DyeUtils;
+import com.ryderbelserion.vital.util.DyeUtil;
 import lombok.Getter;
 import org.bukkit.*;
-import com.ryderbelserion.vital.util.DyeUtil;
-import org.bukkit.Color;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Particle;
-import org.bukkit.Registry;
-import org.bukkit.SoundCategory;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
@@ -318,11 +312,11 @@ public class Crate {
         for (int stop = 0; prizes.isEmpty() && stop <= 2000; stop++) {
             for (Prize prize : usablePrizes) {
                 int max = prize.getMaxRange();
-                int chance = prize.getChance();
-                int num;
+                double chance = prize.getChance();
+                double num;
 
-                for (int counter = 1; counter <= 1; counter++) {
-                    num = MiscUtils.useOtherRandom() ? 1 + ThreadLocalRandom.current().nextInt(max) : 1 + new Random().nextInt(max);
+                for (int counter = 1; counter == 1; counter++) {
+                    num = MiscUtils.useOtherRandom() ? 1 + ThreadLocalRandom.current().nextDouble(max) : 1 + new Random().nextDouble(max);
 
                     if (num <= chance) prizes.add(prize);
                 }
@@ -603,20 +597,24 @@ public class Crate {
      * @param prize the prize the item is being added to.
      * @param item the ItemStack that is being added.
      */
-    public void addEditorItem(String prize, ItemStack item, int chance) {
+    public void addEditorItem(String prize, ItemStack item, double chance) {
+        addEditorItem(prize, item, chance, new ArrayList<>(), true);
+    }
+
+    public void addEditorItem(String prize, ItemStack item, double chance, List<String> commands, boolean save) {
         List<ItemStack> items = new ArrayList<>();
         items.add(item);
 
         String path = "Crate.Prizes." + prize;
 
         if (!this.file.contains(path)) {
-            setItem(item, chance, path);
+            setItem(item, chance, path, commands);
         } else {
             // Must be checked as getList will return null if nothing is found.
             if (this.file.contains(path + ".Editor-Items")) this.file.getList(path + ".Editor-Items").forEach(listItem -> items.add((ItemStack) listItem));
         }
 
-        saveFile(items, path);
+        if (save) saveFile(items, path);
     }
 
     /**
@@ -626,7 +624,12 @@ public class Crate {
      * @param chance the chance to win the item
      * @param path the path in the config to set the item at.
      */
-    private void setItem(ItemStack item, int chance, String path) {
+
+    public void setItem(ItemStack item, double chance, String path) {
+        setItem(item, chance, path, new ArrayList<>());
+    }
+
+    public void setItem(ItemStack item, double chance, String path, List<String> commands) {
         if (item.hasItemMeta()) {
             ItemMeta itemMeta = item.getItemMeta();
 
@@ -648,6 +651,7 @@ public class Crate {
         this.file.set(path + ".DisplayAmount", item.getAmount());
         this.file.set(path + ".MaxRange", 100);
         this.file.set(path + ".Chance", chance);
+        this.file.set(path + ".Commands", commands);
     }
 
     /**

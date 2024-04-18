@@ -29,7 +29,7 @@ public class CrateSettings {
     private final boolean fatePointEnabled, overrideEnabled, extraRewardEnabled;
     private final int fatePointAmount, bonusPity;
 
-    private final Set<ItemData> extraRewards = new HashSet<>();
+    private final List<ItemData> extraRewards = new ArrayList<>();
 
     private final Map<Rarity, RaritySettings> rarityMap = new LinkedHashMap<>();
     private final GachaType gachaType;
@@ -75,14 +75,14 @@ public class CrateSettings {
         List<Tier> tiers = crate.getTiers();
         boolean emptyTiers = tiers.isEmpty();
 
-        String path = "Crate.Gacha.settings";
+        String path = "Crate.Gacha";
         RewardType type = RewardType.EXTRA_REWARD;
-        ConfigurationSection section = config.getConfigurationSection(path + ".extra-reward.items");
+        ConfigurationSection section = config.getConfigurationSection(path + ".extra-reward");
 
         if (section != null) {
-            for (String key : section.getKeys(false)) {
-                Pair<Integer, ItemStack> pair = databaseManager.getItemManager().getItemFromCache(type, Integer.parseInt(key));
-                extraRewards.add(new ItemData(key, Rarity.EXTRA_REWARD, type, pair.second()));
+            for (int key : section.getIntegerList("items")) {
+                Pair<Integer, ItemStack> pair = databaseManager.getItemManager().getItemFromCache(key);
+                extraRewards.add(new ItemData(String.valueOf(key), Rarity.EXTRA_REWARD, type, pair.second()));
             }
         }
 
@@ -135,7 +135,7 @@ public class CrateSettings {
         String rewardName = key + "_" + type.name();
         int id = Integer.parseInt(key);
 
-        ItemStack item = databaseManager.getItemManager().getItemFromCache(type, id).second();
+        ItemStack item = databaseManager.getItemManager().getItemFromCache(id).second();
         if (item == null) {
             return;
         }
@@ -167,7 +167,7 @@ public class CrateSettings {
     }
 
     @NotNull
-    private static ItemBuilder getTierItem(Rarity rarity, RaritySettings raritySettings) {
+    private ItemBuilder getTierItem(Rarity rarity, RaritySettings raritySettings) {
         ItemBuilder tierStack = new ItemBuilder().setMaterial(Material.CHEST);
         tierStack.setName(rarity.name());
 
@@ -231,19 +231,23 @@ public class CrateSettings {
 
     public Set<Prize> getLegendaryStandard() {
         RewardType type = RewardType.STANDARD;
-        return crate.getPrizes().stream().filter(item -> item.getRarity() == Rarity.LEGENDARY && item.getType().equals(type)).collect(Collectors.toSet());
+        Rarity rarity = Rarity.LEGENDARY;
+        return crate.getPrizes().stream().filter(item -> item.getRarity() == rarity && item.getType().equals(type)).collect(Collectors.toSet());
     }
 
     public Set<Prize> getLegendaryLimited() {
         RewardType type = RewardType.LIMITED;
-        return crate.getPrizes().stream().filter(item -> item.getRarity() == Rarity.LEGENDARY && item.getType().equals(type)).collect(Collectors.toSet());
+        Rarity rarity = Rarity.LEGENDARY;
+        return crate.getPrizes().stream().filter(item -> item.getRarity() == rarity && item.getType().equals(type)).collect(Collectors.toSet());
     }
 
     public Set<Prize> getLimited() {
-        return crate.getPrizes().stream().filter(item -> item.getType() == RewardType.LIMITED).collect(Collectors.toSet());
+        RewardType type = RewardType.LIMITED;
+        return crate.getPrizes().stream().filter(item -> item.getType() == type).collect(Collectors.toSet());
     }
 
     public Set<Prize> getStandard() {
-        return crate.getPrizes().stream().filter(item -> item.getType() == RewardType.STANDARD).collect(Collectors.toSet());
+        RewardType type = RewardType.STANDARD;
+        return crate.getPrizes().stream().filter(item -> item.getType() == type).collect(Collectors.toSet());
     }
 }

@@ -1,10 +1,8 @@
 package com.badbones69.crazycrates.api.builders.types.items;
 
-import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.builders.InventoryBuilder;
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.objects.Crate;
-import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
@@ -16,7 +14,6 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
 
@@ -44,7 +41,6 @@ public class ItemAddMenu extends InventoryBuilder {
     }
 
     public static class ItemsAddListener implements Listener {
-        private final DatabaseManager databaseManager = JavaPlugin.getPlugin(CrazyCrates.class).getCrateManager().getDatabaseManager();
         @EventHandler
         public void onInventoryClick(InventoryClickEvent event) {
             Inventory inventory = event.getInventory();
@@ -85,7 +81,7 @@ public class ItemAddMenu extends InventoryBuilder {
             for (ItemStack item : items) {
                 if (item == null || item.getType() == Material.AIR) continue;
 
-                int id = databaseManager.getItemManager().addItem(type, item);
+                int id = holder.plugin.getCrateManager().getDatabaseManager().getItemManager().addItem(type, item);
                 if (id == -1) continue;
 
                 crateSettings.addItem(type, id, rarity, item, crate);

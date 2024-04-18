@@ -37,7 +37,7 @@ public class Prize {
     private final String prizeName;
     private int maxRange = 100;
     private final String prizeNumber;
-    private int chance = 0;
+    private double chance = 0;
 
     private List<Tier> tiers = new ArrayList<>();
     private final List<ItemBuilder> builders;
@@ -72,7 +72,7 @@ public class Prize {
 
         this.prizeName = section.getString("DisplayName", WordUtils.capitalizeFully(section.getString("DisplayItem", "STONE").replaceAll("_", " ")));
         this.maxRange = section.getInt("MaxRange", 100);
-        this.chance = section.getInt("Chance", 50);
+        this.chance = section.getDouble("Chance", 50);
         this.firework = section.getBoolean("Firework", false);
 
         this.messages = section.contains("Messages") ? section.getStringList("Messages") : Collections.emptyList();
@@ -224,7 +224,7 @@ public class Prize {
     /**
      * @return the chance the prize has of being picked.
      */
-    public int getChance() {
+    public double getChance() {
         return this.chance;
     }
     
