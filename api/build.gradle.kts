@@ -1,16 +1,12 @@
 plugins {
-    `maven-publish`
+    `paper-plugin`
 }
 
 project.group = "us.crazycrew.crazycrates"
 project.version = "1.0-snapshot"
 
-val mcVersion = libs.versions.bundle.get()
-
 dependencies {
     compileOnly(fileTree("libs/shade").include("*.jar"))
-
-    paperweight.paperDevBundle(mcVersion)
 
     compileOnly(libs.config.me)
 
@@ -26,7 +22,7 @@ tasks {
     publishing {
         repositories {
             maven {
-                uri("https://repo.crazycrew.us/snapshots/")
+                url = uri("https://repo.crazycrew.us/snapshots")
 
                 credentials {
                     this.username = System.getenv("gradle_username")
@@ -39,7 +35,7 @@ tasks {
             create<MavenPublication>("maven") {
                 group = project.group
                 artifactId = project.name
-                version = project.version.toString()
+                version = "${project.version}"
 
                 artifact(reobfJar)
             }

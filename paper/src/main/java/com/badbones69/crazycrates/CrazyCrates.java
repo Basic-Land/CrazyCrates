@@ -16,7 +16,6 @@ import com.badbones69.crazycrates.listeners.crates.MobileCrateListener;
 import com.badbones69.crazycrates.listeners.crates.QuadCrateListener;
 import com.badbones69.crazycrates.listeners.crates.WarCrateListener;
 import com.badbones69.crazycrates.listeners.other.EntityDamageListener;
-import com.badbones69.crazycrates.support.PluginSupport;
 import com.badbones69.crazycrates.support.holograms.HologramManager;
 import com.badbones69.crazycrates.support.metrics.MetricsManager;
 import com.badbones69.crazycrates.support.placeholders.PlaceholderAPISupport;
@@ -27,6 +26,8 @@ import com.badbones69.crazycrates.tasks.crates.CrateManager;
 import com.ryderbelserion.vital.VitalPlugin;
 import com.ryderbelserion.vital.api.enums.Support;
 import lombok.Getter;
+import com.ryderbelserion.vital.VitalPaper;
+import com.ryderbelserion.vital.enums.Support;
 import net.minecraft.server.dedicated.DedicatedServer;
 import org.bukkit.plugin.java.JavaPlugin;
 import com.badbones69.crazycrates.api.FileManager;
@@ -68,8 +69,6 @@ public class CrazyCrates extends JavaPlugin {
 
         // Register files.
         this.fileManager = new FileManager();
-
-        // Register files.
         this.fileManager.registerDefaultGenerateFiles("CrateExample.yml", "/crates", "/crates")
                 .registerDefaultGenerateFiles("QuadCrateExample.yml", "/crates", "/crates")
                 .registerDefaultGenerateFiles("CosmicCrateExample.yml", "/crates", "/crates")
@@ -87,12 +86,9 @@ public class CrazyCrates extends JavaPlugin {
                 .setup();
     }
 
-    private VitalPlugin plugin;
-
     @Override
     public void onEnable() {
-        this.plugin = new VitalPlugin(this);
-        this.plugin.start();
+        new VitalPaper(this);
 
         int radius = DedicatedServer.getServer().getSpawnProtectionRadius();
 
@@ -114,6 +110,8 @@ public class CrazyCrates extends JavaPlugin {
         this.inventoryManager = new InventoryManager();
         this.crateManager = new CrateManager();
         this.userManager = new BukkitUserManager();
+
+        this.instance.setUserManager(this.userManager);
 
         // Load holograms.
         this.crateManager.loadHolograms();
@@ -168,11 +166,11 @@ public class CrazyCrates extends JavaPlugin {
             String prefix = ConfigManager.getConfig().getProperty(ConfigKeys.console_prefix);
 
             // Print dependency garbage
-            for (PluginSupport value : PluginSupport.values()) {
-                if (value.isPluginEnabled()) {
-                    getServer().getConsoleSender().sendMessage(MsgUtils.color(prefix + "&6&l" + value.name() + " &a&lFOUND"));
+            for (Support value : Support.values()) {
+                if (value.isEnabled()) {
+                    getServer().getConsoleSender().sendMessage(MsgUtils.color(prefix + "&6&l" + value.getName() + " &a&lFOUND"));
                 } else {
-                    getServer().getConsoleSender().sendMessage(MsgUtils.color(prefix + "&6&l" + value.name() + " &c&lNOT FOUND"));
+                    getServer().getConsoleSender().sendMessage(MsgUtils.color(prefix + "&6&l" + value.getName() + " &c&lNOT FOUND"));
                 }
             }
         }
@@ -189,13 +187,7 @@ public class CrazyCrates extends JavaPlugin {
     @Override
     public void onDisable() {
         // Cancel the timer task.
-        if (this.timer != null) {
-            this.timer.cancel();
-        }
-
-        if (this.plugin != null) {
-            this.plugin.stop();
-        }
+        this.timer.cancel();
 
         if (this.baseProfileManager != null) this.baseProfileManager.save();
 

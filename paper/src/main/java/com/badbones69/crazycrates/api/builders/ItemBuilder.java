@@ -8,6 +8,9 @@ import com.badbones69.crazycrates.support.SkullCreator;
 import com.ryderbelserion.vital.api.enums.Support;
 import com.ryderbelserion.vital.utils.DyeUtils;
 import cz.basicland.blibs.spigot.utils.item.NBT;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.ryderbelserion.vital.enums.Support;
+import com.ryderbelserion.vital.util.DyeUtil;
 import io.th0rgal.oraxen.api.OraxenItems;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.*;
@@ -61,7 +64,7 @@ public class ItemBuilder {
 
     // Potions
     private boolean isPotion = false;
-    private Color potionColor = Color.RED;
+    private Color potionColor = null;
     private PotionEffectType potionType = null;
     private int potionDuration = -1;
     private int potionAmplifier = 1;
@@ -83,7 +86,7 @@ public class ItemBuilder {
     // Trims
     private TrimMaterial trimMaterial = null;
     private TrimPattern trimPattern = null;
-    private Color armorColor = Color.RED;
+    private Color armorColor = null;
 
     // Banners
     private boolean isBanner = false;
@@ -94,12 +97,12 @@ public class ItemBuilder {
 
     // Maps
     private boolean isMap = false;
-    private Color mapColor = Color.RED;
+    private Color mapColor = null;
 
     // Fireworks
     private boolean isFirework = false;
     private boolean isFireworkStar = false;
-    private Color fireworkColor = Color.RED;
+    private Color fireworkColor = null;
     private List<Color> fireworkColors = new ArrayList<>();
     private int fireworkPower = 1;
 
@@ -564,12 +567,14 @@ public class ItemBuilder {
             if (isInt(metaData)) {
                 this.itemDamage = Integer.parseInt(metaData);
             } else {
-                this.potionType = getPotionType(PotionEffectType.getByName(metaData)).getEffectType();
+                try {
+                    this.potionType = getPotionType(PotionEffectType.getByName(metaData)).getEffectType();
+                } catch (Exception ignored) {}
 
-                this.potionColor = DyeUtils.getColor(metaData);
-                this.armorColor = DyeUtils.getColor(metaData);
-                this.mapColor = DyeUtils.getColor(metaData);
-                this.fireworkColor = DyeUtils.getColor(metaData);
+                this.potionColor = DyeUtil.getColor(metaData) == null ? DyeUtil.getDefaultColor(metaData) : DyeUtil.getColor(metaData);
+                this.armorColor = DyeUtil.getColor(metaData) == null ? DyeUtil.getDefaultColor(metaData) : DyeUtil.getColor(metaData);
+                this.mapColor = DyeUtil.getColor(metaData) == null ? DyeUtil.getDefaultColor(metaData) : DyeUtil.getColor(metaData);
+                this.fireworkColor = DyeUtil.getColor(metaData) == null ? DyeUtil.getDefaultColor(metaData) : DyeUtil.getColor(metaData);
             }
         } else if (type.contains("#")) {
             String[] section = type.split("#");
@@ -1143,7 +1148,7 @@ public class ItemBuilder {
                         try {
                             for (PatternType pattern : PatternType.values()) {
                                 if (option.equalsIgnoreCase(pattern.name()) || value.equalsIgnoreCase(pattern.getIdentifier())) {
-                                    DyeColor color = DyeUtils.getDyeColor(value);
+                                    DyeColor color = DyeUtil.getDyeColor(value);
                                     if (color != null) itemBuilder.addPattern(new Pattern(color, pattern));
                                     break;
                                 }
@@ -1346,7 +1351,7 @@ public class ItemBuilder {
             for (PatternType pattern : PatternType.values()) {
 
                 if (split[0].equalsIgnoreCase(pattern.name()) || split[0].equalsIgnoreCase(pattern.getIdentifier())) {
-                    DyeColor color = DyeUtils.getDyeColor(split[1]);
+                    DyeColor color = DyeUtil.getDyeColor(split[1]);
 
                     if (color != null) addPattern(new Pattern(color, pattern));
 

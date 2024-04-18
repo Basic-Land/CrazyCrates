@@ -16,6 +16,12 @@ import com.badbones69.crazycrates.tasks.crates.other.CosmicCrateManager;
 import com.ryderbelserion.vital.utils.DyeUtils;
 import lombok.Getter;
 import org.bukkit.*;
+import com.ryderbelserion.vital.util.DyeUtil;
+import org.bukkit.Color;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Particle;
+import org.bukkit.Registry;
+import org.bukkit.SoundCategory;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
@@ -103,7 +109,7 @@ public class Crate {
 
         this.emptyKey = ItemBuilder.convertItemStack(key);
         this.keyBuilder = ItemBuilder.convertItemStack(key).setCrateName(name);
-        this.keyName = keyName;
+        this.keyName = keyName != null ? keyName : "Crate.PhysicalKey.Name is not in the " + name + ".yml";
 
         this.file = file;
         this.name = name;
@@ -144,7 +150,7 @@ public class Crate {
         if (crateType == CrateType.quad_crate) {
             this.particle = Registry.PARTICLE_TYPE.get(NamespacedKey.minecraft(file != null ? file.getString("Crate.particles.type", "dust") : "dust"));
 
-            this.color = DyeUtils.getColor(file != null ? file.getString("Crate.particles.color", "235,64,52") : "235,64,52");
+            this.color = DyeUtil.getColor(file != null ? file.getString("Crate.particles.color", "235,64,52") : "235,64,52");
         }
 
         this.hologram = hologram != null ? hologram : new CrateHologram();

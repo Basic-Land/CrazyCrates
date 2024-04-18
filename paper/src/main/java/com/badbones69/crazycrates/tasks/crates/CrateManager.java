@@ -2,12 +2,29 @@ package com.badbones69.crazycrates.tasks.crates;
 
 import ch.jalu.configme.SettingsManager;
 import com.Zrips.CMI.Modules.ModuleHandling.CMIModule;
-import com.badbones69.crazycrates.CrazyCrates;
-import com.badbones69.crazycrates.api.ChestManager;
 import com.badbones69.crazycrates.api.FileManager;
 import com.badbones69.crazycrates.api.FileManager.Files;
 import com.badbones69.crazycrates.api.builders.CrateBuilder;
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
+import com.badbones69.crazycrates.api.utils.MiscUtils;
+import com.badbones69.crazycrates.tasks.crates.types.*;
+import com.badbones69.crazycrates.tasks.crates.types.CasinoCrate;
+import com.badbones69.crazycrates.tasks.crates.types.CsgoCrate;
+import com.ryderbelserion.vital.common.util.FileUtil;
+import com.ryderbelserion.vital.enums.Support;
+import org.apache.commons.lang.WordUtils;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionDefault;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.plugin.java.JavaPlugin;
+import us.crazycrew.crazycrates.api.enums.types.CrateType;
+import us.crazycrew.crazycrates.api.enums.types.KeyType;
+import com.badbones69.crazycrates.api.enums.PersistentKeys;
+import org.bukkit.scheduler.BukkitTask;
+import us.crazycrew.crazycrates.platform.config.ConfigManager;
+import us.crazycrew.crazycrates.platform.config.impl.ConfigKeys;
 import com.badbones69.crazycrates.api.builders.types.CrateMainMenu;
 import com.badbones69.crazycrates.api.enums.Messages;
 import com.badbones69.crazycrates.api.enums.PersistentKeys;
@@ -51,6 +68,10 @@ import us.crazycrew.crazycrates.api.enums.types.KeyType;
 import us.crazycrew.crazycrates.platform.config.ConfigManager;
 import us.crazycrew.crazycrates.platform.config.impl.ConfigKeys;
 
+import com.badbones69.crazycrates.CrazyCrates;
+import com.badbones69.crazycrates.support.holograms.types.CMIHologramsSupport;
+import com.badbones69.crazycrates.support.holograms.types.DecentHologramsSupport;
+import com.badbones69.crazycrates.api.utils.ItemUtils;
 import java.io.File;
 import java.util.*;
 import java.util.logging.Level;
@@ -156,10 +177,10 @@ public class CrateManager {
     }
 
     public void loadHolograms() {
-        if (PluginSupport.DECENT_HOLOGRAMS.isPluginEnabled()) {
+        if (Support.decent_holograms.isEnabled()) {
             this.holograms = new DecentHologramsSupport();
             if (MiscUtils.isLogging()) this.plugin.getLogger().info("DecentHolograms support has been enabled.");
-        } else if (PluginSupport.CMI.isPluginEnabled() && CMIModule.holograms.isEnabled()) {
+        } else if (Support.cmi.isEnabled() && CMIModule.holograms.isEnabled()) {
             this.holograms = new CMIHologramsSupport();
             if (MiscUtils.isLogging()) this.plugin.getLogger().info("CMI Hologram support has been enabled.");
         } else if (MiscUtils.isLogging()) this.plugin.getLogger().warning("No holograms plugin were found. If using CMI, make sure holograms module is enabled.");
@@ -169,6 +190,8 @@ public class CrateManager {
      * Loads the crates.
      */
     public void loadCrates() {
+        FileUtil.extracts(this.plugin.getClass(), "/examples/", this.plugin.getDataFolder().toPath().resolve("examples"), true);
+
         this.giveNewPlayersKeys = false;
 
         purge();
@@ -188,7 +211,7 @@ public class CrateManager {
                 List<Prize> prizes = new ArrayList<>();
                 List<Tier> tiers = new ArrayList<>();
 
-                String previewName = file.contains("Crate.Preview-Name") ? file.getString("Crate.Preview-Name") : file.getString("Crate.Name");
+                String previewName = file.contains("Crate.Preview-Name") ? file.getString("Crate.Preview-Name") : file.getString("Crate.CrateName");
                 int maxMassOpen = file.getInt("Crate.Max-Mass-Open", 10);
                 int requiredKeys = file.getInt("Crate.RequiredKeys", 0);
 
