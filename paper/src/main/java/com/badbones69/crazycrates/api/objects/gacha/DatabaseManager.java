@@ -103,9 +103,9 @@ public class DatabaseManager {
         connection.update(query.toString()).join();
     }
 
-    public void savePlayerProfile(String playerName, CrateSettings crateName, PlayerProfile profile) {
-        String name = crateName.getCrateName();
-        if (!crateSettings.contains(crateName)) {
+    public void savePlayerProfile(String playerName, CrateSettings crateSettings, PlayerProfile profile) {
+        String name = crateSettings.getCrateName();
+        if (!this.crateSettings.contains(crateSettings)) {
             System.out.println("Error: Crate " + name + " does not exist.");
             return;
         }

@@ -1,6 +1,8 @@
 package com.badbones69.crazycrates.api.builders.types.items;
 
 import com.badbones69.crazycrates.api.builders.InventoryBuilder;
+import com.badbones69.crazycrates.api.builders.ItemBuilder;
+import com.badbones69.crazycrates.api.builders.types.CrateTierMenu;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
 import com.badbones69.crazycrates.api.objects.gacha.data.PlayerProfile;
@@ -21,10 +23,15 @@ public class BonusPityMenu extends InventoryBuilder {
     private int totalPages;
     private int lastItemSlot = 10;
     private final List<ItemData> extraRewards;
+    private final CrateTierMenu crateTierMenu;
+    private final static ItemStack orangeGlassPane = glass(Material.ORANGE_STAINED_GLASS_PANE);
+    private final static ItemStack redGlassPane = glass(Material.RED_STAINED_GLASS_PANE);
+    private final static ItemStack greenGlassPane = glass(Material.GREEN_STAINED_GLASS_PANE);
 
-    public BonusPityMenu(Crate crate, Player player, int size, String title) {
+    public BonusPityMenu(Crate crate, Player player, int size, String title, CrateTierMenu crateTierMenu) {
         super(crate, player, size, title);
         this.extraRewards = crate.getCrateSettings().getExtraRewards();
+        this.crateTierMenu = crateTierMenu;
     }
 
     public InventoryBuilder build() {
@@ -38,7 +45,6 @@ public class BonusPityMenu extends InventoryBuilder {
         if (totalPages == 0) totalPages = 1;
 
         // Set the orange glass pane at the border positions
-        ItemStack orangeGlassPane = new ItemStack(Material.ORANGE_STAINED_GLASS_PANE);
         for (int i = 0; i < 9; i++) {
             getInventory().setItem(i, orangeGlassPane); // Top border
             getInventory().setItem(i + 27, orangeGlassPane); // Bottom border
@@ -49,7 +55,6 @@ public class BonusPityMenu extends InventoryBuilder {
         getInventory().setItem(26, orangeGlassPane);
 
         // Set the red glass pane at the specified positions
-        ItemStack redGlassPane = new ItemStack(Material.RED_STAINED_GLASS_PANE);
         for (int i = 10; i < 17; i++) {
             getInventory().setItem(i, redGlassPane);
         }
@@ -69,38 +74,54 @@ public class BonusPityMenu extends InventoryBuilder {
         ItemStack pageBackItem = new ItemStack(Material.PLAYER_HEAD);
         ItemStack pageForwardItem = new ItemStack(Material.PLAYER_HEAD);
         if (currentPage == 0) { // If it's the first page, set the page back item to an orange glass pane
-            pageBackItem = new ItemStack(Material.ORANGE_STAINED_GLASS_PANE);
+            pageBackItem = orangeGlassPane;
         }
 
         if (currentPage == totalPages - 1) { // If it's the last page, set the page forward item to an orange glass pane
-            pageForwardItem = new ItemStack(Material.ORANGE_STAINED_GLASS_PANE);
+            pageForwardItem = orangeGlassPane;
         }
 
         getInventory().setItem(27, pageBackItem); // Page back
         getInventory().setItem(35, pageForwardItem); // Page forward
 
+        ItemBuilder backItem = new ItemBuilder().setMaterial(Material.ARROW).setCustomModelData(1000002).setHasCustomModelData(true);
+        getInventory().setItem(29, backItem.build());
+
         // Set the paper at the specified position
-        ItemStack paper = new ItemStack(Material.PAPER);
+        ItemStack paper = new ItemBuilder()
+                .setMaterial(Material.PAPER)
+                .setCustomModelData(10)
+                .setHasCustomModelData(true)
+                .setName("#f0af37Progress " + totalPity + "/" + extraRewardPity)
+                .build();
         getInventory().setItem(31, paper);
 
         // Set the barrier or player head at the specified position based on a condition
-        ItemStack lastItem;
-        if (playerProfile.reachedExtraRewardPity()) { // Replace 'extraRewardPity' with the actual condition
-            lastItem = new ItemStack(Material.BARRIER);
+        boolean extraPity = playerProfile.reachedExtraRewardPity();
+
+        ItemBuilder confirm = new ItemBuilder().setMaterial(extraPity ? Material.ARROW : Material.BARRIER)
+                .setCustomModelData(1000001)
+                .setHasCustomModelData(true);
+
+        if (extraPity) {
+            confirm.setName("#f0af37Click to confirm");
+            confirm.addLore("");
         } else {
-            lastItem = new ItemStack(Material.PLAYER_HEAD);
+            confirm.setName("#f0af37You have not reached the required pity");
         }
-        getInventory().setItem(33, lastItem);
+
+
+        getInventory().setItem(33, confirm.build());
 
         return this;
     }
 
-    public void nextPage() {
+    private void nextPage() {
         currentPage++;
         build();
     }
 
-    public void previousPage() {
+    private void previousPage() {
         currentPage--;
         build();
     }
@@ -124,11 +145,9 @@ public class BonusPityMenu extends InventoryBuilder {
 
             // If a displayed item is clicked
             if (clickedSlot >= 19 && clickedSlot <= 25) {
-                ItemStack redGlassPane = new ItemStack(Material.RED_STAINED_GLASS_PANE);
                 holder.getInventory().setItem(holder.lastItemSlot, redGlassPane);
 
                 // Change the red glass pane above it to a green glass pane
-                ItemStack greenGlassPane = new ItemStack(Material.GREEN_STAINED_GLASS_PANE);
                 holder.getInventory().setItem(clickedSlot - 9, greenGlassPane);
                 holder.lastItemSlot = clickedSlot - 9;
             }
@@ -142,6 +161,14 @@ public class BonusPityMenu extends InventoryBuilder {
             if (clickedSlot == 35 && holder.currentPage < holder.totalPages - 1) {
                 holder.nextPage();
             }
+
+            if (clickedSlot == 29) {
+                player.openInventory(holder.crateTierMenu.getInventory());
+            }
         }
+    }
+
+    private static ItemStack glass(Material item) {
+        return new ItemBuilder().setMaterial(item).setCustomModelData(1000001).setHasCustomModelData(true).setName("&7").build();
     }
 }

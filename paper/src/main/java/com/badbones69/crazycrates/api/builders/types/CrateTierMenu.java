@@ -133,7 +133,7 @@ public class CrateTierMenu extends InventoryBuilder {
 
             if (event.getSlot() == holder.getSize() - 1) {
                 crate.playSound(player, player.getLocation(), "click-sound", "UI_BUTTON_CLICK", SoundCategory.PLAYERS);
-                player.openInventory(new BonusPityMenu(crate, player, 36, "&a&lBonus pity prize").build().getInventory());
+                player.openInventory(new BonusPityMenu(crate, player, 36, "&a&lBonus pity prize", holder).build().getInventory());
             }
         }
     }

@@ -18,6 +18,8 @@ import org.bukkit.inventory.ItemStack;
 public class CratePickPrizeMenu extends InventoryBuilder {
     private final ItemStack item;
     private final DatabaseManager databaseManager = plugin.getCrateManager().getDatabaseManager();
+    private final static ItemStack back = new ItemBuilder().setMaterial(Material.RED_STAINED_GLASS_PANE).setName("Back").build();
+    private final static ItemStack save = new ItemBuilder().setMaterial(Material.GREEN_STAINED_GLASS_PANE).setName("Save").build();
 
     public CratePickPrizeMenu(Player player, ItemStack item, Crate crate) {
         super(crate, player, 9, "Item Menu");
@@ -26,8 +28,6 @@ public class CratePickPrizeMenu extends InventoryBuilder {
 
     @Override
     public InventoryBuilder build() {
-        ItemStack back = new ItemBuilder().setMaterial(Material.RED_STAINED_GLASS_PANE).setName("Back").build();
-        ItemStack save = new ItemBuilder().setMaterial(Material.GREEN_STAINED_GLASS_PANE).setName("Save").build();
         for (int i = 0; i < 9; i++) {
             if (i < 4) getInventory().setItem(i, back);
             else if (i == 4) getInventory().setItem(i, item);

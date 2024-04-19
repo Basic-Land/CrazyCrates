@@ -8,7 +8,6 @@ import com.badbones69.crazycrates.api.objects.gacha.data.Result;
 import com.badbones69.crazycrates.api.objects.gacha.enums.GachaType;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.enums.ResultType;
-import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.api.objects.gacha.util.HSLColor;
 import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 import cz.basicland.blibs.spigot.utils.item.NBT;
@@ -90,14 +89,14 @@ public class History {
         int pageMinus = pageNumber - 1;
         int pagePlus = pageNumber + 1;
 
-        String cmd = player.getName().equals(target) ? "/cc history " + crateSettings.getCrateName() + " " : "/cc adminhistory " + crateSettings.getCrateName() + " " + target + " ";
-
         Component pages = Component.text()
                 .appendNewline()
-                .append(Component.text("<<<<", NamedTextColor.DARK_GRAY, TextDecoration.BOLD).clickEvent(ClickEvent.runCommand(cmd + (pageMinus <= 0 ? maxPage : pageMinus)))
+                .append(Component.text("<<<<", NamedTextColor.DARK_GRAY, TextDecoration.BOLD)
+                        .clickEvent(ClickEvent.callback((clickEvent) -> sendHistory(player, target, pageMinus <= 0 ? maxPage : pageMinus, crateSettings)))
                         .hoverEvent(Component.text("Předchozí stránka", NamedTextColor.GRAY)))
                 .append(Component.text(" Strana " + pageNumber + "/" + maxPage + " ", color))
-                .append(Component.text(">>>>", NamedTextColor.DARK_GRAY, TextDecoration.BOLD).clickEvent(ClickEvent.runCommand(cmd + (pagePlus > maxPage ? 1 : pagePlus)))
+                .append(Component.text(">>>>", NamedTextColor.DARK_GRAY, TextDecoration.BOLD)
+                        .clickEvent(ClickEvent.callback((clickEvent) -> sendHistory(player, target, pagePlus > maxPage ? 1 : pagePlus, crateSettings)))
                         .hoverEvent(Component.text("Další stránka", NamedTextColor.GRAY)))
                 .build();
         player.sendMessage(pages);

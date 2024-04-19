@@ -9,6 +9,8 @@ import com.ryderbelserion.vital.enums.Support;
 import com.ryderbelserion.vital.util.DyeUtil;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import io.th0rgal.oraxen.api.OraxenItems;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.*;
 import org.bukkit.block.Banner;
@@ -55,7 +57,11 @@ public class ItemBuilder {
     private int itemDamage = 0;
 
     // Model Data
+    @Setter
+    @Accessors(chain = true)
     private boolean hasCustomModelData = false;
+    @Setter
+    @Accessors(chain = true)
     private int customModelData = 0;
     private String customMaterial = "";
 
