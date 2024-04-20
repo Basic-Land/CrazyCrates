@@ -148,6 +148,7 @@ public class CrazyCrates extends JavaPlugin {
                 new ItemEdit.ItemEditListener(),
                 new RaritiesMenu.RaritiesMenuListener(),
                 new BonusPityMenu.BonusPityListener(),
+                new UltimateMenu.TestMenuListener(),
 
                 // Other listeners.
                 new BrokeLocationsListener(),

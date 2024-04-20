@@ -6,6 +6,7 @@ import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.Tier;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
 import com.ryderbelserion.vital.enums.Support;
+import net.kyori.adventure.text.Component;
 import org.bukkit.plugin.java.JavaPlugin;
 import us.crazycrew.crazycrates.platform.config.ConfigManager;
 import us.crazycrew.crazycrates.platform.config.impl.ConfigKeys;
@@ -78,6 +79,14 @@ public abstract class InventoryBuilder implements InventoryHolder {
         String inventoryTitle = Support.placeholder_api.isEnabled() ? PlaceholderAPI.setPlaceholders(getPlayer(), MsgUtils.color(this.title)) : MsgUtils.color(this.title);
 
         this.inventory = this.plugin.getServer().createInventory(this, this.size, inventoryTitle);
+    }
+
+    public InventoryBuilder(Player player, int size, Component title) {
+        this.title = "";
+        this.player = player;
+        this.size = size;
+
+        this.inventory = this.plugin.getServer().createInventory(this, this.size, title);
     }
 
     public boolean overrideMenu() {

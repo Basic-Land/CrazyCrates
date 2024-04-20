@@ -17,7 +17,9 @@ import java.util.*;
 
 public class DatabaseManager {
     private final DatabaseConnection connection;
+    @Getter
     private final List<CrateSettings> crateSettings;
+    private final Map<String, PlayerProfile> cache = new HashMap<>();
     @Getter
     private final History history;
     @Getter
@@ -41,7 +43,6 @@ public class DatabaseManager {
     private void createCrateTable() {
         connection.update("CREATE TABLE IF NOT EXISTS PlayerData(playerName VARCHAR(16) PRIMARY KEY, baseData VARCHAR NULL)").join();
         connection.update("CREATE TABLE IF NOT EXISTS AllItems(id INTEGER PRIMARY KEY AUTOINCREMENT, itemStack VARCHAR NULL)").join();
-        connection.update("CREATE TABLE IF NOT EXISTS ExtraRewards(id INTEGER PRIMARY KEY AUTOINCREMENT, itemStack VARCHAR NULL)").join();
 
         Set<String> playernames = new HashSet<>();
         connection.query("SELECT playerName FROM PlayerData").thenAccept(rs -> {
@@ -60,6 +61,7 @@ public class DatabaseManager {
                 while (rs.next()) {
                     columnNames.add(rs.getString("name"));
                 }
+
                 columnNames.remove("playerName");
                 columnNames.remove("baseData");
 
@@ -79,7 +81,7 @@ public class DatabaseManager {
         }).join();
     }
 
-    public boolean hasPlayerData(String playerName) {
+    private boolean hasPlayerData(String playerName) {
         try {
             return connection.query("SELECT playerName FROM PlayerData WHERE playerName = ?", playerName).join().next();
         } catch (SQLException e) {
@@ -87,20 +89,33 @@ public class DatabaseManager {
         }
     }
 
-    public void addBlankPlayerData(String playerName) {
+    private PlayerProfile addBlankPlayerData(String playerName, String crateName) {
         StringBuilder query = new StringBuilder("INSERT INTO PlayerData(playerName, baseData");
+
         for (CrateSettings crateSettings : crateSettings) {
             query.append(", ").append(crateSettings.getCrateName());
         }
+
         query.append(") VALUES('").append(playerName).append("'");
         query.append(", '").append(serializeProfile(new PlayerBaseProfile(playerName))).append("'");
+
+        PlayerProfile newProfile = null;
+
         for (CrateSettings crateSettings : crateSettings) {
             PlayerProfile profile = new PlayerProfile(playerName, crateSettings.getRarityMap().keySet(), crateSettings.getBonusPity());
+
+            if (crateSettings.getCrateName().equals(crateName)) {
+                newProfile = profile;
+            }
+
             query.append(", '").append(serializeProfile(profile)).append("'");
         }
+
         query.append(")");
 
         connection.update(query.toString()).join();
+
+        return newProfile;
     }
 
     public void savePlayerProfile(String playerName, CrateSettings crateSettings, PlayerProfile profile) {
@@ -114,25 +129,32 @@ public class DatabaseManager {
         connection.update("UPDATE PlayerData SET " + name + " = ? WHERE playerName = ?", profileString, playerName);
     }
 
-    public PlayerProfile getPlayerProfile(String playerName, CrateSettings crateName, boolean override) {
-        String name = crateName.getCrateName();
-        if (!crateSettings.contains(crateName)) {
-            System.out.println("Error: Crate " + name + " does not exist.");
+    public PlayerProfile getPlayerProfile(String playerName, CrateSettings crateSettings, boolean override) {
+        String crateName = crateSettings.getCrateName();
+
+        if (!this.crateSettings.contains(crateSettings)) {
+            System.out.println("Error: Crate " + crateName + " does not exist.");
             return null;
+        }
+
+        if (cache.containsKey(playerName)) {
+            return cache.get(playerName);
         }
 
         if (!hasPlayerData(playerName)) {
             if (!override) {
-                addBlankPlayerData(playerName);
+                PlayerProfile playerProfile = addBlankPlayerData(playerName, crateName);
+                cache.put(playerName, playerProfile);
+                return playerProfile;
             } else {
                 return null;
             }
         }
 
-        return connection.query("SELECT " + name + " FROM PlayerData WHERE playerName = ?", playerName).thenApply(rs -> {
+        PlayerProfile playerProfile = connection.query("SELECT " + crateName + " FROM PlayerData WHERE playerName = ?", playerName).thenApply(rs -> {
             try {
                 if (rs.next()) {
-                    String profileString = rs.getString(name);
+                    String profileString = rs.getString(crateName);
                     return deserializeProfile(profileString);
                 }
             } catch (SQLException e) {
@@ -140,11 +162,15 @@ public class DatabaseManager {
             }
             return null;
         }).join();
+
+        if (playerProfile != null) cache.put(playerName, playerProfile);
+
+        return playerProfile;
     }
 
     public PlayerBaseProfile getPlayerBaseProfile(String playerName) {
         if (!hasPlayerData(playerName)) {
-            addBlankPlayerData(playerName);
+            addBlankPlayerData(playerName, null);
         }
 
         return connection.query("SELECT baseData FROM PlayerData WHERE playerName = ?", playerName).thenApply(rs -> {

@@ -24,6 +24,9 @@ public class PlayerProfile implements Serializable {
     @Getter
     private boolean nextLegendaryLimited;
     @Getter
+    @Setter
+    private boolean claimedExtraReward;
+    @Getter
     private int fatePoint, totalPity;
     @Setter
     @Getter

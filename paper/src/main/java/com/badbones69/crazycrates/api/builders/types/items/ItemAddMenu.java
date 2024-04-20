@@ -81,7 +81,7 @@ public class ItemAddMenu extends InventoryBuilder {
             for (ItemStack item : items) {
                 if (item == null || item.getType() == Material.AIR) continue;
 
-                int id = holder.plugin.getCrateManager().getDatabaseManager().getItemManager().addItem(type, item);
+                int id = holder.plugin.getCrateManager().getDatabaseManager().getItemManager().addItem(item);
                 if (id == -1) continue;
 
                 crateSettings.addItem(type, id, rarity, item, crate);

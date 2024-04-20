@@ -18,10 +18,10 @@ public class Result implements Serializable {
     @Serial
     private static final long serialVersionUID = 2975781183369196583L;
     private final Rarity rarity;
-    @Setter
-    private ResultType won5050;
     private final int pity;
     private final long timestamp = System.currentTimeMillis();
+    @Setter
+    private ResultType won5050;
     private String itemName;
     private String rewardName;
     private transient Prize prize;

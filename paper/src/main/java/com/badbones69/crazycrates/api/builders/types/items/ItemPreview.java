@@ -155,7 +155,7 @@ public class ItemPreview extends InventoryBuilder {
                     crate.saveFile();
                     player.openInventory(holder.raritiesMenu.getInventory());
                 } else {
-                    player.openInventory(new ItemEdit(holder, player, 27, "Edit Item", item, holder.type).build().getInventory());
+                    player.openInventory(new ItemEdit(holder, player, 27, "Edit Item", item).build().getInventory());
                 }
             } else if (slot == holder.getSize() - 5 && holder.editing && holder.raritiesMenu != null && holder.rarity != null) {
                 player.openInventory(holder.raritiesMenu.getInventory());

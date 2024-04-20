@@ -1,0 +1,13 @@
+banners:
+  - start: 2022-12-25T10:00:00
+    end: 2022-12-25T12:00:00
+    rarity: rare
+    items:
+      - diamond_sword
+      - diamond_armor
+  - start: 2022-12-31T14:00:00
+    end: 2022-12-31T16:00:00
+    rarity: common
+    items:
+      - coal
+      - stick

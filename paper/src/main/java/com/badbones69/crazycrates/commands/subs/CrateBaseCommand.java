@@ -6,6 +6,7 @@ import com.badbones69.crazycrates.api.builders.types.items.ItemPreview;
 import com.badbones69.crazycrates.api.builders.types.items.RaritiesMenu;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
+import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ComponentBuilder;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.api.objects.gacha.data.RaritySettings;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
@@ -269,6 +270,11 @@ public class CrateBaseCommand extends BaseCommand {
         }
 
         player.openInventory(new RaritiesMenu(crate, player, 27, "Rarities of " + crate.getName()).build().getInventory());
+    }
+
+    @SubCommand("test")
+    public void onTest(Player player) {
+        ComponentBuilder.open(player);
     }
 
     @SubCommand("save")

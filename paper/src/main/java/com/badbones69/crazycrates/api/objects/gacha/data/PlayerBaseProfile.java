@@ -15,8 +15,8 @@ import java.io.Serializable;
 public class PlayerBaseProfile implements Serializable {
     @Serial
     private static final long serialVersionUID = 4019127885119793810L;
-    private int stellarShards, mysticTokens, voteTokens;
     private final String playerName;
+    private int stellarShards, mysticTokens, voteTokens;
 
     public void addStellarShards(int amount) {
         stellarShards += amount;

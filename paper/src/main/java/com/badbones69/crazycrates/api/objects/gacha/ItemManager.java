@@ -66,7 +66,7 @@ public class ItemManager {
      * Retrieves specific items from a table based on their IDs.
      *
      * @param table The name of the table to retrieve items from.
-     * @param ids The IDs of the items to retrieve.
+     * @param ids   The IDs of the items to retrieve.
      * @return A list of pairs, where each pair consists of an item ID and an ItemStack.
      */
     public Map<Integer, ItemStack> getItems(String table, List<Integer> ids) {
@@ -97,7 +97,7 @@ public class ItemManager {
      * Retrieves items from the cache based on their IDs.
      *
      * @param table The name of the table to retrieve items from.
-     * @param ids The IDs of the items to retrieve.
+     * @param ids   The IDs of the items to retrieve.
      * @return A list of pairs, where each pair consists of an item ID and an ItemStack.
      */
     public Map<Integer, ItemStack> getItemsFromCache(RewardType table, List<Integer> ids) {
@@ -125,13 +125,12 @@ public class ItemManager {
     /**
      * Adds an item to a specific table.
      *
-     * @param table The name of the table to add the item to.
-     * @param item The ItemStack to add.
+     * @param item  The ItemStack to add.
      * @return The ID of the added item, or -1 if the item could not be added.
      */
-    public int addItem(RewardType table, ItemStack item) {
+    public int addItem(ItemStack item) {
         try {
-            connection.update("INSERT INTO " + table.getTableName() + "(itemStack) VALUES(?)", DBItemStack.encodeItem(item)).join();
+            connection.update("INSERT INTO AllItems(itemStack) VALUES(?)", DBItemStack.encodeItem(item)).join();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -157,11 +156,10 @@ public class ItemManager {
     /**
      * Updates an item in a specific table.
      *
-     * @param rewardType The name of the table to update the item in.
-     * @param id The ID of the item to update.
-     * @param item The new ItemStack to replace the old one.
+     * @param id         The ID of the item to update.
+     * @param item       The new ItemStack to replace the old one.
      */
-    public void updateItem(RewardType rewardType, int id, String item) {
-        connection.update("UPDATE " + rewardType.getTableName() + " SET itemStack = ? WHERE id = ?", item, id);
+    public void updateItem(int id, String item) {
+        connection.update("UPDATE AllItems SET itemStack = ? WHERE id = ?", item, id);
     }
 }

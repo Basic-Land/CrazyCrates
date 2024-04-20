@@ -6,7 +6,6 @@ import com.badbones69.crazycrates.api.builders.types.CrateTierMenu;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
 import com.badbones69.crazycrates.api.objects.gacha.data.PlayerProfile;
-import com.badbones69.crazycrates.api.objects.gacha.util.ItemData;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -22,7 +21,7 @@ public class BonusPityMenu extends InventoryBuilder {
     private int currentPage = 0; // Add this line
     private int totalPages;
     private int lastItemSlot = 10;
-    private final List<ItemData> extraRewards;
+    private final List<ItemStack> extraRewards;
     private final CrateTierMenu crateTierMenu;
     private final static ItemStack orangeGlassPane = glass(Material.ORANGE_STAINED_GLASS_PANE);
     private final static ItemStack redGlassPane = glass(Material.RED_STAINED_GLASS_PANE);
@@ -63,7 +62,7 @@ public class BonusPityMenu extends InventoryBuilder {
         for (int i = 0; i < 7; i++) {
             int index = currentPage * 7 + i;
             if (index < extraRewards.size()) {
-                ItemStack displayedItem = extraRewards.get(index).itemStack();
+                ItemStack displayedItem = extraRewards.get(index);
                 getInventory().setItem(19 + i, displayedItem);
             } else {
                 getInventory().setItem(19 + i, null);
@@ -164,6 +163,24 @@ public class BonusPityMenu extends InventoryBuilder {
 
             if (clickedSlot == 29) {
                 player.openInventory(holder.crateTierMenu.getInventory());
+            }
+
+            if (clickedSlot == 33 && item.getType() == Material.ARROW) {
+                PlayerProfile playerProfile = holder.databaseManager.getPlayerProfile(player.getName(), holder.getCrate().getCrateSettings(), false);
+
+                if (playerProfile.isClaimedExtraReward()) {
+                    player.sendMessage("You have already claimed the extra reward.");
+                    return;
+                }
+
+                if (playerProfile.reachedExtraRewardPity()) {
+                    playerProfile.setClaimedExtraReward(true);
+                    holder.databaseManager.savePlayerProfile(player.getName(), holder.getCrate().getCrateSettings(), playerProfile);
+                    player.sendMessage("You have claimed the extra reward.");
+                    player.openInventory(holder.crateTierMenu.getInventory());
+                } else {
+                    player.sendMessage("You have not reached the required pity.");
+                }
             }
         }
     }

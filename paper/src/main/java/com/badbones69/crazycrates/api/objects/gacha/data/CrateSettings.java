@@ -8,7 +8,6 @@ import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
 import com.badbones69.crazycrates.api.objects.gacha.enums.GachaType;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
-import com.badbones69.crazycrates.api.objects.gacha.util.ItemData;
 import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import lombok.Getter;
@@ -27,9 +26,9 @@ import java.util.stream.Collectors;
 public class CrateSettings {
     private final String crateName;
     private final boolean fatePointEnabled, overrideEnabled, extraRewardEnabled;
-    private final int fatePointAmount, bonusPity;
+    private final int fatePointAmount, bonusPity, modelDataText;
 
-    private final List<ItemData> extraRewards = new ArrayList<>();
+    private final List<ItemStack> extraRewards = new ArrayList<>();
 
     private final Map<Rarity, RaritySettings> rarityMap = new LinkedHashMap<>();
     private final GachaType gachaType;
@@ -43,10 +42,12 @@ public class CrateSettings {
         this.fatePointEnabled = config.getBoolean(path + ".fate-point.enabled");
         this.fatePointAmount = config.getInt(path + ".fate-point.amount");
         this.overrideEnabled = config.getBoolean(path + ".override");
+        this.modelDataText = config.getInt(path + ".model-data");
+        this.bonusPity = config.getInt(path + ".bonus-pity");
+
         this.gachaType = GachaType.getType(fatePointEnabled, overrideEnabled);
 
         this.extraRewardEnabled = config.getBoolean(path + ".extra-reward.enabled");
-        this.bonusPity = config.getInt(path + ".extra-reward.pity");
 
         for (Rarity rarity : Rarity.values()) {
             String rarityName = rarity.name().toLowerCase();
@@ -76,17 +77,16 @@ public class CrateSettings {
         boolean emptyTiers = tiers.isEmpty();
 
         String path = "Crate.Gacha";
-        RewardType type = RewardType.EXTRA_REWARD;
         ConfigurationSection section = config.getConfigurationSection(path + ".extra-reward");
 
         if (section != null) {
             for (int key : section.getIntegerList("items")) {
                 Pair<Integer, ItemStack> pair = databaseManager.getItemManager().getItemFromCache(key);
-                extraRewards.add(new ItemData(String.valueOf(key), Rarity.EXTRA_REWARD, type, pair.second()));
+                extraRewards.add(pair.second());
             }
         }
 
-        int slot = 20;
+        int slot = 23 - rarityMap.size();
 
         for (Map.Entry<Rarity, RaritySettings> entry : rarityMap.entrySet()) {
             Rarity rarity = entry.getKey();
@@ -104,7 +104,7 @@ public class CrateSettings {
             }
 
             path = "Crate.Gacha.standard." + rarityName;
-            type = RewardType.STANDARD;
+            RewardType type = RewardType.STANDARD;
 
             addItems(prizes, databaseManager, config, path, type, rarity, tier);
 
@@ -156,10 +156,8 @@ public class CrateSettings {
         NBT nbt = new NBT(stack);
         nbt.setString("rewardName", rewardName);
 
-        ItemData itemData = new ItemData(rewardName, rarity, type, stack);
-
         if (type == RewardType.EXTRA_REWARD) {
-            extraRewards.add(itemData);
+            extraRewards.add(stack);
             return;
         }
 

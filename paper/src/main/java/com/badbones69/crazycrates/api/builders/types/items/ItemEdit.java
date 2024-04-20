@@ -20,14 +20,12 @@ import java.util.List;
 public class ItemEdit extends InventoryBuilder {
     private final ItemPreview preview;
     private final ItemStack itemStack;
-    private final RewardType type;
     private final List<Integer> slots = List.of(10, 11, 15, 18, 26);
 
-    public ItemEdit(ItemPreview preview, Player player, int size, String title, ItemStack itemStack, RewardType type) {
+    public ItemEdit(ItemPreview preview, Player player, int size, String title, ItemStack itemStack) {
         super(preview.getCrate(), player, size, title);
         this.preview = preview;
         this.itemStack = itemStack;
-        this.type = type;
     }
 
     @Override
@@ -80,7 +78,7 @@ public class ItemEdit extends InventoryBuilder {
                         int id = Integer.parseInt(rewardName[0]);
                         if (id == 0) return;
                         try {
-                            holder.plugin.getCrateManager().getDatabaseManager().getItemManager().updateItem(holder.type, id, DBItemStack.encodeItem(stack));
+                            holder.plugin.getCrateManager().getDatabaseManager().getItemManager().updateItem(id, DBItemStack.encodeItem(stack));
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }

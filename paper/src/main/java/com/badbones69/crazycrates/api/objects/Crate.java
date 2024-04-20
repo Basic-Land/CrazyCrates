@@ -115,13 +115,13 @@ public class Crate {
         this.prizes = prizes;
         this.crateType = crateType;
         this.preview = getPreviewItems();
-        this.previewToggle = file != null && file.getBoolean("Crate.Preview.Toggle", false);
-        this.borderToggle = file != null && file.getBoolean("Crate.Preview.Glass.Toggle", false);
+        this.previewToggle = file.getBoolean("Crate.Preview.Toggle", false);
+        this.borderToggle = file.getBoolean("Crate.Preview.Glass.Toggle", false);
 
-        this.previewTierToggle = file != null && file.getBoolean("Crate.tier-preview.toggle", false);
-        this.previewTierBorderToggle = file != null && file.getBoolean("Crate.tier-preview.glass.toggle", false);
+        this.previewTierToggle = file.getBoolean("Crate.tier-preview.toggle", false);
+        this.previewTierBorderToggle = file.getBoolean("Crate.tier-preview.glass.toggle", false);
 
-        setPreviewChestLines(file != null ? file.getInt("Crate.Preview.ChestLines", 6) : 6);
+        setPreviewChestLines(file.getInt("Crate.Preview.ChestLines", 6));
         this.previewName = MsgUtils.sanitizeColor(previewName);
         this.newPlayerKeys = newPlayerKeys;
         this.giveNewPlayerKeys = newPlayerKeys > 0;
@@ -130,21 +130,21 @@ public class Crate {
 
         for (int amount = this.preview.size(); amount > this.maxSlots - (this.borderToggle ? 18 : this.maxSlots >= this.preview.size() ? 0 : this.maxSlots != 9 ? 9 : 0); amount -= this.maxSlots - (this.borderToggle ? 18 : this.maxSlots != 9 ? 9 : 0), this.maxPage++) ;
 
-        this.crateInventoryName = file != null ? MsgUtils.sanitizeColor(file.getString("Crate.CrateName")) : "";
+        this.crateInventoryName = MsgUtils.sanitizeColor(file.getString("Crate.CrateName"));
 
-        String borderName = file != null && file.contains("Crate.Preview.Glass.Name") ? MsgUtils.color(file.getString("Crate.Preview.Glass.Name")) : " ";
-        this.borderItem = file != null && file.contains("Crate.Preview.Glass.Item") ? new ItemBuilder().setMaterial(file.getString("Crate.Preview.Glass.Item", "GRAY_STAINED_GLASS_PANE")).setName(borderName) : new ItemBuilder().setMaterial(Material.AIR).setName(borderName);
+        String borderName = file.contains("Crate.Preview.Glass.Name") ? MsgUtils.color(file.getString("Crate.Preview.Glass.Name")) : " ";
+        this.borderItem = file.contains("Crate.Preview.Glass.Item") ? new ItemBuilder().setMaterial(file.getString("Crate.Preview.Glass.Item", "GRAY_STAINED_GLASS_PANE")).setName(borderName) : new ItemBuilder().setMaterial(Material.AIR).setName(borderName);
 
-        String previewTierBorderName = file != null ? MsgUtils.color(file.getString("Crate.tier-preview.glass.name", " ")) : " ";
-        this.previewTierBorderItem = file != null ? new ItemBuilder().setMaterial(file.getString("Crate.tier-preview.glass.item", "GRAY_STAINED_GLASS_PANE")).setName(previewTierBorderName) : new ItemBuilder().setMaterial(Material.AIR).setName(previewTierBorderName);
+        String previewTierBorderName = MsgUtils.color(file.getString("Crate.tier-preview.glass.name", " "));
+        this.previewTierBorderItem = new ItemBuilder().setMaterial(file.getString("Crate.tier-preview.glass.item", "GRAY_STAINED_GLASS_PANE")).setName(previewTierBorderName);
 
-        setTierPreviewRows(file != null ? file.getInt("Crate.tier-preview.rows", 5) : 5);
+        setTierPreviewRows(file.getInt("Crate.tier-preview.rows", 5));
         this.previewTierMaxSlots = this.previewTierCrateRows * 9;
 
         if (crateType == CrateType.quad_crate) {
-            this.particle = Registry.PARTICLE_TYPE.get(NamespacedKey.minecraft(file != null ? file.getString("Crate.particles.type", "dust") : "dust"));
+            this.particle = Registry.PARTICLE_TYPE.get(NamespacedKey.minecraft(file.getString("Crate.particles.type", "dust")));
 
-            this.color = DyeUtil.getColor(file != null ? file.getString("Crate.particles.color", "235,64,52") : "235,64,52");
+            this.color = DyeUtil.getColor(file.getString("Crate.particles.color", "235,64,52"));
         }
 
         this.hologram = hologram != null ? hologram : new CrateHologram();
