@@ -49,7 +49,7 @@ public class CrateTierMenu extends InventoryBuilder {
     private void setDefaultItems() {
         getTiers().forEach(tier -> getInventory().setItem(tier.getSlot(), tier.getTierItem(getPlayer())));
 
-        boolean gacha = getCrate().getCrateType() == CrateType.gacha;;
+        boolean gacha = getCrate().getCrateType() == CrateType.gacha;
 
         if (getCrate().isPreviewTierBorderToggle()) {
             List<Integer> borderItems = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8);
@@ -84,7 +84,7 @@ public class CrateTierMenu extends InventoryBuilder {
         CrateSettings settings = getCrate().getCrateSettings();
 
         ItemBuilder item = new ItemBuilder().setMaterial(Material.PLAYER_HEAD).setName("&a&lBonus pity prize").addLore("&7Click to preview/pick a prize");
-        item.setCustomModelData(settings.getModelDataText()).setHasCustomModelData(true);
+        item.setCustomModelData(settings.getModelDataPreviewName()).setHasCustomModelData(true);
         getInventory().setItem(getSize() - 1, item.build());
 
         ItemBuilder paper = new ItemBuilder().setMaterial(Material.PAPER).setCustomModelData(11).setHasCustomModelData(true).setName("Info");

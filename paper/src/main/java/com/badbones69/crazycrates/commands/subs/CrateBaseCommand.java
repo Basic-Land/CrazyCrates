@@ -11,6 +11,7 @@ import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.api.objects.gacha.data.RaritySettings;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
+import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuManager;
 import com.badbones69.crazycrates.api.objects.other.CrateLocation;
 import com.badbones69.crazycrates.api.objects.Prize;
 import com.badbones69.crazycrates.api.PrizeManager;
@@ -274,7 +275,7 @@ public class CrateBaseCommand extends BaseCommand {
 
     @SubCommand("test")
     public void onTest(Player player) {
-        ComponentBuilder.open(player);
+        crateManager.getDatabaseManager().getUltimateMenuManager().open(player);
     }
 
     @SubCommand("save")

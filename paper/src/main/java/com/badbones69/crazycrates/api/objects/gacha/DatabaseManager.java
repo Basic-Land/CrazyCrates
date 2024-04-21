@@ -1,14 +1,23 @@
 package com.badbones69.crazycrates.api.objects.gacha;
 
+import com.Zrips.CMI.CMI;
+import com.Zrips.CMI.Containers.CMIUser;
 import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.api.objects.gacha.data.PlayerBaseProfile;
 import com.badbones69.crazycrates.api.objects.gacha.data.PlayerProfile;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
+import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuManager;
+import com.google.common.collect.Lists;
 import cz.basicland.blibs.shared.databases.hikari.DatabaseConnection;
 import cz.basicland.blibs.spigot.BLibs;
+import cz.basicland.blibs.spigot.utils.item.DBItemStack;
 import lombok.Getter;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.*;
@@ -18,20 +27,25 @@ import java.util.*;
 public class DatabaseManager {
     private final DatabaseConnection connection;
     @Getter
+    private final List<List<CrateSettings>> crateSettingsSplit;
+    @Getter
     private final List<CrateSettings> crateSettings;
-    private final Map<String, PlayerProfile> cache = new HashMap<>();
     @Getter
     private final History history;
     @Getter
     private final ItemManager itemManager;
+    @Getter
+    private final UltimateMenuManager ultimateMenuManager;
 
     public DatabaseManager(List<Crate> crateList) {
         connection = BLibs.getApi().getDatabaseHandler().loadSQLite(JavaPlugin.getPlugin(CrazyCrates.class), "gamba", "crates.db");
         crateSettings = crateList.stream().map(Crate::getCrateSettings).filter(Objects::nonNull).toList();
+        crateSettingsSplit = Lists.partition(crateSettings, 3);
         createCrateTable();
 
         history = new History(this);
         itemManager = new ItemManager(connection);
+        ultimateMenuManager = new UltimateMenuManager();
 
         for (Crate crate : crateList) {
             CrateSettings settings = crate.getCrateSettings();
@@ -43,6 +57,7 @@ public class DatabaseManager {
     private void createCrateTable() {
         connection.update("CREATE TABLE IF NOT EXISTS PlayerData(playerName VARCHAR(16) PRIMARY KEY, baseData VARCHAR NULL)").join();
         connection.update("CREATE TABLE IF NOT EXISTS AllItems(id INTEGER PRIMARY KEY AUTOINCREMENT, itemStack VARCHAR NULL)").join();
+        connection.update("CREATE TABLE IF NOT EXISTS Backup(uuid VARCHAR(36) PRIMARY KEY, inventory VARCHAR NULL)").join();
 
         Set<String> playernames = new HashSet<>();
         connection.query("SELECT playerName FROM PlayerData").thenAccept(rs -> {
@@ -79,6 +94,36 @@ public class DatabaseManager {
                 e.printStackTrace();
             }
         }).join();
+
+        connection.query("SELECT * FROM Backup").thenAccept(rs -> {
+           try {
+               while (rs.next()) {
+                   String uuid = rs.getString("uuid");
+                   String inventory = rs.getString("inventory");
+
+                   List<String> items = Arrays.asList(inventory.split("\n"));
+
+                   ItemStack[] contents = DBItemStack.getItemStackList(items).toArray(new ItemStack[0]);
+
+                   OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
+
+                   Bukkit.getScheduler().runTaskLater(CrazyCrates.getPlugin(CrazyCrates.class), () -> {
+                       CMIUser user = CMI.getInstance().getPlayerManager().getUser(offlinePlayer);
+                       Player player = user.getPlayer();
+
+                       player.getInventory().setContents(contents);
+                       player.saveData();
+                       user.unloadData();
+                   }, 100L);
+               }
+           } catch (SQLException e) {
+               e.printStackTrace();
+           } catch (IOException | ClassNotFoundException e) {
+               throw new RuntimeException(e);
+           }
+
+           connection.update("DELETE FROM Backup");
+        });
     }
 
     private boolean hasPlayerData(String playerName) {
@@ -137,15 +182,9 @@ public class DatabaseManager {
             return null;
         }
 
-        if (cache.containsKey(playerName)) {
-            return cache.get(playerName);
-        }
-
         if (!hasPlayerData(playerName)) {
             if (!override) {
-                PlayerProfile playerProfile = addBlankPlayerData(playerName, crateName);
-                cache.put(playerName, playerProfile);
-                return playerProfile;
+                return addBlankPlayerData(playerName, crateName);
             } else {
                 return null;
             }
@@ -162,8 +201,6 @@ public class DatabaseManager {
             }
             return null;
         }).join();
-
-        if (playerProfile != null) cache.put(playerName, playerProfile);
 
         return playerProfile;
     }
@@ -193,6 +230,24 @@ public class DatabaseManager {
 
     public CrateSettings getCrateSettings(String crateName) {
         return crateSettings.stream().filter(crate -> crate.getCrateName().equals(crateName)).findFirst().orElse(null);
+    }
+
+    public void saveInventory(Player player) {
+        UUID uuid = player.getUniqueId();
+        ItemStack[] contents = player.getInventory().getContents();
+        List<String> items;
+        try {
+            items = DBItemStack.encodeItemList(Arrays.asList(contents));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        String inventory = String.join("\n", items);
+
+        connection.update("INSERT OR REPLACE INTO Backup(uuid, inventory) VALUES(?, ?)", uuid, inventory);
+    }
+
+    public void clearInventory(Player player) {
+        connection.update("DELETE FROM Backup WHERE uuid = ?", player.getUniqueId());
     }
 
     private String serializeProfile(Object profile) {

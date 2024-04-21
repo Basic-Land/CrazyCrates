@@ -18,7 +18,7 @@ import java.util.List;
 
 public class BonusPityMenu extends InventoryBuilder {
     private final DatabaseManager databaseManager = plugin.getCrateManager().getDatabaseManager();
-    private int currentPage = 0; // Add this line
+    private int currentPage = 0;
     private int totalPages;
     private int lastItemSlot = 10;
     private final List<ItemStack> extraRewards;
@@ -48,6 +48,7 @@ public class BonusPityMenu extends InventoryBuilder {
             getInventory().setItem(i, orangeGlassPane); // Top border
             getInventory().setItem(i + 27, orangeGlassPane); // Bottom border
         }
+
         getInventory().setItem(9, orangeGlassPane); // Left border
         getInventory().setItem(18, orangeGlassPane);
         getInventory().setItem(17, orangeGlassPane); // Right border

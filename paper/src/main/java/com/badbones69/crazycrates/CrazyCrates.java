@@ -7,6 +7,7 @@ import com.badbones69.crazycrates.api.builders.types.CratePreviewMenu;
 import com.badbones69.crazycrates.api.builders.types.CrateTierMenu;
 import com.badbones69.crazycrates.api.builders.types.items.*;
 import com.badbones69.crazycrates.api.objects.gacha.BaseProfileManager;
+import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuManager;
 import com.badbones69.crazycrates.api.utils.FileUtils;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
 import com.badbones69.crazycrates.api.utils.MsgUtils;
@@ -194,6 +195,7 @@ public class CrazyCrates extends JavaPlugin {
 
         // Clean up any mess we may have left behind.
         if (this.crateManager != null) {
+            this.crateManager.getDatabaseManager().getUltimateMenuManager().closeAll();
             this.crateManager.purgeRewards();
 
             HologramManager holograms = this.crateManager.getHolograms();

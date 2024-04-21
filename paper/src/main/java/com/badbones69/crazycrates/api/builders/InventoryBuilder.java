@@ -81,9 +81,10 @@ public abstract class InventoryBuilder implements InventoryHolder {
         this.inventory = this.plugin.getServer().createInventory(this, this.size, inventoryTitle);
     }
 
-    public InventoryBuilder(Player player, int size, Component title) {
+    public InventoryBuilder(Crate crate, Player player, int size, Component title) {
         this.title = "";
         this.player = player;
+        this.crate = crate;
         this.size = size;
 
         this.inventory = this.plugin.getServer().createInventory(this, this.size, title);

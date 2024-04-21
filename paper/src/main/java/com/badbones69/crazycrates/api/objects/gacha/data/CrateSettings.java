@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 public class CrateSettings {
     private final String crateName;
     private final boolean fatePointEnabled, overrideEnabled, extraRewardEnabled;
-    private final int fatePointAmount, bonusPity, modelDataText;
+    private final int fatePointAmount, bonusPity, modelDataPreviewName, modelDataMainMenu;
 
     private final List<ItemStack> extraRewards = new ArrayList<>();
 
@@ -42,7 +42,9 @@ public class CrateSettings {
         this.fatePointEnabled = config.getBoolean(path + ".fate-point.enabled");
         this.fatePointAmount = config.getInt(path + ".fate-point.amount");
         this.overrideEnabled = config.getBoolean(path + ".override");
-        this.modelDataText = config.getInt(path + ".model-data");
+        this.modelDataPreviewName = config.getInt(path + ".model-data-preview-name");
+        this.modelDataMainMenu = config.getInt(path + ".model-data-main-menu");
+
         this.bonusPity = config.getInt(path + ".bonus-pity");
 
         this.gachaType = GachaType.getType(fatePointEnabled, overrideEnabled);

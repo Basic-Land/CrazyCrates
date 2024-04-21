@@ -56,7 +56,7 @@ public class GachaCrate extends CrateBuilder {
 
         System.out.println("Chosen reward: " + chosenReward);
 
-        int amount = getPlayer().isSneaking() ? 1000 : 1;
+        int amount = getPlayer().isSneaking() ? 10 : 1;
 
         boolean keyCheck = this.userManager.takeKeys(amount, getPlayer().getUniqueId(), getCrate().getName(), type, checkHand);
 
