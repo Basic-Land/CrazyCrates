@@ -1,15 +1,20 @@
 package com.badbones69.crazycrates.api.builders.types.items;
 
+import ch.jalu.configme.SettingsManager;
 import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.builders.InventoryBuilder;
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
+import com.badbones69.crazycrates.api.enums.Messages;
 import com.badbones69.crazycrates.api.objects.Crate;
+import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.api.objects.gacha.data.PlayerBaseProfile;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ComponentBuilder;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuItems;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -19,28 +24,53 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import us.crazycrew.crazycrates.api.enums.types.KeyType;
+import us.crazycrew.crazycrates.platform.config.ConfigManager;
+import us.crazycrew.crazycrates.platform.config.impl.ConfigKeys;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class UltimateMenu extends InventoryBuilder {
     private final int selectedCrate;
     private final int totalPageAmount;
-    private final List<List<CrateSettings>> gachaCrates;
     private int currentPage;
 
-    public UltimateMenu(List<List<CrateSettings>> gachaCrates, Player player, Component trans, int page, int selectedCrate) {
-        super(gachaCrates.get(page).get(selectedCrate).getCrate(), player, 54, trans);
-        this.gachaCrates = gachaCrates;
+    public UltimateMenu(Crate crate, Player player, Component trans) {
+        super(crate, player, 54, trans);
+        player.getInventory().clear();
+
+        int page = 0;
+        int selectedCrate = 0;
+        List<List<CrateSettings>> crateSettingsSplit = DatabaseManager.getCrateSettingsSplit();
+
+        for (int i = 0; i < crateSettingsSplit.size(); i++) {
+            for (int j = 0; j < crateSettingsSplit.get(i).size(); j++) {
+                if (crateSettingsSplit.get(i).get(j).getCrate().equals(crate)) {
+                    page = i;
+                    selectedCrate = j;
+                    break;
+                }
+            }
+        }
+
+        this.currentPage = page;
+        this.selectedCrate = selectedCrate;
+        this.totalPageAmount = crateSettingsSplit.size();
+    }
+
+    public UltimateMenu(Player player, Component trans, int page, int selectedCrate) {
+        super(DatabaseManager.getCrateSettingsSplit().get(page).get(selectedCrate).getCrate(), player, 54, trans);
         this.currentPage = page;
         this.selectedCrate = selectedCrate;
 
-        this.totalPageAmount = gachaCrates.size();
+        this.totalPageAmount = DatabaseManager.getCrateSettingsSplit().size();
 
         player.getInventory().clear();
     }
 
     public UltimateMenu(UltimateMenu ultimateMenu, Component title, int selectedCrate) {
-        this(ultimateMenu.gachaCrates, ultimateMenu.getPlayer(), title, ultimateMenu.currentPage, selectedCrate);
+        this(ultimateMenu.getPlayer(), title, ultimateMenu.currentPage, selectedCrate);
     }
 
 
@@ -63,7 +93,7 @@ public class UltimateMenu extends InventoryBuilder {
         ItemBuilder unselectedMain = UltimateMenuItems.UNSELECTED;
         ItemBuilder mainCrate = UltimateMenuItems.MAIN_MENU_NAME;
 
-        for (CrateSettings setting : gachaCrates.get(currentPage)) {
+        for (CrateSettings setting : DatabaseManager.getCrateSettingsSplit().get(currentPage)) {
             if (setting == null) continue;
 
             selectedMain.setName("&a&l" + setting.getCrateName());
@@ -129,6 +159,10 @@ public class UltimateMenu extends InventoryBuilder {
         playerInventory.setItem(8, x10);
     }
 
+    private boolean hasKeys(Player player, Crate crate, int amount) {
+        return plugin.getUserManager().getVirtualKeys(player.getUniqueId(), crate.getName()) >= amount;
+    }
+
     public static class TestMenuListener implements Listener {
         @EventHandler
         public void Click(InventoryClickEvent e) {
@@ -158,9 +192,9 @@ public class UltimateMenu extends InventoryBuilder {
 
             if (newCrateNum != -1) {
                 PlayerBaseProfile profile = plugin.getBaseProfileManager().getPlayerBaseProfile(player.getName());
-                CrateSettings newCrate = ultimateMenu.gachaCrates.get(ultimateMenu.currentPage).get(newCrateNum);
+                CrateSettings newCrate = DatabaseManager.getCrateSettingsSplit().get(ultimateMenu.currentPage).get(newCrateNum);
 
-                Component trans = ComponentBuilder.trans(newCrate.getCrateName(), profile.getMysticTokens(), profile.getStellarShards());
+                Component trans = ComponentBuilder.trans(player.getUniqueId(), newCrate.getCrateName(), profile.getMysticTokens(), profile.getStellarShards());
 
                 player.openInventory(new UltimateMenu(ultimateMenu, trans, newCrateNum).build().getInventory());
             }
@@ -186,14 +220,38 @@ public class UltimateMenu extends InventoryBuilder {
                 case 86, 87 -> {
                     close(player);
                     player.setSneaking(false);
-                    crateManager.openCrate(player, crate, KeyType.virtual_key, null, false, false);
+
+                    if (ultimateMenu.hasKeys(player, crate, 1)) {
+                        crateManager.openCrate(player, crate, KeyType.virtual_key, null, false, false);
+                    } else {
+                        message(crate, player);
+                    }
                 }
                 case 88, 89 -> {
                     close(player);
                     player.setSneaking(true);
-                    crateManager.openCrate(player, crate, KeyType.virtual_key, null, false, false);
+
+                    if (ultimateMenu.hasKeys(player, crate, 10)) {
+                        crateManager.openCrate(player, crate, KeyType.virtual_key, null, false, false);
+                    } else {
+                        message(crate, player);
+                    }
                 }
             }
+        }
+
+        private void message(Crate crate, Player player) {
+            SettingsManager config = ConfigManager.getConfig();
+            if (config.getProperty(ConfigKeys.need_key_sound_toggle)) {
+                player.playSound(player.getLocation(), Sound.valueOf(config.getProperty(ConfigKeys.need_key_sound)), SoundCategory.PLAYERS, 1f, 1f);
+            }
+
+            Map<String, String> placeholders = new HashMap<>();
+
+            placeholders.put("{crate}", crate.getName());
+            placeholders.put("{key}", crate.getKeyName());
+
+            player.sendMessage(Messages.no_keys.getMessage(placeholders, player));
         }
 
         private void close(Player player) {

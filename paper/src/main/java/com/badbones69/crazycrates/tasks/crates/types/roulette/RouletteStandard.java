@@ -5,6 +5,7 @@ import com.badbones69.crazycrates.api.PrizeManager;
 import com.badbones69.crazycrates.api.builders.CrateBuilder;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.Prize;
+import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
 import org.bukkit.SoundCategory;
@@ -157,6 +158,7 @@ public class RouletteStandard extends BukkitRunnable {
             @Override
             public void run() {
                 if (player.getOpenInventory().getTopInventory().equals(inventory)) player.closeInventory(InventoryCloseEvent.Reason.UNLOADED);
+                plugin.getCrateManager().getDatabaseManager().getUltimateMenuManager().open(player, crate);
             }
         }.runTaskLater(plugin, 40);
     }

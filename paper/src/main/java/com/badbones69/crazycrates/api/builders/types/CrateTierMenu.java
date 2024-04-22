@@ -85,10 +85,14 @@ public class CrateTierMenu extends InventoryBuilder {
 
         ItemBuilder item = new ItemBuilder().setMaterial(Material.PLAYER_HEAD).setName("&a&lBonus pity prize").addLore("&7Click to preview/pick a prize");
         item.setCustomModelData(settings.getModelDataPreviewName()).setHasCustomModelData(true);
-        getInventory().setItem(getSize() - 1, item.build());
+        getInventory().setItem(getCrate().getAbsolutePreviewItemPosition(8), item.build());
 
         ItemBuilder paper = new ItemBuilder().setMaterial(Material.PAPER).setCustomModelData(11).setHasCustomModelData(true).setName("Info");
         getInventory().setItem(getCrate().getAbsolutePreviewItemPosition(4), paper.build());
+
+        ItemBuilder mainMenu = new ItemBuilder().setMaterial(Material.CHEST).setName("&a&lMain menu");
+        mainMenu.setCustomModelData(1000001).setHasCustomModelData(true);
+        getInventory().setItem(getCrate().getAbsolutePreviewItemPosition(0), mainMenu.build());
     }
 
     public static class CrateTierListener implements Listener {
@@ -152,9 +156,16 @@ public class CrateTierMenu extends InventoryBuilder {
                 player.openInventory(cratePreviewMenu);
             }
 
-            if (event.getSlot() == holder.getSize() - 1) {
+            if (!crate.getCrateType().equals(CrateType.gacha)) return;
+
+            if (event.getSlot() == holder.getCrate().getAbsolutePreviewItemPosition(8)) {
                 crate.playSound(player, player.getLocation(), "click-sound", "UI_BUTTON_CLICK", SoundCategory.PLAYERS);
                 player.openInventory(new BonusPityMenu(crate, player, 36, "&a&lBonus pity prize", holder).build().getInventory());
+            }
+
+            if (event.getSlot() == holder.getCrate().getAbsolutePreviewItemPosition(0)) {
+                crate.playSound(player, player.getLocation(), "click-sound", "UI_BUTTON_CLICK", SoundCategory.PLAYERS);
+                plugin.getCrateManager().getDatabaseManager().getUltimateMenuManager().open(player, crate);
             }
         }
     }

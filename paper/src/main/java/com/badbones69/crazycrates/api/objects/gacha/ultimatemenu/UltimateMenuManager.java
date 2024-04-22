@@ -2,9 +2,8 @@ package com.badbones69.crazycrates.api.objects.gacha.ultimatemenu;
 
 import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.builders.types.items.UltimateMenu;
-import com.badbones69.crazycrates.api.objects.gacha.BaseProfileManager;
+import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
-import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.api.objects.gacha.data.PlayerBaseProfile;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -12,7 +11,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -23,8 +21,11 @@ public class UltimateMenuManager {
     public UltimateMenuManager() {
 
     }
-
     public void open(Player player) {
+        open(player, DatabaseManager.getCrateSettingsSplit().get(0).get(0).getCrate());
+    }
+
+    public void open(Player player, Crate crate) {
         PlayerBaseProfile playerBaseProfile = plugin.getBaseProfileManager().getPlayerBaseProfile(player.getName());
 
         int mysticTokens = playerBaseProfile.getMysticTokens();
@@ -33,9 +34,8 @@ public class UltimateMenuManager {
         items.put(player.getName(), player.getInventory().getContents());
         DatabaseManager databaseManager = plugin.getCrateManager().getDatabaseManager();
         databaseManager.saveInventory(player);
-        List<List<CrateSettings>> crateSettingsSplit = databaseManager.getCrateSettingsSplit();
 
-        UltimateMenu menu = new UltimateMenu(crateSettingsSplit, player, ComponentBuilder.trans(crateSettingsSplit.get(0).get(0).getCrateName(), mysticTokens, stellarShards), 0, 0);
+        UltimateMenu menu = new UltimateMenu(crate, player, ComponentBuilder.trans(player.getUniqueId(), crate.getName(), mysticTokens, stellarShards));
         player.openInventory(menu.build().getInventory());
     }
 
