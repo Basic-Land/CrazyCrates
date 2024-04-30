@@ -260,10 +260,8 @@ public class UltimateMenu extends InventoryBuilder {
 
         @EventHandler
         public void Close(InventoryCloseEvent e) {
-            if (e.getInventory().getHolder() instanceof UltimateMenu testMenu) {
-                if (e.getReason().equals(InventoryCloseEvent.Reason.PLAYER)) {
-                    testMenu.plugin.getCrateManager().getDatabaseManager().getUltimateMenuManager().remove(testMenu.getPlayer());
-                }
+            if (e.getInventory().getHolder() instanceof UltimateMenu testMenu && e.getReason().equals(InventoryCloseEvent.Reason.PLAYER)) {
+                testMenu.plugin.getCrateManager().getDatabaseManager().getUltimateMenuManager().remove(testMenu.getPlayer());
             }
         }
 

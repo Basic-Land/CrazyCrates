@@ -46,7 +46,7 @@ public class DatabaseManager {
 
         history = new History(this);
         itemManager = new ItemManager(connection);
-        ultimateMenuManager = new UltimateMenuManager();
+        ultimateMenuManager = new UltimateMenuManager(this);
 
         for (Crate crate : crateList) {
             CrateSettings settings = crate.getCrateSettings();
@@ -191,7 +191,7 @@ public class DatabaseManager {
             }
         }
 
-        PlayerProfile playerProfile = connection.query("SELECT " + crateName + " FROM PlayerData WHERE playerName = ?", playerName).thenApply(rs -> {
+        return connection.query("SELECT " + crateName + " FROM PlayerData WHERE playerName = ?", playerName).thenApply(rs -> {
             try {
                 if (rs.next()) {
                     String profileString = rs.getString(crateName);
@@ -202,8 +202,6 @@ public class DatabaseManager {
             }
             return null;
         }).join();
-
-        return playerProfile;
     }
 
     public PlayerBaseProfile getPlayerBaseProfile(String playerName) {

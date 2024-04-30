@@ -157,10 +157,9 @@ public class History {
     private HoverEvent<HoverEvent.ShowItem> showItem(ItemStack itemStack) {
         NBT nbt = new NBT(itemStack);
         NamespacedKey key = itemStack.getType().getKey();
-        Key itemKey = Key.key(key.getNamespace(), key.getKey());
         int itemCount = itemStack.getAmount();
         BinaryTagHolder tag = BinaryTagHolder.binaryTagHolder(nbt.getNBTToString());
-        return HoverEvent.showItem(HoverEvent.ShowItem.showItem(itemKey, itemCount, tag));
+        return HoverEvent.showItem(HoverEvent.ShowItem.showItem(key, itemCount, tag));
     }
 
     private Component getHoverText(Result history, CrateSettings crateSettings) {

@@ -17,9 +17,10 @@ import java.util.Map;
 public class UltimateMenuManager {
     private final Map<String, ItemStack[]> items = new HashMap<>();
     private final CrazyCrates plugin = CrazyCrates.getPlugin(CrazyCrates.class);
+    private final DatabaseManager databaseManager;
 
-    public UltimateMenuManager() {
-
+    public UltimateMenuManager(DatabaseManager databaseManager) {
+        this.databaseManager = databaseManager;
     }
     public void open(Player player) {
         open(player, DatabaseManager.getCrateSettingsSplit().get(0).get(0).getCrate());
@@ -32,7 +33,6 @@ public class UltimateMenuManager {
         int stellarShards = playerBaseProfile.getStellarShards();
 
         items.put(player.getName(), player.getInventory().getContents());
-        DatabaseManager databaseManager = plugin.getCrateManager().getDatabaseManager();
         databaseManager.saveInventory(player);
 
         UltimateMenu menu = new UltimateMenu(crate, player, ComponentBuilder.trans(player.getUniqueId(), crate.getName(), mysticTokens, stellarShards));
@@ -41,13 +41,11 @@ public class UltimateMenuManager {
 
     public void remove(Player player) {
         player.getInventory().setContents(items.get(player.getName()));
-        plugin.getCrateManager().getDatabaseManager().clearInventory(player);
+        databaseManager.clearInventory(player);
         items.remove(player.getName());
     }
 
     public void closeAll() {
-        DatabaseManager databaseManager = plugin.getCrateManager().getDatabaseManager();
-
         for (Map.Entry<String, ItemStack[]> items : items.entrySet()) {
             Player player = Bukkit.getPlayer(items.getKey());
             if (player != null) {
