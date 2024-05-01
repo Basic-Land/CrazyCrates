@@ -1,13 +1,10 @@
 package com.badbones69.crazycrates;
 
 import com.badbones69.crazycrates.api.FileManager;
-import com.badbones69.crazycrates.api.builders.types.CrateAdminMenu;
-import com.badbones69.crazycrates.api.builders.types.CrateMainMenu;
-import com.badbones69.crazycrates.api.builders.types.CratePreviewMenu;
-import com.badbones69.crazycrates.api.builders.types.CrateTierMenu;
+import com.badbones69.crazycrates.api.builders.InventoryBuilder;
+import com.badbones69.crazycrates.api.builders.InventoryListener;
 import com.badbones69.crazycrates.api.builders.types.items.*;
 import com.badbones69.crazycrates.api.objects.gacha.BaseProfileManager;
-import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuManager;
 import com.badbones69.crazycrates.api.utils.FileUtils;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
 import com.badbones69.crazycrates.api.utils.MsgUtils;
@@ -24,6 +21,7 @@ import com.badbones69.crazycrates.tasks.BukkitUserManager;
 import com.badbones69.crazycrates.tasks.InventoryManager;
 import com.badbones69.crazycrates.tasks.MigrationManager;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
+import com.google.common.reflect.ClassPath;
 import com.ryderbelserion.vital.VitalPaper;
 import com.ryderbelserion.vital.enums.Support;
 import lombok.Getter;
@@ -136,19 +134,24 @@ public class CrazyCrates extends JavaPlugin {
         }
 
         baseProfileManager = new BaseProfileManager();
+        InventoryListener inventoryListener = new InventoryListener();
+        try {
+            ClassPath.from(getClassLoader()).getAllClasses().stream()
+                    .filter(info -> info.getName().startsWith("com.badbones69.crazycrates.api.builders.types"))
+                    .map(ClassPath.ClassInfo::load)
+                    .filter(InventoryBuilder.class::isAssignableFrom)
+                    .map(clazz -> (Class<? extends InventoryBuilder>) clazz)
+                    .forEach(aClass -> {
+                        inventoryListener.addMenu(aClass);
+                        System.out.println("Added " + aClass.getSimpleName());
+                    });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         List.of(
                 // Menu listeners.
-                new CratePreviewMenu.CratePreviewListener(),
-                new CrateAdminMenu.CrateAdminListener(),
-                new CrateMainMenu.CrateMenuListener(),
-                new CrateTierMenu.CrateTierListener(),
-                new CratePickPrizeMenu.PickPrizeListener(),
-                new ItemAddMenu.ItemsAddListener(),
-                new ItemPreview.ItemPreviewListener(),
-                new ItemEdit.ItemEditListener(),
-                new RaritiesMenu.RaritiesMenuListener(),
-                new BonusPityMenu.BonusPityListener(),
+                inventoryListener,
                 new UltimateMenu.TestMenuListener(),
 
                 // Other listeners.

@@ -114,7 +114,14 @@ public class Prize {
         this.commands = commands;
 
         this.permissions = Collections.emptyList();
-        this.displayItem = new ItemBuilder(stack.clone());
+
+        ItemBuilder display = new ItemBuilder(stack.clone());
+        List<String> updatedLore = display.getUpdatedLore();
+        updatedLore.add(0, "");
+        updatedLore.add(0, type.name());
+        display.setLore(updatedLore);
+
+        this.displayItem = display;
     }
 
     /**

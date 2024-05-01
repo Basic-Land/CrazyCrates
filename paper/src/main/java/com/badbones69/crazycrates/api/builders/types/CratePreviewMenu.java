@@ -16,8 +16,6 @@ import cz.basicland.blibs.spigot.utils.item.NBT;
 import org.bukkit.Material;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -35,8 +33,11 @@ import java.util.List;
 
 public class CratePreviewMenu extends InventoryBuilder {
 
-    @NotNull
-    private final InventoryManager inventoryManager = this.plugin.getInventoryManager();
+    private final @NotNull CrazyCrates plugin = JavaPlugin.getPlugin(CrazyCrates.class);
+
+    private final @NotNull InventoryManager inventoryManager = this.plugin.getInventoryManager();
+
+    private final @NotNull SettingsManager config = ConfigManager.getConfig();
 
     private final boolean isTier;
     private final Tier tier;
@@ -67,18 +68,140 @@ public class CratePreviewMenu extends InventoryBuilder {
         return this;
     }
 
+    @Override
+    public void onClick(InventoryClickEvent event) {
+        Inventory inventory = event.getInventory();
+
+        if (!(inventory.getHolder(false) instanceof CratePreviewMenu holder)) return;
+
+        event.setCancelled(true);
+
+        Player player = holder.getPlayer();
+
+        ItemStack item = event.getCurrentItem();
+
+        if (item == null || item.getType() == Material.AIR) return;
+
+        if (!item.hasItemMeta()) return;
+
+        Crate crate = this.inventoryManager.getCratePreview(player);
+
+        if (crate == null) return;
+
+        ItemMeta itemMeta = item.getItemMeta();
+
+        PersistentDataContainer container = itemMeta.getPersistentDataContainer();
+
+        if (container.has(PersistentKeys.main_menu_button.getNamespacedKey()) && this.config.getProperty(ConfigKeys.enable_crate_menu)) { // Clicked the menu button.
+            if (this.inventoryManager.inCratePreview(player)) {
+                if (holder.overrideMenu()) return;
+
+                crate.playSound(player, player.getLocation(), "click-sound","UI_BUTTON_CLICK", SoundCategory.PLAYERS);
+
+                if (crate.isPreviewTierToggle()) {
+                    player.openInventory(crate.getTierPreview(player));
+
+                    return;
+                }
+
+                this.inventoryManager.removeViewer(player);
+                this.inventoryManager.closeCratePreview(player);
+
+                CrateMainMenu crateMainMenu = new CrateMainMenu(player, this.config.getProperty(ConfigKeys.inventory_size), this.config.getProperty(ConfigKeys.inventory_name));
+
+                player.openInventory(crateMainMenu.build().getInventory());
+            }
+
+            return;
+        }
+
+        if (container.has(PersistentKeys.next_button.getNamespacedKey())) {  // Clicked the next button.
+            if (this.inventoryManager.getPage(player) < crate.getMaxPage()) {
+                crate.playSound(player, player.getLocation(), "click-sound","UI_BUTTON_CLICK", SoundCategory.PLAYERS);
+
+                this.inventoryManager.nextPage(player);
+
+                this.inventoryManager.openCratePreview(player, crate);
+            }
+
+            return;
+        }
+
+        if (container.has(PersistentKeys.back_button.getNamespacedKey())) {  // Clicked the back button.
+            if (this.inventoryManager.getPage(player) > 1 && this.inventoryManager.getPage(player) <= crate.getMaxPage()) {
+                crate.playSound(player, player.getLocation(), "click-sound","UI_BUTTON_CLICK", SoundCategory.PLAYERS);
+
+                this.inventoryManager.backPage(player);
+
+                this.inventoryManager.openCratePreview(player, crate);
+            }
+        }
+
+        if (crate.getCrateType() == CrateType.gacha && holder.tier.getName().equals("legendary")) {
+            GachaType gachaType = crate.getCrateSettings().getGachaType();
+
+            NBT nbt = new NBT(item);
+            String rewardName = nbt.getString("rewardName");
+            if (rewardName.isEmpty()) return;
+
+            System.out.println("Item type: " + rewardName);
+            boolean standard = rewardName.split("_")[1].equals(RewardType.STANDARD.name());
+
+            switch (gachaType) {
+                case NORMAL:
+                    return;
+                case FATE_POINT:
+                    if (crate.getCrateSettings().getLegendaryStandard().stream().map(Prize::getPrizeNumber).anyMatch(rewardName::equals) && standard) {
+                        return;
+                    }
+                    break;
+                case OVERRIDE:
+                    break;
+            }
+
+            player.openInventory(new CratePickPrizeMenu(player, item, crate).build().getInventory());
+        }
+    }
+
     private void setDefaultItems(Inventory inventory) {
         if (getCrate().isBorderToggle()) {
             List<Integer> borderItems = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8);
 
+            ItemBuilder borderItem = getCrate().getBorderItem().setTarget(getPlayer());
+
+            if (getCrate().getCrateType() == CrateType.gacha) {
+                borderItem.setCustomModelData(1000001).setHasCustomModelData(true);
+            }
+
+            ItemStack borderItemStack = borderItem.build();
+
             for (int i : borderItems) { // Top Border slots
-                inventory.setItem(i, getCrate().getBorderItem().setTarget(getPlayer()).build());
+                inventory.setItem(i, borderItemStack);
             }
 
             borderItems.replaceAll(getCrate()::getAbsoluteItemPosition);
 
+            boolean first = false;
+            boolean second = false;
+            ItemBuilder textures = new ItemBuilder(borderItemStack.clone());
+            textures.setHasCustomModelData(true);
+
             for (int i : borderItems) { // Bottom Border slots
-                inventory.setItem(i, getCrate().getBorderItem().setTarget(getPlayer()).build());
+                if (!first) {
+                    first = true;
+                    textures.setCustomModelData(1000003);
+                    inventory.setItem(i, textures.build());
+                    continue;
+                }
+
+                if (!second) {
+                    second = true;
+                    textures.setCustomModelData(1000004);
+                    inventory.setItem(i, textures.build());
+                    continue;
+                }
+
+                inventory.setItem(i, borderItemStack);
             }
         }
 
@@ -130,105 +253,5 @@ public class CratePreviewMenu extends InventoryBuilder {
         }
 
         return items;
-    }
-
-    public static class CratePreviewListener implements Listener {
-
-        private final @NotNull CrazyCrates plugin = JavaPlugin.getPlugin(CrazyCrates.class);
-
-        private final @NotNull InventoryManager inventoryManager = this.plugin.getInventoryManager();
-
-        private final @NotNull SettingsManager config = ConfigManager.getConfig();
-
-        @EventHandler
-        public void onInventoryClick(InventoryClickEvent event) {
-            Inventory inventory = event.getInventory();
-
-            if (!(inventory.getHolder(false) instanceof CratePreviewMenu holder)) return;
-
-            event.setCancelled(true);
-
-            Player player = holder.getPlayer();
-
-            ItemStack item = event.getCurrentItem();
-
-            if (item == null || item.getType() == Material.AIR) return;
-
-            if (!item.hasItemMeta()) return;
-
-            Crate crate = this.inventoryManager.getCratePreview(player);
-
-            if (crate == null) return;
-
-            ItemMeta itemMeta = item.getItemMeta();
-
-            PersistentDataContainer container = itemMeta.getPersistentDataContainer();
-
-            if (container.has(PersistentKeys.main_menu_button.getNamespacedKey()) && this.config.getProperty(ConfigKeys.enable_crate_menu)) { // Clicked the menu button.
-                if (this.inventoryManager.inCratePreview(player)) {
-                    if (holder.overrideMenu()) return;
-
-                    crate.playSound(player, player.getLocation(), "click-sound","UI_BUTTON_CLICK", SoundCategory.PLAYERS);
-
-                    if (crate.isPreviewTierToggle()) {
-                        player.openInventory(crate.getTierPreview(player));
-
-                        return;
-                    }
-
-                    this.inventoryManager.removeViewer(player);
-                    this.inventoryManager.closeCratePreview(player);
-
-                    CrateMainMenu crateMainMenu = new CrateMainMenu(player, this.config.getProperty(ConfigKeys.inventory_size), this.config.getProperty(ConfigKeys.inventory_name));
-
-                    player.openInventory(crateMainMenu.build().getInventory());
-                }
-
-                return;
-            }
-
-            if (container.has(PersistentKeys.next_button.getNamespacedKey())) {  // Clicked the next button.
-                if (this.inventoryManager.getPage(player) < crate.getMaxPage()) {
-                    crate.playSound(player, player.getLocation(), "click-sound","UI_BUTTON_CLICK", SoundCategory.PLAYERS);
-
-                    this.inventoryManager.nextPage(player);
-
-                    this.inventoryManager.openCratePreview(player, crate);
-                }
-
-                return;
-            }
-
-            if (container.has(PersistentKeys.back_button.getNamespacedKey())) {  // Clicked the back button.
-                if (this.inventoryManager.getPage(player) > 1 && this.inventoryManager.getPage(player) <= crate.getMaxPage()) {
-                    crate.playSound(player, player.getLocation(), "click-sound","UI_BUTTON_CLICK", SoundCategory.PLAYERS);
-
-                    this.inventoryManager.backPage(player);
-
-                    this.inventoryManager.openCratePreview(player, crate);
-                }
-            }
-
-            if (crate.getCrateType() == CrateType.gacha && holder.tier.getName().equals("legendary")) {
-                GachaType gachaType = crate.getCrateSettings().getGachaType();
-                NBT nbt = new NBT(item);
-                String rewardName = nbt.getString("rewardName");
-                System.out.println("Item type: " + rewardName);
-                boolean standard = rewardName.split("_")[1].equals(RewardType.STANDARD.name());
-                switch (gachaType) {
-                    case NORMAL:
-                        return;
-                    case FATE_POINT:
-                        if (crate.getCrateSettings().getLegendaryStandard().stream().map(Prize::getPrizeNumber).anyMatch(rewardName::equals) && standard) {
-                            return;
-                        }
-                        break;
-                    case OVERRIDE:
-                        break;
-                }
-
-                player.openInventory(new CratePickPrizeMenu(player, item, crate).build().getInventory());
-            }
-        }
     }
 }

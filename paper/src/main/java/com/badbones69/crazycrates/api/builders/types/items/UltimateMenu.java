@@ -85,6 +85,82 @@ public class UltimateMenu extends InventoryBuilder {
         return this;
     }
 
+    @Override
+    public void onClick(InventoryClickEvent e) {
+        if (!(e.getInventory().getHolder() instanceof UltimateMenu ultimateMenu)) return;
+
+        e.setCancelled(true);
+        int slot = e.getRawSlot();
+        if (slot < 0) return;
+
+        System.out.println("Slot: " + slot);
+
+        CrazyCrates plugin = ultimateMenu.plugin;
+        Player player = ultimateMenu.getPlayer();
+        Crate crate = ultimateMenu.getCrate();
+
+        CrateManager crateManager = plugin.getCrateManager();
+
+        int newCrateNum;
+
+        if (slot < 3) {
+            newCrateNum = 0;
+        } else if (slot < 6) {
+            newCrateNum = 1;
+        } else if (slot < 9) {
+            newCrateNum = 2;
+        } else newCrateNum = -1;
+
+        if (newCrateNum != -1) {
+            PlayerBaseProfile profile = plugin.getBaseProfileManager().getPlayerBaseProfile(player.getName());
+            CrateSettings newCrate = DatabaseManager.getCrateSettingsSplit().get(ultimateMenu.currentPage).get(newCrateNum);
+
+            Component trans = ComponentBuilder.trans(player.getUniqueId(), newCrate.getCrateName(), profile.getMysticTokens(), profile.getStellarShards());
+
+            player.openInventory(new UltimateMenu(ultimateMenu, trans, newCrateNum).build().getInventory());
+        }
+
+        switch (slot) {
+            case 81 -> {
+                close(player);
+                crateManager.getDatabaseManager().getHistory().sendHistory(player, player.getName(), 1, crate.getCrateSettings());
+            }
+            case 82 -> {
+                close(player);
+                plugin.getInventoryManager().openNewCratePreview(player, crate);
+            }
+            case 83 -> {
+                //TODO: Open shop
+            }
+            case 84 -> {
+                //TODO: handle page back
+            }
+            case 85 -> {
+                //TODO: handle page forward
+            }
+            case 86, 87 -> {
+                close(player);
+                player.setSneaking(false);
+
+                if (ultimateMenu.hasKeys(player, crate, 1)) {
+                    crateManager.openCrate(player, crate, KeyType.virtual_key, null, false, false);
+                } else {
+                    message(crate, player);
+                }
+            }
+            case 88, 89 -> {
+                close(player);
+                player.setSneaking(true);
+
+                if (ultimateMenu.hasKeys(player, crate, 10)) {
+                    crateManager.openCrate(player, crate, KeyType.virtual_key, null, false, false);
+                } else {
+                    message(crate, player);
+                }
+            }
+        }
+    }
+
     private void setTopCrates() {
         int slot = 0;
         int crate = 0;
@@ -163,101 +239,25 @@ public class UltimateMenu extends InventoryBuilder {
         return plugin.getUserManager().getVirtualKeys(player.getUniqueId(), crate.getName()) >= amount;
     }
 
+    private void message(Crate crate, Player player) {
+        SettingsManager config = ConfigManager.getConfig();
+        if (config.getProperty(ConfigKeys.need_key_sound_toggle)) {
+            player.playSound(player.getLocation(), Sound.valueOf(config.getProperty(ConfigKeys.need_key_sound)), SoundCategory.PLAYERS, 1f, 1f);
+        }
+
+        Map<String, String> placeholders = new HashMap<>();
+
+        placeholders.put("{crate}", crate.getName());
+        placeholders.put("{key}", crate.getKeyName());
+
+        player.sendMessage(Messages.no_keys.getMessage(placeholders, player));
+    }
+
+    private void close(Player player) {
+        player.closeInventory(InventoryCloseEvent.Reason.PLAYER);
+    }
+
     public static class TestMenuListener implements Listener {
-        @EventHandler
-        public void Click(InventoryClickEvent e) {
-            if (!(e.getInventory().getHolder() instanceof UltimateMenu ultimateMenu)) return;
-
-            e.setCancelled(true);
-            int slot = e.getRawSlot();
-            if (slot < 0) return;
-
-            System.out.println("Slot: " + slot);
-
-            CrazyCrates plugin = ultimateMenu.plugin;
-            Player player = ultimateMenu.getPlayer();
-            Crate crate = ultimateMenu.getCrate();
-
-            CrateManager crateManager = plugin.getCrateManager();
-
-            int newCrateNum;
-
-            if (slot < 3) {
-                newCrateNum = 0;
-            } else if (slot < 6) {
-                newCrateNum = 1;
-            } else if (slot < 9) {
-                newCrateNum = 2;
-            } else newCrateNum = -1;
-
-            if (newCrateNum != -1) {
-                PlayerBaseProfile profile = plugin.getBaseProfileManager().getPlayerBaseProfile(player.getName());
-                CrateSettings newCrate = DatabaseManager.getCrateSettingsSplit().get(ultimateMenu.currentPage).get(newCrateNum);
-
-                Component trans = ComponentBuilder.trans(player.getUniqueId(), newCrate.getCrateName(), profile.getMysticTokens(), profile.getStellarShards());
-
-                player.openInventory(new UltimateMenu(ultimateMenu, trans, newCrateNum).build().getInventory());
-            }
-
-            switch (slot) {
-                case 81 -> {
-                    close(player);
-                    crateManager.getDatabaseManager().getHistory().sendHistory(player, player.getName(), 1, crate.getCrateSettings());
-                }
-                case 82 -> {
-                    close(player);
-                    plugin.getInventoryManager().openNewCratePreview(player, crate);
-                }
-                case 83 -> {
-                    //TODO: Open shop
-                }
-                case 84 -> {
-                    //TODO: handle page back
-                }
-                case 85 -> {
-                    //TODO: handle page forward
-                }
-                case 86, 87 -> {
-                    close(player);
-                    player.setSneaking(false);
-
-                    if (ultimateMenu.hasKeys(player, crate, 1)) {
-                        crateManager.openCrate(player, crate, KeyType.virtual_key, null, false, false);
-                    } else {
-                        message(crate, player);
-                    }
-                }
-                case 88, 89 -> {
-                    close(player);
-                    player.setSneaking(true);
-
-                    if (ultimateMenu.hasKeys(player, crate, 10)) {
-                        crateManager.openCrate(player, crate, KeyType.virtual_key, null, false, false);
-                    } else {
-                        message(crate, player);
-                    }
-                }
-            }
-        }
-
-        private void message(Crate crate, Player player) {
-            SettingsManager config = ConfigManager.getConfig();
-            if (config.getProperty(ConfigKeys.need_key_sound_toggle)) {
-                player.playSound(player.getLocation(), Sound.valueOf(config.getProperty(ConfigKeys.need_key_sound)), SoundCategory.PLAYERS, 1f, 1f);
-            }
-
-            Map<String, String> placeholders = new HashMap<>();
-
-            placeholders.put("{crate}", crate.getName());
-            placeholders.put("{key}", crate.getKeyName());
-
-            player.sendMessage(Messages.no_keys.getMessage(placeholders, player));
-        }
-
-        private void close(Player player) {
-            player.closeInventory(InventoryCloseEvent.Reason.PLAYER);
-        }
-
         @EventHandler
         public void Close(InventoryCloseEvent e) {
             if (e.getInventory().getHolder() instanceof UltimateMenu testMenu && e.getReason().equals(InventoryCloseEvent.Reason.PLAYER)) {

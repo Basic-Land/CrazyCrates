@@ -7,6 +7,7 @@ import com.badbones69.crazycrates.api.objects.Tier;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
 import com.ryderbelserion.vital.enums.Support;
 import net.kyori.adventure.text.Component;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import us.crazycrew.crazycrates.platform.config.ConfigManager;
 import us.crazycrew.crazycrates.platform.config.impl.ConfigKeys;
@@ -116,6 +117,8 @@ public abstract class InventoryBuilder implements InventoryHolder {
     }
 
     public abstract InventoryBuilder build();
+
+    public abstract void onClick(InventoryClickEvent event);
 
     public void size(int size) {
         this.size = size;

@@ -1,6 +1,7 @@
 package com.badbones69.crazycrates.api.builders.types;
 
 import com.badbones69.crazycrates.CrazyCrates;
+import com.badbones69.crazycrates.api.builders.InventoryBuilder;
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.enums.Messages;
 import com.badbones69.crazycrates.api.enums.Permissions;
@@ -9,8 +10,6 @@ import com.badbones69.crazycrates.tasks.crates.CrateManager;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -19,13 +18,19 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
-import com.badbones69.crazycrates.api.builders.InventoryBuilder;
 import us.crazycrew.crazycrates.api.enums.types.KeyType;
 import us.crazycrew.crazycrates.api.users.UserManager;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class CrateAdminMenu extends InventoryBuilder {
+
+    private final @NotNull CrazyCrates plugin = JavaPlugin.getPlugin(CrazyCrates.class);
+
+    private final @NotNull CrateManager crateManager = this.plugin.getCrateManager();
+
+    private final @NotNull UserManager userManager = this.plugin.getUserManager();
 
     public CrateAdminMenu(Player player, int size, String title) {
         super(player, size, title);
@@ -49,61 +54,52 @@ public class CrateAdminMenu extends InventoryBuilder {
         return this;
     }
 
-    public static class CrateAdminListener implements Listener {
+    @Override
+    public void onClick(InventoryClickEvent event) {
+        Inventory inventory = event.getInventory();
 
-        private final @NotNull CrazyCrates plugin = JavaPlugin.getPlugin(CrazyCrates.class);
+        if (!(inventory.getHolder(false) instanceof CrateAdminMenu holder)) return;
 
-        private final @NotNull CrateManager crateManager = this.plugin.getCrateManager();
+        event.setCancelled(true);
 
-        private final @NotNull UserManager userManager = this.plugin.getUserManager();
+        Player player = holder.getPlayer();
 
-        @EventHandler
-        public void onInventoryClick(InventoryClickEvent event) {
-            Inventory inventory = event.getInventory();
+        InventoryView view = holder.getView();
 
-            if (!(inventory.getHolder(false) instanceof CrateAdminMenu holder)) return;
+        if (event.getClickedInventory() != view.getTopInventory()) return;
 
-            event.setCancelled(true);
+        if (!Permissions.CRAZYCRATES_ACCESS.hasPermission(player)) {
+            player.closeInventory(InventoryCloseEvent.Reason.CANT_USE);
+            player.sendMessage(Messages.no_permission.getMessage(player));
+            return;
+        }
 
-            Player player = holder.getPlayer();
+        ItemStack item = event.getCurrentItem();
 
-            InventoryView view = holder.getView();
+        if (item == null || item.getType() == Material.AIR) return;
 
-            if (event.getClickedInventory() != view.getTopInventory()) return;
+        if (!this.crateManager.isKey(item)) return;
 
-            if (!Permissions.CRAZYCRATES_ACCESS.hasPermission(player)) {
-                player.closeInventory(InventoryCloseEvent.Reason.CANT_USE);
-                player.sendMessage(Messages.no_permission.getMessage(player));
+        Crate crate = this.crateManager.getCrateFromKey(item);
+
+        ClickType clickType = event.getClick();
+
+        Map<String, String> placeholders = new HashMap<>();
+
+        placeholders.put("{amount}", String.valueOf(1));
+        placeholders.put("{key}", crate.getKeyName());
+
+        switch (clickType) {
+            case LEFT -> player.getInventory().addItem(crate.getKey(player));
+            case RIGHT -> this.userManager.addKeys(1, player.getUniqueId(), crate.getName(), KeyType.virtual_key);
+            default -> {
                 return;
             }
-
-            ItemStack item = event.getCurrentItem();
-
-            if (item == null || item.getType() == Material.AIR) return;
-
-            if (!this.crateManager.isKey(item)) return;
-
-            Crate crate = this.crateManager.getCrateFromKey(item);
-
-            ClickType clickType = event.getClick();
-
-            Map<String, String> placeholders = new HashMap<>();
-
-            placeholders.put("{amount}", String.valueOf(1));
-            placeholders.put("{key}", crate.getKeyName());
-
-            switch (clickType) {
-                case LEFT -> player.getInventory().addItem(crate.getKey(player));
-                case RIGHT -> this.userManager.addKeys(1, player.getUniqueId(), crate.getName(), KeyType.virtual_key);
-                default -> {
-                    return;
-                }
-            }
-            player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1f, 1f);
-
-            placeholders.put("{keytype}", KeyType.physical_key.getFriendlyName());
-
-            player.sendActionBar(Messages.obtaining_keys.getMessage(placeholders, player));
         }
+        player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1f, 1f);
+
+        placeholders.put("{keytype}", KeyType.physical_key.getFriendlyName());
+
+        player.sendActionBar(Messages.obtaining_keys.getMessage(placeholders, player));
     }
 }

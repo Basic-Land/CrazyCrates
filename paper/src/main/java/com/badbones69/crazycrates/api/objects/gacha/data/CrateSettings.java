@@ -8,6 +8,7 @@ import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
 import com.badbones69.crazycrates.api.objects.gacha.enums.GachaType;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
+import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ComponentBuilder;
 import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import lombok.Getter;
@@ -169,11 +170,10 @@ public class CrateSettings {
     @NotNull
     private ItemBuilder getTierItem(Rarity rarity, RaritySettings raritySettings) {
         ItemBuilder tierStack = new ItemBuilder().setMaterial(Material.CHEST);
-        tierStack.setName(rarity.name());
+        tierStack.setName("&r" + rarity.name());
 
         List<String> lore = new ArrayList<>();
 
-        lore.add("");
         lore.add("");
         lore.add("&8│ &fPity: &e" + raritySettings.pity());
         lore.add("&8│ &fZákladní šance: &e" + raritySettings.baseChance() + "&f%");
@@ -194,20 +194,36 @@ public class CrateSettings {
                 lore.add("&8│ &fMaximální šance pro soft pity je &e" + raritySettings.softPityLimit() + "&f%");
             }
         }
-        lore.add("");
 
         int maxSize = 0;
+        int size = 0;
         for (String s : lore) {
-            if (s.length() > maxSize) {
-                maxSize = s.length();
+            if (s.length() > size) {
+                size = s.length();
+                maxSize = ComponentBuilder.getSize(s);
             }
         }
 
-        lore.set(1, "&8┌" + "─".repeat(maxSize / 2));
-        lore.set(lore.size() - 1, "&8└" + "─".repeat(maxSize / 2));
+        StringBuilder sb = new StringBuilder();
 
+        sb.append("&8┌");
+
+        int i = 6;
+        while (i < maxSize) {
+            sb.append("─");
+            i += 9;
+        }
+
+        lore.add(1, sb.toString());
+
+        sb.setCharAt(2, '└');
+
+        lore.add(sb.toString());
 
         tierStack.setLore(lore);
+        tierStack.setHasCustomModelData(true);
+        tierStack.setCustomModelData(rarity.getModelData());
+
         return tierStack;
     }
 

@@ -53,31 +53,29 @@ public class RaritiesMenu extends InventoryBuilder {
         return this;
     }
 
-    public static class RaritiesMenuListener implements Listener {
-        @EventHandler
-        public void onInventoryClick(InventoryClickEvent event) {
-            Inventory inventory = event.getInventory();
+    @Override
+    public void onClick(InventoryClickEvent event) {
+        Inventory inventory = event.getInventory();
 
-            if (!(inventory.getHolder(false) instanceof RaritiesMenu holder)) return;
+        if (!(inventory.getHolder(false) instanceof RaritiesMenu holder)) return;
 
-            event.setCancelled(true);
-            ItemStack item = event.getCurrentItem();
-            if (item == null || item.getType() == Material.AIR) return;
-            List<String> lore = item.getItemMeta().getLore();
-            if (lore == null || lore.isEmpty()) return;
-            String type = lore.get(0);
-            type = type.substring(2);
+        event.setCancelled(true);
+        ItemStack item = event.getCurrentItem();
+        if (item == null || item.getType() == Material.AIR) return;
+        List<String> lore = item.getItemMeta().getLore();
+        if (lore == null || lore.isEmpty()) return;
+        String type = lore.get(0);
+        type = type.substring(2);
 
-            CrateSettings crateSettings = holder.getCrate().getCrateSettings();
-            if (crateSettings == null) return;
-            RewardType rewardType = RewardType.valueOf(type);
-            Rarity rarity = Rarity.valueOf(item.getItemMeta().getDisplayName());
+        CrateSettings crateSettings = holder.getCrate().getCrateSettings();
+        if (crateSettings == null) return;
+        RewardType rewardType = RewardType.valueOf(type);
+        Rarity rarity = Rarity.valueOf(item.getItemMeta().getDisplayName());
 
-            boolean leftClick = event.getClick().isLeftClick();
+        boolean leftClick = event.getClick().isLeftClick();
 
-            List<Integer> ids = leftClick ? crateSettings.getAllIDs() : crateSettings.getIDsFromRarityType(rarity, rewardType);
+        List<Integer> ids = leftClick ? crateSettings.getAllIDs() : crateSettings.getIDsFromRarityType(rarity, rewardType);
 
-            holder.getPlayer().openInventory(new ItemPreview(holder, 54, "Add Items", rewardType, rarity, ids, leftClick).build().getInventory());
-        }
+        holder.getPlayer().openInventory(new ItemPreview(holder, 54, "Add Items", rewardType, rarity, ids, leftClick).build().getInventory());
     }
 }

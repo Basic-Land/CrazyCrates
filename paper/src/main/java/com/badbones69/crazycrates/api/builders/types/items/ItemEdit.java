@@ -2,7 +2,6 @@ package com.badbones69.crazycrates.api.builders.types.items;
 
 import com.badbones69.crazycrates.api.builders.InventoryBuilder;
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
-import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import cz.basicland.blibs.spigot.utils.item.DBItemStack;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import org.bukkit.Material;
@@ -47,43 +46,41 @@ public class ItemEdit extends InventoryBuilder {
         return this;
     }
 
-    public static class ItemEditListener implements Listener {
-        @EventHandler
-        public void onInventoryClick(InventoryClickEvent event) {
-            Inventory inventory = event.getInventory();
+    @Override
+    public void onClick(InventoryClickEvent event) {
+        Inventory inventory = event.getInventory();
 
-            if (!(inventory.getHolder(false) instanceof ItemEdit holder)) return;
+        if (!(inventory.getHolder(false) instanceof ItemEdit holder)) return;
 
-            Player player = holder.getPlayer();
+        Player player = holder.getPlayer();
 
-            int slot = event.getSlot();
+        int slot = event.getSlot();
 
-            if (event.getClickedInventory() instanceof PlayerInventory) return;
+        if (event.getClickedInventory() instanceof PlayerInventory) return;
 
-            if (slot != 15) {
-                event.setCancelled(true);
-                switch (slot) {
-                    case 11 -> {
-                        ItemStack clone = holder.itemStack.clone();
-                        NBT nbt = new NBT(clone);
-                        nbt.remove("rewardName");
-                        player.getInventory().addItem(clone);
+        if (slot != 15) {
+            event.setCancelled(true);
+            switch (slot) {
+                case 11 -> {
+                    ItemStack clone = holder.itemStack.clone();
+                    NBT nbt = new NBT(clone);
+                    nbt.remove("rewardName");
+                    player.getInventory().addItem(clone);
+                }
+                case 18 -> player.openInventory(holder.preview.build().getInventory());
+                case 26 -> {
+                    ItemStack stack = inventory.getItem(15);
+                    if (stack == null || stack.getType() == Material.AIR) return;
+                    NBT nbt = new NBT(holder.itemStack);
+                    String[] rewardName = nbt.getString("rewardName").split("_");
+                    int id = Integer.parseInt(rewardName[0]);
+                    if (id == 0) return;
+                    try {
+                        holder.plugin.getCrateManager().getDatabaseManager().getItemManager().updateItem(id, DBItemStack.encodeItem(stack));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
                     }
-                    case 18 -> player.openInventory(holder.preview.build().getInventory());
-                    case 26 -> {
-                        ItemStack stack = inventory.getItem(15);
-                        if (stack == null || stack.getType() == Material.AIR) return;
-                        NBT nbt = new NBT(holder.itemStack);
-                        String[] rewardName = nbt.getString("rewardName").split("_");
-                        int id = Integer.parseInt(rewardName[0]);
-                        if (id == 0) return;
-                        try {
-                            holder.plugin.getCrateManager().getDatabaseManager().getItemManager().updateItem(id, DBItemStack.encodeItem(stack));
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                        player.openInventory(holder.preview.build().getInventory());
-                    }
+                    player.openInventory(holder.preview.build().getInventory());
                 }
             }
         }

@@ -12,8 +12,6 @@ import com.google.common.collect.Lists;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -97,69 +95,67 @@ public class ItemPreview extends InventoryBuilder {
         return this;
     }
 
+    @Override
+    public void onClick(InventoryClickEvent event) {
+        Inventory inventory = event.getInventory();
+
+        if (!(inventory.getHolder(false) instanceof ItemPreview holder)) return;
+
+        Player player = holder.getPlayer();
+        int slot = event.getSlot();
+        event.setCancelled(true);
+        ItemStack item = event.getCurrentItem();
+        if (item == null || item.getType() == Material.AIR) return;
+
+        if (slot == holder.getSize() - 9 && holder.page > 0) {
+            // Previous page
+            holder.page--;
+            holder.build();
+        } else if (slot == holder.getSize() - 1 && holder.page < (int) Math.ceil((double) holder.items.size() / holder.getSize()) - 1) {
+            // Next page
+            holder.page++;
+            holder.build();
+        } else if (slot < holder.getSize() - 9 && slot >= 0) {
+            if (holder.editing && holder.raritiesMenu != null && holder.rarity != null) {
+                Crate crate = holder.getCrate();
+                RewardType type = holder.type;
+                Rarity rarity = holder.rarity;
+                int id = new NBT(item).getInteger("itemID");
+
+                crate.getCrateSettings().addItem(type, id, rarity, item, crate);
+
+                boolean extra = type.equals(RewardType.EXTRA_REWARD);
+                String base = "Crate.Gacha.";
+                String path = extra ? base + "extra-reward.items" : base + type.name().toLowerCase() + "." + rarity.name().toLowerCase() + ".list";
+
+                List<Integer> ids = crate.getFile().getIntegerList(path);
+
+                if (holder.leftClick) {
+                    ids.add(id);
+                } else if (ids.contains(id)) {
+                    ids.remove((Integer) id);
+                } else if (!extra) {
+                    crate.getFile().set(base + type.name().toLowerCase() + "." + rarity.name().toLowerCase() + "." + id, null);
+                } else {
+                    throw new IllegalStateException("Detected type EXTRA_REWARD this shouldn't happen.");
+                }
+
+                if (!extra) crate.getFile().set(path, ids);
+
+                crate.saveFile();
+                player.openInventory(holder.raritiesMenu.getInventory());
+            } else {
+                player.openInventory(new ItemEdit(holder, player, 27, "Edit Item", item).build().getInventory());
+            }
+        } else if (slot == holder.getSize() - 5 && holder.editing && holder.raritiesMenu != null && holder.rarity != null) {
+            player.openInventory(holder.raritiesMenu.getInventory());
+        }
+    }
+
     private void add() {
         if (editing) {
             ItemBuilder back = new ItemBuilder().setMaterial(Material.CHEST).setName("&aGo back");
             getInventory().setItem(getSize() - 5, back.build());
-        }
-    }
-
-    public static class ItemPreviewListener implements Listener {
-        @EventHandler
-        public void onInventoryClick(InventoryClickEvent event) {
-            Inventory inventory = event.getInventory();
-
-            if (!(inventory.getHolder(false) instanceof ItemPreview holder)) return;
-
-            Player player = holder.getPlayer();
-            int slot = event.getSlot();
-            event.setCancelled(true);
-            ItemStack item = event.getCurrentItem();
-            if (item == null || item.getType() == Material.AIR) return;
-
-            if (slot == holder.getSize() - 9 && holder.page > 0) {
-                // Previous page
-                holder.page--;
-                holder.build();
-            } else if (slot == holder.getSize() - 1 && holder.page < (int) Math.ceil((double) holder.items.size() / holder.getSize()) - 1) {
-                // Next page
-                holder.page++;
-                holder.build();
-            } else if (slot < holder.getSize() - 9 && slot >= 0) {
-                if (holder.editing && holder.raritiesMenu != null && holder.rarity != null) {
-                    Crate crate = holder.getCrate();
-                    RewardType type = holder.type;
-                    Rarity rarity = holder.rarity;
-                    int id = new NBT(item).getInteger("itemID");
-
-                    crate.getCrateSettings().addItem(type, id, rarity, item, crate);
-
-                    boolean extra = type.equals(RewardType.EXTRA_REWARD);
-                    String base = "Crate.Gacha.";
-                    String path = extra ? base + "extra-reward.items" : base + type.name().toLowerCase() + "." + rarity.name().toLowerCase() + ".list";
-
-                    List<Integer> ids = crate.getFile().getIntegerList(path);
-
-                    if (holder.leftClick) {
-                        ids.add(id);
-                    } else if (ids.contains(id)) {
-                        ids.remove((Integer) id);
-                    } else if (!extra) {
-                        crate.getFile().set(base + type.name().toLowerCase() + "." + rarity.name().toLowerCase() + "." + id, null);
-                    } else {
-                        throw new IllegalStateException("Detected type EXTRA_REWARD this shouldn't happen.");
-                    }
-
-                    if (!extra) crate.getFile().set(path, ids);
-
-                    crate.saveFile();
-                    player.openInventory(holder.raritiesMenu.getInventory());
-                } else {
-                    player.openInventory(new ItemEdit(holder, player, 27, "Edit Item", item).build().getInventory());
-                }
-            } else if (slot == holder.getSize() - 5 && holder.editing && holder.raritiesMenu != null && holder.rarity != null) {
-                player.openInventory(holder.raritiesMenu.getInventory());
-            }
         }
     }
 }

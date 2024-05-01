@@ -23,6 +23,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.*;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class DatabaseManager {
     private final DatabaseConnection connection;
@@ -39,7 +40,7 @@ public class DatabaseManager {
 
     public DatabaseManager(List<Crate> crateList) {
         connection = BLibs.getApi().getDatabaseHandler().loadSQLite(JavaPlugin.getPlugin(CrazyCrates.class), "gamba", "crates.db");
-        crateSettings = crateList.stream().map(Crate::getCrateSettings).filter(Objects::nonNull).toList();
+        crateSettings = crateList.stream().map(Crate::getCrateSettings).filter(Objects::nonNull).collect(Collectors.toList());
         crateSettingsSplit.clear();
         crateSettingsSplit = Lists.partition(crateSettings, 3);
         createCrateTable();

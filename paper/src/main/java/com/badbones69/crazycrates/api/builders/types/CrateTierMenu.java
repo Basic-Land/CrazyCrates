@@ -46,6 +46,72 @@ public class CrateTierMenu extends InventoryBuilder {
         return this;
     }
 
+    @Override
+    public void onClick(InventoryClickEvent event) {
+        Inventory inventory = event.getInventory();
+
+        if (!(inventory.getHolder(false) instanceof CrateTierMenu holder)) return;
+
+        event.setCancelled(true);
+
+        Player player = holder.getPlayer();
+
+        ItemStack item = event.getCurrentItem();
+
+        if (item == null || item.getType() == Material.AIR) return;
+
+        if (!item.hasItemMeta()) return;
+
+        Crate crate = this.inventoryManager.getCratePreview(player);
+
+        if (crate == null) return;
+
+        ItemMeta itemMeta = item.getItemMeta();
+
+        PersistentDataContainer container = itemMeta.getPersistentDataContainer();
+
+        if (container.has(PersistentKeys.main_menu_button.getNamespacedKey()) && this.config.getProperty(ConfigKeys.enable_crate_menu)) {
+            if (this.inventoryManager.inCratePreview(player)) {
+                if (holder.overrideMenu()) return;
+
+                crate.playSound(player, player.getLocation(), "click-sound", "UI_BUTTON_CLICK", SoundCategory.PLAYERS);
+
+                this.inventoryManager.removeViewer(player);
+                this.inventoryManager.closeCratePreview(player);
+
+                CrateMainMenu crateMainMenu = new CrateMainMenu(player, this.config.getProperty(ConfigKeys.inventory_size), this.config.getProperty(ConfigKeys.inventory_name));
+
+                player.openInventory(crateMainMenu.build().getInventory());
+            }
+
+            return;
+        }
+
+        if (container.has(PersistentKeys.preview_tier_button.getNamespacedKey())) {
+            crate.playSound(player, player.getLocation(), "click-sound", "UI_BUTTON_CLICK", SoundCategory.PLAYERS);
+
+            String tierName = container.get(PersistentKeys.preview_tier_button.getNamespacedKey(), PersistentDataType.STRING);
+
+            Tier tier = crate.getTier(tierName);
+
+            Inventory cratePreviewMenu = crate.getPreview(player, this.inventoryManager.getPage(player), true, tier);
+
+            player.openInventory(cratePreviewMenu);
+        }
+
+        if (!crate.getCrateType().equals(CrateType.gacha)) return;
+
+        if (event.getSlot() == holder.getCrate().getAbsolutePreviewItemPosition(8)) {
+            crate.playSound(player, player.getLocation(), "click-sound", "UI_BUTTON_CLICK", SoundCategory.PLAYERS);
+            player.openInventory(new BonusPityMenu(crate, player, 36, "&a&lBonus pity prize", holder).build().getInventory());
+        }
+
+        if (event.getSlot() == holder.getCrate().getAbsolutePreviewItemPosition(0)) {
+            crate.playSound(player, player.getLocation(), "click-sound", "UI_BUTTON_CLICK", SoundCategory.PLAYERS);
+            plugin.getCrateManager().getDatabaseManager().getUltimateMenuManager().open(player, crate);
+        }
+    }
+
     private void setDefaultItems() {
         getTiers().forEach(tier -> getInventory().setItem(tier.getSlot(), tier.getTierItem(getPlayer())));
 
@@ -93,80 +159,5 @@ public class CrateTierMenu extends InventoryBuilder {
         ItemBuilder mainMenu = new ItemBuilder().setMaterial(Material.CHEST).setName("&a&lMain menu");
         mainMenu.setCustomModelData(1000001).setHasCustomModelData(true);
         getInventory().setItem(getCrate().getAbsolutePreviewItemPosition(0), mainMenu.build());
-    }
-
-    public static class CrateTierListener implements Listener {
-
-        private final @NotNull CrazyCrates plugin = JavaPlugin.getPlugin(CrazyCrates.class);
-
-        private final @NotNull InventoryManager inventoryManager = this.plugin.getInventoryManager();
-
-        private final @NotNull SettingsManager config = ConfigManager.getConfig();
-
-        @EventHandler
-        public void onInventoryClick(InventoryClickEvent event) {
-            Inventory inventory = event.getInventory();
-
-            if (!(inventory.getHolder(false) instanceof CrateTierMenu holder)) return;
-
-            event.setCancelled(true);
-
-            Player player = holder.getPlayer();
-
-            ItemStack item = event.getCurrentItem();
-
-            if (item == null || item.getType() == Material.AIR) return;
-
-            if (!item.hasItemMeta()) return;
-
-            Crate crate = this.inventoryManager.getCratePreview(player);
-
-            if (crate == null) return;
-
-            ItemMeta itemMeta = item.getItemMeta();
-
-            PersistentDataContainer container = itemMeta.getPersistentDataContainer();
-
-            if (container.has(PersistentKeys.main_menu_button.getNamespacedKey()) && this.config.getProperty(ConfigKeys.enable_crate_menu)) {
-                if (this.inventoryManager.inCratePreview(player)) {
-                    if (holder.overrideMenu()) return;
-
-                    crate.playSound(player, player.getLocation(), "click-sound", "UI_BUTTON_CLICK", SoundCategory.PLAYERS);
-
-                    this.inventoryManager.removeViewer(player);
-                    this.inventoryManager.closeCratePreview(player);
-
-                    CrateMainMenu crateMainMenu = new CrateMainMenu(player, this.config.getProperty(ConfigKeys.inventory_size), this.config.getProperty(ConfigKeys.inventory_name));
-
-                    player.openInventory(crateMainMenu.build().getInventory());
-                }
-
-                return;
-            }
-
-            if (container.has(PersistentKeys.preview_tier_button.getNamespacedKey())) {
-                crate.playSound(player, player.getLocation(), "click-sound", "UI_BUTTON_CLICK", SoundCategory.PLAYERS);
-
-                String tierName = container.get(PersistentKeys.preview_tier_button.getNamespacedKey(), PersistentDataType.STRING);
-
-                Tier tier = crate.getTier(tierName);
-
-                Inventory cratePreviewMenu = crate.getPreview(player, this.inventoryManager.getPage(player), true, tier);
-
-                player.openInventory(cratePreviewMenu);
-            }
-
-            if (!crate.getCrateType().equals(CrateType.gacha)) return;
-
-            if (event.getSlot() == holder.getCrate().getAbsolutePreviewItemPosition(8)) {
-                crate.playSound(player, player.getLocation(), "click-sound", "UI_BUTTON_CLICK", SoundCategory.PLAYERS);
-                player.openInventory(new BonusPityMenu(crate, player, 36, "&a&lBonus pity prize", holder).build().getInventory());
-            }
-
-            if (event.getSlot() == holder.getCrate().getAbsolutePreviewItemPosition(0)) {
-                crate.playSound(player, player.getLocation(), "click-sound", "UI_BUTTON_CLICK", SoundCategory.PLAYERS);
-                plugin.getCrateManager().getDatabaseManager().getUltimateMenuManager().open(player, crate);
-            }
-        }
     }
 }

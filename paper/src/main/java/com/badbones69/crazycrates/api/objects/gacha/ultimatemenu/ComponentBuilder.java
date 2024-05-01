@@ -87,9 +87,20 @@ public final class ComponentBuilder {
         } + (top ? "" : "_");
     }
 
-    private static int getSize(String name) {
+    public static int getSize(String name) {
         int size = 0;
+        boolean color = false;
         for (char c : name.toCharArray()) {
+            if (c == '&') {
+                color = true;
+                continue;
+            }
+
+            if (color) {
+                color = false;
+                continue;
+            }
+
             size += switch (c) {
                 case 'q','w','e','r','z','u','o',
                      'p','a','s','d','g','h','j',
@@ -98,11 +109,14 @@ public final class ComponentBuilder {
                      'O','P','A','S','D','F','G',
                      'H','J','K','L','Y','X','C',
                      'V','B','N','M','0','1','2',
-                     '3','4','5','6','7','8','9' -> 6;
+                     '3','4','5','6','7','8','9',
+                     '/','%','ě','š','č','ř','ž',
+                     'ý','á','í','é','Ě','Š','Č',
+                     'Ř','Ž','Ý','Á','Í','É' -> 6;
                 case 't', 'I', ' ' -> 4;
-                case 'i' -> 2;
+                case 'i', ':' -> 2;
                 case 'f','k' -> 5;
-                case 'l' -> 3;
+                case 'l', '│' -> 3;
                 default -> 0;
             };
         }

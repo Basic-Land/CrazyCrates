@@ -8,8 +8,6 @@ import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
 import com.badbones69.crazycrates.api.objects.gacha.data.PlayerProfile;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -116,6 +114,64 @@ public class BonusPityMenu extends InventoryBuilder {
         return this;
     }
 
+    @Override
+    public void onClick(InventoryClickEvent event) {
+        Inventory inventory = event.getInventory();
+
+        if (!(inventory.getHolder(false) instanceof BonusPityMenu holder)) return;
+
+        event.setCancelled(true);
+
+        Player player = holder.getPlayer();
+
+        ItemStack item = event.getCurrentItem();
+
+        if (item == null || item.getType() == Material.AIR) return;
+
+        int clickedSlot = event.getSlot();
+
+        // If a displayed item is clicked
+        if (clickedSlot >= 19 && clickedSlot <= 25) {
+            holder.getInventory().setItem(holder.lastItemSlot, redGlassPane);
+
+            // Change the red glass pane above it to a green glass pane
+            holder.getInventory().setItem(clickedSlot - 9, greenGlassPane);
+            holder.lastItemSlot = clickedSlot - 9;
+        }
+
+        // If the page back item is clicked
+        if (clickedSlot == 27 && holder.currentPage > 0) {
+            holder.previousPage();
+        }
+
+        // If the page forward item is clicked
+        if (clickedSlot == 35 && holder.currentPage < holder.totalPages - 1) {
+            holder.nextPage();
+        }
+
+        if (clickedSlot == 29) {
+            player.openInventory(holder.crateTierMenu.getInventory());
+        }
+
+        if (clickedSlot == 33 && item.getType() == Material.ARROW) {
+            PlayerProfile playerProfile = holder.databaseManager.getPlayerProfile(player.getName(), holder.getCrate().getCrateSettings(), false);
+
+            if (playerProfile.isClaimedExtraReward()) {
+                player.sendMessage("You have already claimed the extra reward.");
+                return;
+            }
+
+            if (playerProfile.reachedExtraRewardPity()) {
+                playerProfile.setClaimedExtraReward(true);
+                holder.databaseManager.savePlayerProfile(player.getName(), holder.getCrate().getCrateSettings(), playerProfile);
+                player.sendMessage("You have claimed the extra reward.");
+                player.openInventory(holder.crateTierMenu.getInventory());
+            } else {
+                player.sendMessage("You have not reached the required pity.");
+            }
+        }
+    }
+
     private void nextPage() {
         currentPage++;
         build();
@@ -124,66 +180,6 @@ public class BonusPityMenu extends InventoryBuilder {
     private void previousPage() {
         currentPage--;
         build();
-    }
-
-    public static class BonusPityListener implements Listener {
-        @EventHandler
-        public void onInventoryClick(InventoryClickEvent event) {
-            Inventory inventory = event.getInventory();
-
-            if (!(inventory.getHolder(false) instanceof BonusPityMenu holder)) return;
-
-            event.setCancelled(true);
-
-            Player player = holder.getPlayer();
-
-            ItemStack item = event.getCurrentItem();
-
-            if (item == null || item.getType() == Material.AIR) return;
-
-            int clickedSlot = event.getSlot();
-
-            // If a displayed item is clicked
-            if (clickedSlot >= 19 && clickedSlot <= 25) {
-                holder.getInventory().setItem(holder.lastItemSlot, redGlassPane);
-
-                // Change the red glass pane above it to a green glass pane
-                holder.getInventory().setItem(clickedSlot - 9, greenGlassPane);
-                holder.lastItemSlot = clickedSlot - 9;
-            }
-
-            // If the page back item is clicked
-            if (clickedSlot == 27 && holder.currentPage > 0) {
-                holder.previousPage();
-            }
-
-            // If the page forward item is clicked
-            if (clickedSlot == 35 && holder.currentPage < holder.totalPages - 1) {
-                holder.nextPage();
-            }
-
-            if (clickedSlot == 29) {
-                player.openInventory(holder.crateTierMenu.getInventory());
-            }
-
-            if (clickedSlot == 33 && item.getType() == Material.ARROW) {
-                PlayerProfile playerProfile = holder.databaseManager.getPlayerProfile(player.getName(), holder.getCrate().getCrateSettings(), false);
-
-                if (playerProfile.isClaimedExtraReward()) {
-                    player.sendMessage("You have already claimed the extra reward.");
-                    return;
-                }
-
-                if (playerProfile.reachedExtraRewardPity()) {
-                    playerProfile.setClaimedExtraReward(true);
-                    holder.databaseManager.savePlayerProfile(player.getName(), holder.getCrate().getCrateSettings(), playerProfile);
-                    player.sendMessage("You have claimed the extra reward.");
-                    player.openInventory(holder.crateTierMenu.getInventory());
-                } else {
-                    player.sendMessage("You have not reached the required pity.");
-                }
-            }
-        }
     }
 
     private static ItemStack glass(Material item) {
