@@ -1,17 +1,11 @@
 package com.badbones69.crazycrates.api.objects.gacha.data;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
 
-@Setter
-@Getter
-@ToString
-@RequiredArgsConstructor
+@Data
 public class PlayerBaseProfile implements Serializable {
     @Serial
     private static final long serialVersionUID = 4019127885119793810L;

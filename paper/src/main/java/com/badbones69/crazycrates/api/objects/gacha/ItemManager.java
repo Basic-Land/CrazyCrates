@@ -2,7 +2,6 @@ package com.badbones69.crazycrates.api.objects.gacha;
 
 import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.objects.Crate;
-import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
 import cz.basicland.blibs.shared.databases.hikari.DatabaseConnection;
@@ -11,9 +10,7 @@ import me.ztowne13.customcrates.crates.options.CReward;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.IOException;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +26,7 @@ public class ItemManager {
      */
     public ItemManager(DatabaseConnection connection) {
         this.connection = connection;
-        allItems.putAll(getAllItems("AllItems"));
+        allItems.putAll(getAllItems());
         convertItems();
     }
 
@@ -55,53 +52,22 @@ public class ItemManager {
     /**
      * Retrieves all items from a specific table.
      *
-     * @param table The name of the table to retrieve items from.
      * @return A list of pairs, where each pair consists of an item ID and an ItemStack.
      */
-    public Map<Integer, ItemStack> getAllItems(String table) {
-        return connection.query("SELECT * FROM " + table).thenApply(this::items).join();
-    }
-
-    /**
-     * Retrieves specific items from a table based on their IDs.
-     *
-     * @param table The name of the table to retrieve items from.
-     * @param ids   The IDs of the items to retrieve.
-     * @return A list of pairs, where each pair consists of an item ID and an ItemStack.
-     */
-    public Map<Integer, ItemStack> getItems(String table, List<Integer> ids) {
-        return connection.query("SELECT * FROM " + table + " WHERE rewardName IN (" + String.join(",", Collections.nCopies(ids.size(), "?")) + ")", ids.toArray()).thenApply(this::items).join();
-    }
-
-    /**
-     * Converts a ResultSet into a list of pairs, where each pair consists of an item ID and an ItemStack.
-     *
-     * @param rs The ResultSet to convert.
-     * @return A list of pairs, where each pair consists of an item ID and an ItemStack.
-     */
-    private Map<Integer, ItemStack> items(ResultSet rs) {
-        Map<Integer, ItemStack> items = new HashMap<>();
-        try {
-            while (rs.next()) {
-                int id = rs.getInt("id");
-                ItemStack item = DBItemStack.decodeItem(rs.getString("itemStack"));
-                items.put(id, item);
+    private Map<Integer, ItemStack> getAllItems() {
+        return connection.querySQLite("SELECT * FROM AllItems").thenApply(rs -> {
+            Map<Integer, ItemStack> items = new HashMap<>();
+            try {
+                while (rs.next()) {
+                    int id = rs.getInt("id");
+                    ItemStack item = DBItemStack.decodeItem(rs.getString("itemStack"));
+                    items.put(id, item);
+                }
+            } catch (SQLException | IOException | ClassNotFoundException e) {
+                e.printStackTrace();
             }
-        } catch (SQLException | IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return items;
-    }
-
-    /**
-     * Retrieves items from the cache based on their IDs.
-     *
-     * @param table The name of the table to retrieve items from.
-     * @param ids   The IDs of the items to retrieve.
-     * @return A list of pairs, where each pair consists of an item ID and an ItemStack.
-     */
-    public Map<Integer, ItemStack> getItemsFromCache(RewardType table, List<Integer> ids) {
-        return get(allItems, ids);
+            return items;
+        }).join();
     }
 
     private Map<Integer, ItemStack> get(Map<Integer, ItemStack> map, List<Integer> ids) {
@@ -115,7 +81,7 @@ public class ItemManager {
      * @return A pair consisting of the item ID and an ItemStack, or null if the item is not found.
      */
     public Pair<Integer, ItemStack> getItemFromCache(int id) {
-        return new Pair<>(id, allItems.get(id));
+        return new Pair<>(id, allItems.get(id).clone());
     }
 
     public Map<Integer, ItemStack> getAllItemsFromCache() {
@@ -160,6 +126,6 @@ public class ItemManager {
      * @param item       The new ItemStack to replace the old one.
      */
     public void updateItem(int id, String item) {
-        connection.update("UPDATE AllItems SET itemStack = ? WHERE id = ?", item, id);
+        connection.updateSQLite("UPDATE AllItems SET itemStack = ? WHERE id = ?", item, id);
     }
 }

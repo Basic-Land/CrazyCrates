@@ -10,6 +10,7 @@ public enum ResultType {
     WON(NamedTextColor.GOLD),
     WON_OF_RATE_UP(TextColor.fromHexString("#8c26ad")),
     GUARANTEED(NamedTextColor.BLUE);
+
     private final TextColor color;
 
     ResultType(TextColor color) {

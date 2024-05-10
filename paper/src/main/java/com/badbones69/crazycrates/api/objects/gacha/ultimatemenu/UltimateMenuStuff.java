@@ -1,9 +1,11 @@
 package com.badbones69.crazycrates.api.objects.gacha.ultimatemenu;
 
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import org.bukkit.Material;
 
-public class UltimateMenuItems {
+public class UltimateMenuStuff {
     public static final ItemBuilder SELECTED = getItem(Material.GREEN_STAINED_GLASS_PANE, 1000002)
             .addLore("&7Právě vybraná truhla");
     public static final ItemBuilder UNSELECTED = getItem(Material.RED_STAINED_GLASS_PANE, 1000002)
@@ -23,7 +25,7 @@ public class UltimateMenuItems {
     public static final ItemBuilder SHOP = getItem(Material.EMERALD, 1000001)
             .setName("&f&lObchod")
             .addLore("&7Kliknutím otevřeš obchod");
-    public static final ItemBuilder BACK = getItem(Material.ARROW, 1000002)
+    public static final ItemBuilder BACK_ITEM = getItem(Material.ARROW, 1000002)
             .setName("&f&lZpět")
             .addLore("&7Kliknutím se vrátíš o stránku zpět");
     public static final ItemBuilder FORWARD = getItem(Material.ARROW, 1000002)
@@ -39,4 +41,10 @@ public class UltimateMenuItems {
     private static ItemBuilder getItem(Material material, int modelData) {
         return new ItemBuilder().setMaterial(material).setCustomModelData(modelData).setHasCustomModelData(true).setName("&f");
     }
+
+    public static final Sound CLICK = Sound.sound(Key.key("crate", "click"), Sound.Source.MASTER, 1f, 1f);
+    public static final Sound BACK = Sound.sound(Key.key("crate", "back"), Sound.Source.MASTER, 1f, 1f);
+    public static final Sound ERROR = Sound.sound(Key.key("crate", "error"), Sound.Source.MASTER, 1f, 1f);
+    public static final Sound CRATE = Sound.sound(Key.key("crate", "crate"), Sound.Source.MASTER, 1f, 1f);
+
 }

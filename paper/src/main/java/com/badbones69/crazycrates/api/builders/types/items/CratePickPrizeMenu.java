@@ -6,6 +6,7 @@ import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.api.objects.gacha.data.PlayerProfile;
+import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuStuff;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -58,9 +59,11 @@ public class CratePickPrizeMenu extends InventoryBuilder {
         NBT nbt = new NBT(picked);
 
         if (event.getSlot() < 4) {
+            player.playSound(UltimateMenuStuff.BACK);
             // Open the previous menu
             player.openInventory(crate.getTierPreview(player));
         } else if (event.getSlot() > 4) {
+            player.playSound(UltimateMenuStuff.CLICK);
             // Retrieve the player's profile and save the chosen reward
             PlayerProfile playerProfile = holder.databaseManager.getPlayerProfile(player.getName(), crateSettings, false);
 

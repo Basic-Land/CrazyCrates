@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 public class DatabaseManager {
     private final DatabaseConnection connection;
     @Getter
-    private static List<List<CrateSettings>> crateSettingsSplit = new ArrayList<>();
+    private final List<List<CrateSettings>> crateSettingsSplit;
     @Getter
     private final List<CrateSettings> crateSettings;
     @Getter
@@ -41,7 +41,6 @@ public class DatabaseManager {
     public DatabaseManager(List<Crate> crateList) {
         connection = BLibs.getApi().getDatabaseHandler().loadSQLite(JavaPlugin.getPlugin(CrazyCrates.class), "gamba", "crates.db");
         crateSettings = crateList.stream().map(Crate::getCrateSettings).filter(Objects::nonNull).collect(Collectors.toList());
-        crateSettingsSplit.clear();
         crateSettingsSplit = Lists.partition(crateSettings, 3);
         createCrateTable();
 
@@ -57,12 +56,12 @@ public class DatabaseManager {
     }
 
     private void createCrateTable() {
-        connection.update("CREATE TABLE IF NOT EXISTS PlayerData(playerName VARCHAR(16) PRIMARY KEY, baseData VARCHAR NULL)").join();
-        connection.update("CREATE TABLE IF NOT EXISTS AllItems(id INTEGER PRIMARY KEY AUTOINCREMENT, itemStack VARCHAR NULL)").join();
-        connection.update("CREATE TABLE IF NOT EXISTS Backup(uuid VARCHAR(36) PRIMARY KEY, inventory VARCHAR NULL)").join();
+        connection.updateSQLite("CREATE TABLE IF NOT EXISTS PlayerData(playerName VARCHAR(16) PRIMARY KEY, baseData VARCHAR NULL)").join();
+        connection.updateSQLite("CREATE TABLE IF NOT EXISTS AllItems(id INTEGER PRIMARY KEY AUTOINCREMENT, itemStack VARCHAR NULL)").join();
+        connection.updateSQLite("CREATE TABLE IF NOT EXISTS Backup(uuid VARCHAR(36) PRIMARY KEY, inventory VARCHAR NULL)").join();
 
         Set<String> playernames = new HashSet<>();
-        connection.query("SELECT playerName FROM PlayerData").thenAccept(rs -> {
+        connection.querySQLite("SELECT playerName FROM PlayerData").thenAccept(rs -> {
             try {
                 while (rs.next()) {
                     playernames.add(rs.getString("playerName"));
@@ -88,8 +87,8 @@ public class DatabaseManager {
                     int bonusPity = crate.getBonusPity();
 
                     if (!columnNames.contains(name)) {
-                        connection.update("ALTER TABLE PlayerData ADD COLUMN " + name + " VARCHAR NULL").join();
-                        playernames.forEach(playerName -> connection.update("UPDATE PlayerData SET " + name + " = ? WHERE playerName = ?", serializeProfile(new PlayerProfile(playerName, rarities, bonusPity)), playerName));
+                        connection.updateSQLite("ALTER TABLE PlayerData ADD COLUMN " + name + " VARCHAR NULL").join();
+                        playernames.forEach(playerName -> connection.updateSQLite("UPDATE PlayerData SET " + name + " = ? WHERE playerName = ?", serializeProfile(new PlayerProfile(playerName, rarities, bonusPity)), playerName));
                     }
                 });
             } catch (SQLException e) {
@@ -97,7 +96,7 @@ public class DatabaseManager {
             }
         }).join();
 
-        connection.query("SELECT * FROM Backup").thenAccept(rs -> {
+        connection.querySQLite("SELECT * FROM Backup").thenAccept(rs -> {
            try {
                while (rs.next()) {
                    String uuid = rs.getString("uuid");
@@ -124,13 +123,13 @@ public class DatabaseManager {
                throw new RuntimeException(e);
            }
 
-           connection.update("DELETE FROM Backup");
+           connection.updateSQLite("DELETE FROM Backup");
         });
     }
 
     private boolean hasPlayerData(String playerName) {
         try {
-            return connection.query("SELECT playerName FROM PlayerData WHERE playerName = ?", playerName).join().next();
+            return connection.querySQLite("SELECT playerName FROM PlayerData WHERE playerName = ?", playerName).join().next();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

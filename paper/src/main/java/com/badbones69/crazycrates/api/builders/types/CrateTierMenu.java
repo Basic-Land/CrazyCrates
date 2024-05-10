@@ -5,10 +5,12 @@ import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.builders.InventoryBuilder;
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.builders.types.items.BonusPityMenu;
+import com.badbones69.crazycrates.api.builders.types.items.UltimateMenu;
 import com.badbones69.crazycrates.api.enums.PersistentKeys;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.Tier;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
+import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuStuff;
 import org.bukkit.plugin.java.JavaPlugin;
 import us.crazycrew.crazycrates.api.enums.types.CrateType;
 import us.crazycrew.crazycrates.platform.config.ConfigManager;
@@ -34,6 +36,7 @@ public class CrateTierMenu extends InventoryBuilder {
     private final @NotNull InventoryManager inventoryManager = this.plugin.getInventoryManager();
 
     private final @NotNull SettingsManager config = ConfigManager.getConfig();
+    private final boolean gacha = getCrate().getCrateType().equals(CrateType.gacha);
 
     public CrateTierMenu(List<Tier> tiers, Crate crate, Player player, int size, String title) {
         super(tiers, crate, player, size, title);
@@ -88,7 +91,8 @@ public class CrateTierMenu extends InventoryBuilder {
         }
 
         if (container.has(PersistentKeys.preview_tier_button.getNamespacedKey())) {
-            crate.playSound(player, player.getLocation(), "click-sound", "UI_BUTTON_CLICK", SoundCategory.PLAYERS);
+            if (!gacha) crate.playSound(player, player.getLocation(), "click-sound", "UI_BUTTON_CLICK", SoundCategory.PLAYERS);
+            else player.playSound(UltimateMenuStuff.CLICK);
 
             String tierName = container.get(PersistentKeys.preview_tier_button.getNamespacedKey(), PersistentDataType.STRING);
 
@@ -99,15 +103,15 @@ public class CrateTierMenu extends InventoryBuilder {
             player.openInventory(cratePreviewMenu);
         }
 
-        if (!crate.getCrateType().equals(CrateType.gacha)) return;
+        if (!gacha) return;
 
         if (event.getSlot() == holder.getCrate().getAbsolutePreviewItemPosition(8)) {
-            crate.playSound(player, player.getLocation(), "click-sound", "UI_BUTTON_CLICK", SoundCategory.PLAYERS);
+            player.playSound(UltimateMenuStuff.CLICK);
             player.openInventory(new BonusPityMenu(crate, player, 36, "&a&lBonus pity prize", holder).build().getInventory());
         }
 
         if (event.getSlot() == holder.getCrate().getAbsolutePreviewItemPosition(0)) {
-            crate.playSound(player, player.getLocation(), "click-sound", "UI_BUTTON_CLICK", SoundCategory.PLAYERS);
+            player.playSound(UltimateMenuStuff.BACK);
             plugin.getCrateManager().getDatabaseManager().getUltimateMenuManager().open(player, crate);
         }
     }

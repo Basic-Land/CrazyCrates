@@ -11,6 +11,7 @@ import com.badbones69.crazycrates.api.objects.Prize;
 import com.badbones69.crazycrates.api.objects.Tier;
 import com.badbones69.crazycrates.api.objects.gacha.enums.GachaType;
 import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
+import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuStuff;
 import com.badbones69.crazycrates.tasks.InventoryManager;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import org.bukkit.Material;
@@ -38,6 +39,7 @@ public class CratePreviewMenu extends InventoryBuilder {
     private final @NotNull InventoryManager inventoryManager = this.plugin.getInventoryManager();
 
     private final @NotNull SettingsManager config = ConfigManager.getConfig();
+    private final boolean gacha = getCrate().getCrateType() == CrateType.gacha;
 
     private final boolean isTier;
     private final Tier tier;
@@ -96,7 +98,8 @@ public class CratePreviewMenu extends InventoryBuilder {
             if (this.inventoryManager.inCratePreview(player)) {
                 if (holder.overrideMenu()) return;
 
-                crate.playSound(player, player.getLocation(), "click-sound","UI_BUTTON_CLICK", SoundCategory.PLAYERS);
+                if (!gacha) crate.playSound(player, player.getLocation(), "click-sound","UI_BUTTON_CLICK", SoundCategory.PLAYERS);
+                else player.playSound(UltimateMenuStuff.BACK);
 
                 if (crate.isPreviewTierToggle()) {
                     player.openInventory(crate.getTierPreview(player));
@@ -159,6 +162,8 @@ public class CratePreviewMenu extends InventoryBuilder {
                     break;
             }
 
+            player.playSound(UltimateMenuStuff.CLICK);
+
             player.openInventory(new CratePickPrizeMenu(player, item, crate).build().getInventory());
         }
     }
@@ -187,18 +192,20 @@ public class CratePreviewMenu extends InventoryBuilder {
             textures.setHasCustomModelData(true);
 
             for (int i : borderItems) { // Bottom Border slots
-                if (!first) {
-                    first = true;
-                    textures.setCustomModelData(1000003);
-                    inventory.setItem(i, textures.build());
-                    continue;
-                }
+                if (gacha) {
+                    if (!first) {
+                        first = true;
+                        textures.setCustomModelData(1000003);
+                        inventory.setItem(i, textures.build());
+                        continue;
+                    }
 
-                if (!second) {
-                    second = true;
-                    textures.setCustomModelData(1000004);
-                    inventory.setItem(i, textures.build());
-                    continue;
+                    if (!second) {
+                        second = true;
+                        textures.setCustomModelData(1000004);
+                        inventory.setItem(i, textures.build());
+                        continue;
+                    }
                 }
 
                 inventory.setItem(i, borderItemStack);
@@ -230,6 +237,9 @@ public class CratePreviewMenu extends InventoryBuilder {
 
     private List<ItemStack> getPageItems(int page) {
         List<ItemStack> list = !this.isTier ? getCrate().getPreviewItems(getPlayer()) : getCrate().getPreviewItems(this.tier, getPlayer());
+        System.out.println("List size: " + list.size());
+        System.out.println(list);
+        getCrate().getPrizes().forEach(prize -> System.out.println(prize.getPrizeNumber()));
         List<ItemStack> items = new ArrayList<>();
 
         if (page <= 0) page = 1;

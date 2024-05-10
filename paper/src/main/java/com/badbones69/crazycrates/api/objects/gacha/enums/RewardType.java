@@ -1,8 +1,5 @@
 package com.badbones69.crazycrates.api.objects.gacha.enums;
 
-import lombok.Getter;
-
-@Getter
 public enum RewardType {
     STANDARD,
     LIMITED,
@@ -16,5 +13,4 @@ public enum RewardType {
         }
         return null;
     }
-
 }

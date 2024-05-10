@@ -22,8 +22,9 @@ public class UltimateMenuManager {
     public UltimateMenuManager(DatabaseManager databaseManager) {
         this.databaseManager = databaseManager;
     }
+
     public void open(Player player) {
-        open(player, DatabaseManager.getCrateSettingsSplit().get(0).get(0).getCrate());
+        open(player, databaseManager.getCrateSettingsSplit().get(0).get(0).getCrate());
     }
 
     public void open(Player player, Crate crate) {

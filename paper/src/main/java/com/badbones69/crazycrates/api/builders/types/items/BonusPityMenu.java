@@ -6,6 +6,7 @@ import com.badbones69.crazycrates.api.builders.types.CrateTierMenu;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
 import com.badbones69.crazycrates.api.objects.gacha.data.PlayerProfile;
+import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuStuff;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -132,6 +133,7 @@ public class BonusPityMenu extends InventoryBuilder {
 
         // If a displayed item is clicked
         if (clickedSlot >= 19 && clickedSlot <= 25) {
+            player.playSound(UltimateMenuStuff.CLICK);
             holder.getInventory().setItem(holder.lastItemSlot, redGlassPane);
 
             // Change the red glass pane above it to a green glass pane
@@ -141,32 +143,43 @@ public class BonusPityMenu extends InventoryBuilder {
 
         // If the page back item is clicked
         if (clickedSlot == 27 && holder.currentPage > 0) {
+            player.playSound(UltimateMenuStuff.CLICK);
             holder.previousPage();
         }
 
         // If the page forward item is clicked
         if (clickedSlot == 35 && holder.currentPage < holder.totalPages - 1) {
+            player.playSound(UltimateMenuStuff.CLICK);
             holder.nextPage();
         }
 
         if (clickedSlot == 29) {
+            player.playSound(UltimateMenuStuff.BACK);
             player.openInventory(holder.crateTierMenu.getInventory());
         }
 
-        if (clickedSlot == 33 && item.getType() == Material.ARROW) {
-            PlayerProfile playerProfile = holder.databaseManager.getPlayerProfile(player.getName(), holder.getCrate().getCrateSettings(), false);
+        if (clickedSlot == 33) {
+            if (item.getType() == Material.ARROW) {
+                PlayerProfile playerProfile = holder.databaseManager.getPlayerProfile(player.getName(), holder.getCrate().getCrateSettings(), false);
 
-            if (playerProfile.isClaimedExtraReward()) {
-                player.sendMessage("You have already claimed the extra reward.");
-                return;
-            }
+                if (playerProfile.isClaimedExtraReward()) {
+                    player.sendMessage("You have already claimed the extra reward.");
+                    player.playSound(UltimateMenuStuff.ERROR);
+                    return;
+                }
 
-            if (playerProfile.reachedExtraRewardPity()) {
-                playerProfile.setClaimedExtraReward(true);
-                holder.databaseManager.savePlayerProfile(player.getName(), holder.getCrate().getCrateSettings(), playerProfile);
-                player.sendMessage("You have claimed the extra reward.");
-                player.openInventory(holder.crateTierMenu.getInventory());
-            } else {
+                if (playerProfile.reachedExtraRewardPity()) {
+                    player.playSound(UltimateMenuStuff.CLICK);
+                    playerProfile.setClaimedExtraReward(true);
+                    holder.databaseManager.savePlayerProfile(player.getName(), holder.getCrate().getCrateSettings(), playerProfile);
+                    player.sendMessage("You have claimed the extra reward.");
+                    player.openInventory(holder.crateTierMenu.getInventory());
+                } else {
+                    player.playSound(UltimateMenuStuff.ERROR);
+                    player.sendMessage("You have not reached the required pity.");
+                }
+            } else if (item.getType() == Material.BARRIER) {
+                player.playSound(UltimateMenuStuff.ERROR);
                 player.sendMessage("You have not reached the required pity.");
             }
         }
