@@ -39,7 +39,7 @@ public class Tier {
     public Tier(String tier, double chance, int slot, ItemBuilder stack) {
         this.name = tier;
         this.coloredName = stack.getName();
-        this.lore = stack.getUpdatedLore();
+        this.lore = stack.getDisplayLore();
         this.item = stack;
         this.chance = chance;
         this.maxRange = 100;

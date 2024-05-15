@@ -1,10 +1,15 @@
 package com.badbones69.crazycrates.commands;
 
+import com.badbones69.crazycrates.CrazyCrates;
+import com.badbones69.crazycrates.api.objects.Crate;
+import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
+import com.badbones69.crazycrates.api.objects.gacha.data.RaritySettings;
+import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
+import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.api.objects.other.CrateLocation;
 import com.badbones69.crazycrates.commands.relations.ArgumentRelations;
-import com.badbones69.crazycrates.commands.relations.MiscRelations;
-import com.badbones69.crazycrates.commands.subs.CrateBaseCommand;
 import com.badbones69.crazycrates.commands.subs.BaseKeyCommand;
+import com.badbones69.crazycrates.commands.subs.CrateBaseCommand;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
 import dev.triumphteam.cmd.bukkit.BukkitCommandManager;
 import dev.triumphteam.cmd.core.suggestion.SuggestionKey;
@@ -12,9 +17,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
-import com.badbones69.crazycrates.CrazyCrates;
-import java.util.ArrayList;
-import java.util.List;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class CommandManager {
 

@@ -7,7 +7,9 @@ import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.Prize;
 import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
+import com.badbones69.crazycrates.scheduler.FoliaRunnable;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
+import io.papermc.paper.threadedregions.scheduler.EntityScheduler;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -19,7 +21,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.Arrays;
 import java.util.List;
 
-public class RouletteStandard extends BukkitRunnable {
+public class RouletteStandard extends FoliaRunnable {
     private final CrateBuilder builder;
     private final Crate crate;
     private final Player player;
@@ -28,7 +30,8 @@ public class RouletteStandard extends BukkitRunnable {
     private final boolean multi;
     private final int[] slots;
 
-    public RouletteStandard(CrateBuilder builder, List<Prize> prize, boolean multi) {
+    public RouletteStandard(EntityScheduler entityScheduler, Runnable runnable, CrateBuilder builder, List<Prize> prize, boolean multi) {
+        super(entityScheduler, runnable);
         this.builder = builder;
         this.crate = builder.getCrate();
         this.player = builder.getPlayer();

@@ -246,7 +246,7 @@ public class UltimateMenu extends InventoryBuilder {
         placeholders.put("{crate}", crate.getName());
         placeholders.put("{key}", crate.getKeyName());
 
-        player.sendMessage(Messages.no_keys.getMessage(placeholders, player));
+        player.sendMessage(Messages.no_keys.getMessage(player, placeholders));
     }
 
     private void close(Player player) {

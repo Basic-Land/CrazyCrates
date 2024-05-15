@@ -10,7 +10,7 @@ public enum Rarity {
     UNCOMMON(NamedTextColor.DARK_AQUA, 1000003),
     RARE(NamedTextColor.YELLOW, 1000004),
     EPIC(NamedTextColor.DARK_PURPLE, 1000005),
-    LEGENDARY(TextColor.fromHexString("#ff8259"), 1000006),
+    LEGENDARY(TextColor.fromHexString("#ffc13d"), 1000006),
     EXTRA_REWARD(NamedTextColor.BLACK, 1000007);
 
     private final TextColor color;

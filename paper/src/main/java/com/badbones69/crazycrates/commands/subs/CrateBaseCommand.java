@@ -1,11 +1,21 @@
 package com.badbones69.crazycrates.commands.subs;
 
 import ch.jalu.configme.SettingsManager;
+import com.badbones69.crazycrates.api.builders.types.items.ItemAddMenu;
+import com.badbones69.crazycrates.api.builders.types.items.ItemPreview;
+import com.badbones69.crazycrates.api.builders.types.items.RaritiesMenu;
 import com.badbones69.crazycrates.api.objects.Crate;
+import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
+import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
+import com.badbones69.crazycrates.api.objects.gacha.data.RaritySettings;
+import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
+import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.api.objects.other.CrateLocation;
 import com.badbones69.crazycrates.api.objects.Prize;
 import com.badbones69.crazycrates.api.PrizeManager;
+import com.badbones69.crazycrates.tasks.BukkitUserManager;
 import com.badbones69.crazycrates.tasks.InventoryManager;
+import com.ryderbelserion.vital.files.FileManager;
 import dev.triumphteam.cmd.core.annotation.ArgName;
 import dev.triumphteam.cmd.core.annotation.Command;
 import dev.triumphteam.cmd.core.annotation.Default;
@@ -20,12 +30,11 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
+import us.crazycrew.crazycrates.api.enums.Files;
 import us.crazycrew.crazycrates.platform.config.ConfigManager;
 import us.crazycrew.crazycrates.platform.config.impl.ConfigKeys;
 import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
-import com.badbones69.crazycrates.api.FileManager;
-import com.badbones69.crazycrates.api.FileManager.Files;
 import com.badbones69.crazycrates.api.events.PlayerPrizeEvent;
 import com.badbones69.crazycrates.api.events.PlayerReceiveKeyEvent;
 import com.badbones69.crazycrates.api.enums.Permissions;
@@ -43,7 +52,6 @@ import us.crazycrew.crazycrates.api.enums.types.KeyType;
 import com.badbones69.crazycrates.api.builders.types.CrateAdminMenu;
 import com.badbones69.crazycrates.api.builders.types.CrateMainMenu;
 import com.badbones69.crazycrates.api.enums.Messages;
-import com.badbones69.crazycrates.api.utils.FileUtils;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
 import com.badbones69.crazycrates.api.utils.MsgUtils;
 import us.crazycrew.crazycrates.api.users.UserManager;
@@ -239,7 +247,7 @@ public class CrateBaseCommand extends BaseCommand {
         Crate crate = this.crateManager.getCrateFromName(crateName);
 
         if (crate == null || crate.getCrateSettings() == null) {
-            player.sendMessage(Messages.not_a_crate.getMessage("{crate}", crateName, player));
+            player.sendMessage(Messages.not_a_crate.getMessage(player, crateName, "{crate}"));
             return;
         }
 

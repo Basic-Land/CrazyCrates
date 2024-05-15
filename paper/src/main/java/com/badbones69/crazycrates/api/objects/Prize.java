@@ -7,6 +7,7 @@ import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -118,7 +119,7 @@ public class Prize {
         this.permissions = Collections.emptyList();
 
         ItemBuilder display = new ItemBuilder(stack.clone());
-        List<String> updatedLore = display.getUpdatedLore();
+        List<String> updatedLore = display.getDisplayLore();
         updatedLore.add(0, "");
         updatedLore.add(0, type.name());
         display.setLore(updatedLore);

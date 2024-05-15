@@ -5,6 +5,7 @@ import com.badbones69.crazycrates.api.objects.Prize;
 import com.badbones69.crazycrates.api.PrizeManager;
 import com.badbones69.crazycrates.tasks.BukkitUserManager;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
+import com.badbones69.crazycrates.tasks.crates.types.roulette.RouletteStandard;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -43,7 +44,7 @@ public class RouletteCrate extends CrateBuilder {
 
         setItem(22, getCrate().pickPrize(getPlayer()).getDisplayItem(getPlayer()));
 
-        addCrateTask(new RouletteStandard(this, null, false).runTaskTimer(this.plugin, 2, 2));
+        addCrateTask(new RouletteStandard(getPlayer().getScheduler(), null, this, null, false).runAtFixedRate(this.plugin, 2, 2));
     }
 
     @Override

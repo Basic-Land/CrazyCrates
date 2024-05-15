@@ -863,6 +863,10 @@ public class ItemBuilder {
         return newLore;
     }
 
+    public List<String> getDisplayLore() {
+        return this.displayLore;
+    }
+
     /**
      * Remove a placeholder from the lore.
      *

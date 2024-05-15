@@ -1,39 +1,35 @@
 package com.badbones69.crazycrates.api.objects;
 
+import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
+import com.badbones69.crazycrates.api.builders.types.CratePreviewMenu;
 import com.badbones69.crazycrates.api.builders.types.CrateTierMenu;
 import com.badbones69.crazycrates.api.enums.PersistentKeys;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
+import com.badbones69.crazycrates.api.utils.MiscUtils;
+import com.badbones69.crazycrates.tasks.BukkitUserManager;
+import com.badbones69.crazycrates.tasks.InventoryManager;
 import com.badbones69.crazycrates.tasks.crates.effects.SoundEffect;
+import com.badbones69.crazycrates.tasks.crates.other.AbstractCrateManager;
+import com.badbones69.crazycrates.tasks.crates.other.CosmicCrateManager;
+import com.ryderbelserion.vital.files.FileManager;
 import com.ryderbelserion.vital.util.DyeUtil;
-import org.bukkit.Color;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Particle;
-import org.bukkit.Registry;
-import org.bukkit.SoundCategory;
+import lombok.Getter;
+import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
-import us.crazycrew.crazycrates.api.enums.types.CrateType;
-import com.badbones69.crazycrates.CrazyCrates;
-import com.badbones69.crazycrates.api.FileManager;
-import com.badbones69.crazycrates.tasks.crates.other.CosmicCrateManager;
-import com.badbones69.crazycrates.tasks.crates.other.AbstractCrateManager;
 import org.jetbrains.annotations.NotNull;
 import us.crazycrew.crazycrates.api.crates.CrateHologram;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import com.badbones69.crazycrates.tasks.InventoryManager;
-import com.badbones69.crazycrates.api.builders.types.CratePreviewMenu;
-import com.badbones69.crazycrates.api.utils.MiscUtils;
-import com.badbones69.crazycrates.api.utils.MsgUtils;
+import us.crazycrew.crazycrates.api.enums.types.CrateType;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -119,13 +115,13 @@ public class Crate {
         this.prizes = prizes;
         this.crateType = crateType;
         this.preview = getPreviewItems();
-        this.previewToggle = file != null && file.getBoolean("Crate.Preview.Toggle", false);
-        this.borderToggle = file != null && file.getBoolean("Crate.Preview.Glass.Toggle", false);
+        this.previewToggle = file.getBoolean("Crate.Preview.Toggle", false);
+        this.borderToggle = file.getBoolean("Crate.Preview.Glass.Toggle", false);
 
-        this.previewTierToggle = file != null && file.getBoolean("Crate.tier-preview.toggle", false);
-        this.previewTierBorderToggle = file != null && file.getBoolean("Crate.tier-preview.glass.toggle", false);
+        this.previewTierToggle = file.getBoolean("Crate.tier-preview.toggle", false);
+        this.previewTierBorderToggle = file.getBoolean("Crate.tier-preview.glass.toggle", false);
 
-        setPreviewChestLines(file != null ? file.getInt("Crate.Preview.ChestLines", 6) : 6);
+        setPreviewChestLines(file.getInt("Crate.Preview.ChestLines", 6));
         this.previewName = previewName;
         this.newPlayerKeys = newPlayerKeys;
         this.giveNewPlayerKeys = newPlayerKeys > 0;
@@ -134,24 +130,24 @@ public class Crate {
 
         for (int amount = this.preview.size(); amount > this.maxSlots - (this.borderToggle ? 18 : this.maxSlots >= this.preview.size() ? 0 : this.maxSlots != 9 ? 9 : 0); amount -= this.maxSlots - (this.borderToggle ? 18 : this.maxSlots >= this.preview.size() ? 0 : this.maxSlots != 9 ? 9 : 0), this.maxPage++) ;
 
-        this.crateInventoryName = file != null ? file.getString("Crate.CrateName") : "";
+        this.crateInventoryName = file.getString("Crate.CrateName");
 
-        String borderName = file != null && file.contains("Crate.Preview.Glass.Name") ? file.getString("Crate.Preview.Glass.Name") : " ";
-        this.borderItem = file != null && file.contains("Crate.Preview.Glass.Item") ? new ItemBuilder().setMaterial(file.getString("Crate.Preview.Glass.Item", "GRAY_STAINED_GLASS_PANE"))
+        String borderName = file.contains("Crate.Preview.Glass.Name") ? file.getString("Crate.Preview.Glass.Name") : " ";
+        this.borderItem = file.contains("Crate.Preview.Glass.Item") ? new ItemBuilder().setMaterial(file.getString("Crate.Preview.Glass.Item", "GRAY_STAINED_GLASS_PANE"))
                 .hideItemFlags(file.getBoolean("Crate.Preview.Glass.HideItemFlags", false))
                 .setName(borderName) : new ItemBuilder().setMaterial(Material.AIR).setName(borderName);
 
-        String previewTierBorderName = file != null ? file.getString("Crate.tier-preview.glass.name", " ") : " ";
-        this.previewTierBorderItem = file != null ? new ItemBuilder().setMaterial(file.getString("Crate.tier-preview.glass.item", "GRAY_STAINED_GLASS_PANE")).hideItemFlags(file.getBoolean("Crate.tier-preview.glass.hideitemflags", false))
-                .setName(previewTierBorderName) : new ItemBuilder().setMaterial(Material.AIR).setName(previewTierBorderName);
+        String previewTierBorderName = file.getString("Crate.tier-preview.glass.name", " ");
+        this.previewTierBorderItem = new ItemBuilder().setMaterial(file.getString("Crate.tier-preview.glass.item", "GRAY_STAINED_GLASS_PANE")).hideItemFlags(file.getBoolean("Crate.tier-preview.glass.hideitemflags", false))
+                .setName(previewTierBorderName);
 
-        setTierPreviewRows(file != null ? file.getInt("Crate.tier-preview.rows", 5) : 5);
+        setTierPreviewRows(file.getInt("Crate.tier-preview.rows", 5));
         this.previewTierMaxSlots = this.previewTierCrateRows * 9;
 
         if (crateType == CrateType.quad_crate) {
-            this.particle = Registry.PARTICLE_TYPE.get(NamespacedKey.minecraft(file != null ? file.getString("Crate.particles.type", "dust") : "dust"));
+            this.particle = Registry.PARTICLE_TYPE.get(NamespacedKey.minecraft(file.getString("Crate.particles.type", "dust")));
 
-            this.color = DyeUtil.getColor(file != null ? file.getString("Crate.particles.color", "235,64,52") : "235,64,52");
+            this.color = DyeUtil.getColor(file.getString("Crate.particles.color", "235,64,52"));
         }
 
         this.hologram = hologram != null ? hologram : new CrateHologram();
@@ -592,7 +588,6 @@ public class Crate {
      * @param prize the prize the item is being added to.
      * @param item the ItemStack that is being added.
      */
-    public void addEditorItem(String prize, ItemStack item, int chance) {
     public void addEditorItem(String prize, ItemStack item, double chance) {
         addEditorItem(prize, item, chance, new ArrayList<>(), true);
     }
@@ -603,13 +598,7 @@ public class Crate {
 
         String path = "Crate.Prizes." + prize;
 
-        setItem(item, chance, path);
-        if (!this.file.contains(path)) {
-            setItem(item, chance, path, commands);
-        } else {
-            // Must be checked as getList will return null if nothing is found.
-            if (this.file.contains(path + ".Editor-Items")) this.file.getList(path + ".Editor-Items").forEach(listItem -> items.add((ItemStack) listItem));
-        }
+        setItem(item, chance, path, commands);
 
         saveFile();
         if (save) saveFile(items, path);
@@ -622,30 +611,18 @@ public class Crate {
      * @param chance the chance to win the item
      * @param path the path in the config to set the item at.
      */
-    private void setItem(ItemStack item, int chance, String path) {
-        net.minecraft.world.item.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
-
     public void setItem(ItemStack item, double chance, String path) {
         setItem(item, chance, path, new ArrayList<>());
     }
 
-    public void setItem(ItemStack item, double chance, String path, List<String> commands) {
-        if (item.hasItemMeta()) {
-            ItemMeta itemMeta = item.getItemMeta();
-
-            if (itemMeta.hasDisplayName()) this.file.set(path + ".DisplayName", itemMeta.getDisplayName());
-            if (itemMeta.hasLore()) this.file.set(path + ".Lore", itemMeta.getLore());
-
-            this.file.set(path + ".Unbreakable", itemMeta.isUnbreakable());
-        }
+    private void setItem(ItemStack item, double chance, String path, List<String> commands) {
+        net.minecraft.world.item.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
 
         String tag = nmsItem.getOrCreateTag().getAsString();
 
         if (!tag.isEmpty()) {
             this.file.set(path + ".DisplayNbt", tag);
         }
-
-        if (!enchantments.isEmpty()) this.file.set(path + ".DisplayEnchantments", enchantments);
 
         this.file.set(path + ".DisplayItem", item.getType().name());
         this.file.set(path + ".DisplayAmount", item.getAmount());
@@ -697,7 +674,7 @@ public class Crate {
             add(tier.getName());
         }});
 
-        saveFile(items, path);
+        saveFile();
     }
     
     /**

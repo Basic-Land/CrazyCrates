@@ -102,7 +102,7 @@ public class GachaCrate extends CrateBuilder {
         baseProfile.addMysticTokens(mysticTokens);
         baseProfile.addStellarShards(stellarShards);
 
-        addCrateTask(new RouletteStandard(this, items, getPlayer().isSneaking()).runTaskTimer(this.plugin, 2, 2));
+        addCrateTask(new RouletteStandard(getPlayer().getScheduler(), null, this, items, getPlayer().isSneaking()).runAtFixedRate(this.plugin, 2, 2));
 
         playerDataManager.savePlayerProfile(playerName, crateSettings, playerProfile);
     }
