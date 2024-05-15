@@ -2,10 +2,9 @@ package com.badbones69.crazycrates.api.builders.types;
 
 import ch.jalu.configme.SettingsManager;
 import com.badbones69.crazycrates.CrazyCrates;
-import com.badbones69.crazycrates.api.builders.InventoryBuilder;
-import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.enums.Messages;
 import com.badbones69.crazycrates.api.objects.Crate;
+import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.utils.ItemUtils;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
 import com.badbones69.crazycrates.tasks.BukkitUserManager;
@@ -16,16 +15,18 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
-import us.crazycrew.crazycrates.api.enums.types.KeyType;
 import us.crazycrew.crazycrates.platform.config.ConfigManager;
 import us.crazycrew.crazycrates.platform.config.impl.ConfigKeys;
-
+import com.badbones69.crazycrates.api.builders.InventoryBuilder;
+import us.crazycrew.crazycrates.api.enums.types.KeyType;
 import java.text.NumberFormat;
 import java.util.List;
 
@@ -151,82 +152,6 @@ public class CrateMainMenu extends InventoryBuilder {
         return this;
     }
 
-    @Override
-    public void onClick(InventoryClickEvent event) {
-        Inventory inventory = event.getInventory();
-
-        if (!(inventory.getHolder(false) instanceof CrateMainMenu holder)) return;
-
-        event.setCancelled(true);
-
-        Player player = holder.getPlayer();
-
-        ItemStack item = event.getCurrentItem();
-
-        if (item == null || item.getType() == Material.AIR) return;
-
-        if (!item.hasItemMeta()) return;
-
-        Crate crate = this.plugin.getCrateManager().getCrateFromName(ItemUtils.getKey(item.getItemMeta()));
-
-        if (crate == null) return;
-
-        if (event.getAction() == InventoryAction.PICKUP_HALF) { // Right-clicked the item
-            if (crate.isPreviewEnabled()) {
-                crate.playSound(player, player.getLocation(), "click-sound", "UI_BUTTON_CLICK", SoundCategory.PLAYERS);
-
-                player.closeInventory();
-
-                this.inventoryManager.addViewer(player);
-                this.inventoryManager.openNewCratePreview(player, crate);
-            } else {
-                player.sendMessage(Messages.preview_disabled.getMessage("{crate}", crate.getName(), player));
-            }
-
-            return;
-        }
-
-        if (this.crateManager.isInOpeningList(player)) {
-            player.sendMessage(Messages.already_opening_crate.getMessage("{crate}", crate.getName(), player));
-            return;
-        }
-
-        boolean hasKey = false;
-        KeyType keyType = KeyType.virtual_key;
-
-        if (this.userManager.getVirtualKeys(player.getUniqueId(), crate.getName()) >= 1) {
-            hasKey = true;
-        } else {
-            if (this.config.getProperty(ConfigKeys.virtual_accepts_physical_keys) && this.userManager.hasPhysicalKey(player.getUniqueId(), crate.getName(), false)) {
-                hasKey = true;
-                keyType = KeyType.physical_key;
-            }
-        }
-
-        if (!hasKey) {
-            if (this.config.getProperty(ConfigKeys.need_key_sound_toggle)) {
-                player.playSound(player.getLocation(), Sound.valueOf(this.config.getProperty(ConfigKeys.need_key_sound)), SoundCategory.PLAYERS, 1f, 1f);
-            }
-
-            player.sendMessage(Messages.no_virtual_key.getMessage("{crate}", crate.getName(), player));
-            return;
-        }
-
-        for (String world : this.config.getProperty(ConfigKeys.disabled_worlds)) {
-            if (world.equalsIgnoreCase(player.getWorld().getName())) {
-                player.sendMessage(Messages.world_disabled.getMessage("{world}", player.getWorld().getName(), player));
-                return;
-            }
-        }
-
-        if (MiscUtils.isInventoryFull(player)) {
-            player.sendMessage(Messages.inventory_not_empty.getMessage("{crate}", crate.getName(), player));
-            return;
-        }
-
-        this.crateManager.openCrate(player, crate, keyType, player.getLocation(), true, false);
-    }
-
     private String getCrates(String option) {
         for (Crate crate : this.plugin.getCrateManager().getUsableCrates()) {
             option = option.replaceAll("%" + crate.getName().toLowerCase() + "}", this.userManager.getVirtualKeys(getPlayer().getUniqueId(), crate.getName()) + "")
@@ -236,5 +161,98 @@ public class CrateMainMenu extends InventoryBuilder {
         }
 
         return option;
+    }
+
+    public static class CrateMenuListener implements Listener {
+
+        private final @NotNull CrazyCrates plugin = JavaPlugin.getPlugin(CrazyCrates.class);
+
+        private final @NotNull InventoryManager inventoryManager = this.plugin.getInventoryManager();
+
+        private final @NotNull SettingsManager config = ConfigManager.getConfig();
+
+        private final @NotNull CrateManager crateManager = this.plugin.getCrateManager();
+
+        private final @NotNull BukkitUserManager userManager = this.plugin.getUserManager();
+
+        @EventHandler
+        public void onInventoryClick(InventoryClickEvent event) {
+            Inventory inventory = event.getInventory();
+
+            if (!(inventory.getHolder(false) instanceof CrateMainMenu holder)) return;
+
+            event.setCancelled(true);
+
+            Player player = holder.getPlayer();
+
+            ItemStack item = event.getCurrentItem();
+
+            if (item == null || item.getType() == Material.AIR) return;
+
+            if (!item.hasItemMeta()) return;
+
+            Crate crate = this.plugin.getCrateManager().getCrateFromName(ItemUtils.getKey(item.getItemMeta()));
+
+            if (crate == null) return;
+
+            if (event.getAction() == InventoryAction.PICKUP_HALF) { // Right-clicked the item
+                if (crate.isPreviewEnabled()) {
+                    crate.playSound(player, player.getLocation(), "click-sound", "UI_BUTTON_CLICK", SoundCategory.PLAYERS);
+
+                    player.closeInventory();
+
+                    this.inventoryManager.addViewer(player);
+                    this.inventoryManager.openNewCratePreview(player, crate);
+                } else {
+                    player.sendRichMessage(Messages.preview_disabled.getMessage(player, "{crate}", crate.getName()));
+                }
+
+                return;
+            }
+
+            if (this.crateManager.isInOpeningList(player)) {
+                player.sendRichMessage(Messages.already_opening_crate.getMessage(player, "{crate}", crate.getName()));
+
+                return;
+            }
+
+            boolean hasKey = false;
+            KeyType keyType = KeyType.virtual_key;
+
+            if (this.userManager.getVirtualKeys(player.getUniqueId(), crate.getName()) >= 1) {
+                hasKey = true;
+            } else {
+                if (this.config.getProperty(ConfigKeys.virtual_accepts_physical_keys) && this.userManager.hasPhysicalKey(player.getUniqueId(), crate.getName(), false)) {
+                    hasKey = true;
+                    keyType = KeyType.physical_key;
+                }
+            }
+
+            if (!hasKey) {
+                if (this.config.getProperty(ConfigKeys.need_key_sound_toggle)) {
+                    player.playSound(player.getLocation(), Sound.valueOf(this.config.getProperty(ConfigKeys.need_key_sound)), SoundCategory.PLAYERS, 1f, 1f);
+                }
+
+                player.sendRichMessage(Messages.no_virtual_key.getMessage(player, "{crate}", crate.getName()));
+
+                return;
+            }
+
+            for (String world : this.config.getProperty(ConfigKeys.disabled_worlds)) {
+                if (world.equalsIgnoreCase(player.getWorld().getName())) {
+                    player.sendRichMessage(Messages.world_disabled.getMessage(player, "{world}", player.getWorld().getName()));
+
+                    return;
+                }
+            }
+
+            if (MiscUtils.isInventoryFull(player)) {
+                player.sendRichMessage(Messages.inventory_not_empty.getMessage(player, "{crate}", crate.getName()));
+
+                return;
+            }
+
+            this.crateManager.openCrate(player, crate, keyType, player.getLocation(), true, false);
+        }
     }
 }

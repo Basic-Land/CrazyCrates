@@ -1,7 +1,13 @@
+## Additions:
+* Added bstats back to avoid blimps in the bstats page.
+  * If you wish to disable `bstats`, You can use the provided `bStats` to turn it off entirely. There is no need to provide a per plugin toggle as if you don't want it in one plugin, you don't want it in any of them.
+
 ## Fixes:
-* Fixed an issue with casino crate where you could open a casino crate without the key.
-* Temp fix for double message when trying to open a crate with key in off hand. This means for the time being, keys cannot be used in off hand.
-  * A few changes will be made to how physical crate locations handle keys in the next 2 days in the `dev` branch with 2.1 builds so until then. This is the quicker solution..
+* Fixed an issue with an immutable error when doing /crates additem on a prize already existing.
+
+## Minor:
+* Updated outdated commands in default files.
+* Removed unused or commented out code
 
 ## Other:
 * [Feature Requests](https://github.com/Crazy-Crew/CrazyCrates/discussions/categories/features)
