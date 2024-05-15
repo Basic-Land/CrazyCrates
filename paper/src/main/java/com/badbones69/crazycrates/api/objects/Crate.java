@@ -45,7 +45,6 @@ public class Crate {
     private final String name;
     private String keyName;
     private ItemBuilder keyBuilder;
-    private ItemBuilder emptyKey;
     private int maxPage = 1;
     private int maxSlots;
     private String previewName;

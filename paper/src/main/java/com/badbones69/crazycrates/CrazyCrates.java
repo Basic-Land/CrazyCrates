@@ -47,7 +47,6 @@ public class CrazyCrates extends JavaPlugin {
     private InventoryManager inventoryManager;
     private BukkitUserManager userManager;
     private CrateManager crateManager;
-    private FileManager fileManager;
     @Getter
     private BaseProfileManager baseProfileManager;
 

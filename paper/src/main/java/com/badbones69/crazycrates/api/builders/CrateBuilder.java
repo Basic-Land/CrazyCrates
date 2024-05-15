@@ -65,7 +65,7 @@ public abstract class CrateBuilder extends FoliaRunnable {
      * @param crate crate opened by player.
      * @param player player opening crate.
      * @param size size of inventory.
-     * @param crateName crate type of crate.
+     * @param crateName crate name of crate.
      */
     public CrateBuilder(Crate crate, Player player, int size, String crateName) {
         super(player.getScheduler(), null);
@@ -298,7 +298,7 @@ public abstract class CrateBuilder extends FoliaRunnable {
      *
      * @param slot slot to set at.
      * @param material material to use.
-     * @param name type of item.
+     * @param name name of item.
      * @param lore lore of item.
      */
     public void setItem(int slot, Material material, String name, List<String> lore) {
@@ -312,7 +312,7 @@ public abstract class CrateBuilder extends FoliaRunnable {
      *
      * @param slot slot to set at.
      * @param material material to use.
-     * @param name type of item.
+     * @param name name of item.
      */
     public void setItem(int slot, Material material, String name) {
         ItemBuilder builder = new ItemBuilder(new ItemStack(material)).setName(name).setTarget(getPlayer());

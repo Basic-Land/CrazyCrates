@@ -237,9 +237,6 @@ public class CratePreviewMenu extends InventoryBuilder {
 
     private List<ItemStack> getPageItems(int page) {
         List<ItemStack> list = !this.isTier ? getCrate().getPreviewItems(getPlayer()) : getCrate().getPreviewItems(this.tier, getPlayer());
-        System.out.println("List size: " + list.size());
-        System.out.println(list);
-        getCrate().getPrizes().forEach(prize -> System.out.println(prize.getPrizeNumber()));
         List<ItemStack> items = new ArrayList<>();
 
         if (page <= 0) page = 1;

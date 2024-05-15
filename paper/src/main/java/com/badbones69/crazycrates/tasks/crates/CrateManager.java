@@ -62,7 +62,9 @@ public class CrateManager {
 
     private final @NotNull CrazyCrates plugin = JavaPlugin.getPlugin(CrazyCrates.class);
     private final @NotNull InventoryManager inventoryManager = this.plugin.getInventoryManager();
+
     private final @NotNull FileManager fileManager = this.plugin.getFileManager();
+
     private final List<CrateLocation> crateLocations = new ArrayList<>();
     private final List<CrateSchematic> crateSchematics = new ArrayList<>();
     private final List<BrokeLocation> brokeLocations = new ArrayList<>();
