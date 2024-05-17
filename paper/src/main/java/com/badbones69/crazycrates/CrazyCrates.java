@@ -1,15 +1,19 @@
 package com.badbones69.crazycrates;
 
-import com.badbones69.crazycrates.api.builders.InventoryBuilder;
-import com.badbones69.crazycrates.api.builders.InventoryListener;
-import com.badbones69.crazycrates.api.builders.types.items.UltimateMenu;
-import com.badbones69.crazycrates.api.objects.gacha.BaseProfileManager;
+import com.badbones69.crazycrates.api.builders.types.CrateAdminMenu;
+import com.badbones69.crazycrates.api.builders.types.CrateMainMenu;
+import com.badbones69.crazycrates.api.builders.types.CratePreviewMenu;
+import com.badbones69.crazycrates.api.builders.types.CrateTierMenu;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
 import com.badbones69.crazycrates.commands.CommandManager;
 import com.badbones69.crazycrates.listeners.BrokeLocationsListener;
 import com.badbones69.crazycrates.listeners.CrateControlListener;
 import com.badbones69.crazycrates.listeners.MiscListener;
-import com.badbones69.crazycrates.listeners.crates.*;
+import com.badbones69.crazycrates.listeners.crates.CosmicCrateListener;
+import com.badbones69.crazycrates.listeners.crates.CrateOpenListener;
+import com.badbones69.crazycrates.listeners.crates.MobileCrateListener;
+import com.badbones69.crazycrates.listeners.crates.QuadCrateListener;
+import com.badbones69.crazycrates.listeners.crates.WarCrateListener;
 import com.badbones69.crazycrates.listeners.other.EntityDamageListener;
 import com.badbones69.crazycrates.support.MetricsWrapper;
 import com.badbones69.crazycrates.support.holograms.HologramManager;
@@ -17,25 +21,19 @@ import com.badbones69.crazycrates.support.placeholders.PlaceholderAPISupport;
 import com.badbones69.crazycrates.tasks.BukkitUserManager;
 import com.badbones69.crazycrates.tasks.InventoryManager;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
-import com.google.common.reflect.ClassPath;
 import com.ryderbelserion.vital.VitalPaper;
 import com.ryderbelserion.vital.enums.Support;
 import com.ryderbelserion.vital.files.FileManager;
-import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import us.crazycrew.crazycrates.platform.Server;
 import us.crazycrew.crazycrates.platform.config.ConfigManager;
 import us.crazycrew.crazycrates.platform.config.impl.ConfigKeys;
-
 import java.util.List;
 import java.util.Timer;
-
 import static com.badbones69.crazycrates.api.utils.MiscUtils.registerPermissions;
 
 public class CrazyCrates extends JavaPlugin {
-
-    private Server instance;
 
     private final Timer timer;
 
@@ -50,15 +48,12 @@ public class CrazyCrates extends JavaPlugin {
     @Getter
     private BaseProfileManager baseProfileManager;
 
-    @Override
-    public void onLoad() {
-        this.instance = new Server(this);
-        this.instance.enable();
-    }
+    private Server instance;
 
     @Override
     public void onEnable() {
-        new VitalPaper(this);
+        this.instance = new Server(getDataFolder(), getLogger());
+        this.instance.apply();
 
         // Register permissions that we need.
         registerPermissions();
@@ -118,10 +113,10 @@ public class CrazyCrates extends JavaPlugin {
         ).forEach(listener -> getServer().getPluginManager().registerEvents(listener, this));
 
         if (MiscUtils.isLogging()) {
-            String prefix = ConfigManager.getConfig().getProperty(ConfigKeys.console_prefix);
+            final String prefix = ConfigManager.getConfig().getProperty(ConfigKeys.console_prefix);
 
             // Print dependency garbage
-            for (Support value : Support.values()) {
+            for (final Support value : Support.values()) {
                 if (value.isEnabled()) {
                     getServer().getConsoleSender().sendRichMessage(prefix + "<bold><gold>" + value.getName() + " <green>FOUND");
                 } else {
@@ -155,7 +150,7 @@ public class CrazyCrates extends JavaPlugin {
             this.crateManager.getDatabaseManager().getUltimateMenuManager().closeAll();
             this.crateManager.purgeRewards();
 
-            HologramManager holograms = this.crateManager.getHolograms();
+            final HologramManager holograms = this.crateManager.getHolograms();
 
             if (holograms != null && !holograms.isEmpty()) {
                 holograms.removeAllHolograms(true);
@@ -167,27 +162,23 @@ public class CrazyCrates extends JavaPlugin {
         }
     }
 
-    public @NotNull InventoryManager getInventoryManager() {
+    public @NotNull final InventoryManager getInventoryManager() {
         return this.inventoryManager;
     }
 
-    public @NotNull BukkitUserManager getUserManager() {
+    public @NotNull final BukkitUserManager getUserManager() {
         return this.userManager;
     }
 
-    public @NotNull CrateManager getCrateManager() {
+    public @NotNull final CrateManager getCrateManager() {
         return this.crateManager;
     }
 
-    public @NotNull FileManager getFileManager() {
-        return this.instance.getFileManager();
-    }
-
-    public @NotNull Server getInstance() {
+    public @NotNull final Server getInstance() {
         return this.instance;
     }
 
-    public @NotNull Timer getTimer() {
+    public @NotNull final Timer getTimer() {
         return this.timer;
     }
 }

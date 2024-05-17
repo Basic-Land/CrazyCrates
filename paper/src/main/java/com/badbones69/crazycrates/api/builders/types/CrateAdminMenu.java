@@ -1,13 +1,10 @@
 package com.badbones69.crazycrates.api.builders.types;
 
-import com.badbones69.crazycrates.api.builders.InventoryBuilder;
-import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.enums.Messages;
 import com.badbones69.crazycrates.api.enums.Permissions;
 import com.badbones69.crazycrates.api.objects.Crate;
-import com.badbones69.crazycrates.tasks.BukkitUserManager;
-import com.badbones69.crazycrates.tasks.crates.CrateManager;
 import com.ryderbelserion.vital.util.MiscUtil;
+import com.ryderbelserion.vital.util.builders.items.ItemBuilder;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -18,35 +15,35 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import com.badbones69.crazycrates.api.builders.InventoryBuilder;
 import us.crazycrew.crazycrates.api.enums.types.KeyType;
-
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class CrateAdminMenu extends InventoryBuilder {
-    private final @NotNull CrateManager crateManager = this.plugin.getCrateManager();
 
-    private final @NotNull BukkitUserManager userManager = this.plugin.getUserManager();
-
-    public CrateAdminMenu(Player player, int size, String title) {
-        super(player, size, title);
+    public CrateAdminMenu(@NotNull final Player player, @NotNull final String title, final int size) {
+        super(player, title, size);
     }
+
+    public CrateAdminMenu() {}
 
     @Override
     public InventoryBuilder build() {
-        Inventory inventory = getInventory();
+        final Inventory inventory = getInventory();
 
-        inventory.setItem(49, new ItemBuilder().setMaterial(Material.CHEST)
-                .setName("<red>What is this menu?")
-                .addLore("")
-                .addLore("<light_purple>A cheat cheat menu of all your available keys.")
-                .addLore("<bold><gray>Right click to get virtual keys.")
-                .addLore("<bold><gray>Shift right click to get 8 virtual keys.")
-                .addLore("<bold><gray>Left click to get physical keys.")
-                .addLore("<bold><gray>Shift left click to get 8 physical keys.")
-                .build());
+        inventory.setItem(49, new ItemBuilder(Material.CHEST)
+                .setDisplayName("<red>What is this menu?")
+                .addDisplayLore("")
+                .addDisplayLore("<light_purple>A cheat cheat menu of all your available keys.")
+                .addDisplayLore("<bold><gray>Right click to get virtual keys.")
+                .addDisplayLore("<bold><gray>Shift right click to get 8 virtual keys.")
+                .addDisplayLore("<bold><gray>Left click to get physical keys.")
+                .addDisplayLore("<bold><gray>Shift left click to get 8 physical keys.")
+                .getStack());
 
-        for (Crate crate : this.plugin.getCrateManager().getUsableCrates()) {
+        for (final Crate crate : this.crateManager.getUsableCrates()) {
             if (inventory.firstEmpty() >= 0) inventory.setItem(inventory.firstEmpty(), crate.getKey(1, getPlayer()));
         }
 
@@ -54,16 +51,16 @@ public class CrateAdminMenu extends InventoryBuilder {
     }
 
     @Override
-    public void onClick(InventoryClickEvent event) {
-        Inventory inventory = event.getInventory();
+    public void run(InventoryClickEvent event) {
+        final Inventory inventory = event.getInventory();
 
         if (!(inventory.getHolder(false) instanceof CrateAdminMenu holder)) return;
 
         event.setCancelled(true);
 
-        Player player = holder.getPlayer();
+        final Player player = holder.getPlayer();
 
-        InventoryView view = holder.getView();
+        final InventoryView view = holder.getView();
 
         if (event.getClickedInventory() != view.getTopInventory()) return;
 
@@ -74,17 +71,22 @@ public class CrateAdminMenu extends InventoryBuilder {
             return;
         }
 
-        ItemStack item = event.getCurrentItem();
+        final ItemStack item = event.getCurrentItem();
 
         if (item == null || item.getType() == Material.AIR) return;
 
         if (!this.crateManager.isKey(item)) return;
 
-        Crate crate = this.crateManager.getCrateFromKey(item);
+        final Crate crate = this.crateManager.getCrateFromKey(item);
 
-        ClickType clickType = event.getClick();
+        if (crate == null) return;
 
-        Map<String, String> placeholders = new HashMap<>();
+        final String crateName = crate.getName();
+        final UUID uuid = player.getUniqueId();
+
+        final ClickType clickType = event.getClick();
+
+        final Map<String, String> placeholders = new HashMap<>();
 
         placeholders.put("{amount}", String.valueOf(1));
         placeholders.put("{key}", crate.getKeyName());
@@ -95,6 +97,7 @@ public class CrateAdminMenu extends InventoryBuilder {
 
                 player.getInventory().addItem(key);
 
+                //todo() make this configurable?
                 player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1f, 1f);
 
                 placeholders.put("{keytype}", KeyType.physical_key.getFriendlyName());
@@ -107,6 +110,7 @@ public class CrateAdminMenu extends InventoryBuilder {
 
                 player.getInventory().addItem(key);
 
+                //todo() make this configurable?
                 player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1f, 1f);
 
                 placeholders.put("{keytype}", KeyType.physical_key.getFriendlyName());
@@ -116,8 +120,9 @@ public class CrateAdminMenu extends InventoryBuilder {
             }
 
             case RIGHT -> {
-                this.userManager.addKeys(1, player.getUniqueId(), crate.getName(), KeyType.virtual_key);
+                this.userManager.addKeys(uuid, crateName, KeyType.virtual_key, 1);
 
+                //todo() make this configurable?
                 player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1f, 1f);
 
                 placeholders.put("{keytype}", KeyType.physical_key.getFriendlyName());
@@ -126,8 +131,9 @@ public class CrateAdminMenu extends InventoryBuilder {
             }
 
             case SHIFT_RIGHT -> {
-                this.userManager.addKeys(8, player.getUniqueId(), crate.getName(), KeyType.virtual_key);
+                this.userManager.addKeys(uuid, crateName, KeyType.virtual_key, 8);
 
+                //todo() make this configurable?
                 player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1f, 1f);
 
                 placeholders.put("{keytype}", KeyType.physical_key.getFriendlyName());

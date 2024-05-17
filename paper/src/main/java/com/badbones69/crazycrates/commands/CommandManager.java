@@ -1,15 +1,9 @@
 package com.badbones69.crazycrates.commands;
 
-import com.badbones69.crazycrates.CrazyCrates;
-import com.badbones69.crazycrates.api.objects.Crate;
-import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
-import com.badbones69.crazycrates.api.objects.gacha.data.RaritySettings;
-import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
-import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.api.objects.other.CrateLocation;
 import com.badbones69.crazycrates.commands.relations.ArgumentRelations;
-import com.badbones69.crazycrates.commands.subs.BaseKeyCommand;
 import com.badbones69.crazycrates.commands.subs.CrateBaseCommand;
+import com.badbones69.crazycrates.commands.subs.BaseKeyCommand;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
 import dev.triumphteam.cmd.bukkit.BukkitCommandManager;
 import dev.triumphteam.cmd.core.suggestion.SuggestionKey;
@@ -17,9 +11,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.*;
-import java.util.stream.Collectors;
+import com.badbones69.crazycrates.CrazyCrates;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CommandManager {
 
@@ -35,37 +29,47 @@ public class CommandManager {
         new ArgumentRelations().build();
 
         commandManager.registerSuggestion(SuggestionKey.of("crates"), (sender, context) -> {
-            List<String> crates = new ArrayList<>(plugin.getCrateManager().getCrateNames());
+            final List<String> crates = new ArrayList<>(crateManager.getCrateNames());
 
             crates.add("Menu");
 
             return crates;
         });
 
-        commandManager.registerSuggestion(SuggestionKey.of("key-types"), (sender, context) -> List.of("virtual", "v", "physical", "p"));
+        commandManager.registerSuggestion(SuggestionKey.of("keys"), (sender, context) -> List.of("virtual", "v", "physical", "p"));
 
-        commandManager.registerSuggestion(SuggestionKey.of("online-players"), (sender, context) -> plugin.getServer().getOnlinePlayers().stream().map(Player::getName).toList());
+        commandManager.registerSuggestion(SuggestionKey.of("admin-keys"), (sender, context) -> List.of("virtual", "v", "physical", "p", "free", "f"));
+
+        commandManager.registerSuggestion(SuggestionKey.of("players"), (sender, context) -> plugin.getServer().getOnlinePlayers().stream().map(Player::getName).toList());
 
         commandManager.registerSuggestion(SuggestionKey.of("locations"), (sender, context) -> crateManager.getCrateLocations().stream().map(CrateLocation::getID).toList());
 
         commandManager.registerSuggestion(SuggestionKey.of("prizes"), (sender, context) -> {
-            List<String> numbers = new ArrayList<>();
+            final List<String> prizes = new ArrayList<>();
 
-            crateManager.getCrateFromName(context.getArgs().get(0)).getPrizes().forEach(prize -> numbers.add(prize.getPrizeNumber()));
+            Crate crate = crateManager.getCrateFromName(context.getFirst());
 
-            return numbers;
+            if (crate != null) {
+                crate.getPrizes().forEach(prize -> prizes.add(prize.getSectionName()));
+            }
+
+            return prizes;
         });
 
         commandManager.registerSuggestion(SuggestionKey.of("tiers"), (sender, context) -> {
-            List<String> numbers = new ArrayList<>();
+            final List<String> tiers = new ArrayList<>();
 
-            crateManager.getCrateFromName(context.getArgs().get(0)).getTiers().forEach(tier -> numbers.add(tier.getName()));
+            Crate crate = crateManager.getCrateFromName(context.getFirst());
 
-            return numbers;
+            if (crate != null) {
+                crate.getTiers().forEach(tier -> tiers.add(tier.getName()));
+            }
+
+            return tiers;
         });
 
         commandManager.registerSuggestion(SuggestionKey.of("numbers"), (sender, context) -> {
-            List<String> numbers = new ArrayList<>();
+            final List<String> numbers = new ArrayList<>();
 
             for (int i = 1; i <= 100; i++) numbers.add(String.valueOf(i));
 
@@ -118,10 +122,28 @@ public class CommandManager {
             return collect;
         });
 
-        commandManager.registerArgument(CrateBaseCommand.CustomPlayer.class, (sender, context) -> new CrateBaseCommand.CustomPlayer(context));
+        commandManager.registerArgument(PlayerBuilder.class, (sender, context) -> new PlayerBuilder(context));
 
-        commandManager.registerCommand(new CrateBaseCommand());
-        commandManager.registerCommand(new BaseKeyCommand());
+        List.of(
+                new CommandTeleport(),
+                new CommandAddItem(),
+                new CommandPreview(),
+                new CommandDebug(),
+                new CommandList(),
+                new CommandSet(),
+
+                new CommandGive(),
+                new CommandOpen(),
+                new CommandTake(),
+
+                new CommandReload(),
+                new CommandAdmin(),
+
+                new CommandTransfer(),
+                new CommandKey(),
+
+                new CommandHelp()
+        ).forEach(commandManager::registerCommand);
     }
 
     public static @NotNull BukkitCommandManager<CommandSender> getCommandManager() {

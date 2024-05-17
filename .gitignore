@@ -6,13 +6,13 @@ build
 buildSrc/.gradle
 buildSrc/build
 
+common/.gradle
+common/build
+
 api/.gradle
 api/build
 libs/compile/bLibs-2.0.0-WIP.jar
 libs/compile/bSpecializedCrates-1.2.1.jar
-
-publish/build
-publish/.gradle
 
 paper/.gradle
 paper/build
