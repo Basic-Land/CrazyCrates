@@ -2,7 +2,6 @@ package com.badbones69.crazycrates.api.builders.types.items;
 
 import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.builders.InventoryBuilder;
-import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.enums.Messages;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
@@ -11,6 +10,7 @@ import com.badbones69.crazycrates.api.objects.gacha.data.PlayerBaseProfile;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ComponentBuilder;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuStuff;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
+import com.ryderbelserion.vital.util.builders.items.ItemBuilder;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -83,7 +83,7 @@ public class UltimateMenu extends InventoryBuilder {
     }
 
     @Override
-    public void onClick(InventoryClickEvent e) {
+    public void run(InventoryClickEvent e) {
         if (!(e.getInventory().getHolder() instanceof UltimateMenu ultimateMenu)) return;
 
         e.setCancelled(true);
@@ -171,28 +171,28 @@ public class UltimateMenu extends InventoryBuilder {
         for (CrateSettings setting : manager.getCrateSettingsSplit().get(currentPage)) {
             if (setting == null) continue;
 
-            selectedMain.setName("&a&l" + setting.getCrateName());
-            unselectedMain.setName("&c&l" + setting.getCrateName());
+            selectedMain.setDisplayName("&a&l" + setting.getCrateName());
+            unselectedMain.setDisplayName("&c&l" + setting.getCrateName());
 
             if (crate == selectedCrate) {
                 selectedMain.setCustomModelData(1000002);
-                getInventory().setItem(slot, selectedMain.build());
+                getInventory().setItem(slot, selectedMain.getStack());
 
                 selectedMain.setCustomModelData(1000003);
-                getInventory().setItem(slot + 1, selectedMain.build());
-                getInventory().setItem(slot + 2, selectedMain.build());
+                getInventory().setItem(slot + 1, selectedMain.getStack());
+                getInventory().setItem(slot + 2, selectedMain.getStack());
 
                 int model = setting.getModelDataMainMenu();
                 mainCrate.setCustomModelData(model);
-                ItemStack item = mainCrate.build();
+                ItemStack item = mainCrate.getStack();
                 getPlayer().getInventory().setItem(29, item);
             } else {
                 unselectedMain.setCustomModelData(1000002);
-                getInventory().setItem(slot, unselectedMain.build());
+                getInventory().setItem(slot, unselectedMain.getStack());
 
                 unselectedMain.setCustomModelData(1000001);
-                getInventory().setItem(slot + 1, unselectedMain.build());
-                getInventory().setItem(slot + 2, unselectedMain.build());
+                getInventory().setItem(slot + 1, unselectedMain.getStack());
+                getInventory().setItem(slot + 2, unselectedMain.getStack());
             }
 
             crate++;
@@ -202,34 +202,34 @@ public class UltimateMenu extends InventoryBuilder {
 
     private void setTextureGlass() {
         PlayerInventory playerInventory = getPlayer().getInventory();
-        playerInventory.setItem(27, UltimateMenuStuff.MAIN_MENU.build());
-        playerInventory.setItem(28, UltimateMenuStuff.BANNER.build());
+        playerInventory.setItem(27, UltimateMenuStuff.MAIN_MENU.getStack());
+        playerInventory.setItem(28, UltimateMenuStuff.BANNER.getStack());
     }
 
     private void setItemsPlayerInv() {
         PlayerInventory playerInventory = getPlayer().getInventory();
 
-        playerInventory.setItem(0, UltimateMenuStuff.BOOK.build());
-        playerInventory.setItem(1, UltimateMenuStuff.PAPER.build());
-        playerInventory.setItem(2, UltimateMenuStuff.SHOP.build());
+        playerInventory.setItem(0, UltimateMenuStuff.BOOK.getStack());
+        playerInventory.setItem(1, UltimateMenuStuff.PAPER.getStack());
+        playerInventory.setItem(2, UltimateMenuStuff.SHOP.getStack());
 
         if (totalPageAmount > 1) {
             if (currentPage > 0) {
-                playerInventory.setItem(3, UltimateMenuStuff.BACK_ITEM.build());
-                playerInventory.setItem(30, UltimateMenuStuff.ARROW_LEFT.build());
+                playerInventory.setItem(3, UltimateMenuStuff.BACK_ITEM.getStack());
+                playerInventory.setItem(30, UltimateMenuStuff.ARROW_LEFT.getStack());
             }
 
             if (currentPage < totalPageAmount - 1) {
-                playerInventory.setItem(4, UltimateMenuStuff.FORWARD.build());
-                playerInventory.setItem(31, UltimateMenuStuff.ARROW_RIGHT.build());
+                playerInventory.setItem(4, UltimateMenuStuff.FORWARD.getStack());
+                playerInventory.setItem(31, UltimateMenuStuff.ARROW_RIGHT.getStack());
             }
         }
 
-        ItemStack x1 = UltimateMenuStuff.BUILDER_X1.build();
+        ItemStack x1 = UltimateMenuStuff.BUILDER_X1.getStack();
         playerInventory.setItem(5, x1);
         playerInventory.setItem(6, x1);
 
-        ItemStack x10 = UltimateMenuStuff.BUILDER_X10.build();
+        ItemStack x10 = UltimateMenuStuff.BUILDER_X10.getStack();
         playerInventory.setItem(7, x10);
         playerInventory.setItem(8, x10);
     }
@@ -256,14 +256,14 @@ public class UltimateMenu extends InventoryBuilder {
     public static class TestMenuListener implements Listener {
         @EventHandler
         public void Close(InventoryCloseEvent e) {
-            if (e.getInventory().getHolder() instanceof UltimateMenu testMenu && e.getReason().equals(InventoryCloseEvent.Reason.PLAYER)) {
+            if (e.getInventory().getHolder(false) instanceof UltimateMenu testMenu && e.getReason().equals(InventoryCloseEvent.Reason.PLAYER)) {
                 testMenu.plugin.getCrateManager().getDatabaseManager().getUltimateMenuManager().remove(testMenu.getPlayer());
             }
         }
 
         @EventHandler
         public void pickUpItem(EntityPickupItemEvent e) {
-            if (e.getEntity() instanceof Player player && player.getOpenInventory().getTopInventory().getHolder() instanceof UltimateMenu) {
+            if (e.getEntity() instanceof Player player && player.getOpenInventory().getTopInventory().getHolder(false) instanceof UltimateMenu) {
                 e.setCancelled(true);
             }
         }

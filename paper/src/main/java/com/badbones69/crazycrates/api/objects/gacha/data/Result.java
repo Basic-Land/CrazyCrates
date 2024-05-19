@@ -1,13 +1,15 @@
 package com.badbones69.crazycrates.api.objects.gacha.data;
 
-import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.objects.Prize;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.enums.ResultType;
+import com.ryderbelserion.vital.util.builders.items.ItemBuilder;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -43,12 +45,12 @@ public class Result implements Serializable {
     public void setItemData(Prize prize) {
         this.prize = prize;
         if (prize == null) return;
-        ItemBuilder item = prize.getDisplayItemBuilder();
-        NBT nbt = new NBT(item.getItemStack());
+        @NotNull ItemStack item = prize.getDisplayItem();
+        NBT nbt = new NBT(item);
         this.rewardName = nbt.getString("rewardName");
-        this.itemName = item.getName();
+        this.itemName = item.getItemMeta().getDisplayName();
         if (itemName.isEmpty()) {
-            itemName = itemName(item.getMaterial().name());
+            itemName = itemName(item.getType().name());
         }
     }
 

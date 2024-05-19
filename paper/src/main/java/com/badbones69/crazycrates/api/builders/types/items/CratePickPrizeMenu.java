@@ -1,12 +1,12 @@
 package com.badbones69.crazycrates.api.builders.types.items;
 
 import com.badbones69.crazycrates.api.builders.InventoryBuilder;
-import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.api.objects.gacha.data.PlayerProfile;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuStuff;
+import com.ryderbelserion.vital.util.builders.items.ItemBuilder;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -17,11 +17,11 @@ import org.bukkit.inventory.ItemStack;
 public class CratePickPrizeMenu extends InventoryBuilder {
     private final ItemStack item;
     private final DatabaseManager databaseManager = plugin.getCrateManager().getDatabaseManager();
-    private final static ItemStack back = new ItemBuilder().setMaterial(Material.RED_STAINED_GLASS_PANE).setName("Back").build();
-    private final static ItemStack save = new ItemBuilder().setMaterial(Material.GREEN_STAINED_GLASS_PANE).setName("Save").build();
+    private final static ItemStack back = new ItemBuilder(Material.RED_STAINED_GLASS_PANE).setDisplayName("Back").getStack();
+    private final static ItemStack save = new ItemBuilder(Material.GREEN_STAINED_GLASS_PANE).setDisplayName("Save").getStack();
 
     public CratePickPrizeMenu(Player player, ItemStack item, Crate crate) {
-        super(crate, player, 9, "Item Menu");
+        super(player, "Item menu", 9, crate);
         this.item = item;
     }
 
@@ -36,7 +36,7 @@ public class CratePickPrizeMenu extends InventoryBuilder {
     }
 
     @Override
-    public void onClick(InventoryClickEvent event) {
+    public void run(InventoryClickEvent event) {
         Inventory inventory = event.getInventory();
 
         if (!(inventory.getHolder(false) instanceof CratePickPrizeMenu holder)) return;

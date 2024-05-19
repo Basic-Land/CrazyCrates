@@ -24,7 +24,7 @@ public class InventoryListener implements Listener {
             InventoryHolder holder = event.getInventory().getHolder(false);
             if (menu.isInstance(holder)) {
                 InventoryBuilder inventoryBuilder = (InventoryBuilder) holder;
-                inventoryBuilder.onClick(event);
+                inventoryBuilder.run(event);
             }
         }
     }

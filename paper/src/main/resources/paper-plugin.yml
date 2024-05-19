@@ -30,3 +30,7 @@ dependencies:
      load: BEFORE
      required: false
      join-classpath: true
+    bLibs:
+      load: BEFORE
+      required: true
+      join-classpath: true

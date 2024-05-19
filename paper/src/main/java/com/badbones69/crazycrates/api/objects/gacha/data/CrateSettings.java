@@ -1,6 +1,5 @@
 package com.badbones69.crazycrates.api.objects.gacha.data;
 
-import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.Prize;
 import com.badbones69.crazycrates.api.objects.Tier;
@@ -10,14 +9,15 @@ import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ComponentBuilder;
 import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
+import com.ryderbelserion.vital.util.builders.items.ItemBuilder;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import lombok.Getter;
 import lombok.ToString;
 import org.bukkit.Material;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.simpleyaml.configuration.ConfigurationSection;
+import org.simpleyaml.configuration.file.FileConfiguration;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -169,8 +169,8 @@ public class CrateSettings {
 
     @NotNull
     private ItemBuilder getTierItem(Rarity rarity, RaritySettings raritySettings) {
-        ItemBuilder tierStack = new ItemBuilder().setMaterial(Material.CHEST);
-        tierStack.setName("&r" + rarity.name());
+        ItemBuilder tierStack = new ItemBuilder(Material.CHEST);
+        tierStack.setDisplayName("&r" + rarity.name());
 
         List<String> lore = new ArrayList<>();
 
@@ -220,23 +220,22 @@ public class CrateSettings {
 
         lore.add(sb.toString());
 
-        tierStack.setLore(lore);
-        tierStack.setHasCustomModelData(true);
+        tierStack.setDisplayLore(lore);
         tierStack.setCustomModelData(rarity.getModelData());
 
         return tierStack;
     }
 
     public List<Integer> getAllIDs() {
-        return crate.getPrizes().stream().map(prize -> prize.getPrizeNumber().split("_")[0]).map(Integer::parseInt).toList();
+        return crate.getPrizes().stream().map(prize -> prize.getSectionName().split("_")[0]).map(Integer::parseInt).toList();
     }
 
     public List<Integer> getIDsFromRarityType(Rarity rarity, RewardType type) {
-        return crate.getPrizes().stream().filter(prize -> prize.getRarity() == rarity && prize.getType() == type).map(prize -> prize.getPrizeNumber().split("_")[0]).map(Integer::parseInt).toList();
+        return crate.getPrizes().stream().filter(prize -> prize.getRarity() == rarity && prize.getType() == type).map(prize -> prize.getSectionName().split("_")[0]).map(Integer::parseInt).toList();
     }
 
     public Prize findLegendary(String chosenReward) {
-        return crate.getPrizes().stream().filter(prize -> prize.getPrizeNumber().equals(chosenReward)).findFirst().orElse(null);
+        return crate.getPrizes().stream().filter(prize -> prize.getSectionName().equals(chosenReward)).findFirst().orElse(null);
     }
 
     public Set<Prize> getBoth(Rarity rarity) {

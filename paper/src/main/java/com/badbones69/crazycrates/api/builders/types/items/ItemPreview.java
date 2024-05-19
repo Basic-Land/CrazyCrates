@@ -2,13 +2,13 @@ package com.badbones69.crazycrates.api.builders.types.items;
 
 import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.builders.InventoryBuilder;
-import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.ItemManager;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 import com.google.common.collect.Lists;
+import com.ryderbelserion.vital.util.builders.items.ItemBuilder;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -30,7 +30,7 @@ public class ItemPreview extends InventoryBuilder {
     private int page = 0;
 
     public ItemPreview(Player player, int size, String title, RewardType type) {
-        super(player, size, title);
+        super(player, title, size);
         this.type = type;
         this.editing = false;
         this.rarity = null;
@@ -43,7 +43,7 @@ public class ItemPreview extends InventoryBuilder {
     }
 
     public ItemPreview(RaritiesMenu raritiesMenu, int size, String title, RewardType type, Rarity rarity, List<Integer> ids, boolean leftClick) {
-        super(raritiesMenu.getCrate(), raritiesMenu.getPlayer(), size, title);
+        super(raritiesMenu.getPlayer(), title, size, raritiesMenu.getCrate());
         this.raritiesMenu = raritiesMenu;
         this.type = type;
         this.leftClick = leftClick;
@@ -79,15 +79,15 @@ public class ItemPreview extends InventoryBuilder {
 
         // Add page navigation items
         if (page > 0) {
-            ItemBuilder previousPage = new ItemBuilder().setMaterial(Material.ARROW).setName("&aPrevious Page");
+            ItemBuilder previousPage = new ItemBuilder(Material.ARROW).setDisplayName("&aPrevious Page");
             // Add previous page item
-            getInventory().setItem(getSize() - 9, previousPage.build());
+            getInventory().setItem(getSize() - 9, previousPage.getStack());
         }
 
         if (page < totalPages - 1) {
-            ItemBuilder nextPage = new ItemBuilder().setMaterial(Material.ARROW).setName("&aNext Page");
+            ItemBuilder nextPage = new ItemBuilder(Material.ARROW).setDisplayName("&aNext Page");
             // Add next page item
-            getInventory().setItem(getSize() - 1, nextPage.build());
+            getInventory().setItem(getSize() - 1, nextPage.getStack());
         }
 
         add();
@@ -96,7 +96,7 @@ public class ItemPreview extends InventoryBuilder {
     }
 
     @Override
-    public void onClick(InventoryClickEvent event) {
+    public void run(InventoryClickEvent event) {
         Inventory inventory = event.getInventory();
 
         if (!(inventory.getHolder(false) instanceof ItemPreview holder)) return;
@@ -154,8 +154,8 @@ public class ItemPreview extends InventoryBuilder {
 
     private void add() {
         if (editing) {
-            ItemBuilder back = new ItemBuilder().setMaterial(Material.CHEST).setName("&aGo back");
-            getInventory().setItem(getSize() - 5, back.build());
+            ItemBuilder back = new ItemBuilder(Material.CHEST).setDisplayName("&aGo back");
+            getInventory().setItem(getSize() - 5, back.getStack());
         }
     }
 }

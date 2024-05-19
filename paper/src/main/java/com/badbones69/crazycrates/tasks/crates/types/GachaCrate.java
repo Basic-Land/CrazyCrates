@@ -33,7 +33,7 @@ public class GachaCrate extends CrateBuilder {
     }
 
     @Override
-    public void open(KeyType type, boolean checkHand) {
+    public void open(@NotNull KeyType type, boolean checkHand) {
         // Crate event failed so we return.
         if (isCrateEventValid(type, checkHand)) {
             return;
@@ -58,7 +58,7 @@ public class GachaCrate extends CrateBuilder {
 
         int amount = getPlayer().isSneaking() ? 10 : 1;
 
-        boolean keyCheck = this.userManager.takeKeys(amount, getPlayer().getUniqueId(), getCrate().getName(), type, checkHand);
+        boolean keyCheck = this.userManager.takeKeys(getPlayer().getUniqueId(), getCrate().getName(), type, amount, checkHand);
 
         if (!keyCheck) {
             // Send the message about failing to take the key.
@@ -102,7 +102,7 @@ public class GachaCrate extends CrateBuilder {
         baseProfile.addMysticTokens(mysticTokens);
         baseProfile.addStellarShards(stellarShards);
 
-        addCrateTask(new RouletteStandard(getPlayer().getScheduler(), null, this, items, getPlayer().isSneaking()).runAtFixedRate(this.plugin, 2, 2));
+        addCrateTask(new RouletteStandard(getPlayer().getScheduler(), this, items, getPlayer().isSneaking()).runAtFixedRate(this.plugin, 2, 2));
 
         playerDataManager.savePlayerProfile(playerName, crateSettings, playerProfile);
     }

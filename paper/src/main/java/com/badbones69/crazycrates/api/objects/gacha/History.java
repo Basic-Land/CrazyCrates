@@ -138,7 +138,7 @@ public class History {
 
     private ItemStack getItem(Result history, Rarity rarity, CrateSettings crateSettings) {
         Set<Prize> items = crateSettings.getGachaType().equals(GachaType.OVERRIDE) ? crateSettings.getBoth(rarity) : new HashSet<>(history.isWon5050() ? crateSettings.getLimited() : crateSettings.getStandard());
-        items.removeIf(item -> item.getRarity() != rarity || !item.getPrizeNumber().equals(history.getRewardName()));
+        items.removeIf(item -> item.getRarity() != rarity || !item.getSectionName().equals(history.getRewardName()));
 
         ItemStack item = items.stream().findFirst().map(Prize::getDisplayItem).orElse(null);
         if (item == null) {

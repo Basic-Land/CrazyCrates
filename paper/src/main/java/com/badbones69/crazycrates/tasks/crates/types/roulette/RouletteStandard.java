@@ -5,12 +5,11 @@ import com.badbones69.crazycrates.api.PrizeManager;
 import com.badbones69.crazycrates.api.builders.CrateBuilder;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.Prize;
-import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
-import com.badbones69.crazycrates.scheduler.FoliaRunnable;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
+import com.ryderbelserion.vital.util.scheduler.FoliaRunnable;
 import io.papermc.paper.threadedregions.scheduler.EntityScheduler;
-import org.bukkit.SoundCategory;
+import net.kyori.adventure.sound.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
@@ -29,9 +28,12 @@ public class RouletteStandard extends FoliaRunnable {
     private final List<Prize> prize;
     private final boolean multi;
     private final int[] slots;
+    private final CrazyCrates plugin = JavaPlugin.getPlugin(CrazyCrates.class);
+    private final CrateManager crateManager = plugin.getCrateManager();
+    private final List<Integer> slowSpin = MiscUtils.slowSpin(55, 10);
 
-    public RouletteStandard(EntityScheduler entityScheduler, Runnable runnable, CrateBuilder builder, List<Prize> prize, boolean multi) {
-        super(entityScheduler, runnable);
+    public RouletteStandard(EntityScheduler entityScheduler, CrateBuilder builder, List<Prize> prize, boolean multi) {
+        super(entityScheduler, null);
         this.builder = builder;
         this.crate = builder.getCrate();
         this.player = builder.getPlayer();
@@ -41,22 +43,19 @@ public class RouletteStandard extends FoliaRunnable {
         if (multi) slots = new int[]{6, 16, 25, 34, 42, 38, 28, 19, 10, 2, 22};
         else slots = new int[]{22};
     }
+
     private int full = 0;
     private int time = 1;
     private int even = 0;
     private int open = 0;
     private int longSpin = 0;
-    private final CrazyCrates plugin = JavaPlugin.getPlugin(CrazyCrates.class);
-    private final CrateManager crateManager = plugin.getCrateManager();
-    private final List<Integer> slowSpin = MiscUtils.slowSpin(55, 10);
 
     @Override
     public void run() {
         if (this.full <= 15) {
             builder.setItem(22, pickPrize().getDisplayItem(player));
             setGlass();
-
-            builder.playSound("cycle-sound", SoundCategory.PLAYERS, "BLOCK_NOTE_BLOCK_XYLOPHONE");
+            builder.playSound("cycle-sound", Sound.Source.PLAYER, "block.note_block.xylophone");
             this.even++;
 
             if (this.even >= 4) {
@@ -87,7 +86,7 @@ public class RouletteStandard extends FoliaRunnable {
                         setGlass();
                         builder.setItem(slots[longSpin], item);
 
-                        builder.playSound("cycle-sound", SoundCategory.PLAYERS, "BLOCK_NOTE_BLOCK_XYLOPHONE");
+                        builder.playSound("cycle-sound", Sound.Source.PLAYER, "block.note_block.xylophone");
                         longSpin++;
                     }
                 }
@@ -102,11 +101,11 @@ public class RouletteStandard extends FoliaRunnable {
                     setGlass();
                     builder.setItem(22, pickPrize().getDisplayItem(player));
 
-                    builder.playSound("cycle-sound", SoundCategory.PLAYERS, "BLOCK_NOTE_BLOCK_XYLOPHONE");
+                    builder.playSound("cycle-sound", Sound.Source.PLAYER, "block.note_block.xylophone");
                 }
 
                 if (time == 22 && prize != null) {
-                    builder.setItem(22, prize.get(0).getDisplayItem());
+                    builder.setItem(22, prize.getFirst().getDisplayItem());
                 }
 
                 this.time++;
@@ -132,13 +131,13 @@ public class RouletteStandard extends FoliaRunnable {
     }
 
     private void endTask() {
-        builder.playSound("stop-sound", SoundCategory.PLAYERS, "ENTITY_PLAYER_LEVELUP");
+        builder.playSound("stop-sound", Sound.Source.PLAYER, "entity.player.levelup");
         crateManager.endCrate(player);
 
         if (prize != null) {
             for (Prize itemData : prize) {
                 for (Prize prize : crate.getPrizes()) {
-                    if (prize.getPrizeNumber().equals(itemData.getPrizeNumber())) {
+                    if (prize.getSectionName().equals(itemData.getSectionName())) {
                         PrizeManager.givePrize(player, prize, crate);
                         break;
                     }

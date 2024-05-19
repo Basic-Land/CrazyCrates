@@ -1,10 +1,16 @@
 package com.badbones69.crazycrates.api.builders.types;
 
 import ch.jalu.configme.SettingsManager;
+import com.badbones69.crazycrates.api.builders.types.items.CratePickPrizeMenu;
 import com.badbones69.crazycrates.api.enums.PersistentKeys;
 import com.badbones69.crazycrates.api.objects.Crate;
+import com.badbones69.crazycrates.api.objects.Prize;
 import com.badbones69.crazycrates.api.objects.Tier;
+import com.badbones69.crazycrates.api.objects.gacha.enums.GachaType;
+import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
+import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuStuff;
 import com.badbones69.crazycrates.tasks.InventoryManager;
+import cz.basicland.blibs.spigot.utils.item.NBT;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -28,6 +34,7 @@ public class CratePreviewMenu extends InventoryBuilder {
     private @NotNull final InventoryManager inventoryManager = this.plugin.getInventoryManager();
 
     private @NotNull final SettingsManager config = ConfigManager.getConfig();
+    private final boolean gacha = getCrate().getCrateType() == CrateType.gacha;
 
     private boolean isTier;
     private Tier tier;
@@ -131,9 +138,10 @@ public class CratePreviewMenu extends InventoryBuilder {
             if (this.inventoryManager.inCratePreview(player)) {
                 if (holder.overrideMenu()) return;
 
-                crate.playSound(player, player.getLocation(), "click-sound","ui.button.click", Sound.Source.PLAYER);
+                if (!gacha) crate.playSound(player, player.getLocation(), "click-sound", "ui.button.click", Sound.Source.PLAYER);
+                else player.playSound(UltimateMenuStuff.BACK);
 
-                if (crate.isPreviewTierToggle() && crate.getCrateType() == CrateType.casino || crate.getCrateType() == CrateType.cosmic) {
+                if (crate.isPreviewTierToggle()) {
                     player.openInventory(crate.getTierPreview(player));
 
                     return;
@@ -152,7 +160,7 @@ public class CratePreviewMenu extends InventoryBuilder {
 
         if (container.has(PersistentKeys.next_button.getNamespacedKey())) {  // Clicked the next button.
             if (this.inventoryManager.getPage(player) < crate.getMaxPage()) {
-                crate.playSound(player, player.getLocation(), "click-sound","ui.button.click", Sound.Source.PLAYER);
+                crate.playSound(player, player.getLocation(), "click-sound", "ui.button.click", Sound.Source.PLAYER);
 
                 this.inventoryManager.nextPage(player);
 
@@ -170,6 +178,33 @@ public class CratePreviewMenu extends InventoryBuilder {
 
                 this.inventoryManager.openCratePreview(player, crate);
             }
+        }
+
+        if (crate.getCrateType() == CrateType.gacha && holder.tier.getName().equals("legendary")) {
+            GachaType gachaType = crate.getCrateSettings().getGachaType();
+
+            NBT nbt = new NBT(item);
+            String rewardName = nbt.getString("rewardName");
+            if (rewardName.isEmpty()) return;
+
+            System.out.println("Item type: " + rewardName);
+            boolean standard = rewardName.split("_")[1].equals(RewardType.STANDARD.name());
+
+            switch (gachaType) {
+                case NORMAL:
+                    return;
+                case FATE_POINT:
+                    if (crate.getCrateSettings().getLegendaryStandard().stream().map(Prize::getSectionName).anyMatch(rewardName::equals) && standard) {
+                        return;
+                    }
+                    break;
+                case OVERRIDE:
+                    break;
+            }
+
+            player.playSound(UltimateMenuStuff.CLICK);
+
+            player.openInventory(new CratePickPrizeMenu(player, item, crate).build().getInventory());
         }
     }
 

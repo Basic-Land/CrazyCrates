@@ -1,13 +1,11 @@
 package com.badbones69.crazycrates.api.builders.types.items;
 
 import com.badbones69.crazycrates.api.builders.InventoryBuilder;
-import com.badbones69.crazycrates.api.builders.ItemBuilder;
+import com.ryderbelserion.vital.util.builders.items.ItemBuilder;
 import cz.basicland.blibs.spigot.utils.item.DBItemStack;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -22,17 +20,17 @@ public class ItemEdit extends InventoryBuilder {
     private final List<Integer> slots = List.of(10, 11, 15, 18, 26);
 
     public ItemEdit(ItemPreview preview, Player player, int size, String title, ItemStack itemStack) {
-        super(preview.getCrate(), player, size, title);
+        super(player, title, size, preview.getCrate());
         this.preview = preview;
         this.itemStack = itemStack;
     }
 
     @Override
     public InventoryBuilder build() {
-        ItemStack head = new ItemBuilder().setMaterial(Material.PLAYER_HEAD).setPlayerName("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjMyY2E2NjA1NmI3Mjg2M2U5OGY3ZjMyYmQ3ZDk0YzdhMGQ3OTZhZjY5MWM5YWMzYTkxMzYzMzEzNTIyODhmOSJ9fX0=").setName("Current Item").build();
-        ItemStack back = new ItemBuilder().setMaterial(Material.RED_STAINED_GLASS_PANE).setName("Back").build();
-        ItemStack save = new ItemBuilder().setMaterial(Material.GREEN_STAINED_GLASS_PANE).setName("Save").build();
-        ItemStack glass = new ItemBuilder().setMaterial(Material.LIGHT_GRAY_STAINED_GLASS_PANE).setName("&7").build();
+        ItemStack head = new ItemBuilder(Material.PLAYER_HEAD).setPlayer("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjMyY2E2NjA1NmI3Mjg2M2U5OGY3ZjMyYmQ3ZDk0YzdhMGQ3OTZhZjY5MWM5YWMzYTkxMzYzMzEzNTIyODhmOSJ9fX0=").setDisplayName("Current Item").getStack();
+        ItemStack back = new ItemBuilder(Material.RED_STAINED_GLASS_PANE).setDisplayName("Back").getStack();
+        ItemStack save = new ItemBuilder(Material.GREEN_STAINED_GLASS_PANE).setDisplayName("Save").getStack();
+        ItemStack glass = new ItemBuilder(Material.LIGHT_GRAY_STAINED_GLASS_PANE).setDisplayName("&7").getStack();
 
         getInventory().setItem(10, head);
         getInventory().setItem(11, itemStack);
@@ -47,7 +45,7 @@ public class ItemEdit extends InventoryBuilder {
     }
 
     @Override
-    public void onClick(InventoryClickEvent event) {
+    public void run(InventoryClickEvent event) {
         Inventory inventory = event.getInventory();
 
         if (!(inventory.getHolder(false) instanceof ItemEdit holder)) return;

@@ -1,8 +1,12 @@
 package com.badbones69.crazycrates.api.objects;
 
 import com.badbones69.crazycrates.api.enums.PersistentKeys;
+import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
+import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.api.utils.ItemUtils;
 import com.ryderbelserion.vital.util.builders.items.ItemBuilder;
+import cz.basicland.blibs.spigot.utils.item.NBT;
+import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -10,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.simpleyaml.configuration.ConfigurationSection;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Prize {
@@ -73,7 +78,7 @@ public class Prize {
         this.section = null;
         this.rarity = rarity;
         this.type = type;
-        this.prizeNumber = prizeNumber;
+        this.sectionName = prizeNumber;
 
         this.crateName = crateName;
 
@@ -98,12 +103,14 @@ public class Prize {
         this.permissions = Collections.emptyList();
 
         ItemBuilder display = new ItemBuilder(stack.clone());
-        List<String> updatedLore = display.getDisplayLore();
-        updatedLore.add(0, "");
-        updatedLore.add(0, type.name());
-        display.setLore(updatedLore);
+        List<String> updatedLore = display.getStack().getLore();
+        if (updatedLore == null) updatedLore = new ArrayList<>();
+        updatedLore.addFirst("");
+        updatedLore.addFirst(type.name());
+        display.setDisplayLore(updatedLore);
 
         this.displayItem = display;
+        this.prizeItem = display;
     }
 
     /**

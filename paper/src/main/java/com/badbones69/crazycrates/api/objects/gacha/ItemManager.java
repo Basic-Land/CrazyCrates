@@ -45,7 +45,7 @@ public class ItemManager {
             List<String> commands = reward.getCommands();
             boolean give = reward.isGiveDisplayItem();
 
-            crate.addEditorItem(rewardName, item, chance, commands, give);
+            //crate.addEditorItem(rewardName, item, chance, commands, give);
         });
     }
 

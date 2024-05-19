@@ -1,11 +1,11 @@
 package com.badbones69.crazycrates.api.builders.types.items;
 
 import com.badbones69.crazycrates.api.builders.InventoryBuilder;
-import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
+import com.ryderbelserion.vital.util.builders.items.ItemBuilder;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -20,7 +20,7 @@ public class ItemAddMenu extends InventoryBuilder {
     private final RewardType type;
 
     public ItemAddMenu(Player player, int size, String title, Crate crate, Rarity rarity, RewardType type) {
-        super(crate, player, size, title);
+        super(player, title, size, crate);
         this.rarity = rarity;
         this.type = type;
     }
@@ -29,17 +29,17 @@ public class ItemAddMenu extends InventoryBuilder {
     public InventoryBuilder build() {
         Inventory inventory = getInventory();
         ItemBuilder builder = new ItemBuilder(new ItemStack(Material.CHEST));
-        builder.setName("&aSave Items");
-        builder.addLore("");
-        builder.addLore("&7&lRight click to close.");
-        builder.addLore("&7&lLeft click to save.");
+        builder.setDisplayName("&aSave Items");
+        builder.addDisplayLore("");
+        builder.addDisplayLore("&7&lRight click to close.");
+        builder.addDisplayLore("&7&lLeft click to save.");
 
-        inventory.setItem(53, builder.getItemStack());
+        inventory.setItem(53, builder.getStack());
         return this;
     }
 
     @Override
-    public void onClick(InventoryClickEvent event) {
+    public void run(InventoryClickEvent event) {
         Inventory inventory = event.getInventory();
 
         int slot = event.getSlot();

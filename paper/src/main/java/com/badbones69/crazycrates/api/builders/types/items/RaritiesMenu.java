@@ -1,12 +1,12 @@
 package com.badbones69.crazycrates.api.builders.types.items;
 
 import com.badbones69.crazycrates.api.builders.InventoryBuilder;
-import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.api.objects.gacha.data.RaritySettings;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
+import com.ryderbelserion.vital.util.builders.items.ItemBuilder;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -19,7 +19,7 @@ import java.util.Map;
 public class RaritiesMenu extends InventoryBuilder {
 
     public RaritiesMenu(Crate crate, Player player, int size, String title) {
-        super(crate, player, size, title);
+        super(player, title, size, crate);
     }
 
     @Override
@@ -32,27 +32,27 @@ public class RaritiesMenu extends InventoryBuilder {
 
             ItemStack item;
             if (raritySettings.is5050Enabled()) {
-                item = new ItemBuilder().setMaterial(Material.CHEST).setName(rarity.name())
-                        .addLore("&fSTANDARD")
-                        .addLore("- &fKliknuti &c&lLEVYM &ftlacitkem pro &c&lPRIDANI &fitemu do crate")
-                        .addLore("- &fKliknuti &c&lPRAVYM &ftlacitkem pro &c&lODEBRANI &fitemu z crate")
-                        .build();
+                item = new ItemBuilder(Material.CHEST).setDisplayName(rarity.name())
+                        .addDisplayLore("&fSTANDARD")
+                        .addDisplayLore("- &fKliknuti &c&lLEVYM &ftlacitkem pro &c&lPRIDANI &fitemu do crate")
+                        .addDisplayLore("- &fKliknuti &c&lPRAVYM &ftlacitkem pro &c&lODEBRANI &fitemu z crate")
+                        .getStack();
 
                 getInventory().addItem(item);
             }
 
-            item = new ItemBuilder().setMaterial(Material.CHEST).setName(rarity.name())
-                    .addLore("&fLIMITED")
-                    .addLore("- &fKliknuti &c&lLEVYM &ftlacitkem pro &c&lPRIDANI &fitemu do crate")
-                    .addLore("- &fKliknuti &c&lPRAVYM &ftlacitkem pro &c&lODEBRANI &fitemu z crate")
-                    .build();
+            item = new ItemBuilder(Material.CHEST).setDisplayName(rarity.name())
+                    .addDisplayLore("&fLIMITED")
+                    .addDisplayLore("- &fKliknuti &c&lLEVYM &ftlacitkem pro &c&lPRIDANI &fitemu do crate")
+                    .addDisplayLore("- &fKliknuti &c&lPRAVYM &ftlacitkem pro &c&lODEBRANI &fitemu z crate")
+                    .getStack();
             getInventory().addItem(item);
         }
         return this;
     }
 
     @Override
-    public void onClick(InventoryClickEvent event) {
+    public void run(InventoryClickEvent event) {
         Inventory inventory = event.getInventory();
 
         if (!(inventory.getHolder(false) instanceof RaritiesMenu holder)) return;
@@ -62,7 +62,7 @@ public class RaritiesMenu extends InventoryBuilder {
         if (item == null || item.getType() == Material.AIR) return;
         List<String> lore = item.getItemMeta().getLore();
         if (lore == null || lore.isEmpty()) return;
-        String type = lore.get(0);
+        String type = lore.getFirst();
         type = type.substring(2);
 
         CrateSettings crateSettings = holder.getCrate().getCrateSettings();

@@ -1,19 +1,32 @@
 package com.badbones69.crazycrates.commands;
 
+import com.badbones69.crazycrates.api.objects.Crate;
+import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
+import com.badbones69.crazycrates.api.objects.gacha.data.RaritySettings;
+import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
+import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.api.objects.other.CrateLocation;
+import com.badbones69.crazycrates.commands.crates.types.admin.CommandAdmin;
+import com.badbones69.crazycrates.commands.crates.types.admin.CommandReload;
+import com.badbones69.crazycrates.commands.crates.types.admin.crates.*;
+import com.badbones69.crazycrates.commands.crates.types.admin.keys.CommandGive;
+import com.badbones69.crazycrates.commands.crates.types.admin.keys.CommandOpen;
+import com.badbones69.crazycrates.commands.crates.types.admin.keys.CommandTake;
+import com.badbones69.crazycrates.commands.crates.types.player.*;
 import com.badbones69.crazycrates.commands.relations.ArgumentRelations;
-import com.badbones69.crazycrates.commands.subs.CrateBaseCommand;
-import com.badbones69.crazycrates.commands.subs.BaseKeyCommand;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
+import com.ryderbelserion.vital.util.builders.PlayerBuilder;
 import dev.triumphteam.cmd.bukkit.BukkitCommandManager;
+import dev.triumphteam.cmd.core.argument.keyed.ArgumentKey;
 import dev.triumphteam.cmd.core.suggestion.SuggestionKey;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import com.badbones69.crazycrates.CrazyCrates;
-import java.util.ArrayList;
-import java.util.List;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class CommandManager {
 
@@ -77,36 +90,30 @@ public class CommandManager {
         });
 
         commandManager.registerSuggestion(SuggestionKey.of("types"), (sender, context) -> {
-            String subCommand = context.getSubCommand();
-            if (subCommand.equalsIgnoreCase("additems")) {
-                Crate crate = plugin.getCrateManager().getCrateFromName(context.getArgs().get(0));
-                CrateSettings crateSettings = crate.getCrateSettings();
-                if (crateSettings == null) return Collections.emptyList();
-                if (context.getArgs().get(1).equalsIgnoreCase("EXTRA_REWARD")) {
-                    return Collections.singletonList("EXTRA_REWARD");
+            Crate crate = plugin.getCrateManager().getCrateFromName(context.get(2));
+            if (crate == null) return Collections.emptyList();
+            CrateSettings crateSettings = crate.getCrateSettings();
+            if (crateSettings == null) return Collections.emptyList();
+            if (context.get(2).equalsIgnoreCase("EXTRA_REWARD")) {
+                return Collections.singletonList("EXTRA_REWARD");
+            } else {
+                RaritySettings raritySettings = crateSettings.getRarityMap().get(Rarity.valueOf(context.get(2)));
+                if (raritySettings.is5050Enabled()) {
+                    return List.of("LIMITED", "STANDARD");
                 } else {
-                    RaritySettings raritySettings = crateSettings.getRarityMap().get(Rarity.valueOf(context.getArgs().get(1)));
-                    if (raritySettings.is5050Enabled()) {
-                        return List.of("LIMITED", "STANDARD");
-                    } else {
-                        return Collections.singletonList("LIMITED");
-                    }
+                    return Collections.singletonList("LIMITED");
                 }
             }
-            return Arrays.stream(RewardType.values()).map(Enum::name).toList();
         });
 
         commandManager.registerSuggestion(SuggestionKey.of("rarities"), (sender, context) -> {
-            String subCommand = context.getSubCommand();
-            if (subCommand.equalsIgnoreCase("additems")) {
-                Crate crate = plugin.getCrateManager().getCrateFromName(context.getArgs().get(0));
-                CrateSettings crateSettings = crate.getCrateSettings();
-                if (crateSettings == null) return Collections.emptyList();
-                Set<Rarity> rarityMap = new HashSet<>(crateSettings.getRarityMap().keySet());
-                rarityMap.add(Rarity.EXTRA_REWARD);
-                return rarityMap.stream().map(Enum::name).toList();
-            }
-            return Collections.emptyList();
+            Crate crate = plugin.getCrateManager().getCrateFromName(context.getFirst());
+            if (crate == null) return Collections.emptyList();
+            CrateSettings crateSettings = crate.getCrateSettings();
+            if (crateSettings == null) return Collections.emptyList();
+            Set<Rarity> rarityMap = new HashSet<>(crateSettings.getRarityMap().keySet());
+            rarityMap.add(Rarity.EXTRA_REWARD);
+            return rarityMap.stream().map(Enum::name).toList();
         });
 
         commandManager.registerSuggestion(SuggestionKey.of("both"), (sender, context) -> {
@@ -131,6 +138,8 @@ public class CommandManager {
                 new CommandDebug(),
                 new CommandList(),
                 new CommandSet(),
+                new CommandAddItemCustom(),
+                new CommandEditItems(),
 
                 new CommandGive(),
                 new CommandOpen(),
@@ -142,7 +151,10 @@ public class CommandManager {
                 new CommandTransfer(),
                 new CommandKey(),
 
-                new CommandHelp()
+                new CommandHelp(),
+                new CommandHistory(),
+                new CommandPity(),
+                new CommandTest()
         ).forEach(commandManager::registerCommand);
     }
 

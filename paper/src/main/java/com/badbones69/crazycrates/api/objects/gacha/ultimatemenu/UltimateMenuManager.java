@@ -24,7 +24,7 @@ public class UltimateMenuManager {
     }
 
     public void open(Player player) {
-        open(player, databaseManager.getCrateSettingsSplit().get(0).get(0).getCrate());
+        open(player, databaseManager.getCrateSettingsSplit().getFirst().getFirst().getCrate());
     }
 
     public void open(Player player, Crate crate) {
