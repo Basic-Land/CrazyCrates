@@ -28,6 +28,7 @@ public class BaseProfileManager implements Listener {
         Player player = event.getPlayer();
         PlayerBaseProfile profile = databaseManager.getPlayerBaseProfile(player.getName());
         profilesCache.put(player.getName(), profile);
+        databaseManager.restoreInv(player.getUniqueId());
     }
 
     @EventHandler

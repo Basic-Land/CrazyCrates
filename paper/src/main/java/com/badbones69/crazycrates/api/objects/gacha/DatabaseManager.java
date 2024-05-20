@@ -96,34 +96,40 @@ public class DatabaseManager {
             }
         }).join();
 
-        connection.querySQLite("SELECT * FROM Backup").thenAccept(rs -> {
-           try {
-               while (rs.next()) {
-                   String uuid = rs.getString("uuid");
-                   String inventory = rs.getString("inventory");
+        restoreInv(null);
+    }
 
-                   List<String> items = Arrays.asList(inventory.split("\n"));
+    public void restoreInv(UUID target) {
+        String targetStr = target == null ? "" : " WHERE uuid = '" + target + "'";
 
-                   ItemStack[] contents = DBItemStack.getItemStackList(items).toArray(new ItemStack[0]);
+        connection.querySQLite("SELECT * FROM Backup" + targetStr).thenAccept(rs -> {
+            try {
+                while (rs.next()) {
+                    String uuid = rs.getString("uuid");
+                    String inventory = rs.getString("inventory");
 
-                   OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
+                    List<String> items = Arrays.asList(inventory.split("\n"));
 
-                   Bukkit.getScheduler().runTaskLater(CrazyCrates.getPlugin(CrazyCrates.class), () -> {
-                       CMIUser user = CMI.getInstance().getPlayerManager().getUser(offlinePlayer);
-                       Player player = user.getPlayer();
+                    ItemStack[] contents = DBItemStack.getItemStackList(items).toArray(new ItemStack[0]);
 
-                       player.getInventory().setContents(contents);
-                       player.saveData();
-                       user.unloadData();
-                   }, 100L);
-               }
-           } catch (SQLException e) {
-               e.printStackTrace();
-           } catch (IOException | ClassNotFoundException e) {
-               throw new RuntimeException(e);
-           }
+                    OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
 
-           connection.updateSQLite("DELETE FROM Backup");
+                    Bukkit.getScheduler().runTaskLater(CrazyCrates.getPlugin(CrazyCrates.class), () -> {
+                        CMIUser user = CMI.getInstance().getPlayerManager().getUser(offlinePlayer);
+                        Player player = user.getPlayer();
+
+                        player.getInventory().setContents(contents);
+                        player.saveData();
+                        user.unloadData();
+                    }, 100L);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+
+            connection.updateSQLite("DELETE FROM Backup" + targetStr);
         });
     }
 

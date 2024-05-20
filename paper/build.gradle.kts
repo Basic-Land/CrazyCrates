@@ -27,7 +27,7 @@ dependencies {
 
     compileOnly(libs.oraxen.api)
 
-    compileOnly("cz.basicland:bLibs:2.0.0-WIP-b22")
+    compileOnly("cz.basicland:bLibs:2.0.0-WIP-b24")
 
     compileOnly ("org.projectlombok:lombok:1.18.32")
     annotationProcessor ("org.projectlombok:lombok:1.18.32")

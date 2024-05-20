@@ -9,7 +9,7 @@ import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ComponentBuilder;
 import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
-import com.ryderbelserion.vital.util.builders.items.ItemBuilder;
+import com.badbones69.crazycrates.api.objects.gacha.util.TierInfo;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import lombok.Getter;
 import lombok.ToString;
@@ -96,11 +96,11 @@ public class CrateSettings {
             String rarityName = rarity.name().toLowerCase();
             RaritySettings raritySettings = entry.getValue();
 
-            ItemBuilder tierStack = getTierItem(rarity, raritySettings);
+            @NotNull TierInfo tierInfo = getTierInfo(rarity, raritySettings);
 
             Tier tier;
             if (emptyTiers) {
-                tier = new Tier(rarityName, raritySettings.baseChance(), slot, tierStack);
+                tier = new Tier(rarityName, raritySettings.baseChance(), slot, tierInfo);
                 tiers.add(tier);
             } else {
                 tier = tiers.stream().filter(t -> t.getName().equals(rarityName)).findFirst().orElseThrow();
@@ -168,45 +168,42 @@ public class CrateSettings {
     }
 
     @NotNull
-    private ItemBuilder getTierItem(Rarity rarity, RaritySettings raritySettings) {
-        ItemBuilder tierStack = new ItemBuilder(Material.CHEST);
-        tierStack.setDisplayName("&r" + rarity.name());
-
+    private TierInfo getTierInfo(Rarity rarity, RaritySettings raritySettings) {
         List<String> lore = new ArrayList<>();
 
         lore.add("");
-        lore.add("&8│ &fPity: &e" + raritySettings.pity());
-        lore.add("&8│ &fZákladní šance: &e" + raritySettings.baseChance() + "&f%");
+        lore.add("<dark_gray>│ <white>Pity: <yellow>" + raritySettings.pity());
+        lore.add("<dark_gray>│ <white>Základní šance: <yellow>" + raritySettings.baseChance() + "<white>%");
 
-        lore.add("&8│ &f50/50 je: &e" + (raritySettings.is5050Enabled() ? "Zapnutá" : "Vypnutá"));
+        lore.add("<dark_gray>│ <white>50/50 je: <yellow>" + (raritySettings.is5050Enabled() ? "Zapnutá" : "Vypnutá"));
         if (raritySettings.is5050Enabled()) {
-            lore.add("&8│ &f50/50 Šance: &e" + raritySettings.get5050Chance() + "&f% na výhru");
+            lore.add("<dark_gray>│ <white>50/50 Šance: <yellow>" + raritySettings.get5050Chance() + "<white>% na výhru");
         }
 
         if (raritySettings.softPityFrom() != 1) {
-            lore.add("&8│ &fSoft pity začíná od: &e" + raritySettings.softPityFrom() + " &fotevření");
+            lore.add("<dark_gray>│ <white>Soft pity začíná od: <yellow>" + raritySettings.softPityFrom() + " <white>otevření");
             if (raritySettings.staticFormula()) {
-                lore.add("&8│ &fa od &e" + raritySettings.softPityFrom() + "&f a výše je &e" + raritySettings.softPityFormula() + "&f%");
+                lore.add("<dark_gray>│ <white>a od <yellow>" + raritySettings.softPityFrom() + "<white> a výše je <yellow>" + raritySettings.softPityFormula() + "<white>%");
             } else {
-                lore.add("&8│ &fSoft pity od &e" + raritySettings.softPityFrom() + "&f se zvyšuje o &e" + raritySettings.softPityFormula() + "&f% pokaždém otevření");
+                lore.add("<dark_gray>│ <white>Soft pity od <yellow>" + raritySettings.softPityFrom() + "<white> se zvyšuje o <yellow>" + raritySettings.softPityFormula() + "<white>% pokaždém otevření");
             }
             if (raritySettings.softPityLimit() != -1) {
-                lore.add("&8│ &fMaximální šance pro soft pity je &e" + raritySettings.softPityLimit() + "&f%");
+                lore.add("<dark_gray>│ <white>Maximální šance pro soft pity je <yellow>" + raritySettings.softPityLimit() + "<white>%");
             }
         }
 
         int maxSize = 0;
-        int size = 0;
+        int size;
         for (String s : lore) {
-            if (s.length() > size) {
-                size = s.length();
-                maxSize = ComponentBuilder.getSize(s);
+            size = ComponentBuilder.getSize(s);
+            if (size > maxSize) {
+                maxSize = size;
             }
         }
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append("&8┌");
+        sb.append("<dark_gray>┌");
 
         int i = 6;
         while (i < maxSize) {
@@ -216,14 +213,11 @@ public class CrateSettings {
 
         lore.add(1, sb.toString());
 
-        sb.setCharAt(2, '└');
+        sb.setCharAt(11, '└');
 
         lore.add(sb.toString());
 
-        tierStack.setDisplayLore(lore);
-        tierStack.setCustomModelData(rarity.getModelData());
-
-        return tierStack;
+        return new TierInfo(Material.CHEST, rarity.name(), lore, rarity.getModelData());
     }
 
     public List<Integer> getAllIDs() {

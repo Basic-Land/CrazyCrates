@@ -11,22 +11,26 @@ import com.badbones69.crazycrates.api.objects.gacha.enums.ResultType;
 import com.badbones69.crazycrates.api.objects.gacha.util.HSLColor;
 import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 import cz.basicland.blibs.spigot.utils.item.NBT;
+import io.papermc.paper.adventure.PaperAdventure;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.api.BinaryTagHolder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.DataComponentValue;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.NamespacedKey;
+import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class History {
@@ -155,11 +159,9 @@ public class History {
     }
 
     private HoverEvent<HoverEvent.ShowItem> showItem(ItemStack itemStack) {
-        NBT nbt = new NBT(itemStack);
         NamespacedKey key = itemStack.getType().getKey();
         int itemCount = itemStack.getAmount();
-        BinaryTagHolder tag = BinaryTagHolder.binaryTagHolder(nbt.getNBTToString());
-        return HoverEvent.showItem(HoverEvent.ShowItem.showItem(key, itemCount, tag));
+        return HoverEvent.showItem(HoverEvent.ShowItem.showItem(key, itemCount, PaperAdventure.asAdventure(CraftItemStack.asNMSCopy(itemStack).getComponentsPatch())));
     }
 
     private Component getHoverText(Result history, CrateSettings crateSettings) {

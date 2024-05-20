@@ -30,7 +30,7 @@ public class ItemEdit extends InventoryBuilder {
         ItemStack head = new ItemBuilder(Material.PLAYER_HEAD).setPlayer("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjMyY2E2NjA1NmI3Mjg2M2U5OGY3ZjMyYmQ3ZDk0YzdhMGQ3OTZhZjY5MWM5YWMzYTkxMzYzMzEzNTIyODhmOSJ9fX0=").setDisplayName("Current Item").getStack();
         ItemStack back = new ItemBuilder(Material.RED_STAINED_GLASS_PANE).setDisplayName("Back").getStack();
         ItemStack save = new ItemBuilder(Material.GREEN_STAINED_GLASS_PANE).setDisplayName("Save").getStack();
-        ItemStack glass = new ItemBuilder(Material.LIGHT_GRAY_STAINED_GLASS_PANE).setDisplayName("&7").getStack();
+        ItemStack glass = new ItemBuilder(Material.LIGHT_GRAY_STAINED_GLASS_PANE).setDisplayName("<gray>").getStack();
 
         getInventory().setItem(10, head);
         getInventory().setItem(11, itemStack);

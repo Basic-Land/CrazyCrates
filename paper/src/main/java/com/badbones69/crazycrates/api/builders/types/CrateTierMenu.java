@@ -85,11 +85,11 @@ public class CrateTierMenu extends InventoryBuilder {
             return;
         }
 
-        if (container.has(PersistentKeys.preview_tier_button.getNamespacedKey())) {
+        if (container.has(PersistentKeys.crate_tier.getNamespacedKey())) {
             if (!gacha) crate.playSound(player, player.getLocation(), "click-sound", "ui.button.click", Sound.Source.PLAYER);
             else player.playSound(UltimateMenuStuff.CLICK);
 
-            final String tierName = container.get(PersistentKeys.preview_tier_button.getNamespacedKey(), PersistentDataType.STRING);
+            final String tierName = container.get(PersistentKeys.crate_tier.getNamespacedKey(), PersistentDataType.STRING);
 
             final Tier tier = crate.getTier(tierName);
 
@@ -102,7 +102,7 @@ public class CrateTierMenu extends InventoryBuilder {
 
         if (event.getSlot() == holder.getCrate().getAbsolutePreviewItemPosition(8)) {
             player.playSound(UltimateMenuStuff.CLICK);
-            player.openInventory(new BonusPityMenu(crate, player, 36, "&a&lBonus pity prize", holder).build().getInventory());
+            player.openInventory(new BonusPityMenu(crate, player, 36, "<green><b>Bonus pity prize", holder).build().getInventory());
         }
 
         if (event.getSlot() == holder.getCrate().getAbsolutePreviewItemPosition(0)) {
@@ -151,14 +151,14 @@ public class CrateTierMenu extends InventoryBuilder {
     private void setItemsGacha() {
         CrateSettings settings = getCrate().getCrateSettings();
 
-        ItemBuilder item = new ItemBuilder(Material.PLAYER_HEAD).setDisplayName("&a&lBonus pity prize").addDisplayLore("&7Click to preview/pick a prize");
+        ItemBuilder item = new ItemBuilder(Material.PLAYER_HEAD).setDisplayName("<green><b>Bonus pity prize").addDisplayLore("<gray>Click to preview/pick a prize");
         item.setCustomModelData(settings.getModelDataPreviewName());
         getInventory().setItem(getCrate().getAbsolutePreviewItemPosition(8), item.getStack());
 
         ItemBuilder paper = new ItemBuilder(Material.PAPER).setCustomModelData(11).setDisplayName("Info");
         getInventory().setItem(getCrate().getAbsolutePreviewItemPosition(4), paper.getStack());
 
-        ItemBuilder mainMenu = new ItemBuilder(Material.CHEST).setDisplayName("&a&lMain menu");
+        ItemBuilder mainMenu = new ItemBuilder(Material.CHEST).setDisplayName("<green><b>Main menu");
         mainMenu.setCustomModelData(1000001);
         getInventory().setItem(getCrate().getAbsolutePreviewItemPosition(0), mainMenu.getStack());
     }

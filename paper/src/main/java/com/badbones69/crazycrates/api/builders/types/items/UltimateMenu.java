@@ -154,7 +154,7 @@ public class UltimateMenu extends InventoryBuilder {
     private void open(UltimateMenu ultimateMenu, Player player, Crate crate, CrateManager crateManager, int size) {
         if (ultimateMenu.hasKeys(player, crate, size)) {
             player.playSound(UltimateMenuStuff.CRATE);
-            crateManager.openCrate(player, crate, KeyType.virtual_key, null, false, false);
+            crateManager.openCrate(player, crate, KeyType.virtual_key, player.getLocation(), false, false);
         } else {
             message(crate, player);
         }
@@ -171,8 +171,8 @@ public class UltimateMenu extends InventoryBuilder {
         for (CrateSettings setting : manager.getCrateSettingsSplit().get(currentPage)) {
             if (setting == null) continue;
 
-            selectedMain.setDisplayName("&a&l" + setting.getCrateName());
-            unselectedMain.setDisplayName("&c&l" + setting.getCrateName());
+            selectedMain.setDisplayName("<green><b>" + setting.getCrateName());
+            unselectedMain.setDisplayName("<red><b>" + setting.getCrateName());
 
             if (crate == selectedCrate) {
                 selectedMain.setCustomModelData(1000002);

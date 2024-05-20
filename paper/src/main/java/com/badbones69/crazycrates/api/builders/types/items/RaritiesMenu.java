@@ -33,18 +33,18 @@ public class RaritiesMenu extends InventoryBuilder {
             ItemStack item;
             if (raritySettings.is5050Enabled()) {
                 item = new ItemBuilder(Material.CHEST).setDisplayName(rarity.name())
-                        .addDisplayLore("&fSTANDARD")
-                        .addDisplayLore("- &fKliknuti &c&lLEVYM &ftlacitkem pro &c&lPRIDANI &fitemu do crate")
-                        .addDisplayLore("- &fKliknuti &c&lPRAVYM &ftlacitkem pro &c&lODEBRANI &fitemu z crate")
+                        .addDisplayLore("<white>STANDARD")
+                        .addDisplayLore("- <white>Kliknuti <red><b>LEVYM</red> tlacitkem pro <red><b>PRIDANI</red> itemu do crate</white>")
+                        .addDisplayLore("- <white>Kliknuti <red><b>PRAVYM</red> tlacitkem pro <red><b>ODEBRANI</red> itemu z crate</white>")
                         .getStack();
 
                 getInventory().addItem(item);
             }
 
             item = new ItemBuilder(Material.CHEST).setDisplayName(rarity.name())
-                    .addDisplayLore("&fLIMITED")
-                    .addDisplayLore("- &fKliknuti &c&lLEVYM &ftlacitkem pro &c&lPRIDANI &fitemu do crate")
-                    .addDisplayLore("- &fKliknuti &c&lPRAVYM &ftlacitkem pro &c&lODEBRANI &fitemu z crate")
+                    .addDisplayLore("<white>LIMITED")
+                    .addDisplayLore("- <white>Kliknuti <red><b>LEVYM</red> tlacitkem pro <red><b>PRIDANI</red> itemu do crate</white>")
+                    .addDisplayLore("- <white>Kliknuti <red><b>PRAVYM</red> tlacitkem pro <red><b>ODEBRANI</red> itemu z crate</white>")
                     .getStack();
             getInventory().addItem(item);
         }

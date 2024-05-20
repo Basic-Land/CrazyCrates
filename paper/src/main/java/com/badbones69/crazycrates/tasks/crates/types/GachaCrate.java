@@ -49,28 +49,27 @@ public class GachaCrate extends CrateBuilder {
         GachaType gachaType = crateSettings.getGachaType();
 
         if (!gachaType.equals(GachaType.NORMAL) && (chosenReward == null || chosenReward.isEmpty())) {
-            getPlayer().sendMessage("§cYou have not chosen a reward yet. Please choose a reward using menu");
+            getPlayer().sendMessage("<red>You have not chosen a reward yet. Please choose a reward using menu");
             crateManager.removePlayerFromOpeningList(getPlayer());
             return;
         }
 
         System.out.println("Chosen reward: " + chosenReward);
 
-        int amount = getPlayer().isSneaking() ? 10 : 1;
+        boolean sneak = getPlayer().isSneaking();
+        int amount = sneak ? 10 : 1;
 
         boolean keyCheck = this.userManager.takeKeys(getPlayer().getUniqueId(), getCrate().getName(), type, amount, checkHand);
 
         if (!keyCheck) {
             // Send the message about failing to take the key.
             MiscUtils.failedToTakeKey(getPlayer(), getCrate().getName());
-
             // Remove from opening list.
             this.crateManager.removePlayerFromOpeningList(getPlayer());
-
             return;
         }
 
-        List<Prize> items = new ArrayList<>();
+        List<Result> items = new ArrayList<>();
 
         Prize prize = crateSettings.findLegendary(chosenReward);
 
@@ -96,13 +95,13 @@ public class GachaCrate extends CrateBuilder {
             stellarShards += rarityMap.get(rarity).stellarShards();
             mysticTokens += rarityMap.get(rarity).mysticTokens();
 
-            items.add(result.getPrize());
+            items.add(result);
         }
 
         baseProfile.addMysticTokens(mysticTokens);
         baseProfile.addStellarShards(stellarShards);
 
-        addCrateTask(new RouletteStandard(getPlayer().getScheduler(), this, items, getPlayer().isSneaking()).runAtFixedRate(this.plugin, 2, 2));
+        addCrateTask(new RouletteStandard(getPlayer().getScheduler(), this, items, sneak).runAtFixedRate(this.plugin, 1, 2));
 
         playerDataManager.savePlayerProfile(playerName, crateSettings, playerProfile);
     }

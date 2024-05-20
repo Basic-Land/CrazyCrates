@@ -18,7 +18,7 @@ public class CommandEditItems extends BaseCommand {
         RewardType rewardType = RewardType.fromString(type);
         Crate crate = this.crateManager.getCrateFromName(type);
         if (crate == null) {
-            player.openInventory(new ItemPreview(player, 54, "&c&lEdit Items", rewardType).build().getInventory());
+            player.openInventory(new ItemPreview(player, 54, "<red><b>Edit Items", rewardType).build().getInventory());
             return;
         }
 

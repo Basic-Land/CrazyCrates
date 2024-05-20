@@ -29,10 +29,10 @@ public class ItemAddMenu extends InventoryBuilder {
     public InventoryBuilder build() {
         Inventory inventory = getInventory();
         ItemBuilder builder = new ItemBuilder(new ItemStack(Material.CHEST));
-        builder.setDisplayName("&aSave Items");
+        builder.setDisplayName("<green>Save Items");
         builder.addDisplayLore("");
-        builder.addDisplayLore("&7&lRight click to close.");
-        builder.addDisplayLore("&7&lLeft click to save.");
+        builder.addDisplayLore("<gray><b>Right click to close.");
+        builder.addDisplayLore("<gray><b>Left click to save.");
 
         inventory.setItem(53, builder.getStack());
         return this;

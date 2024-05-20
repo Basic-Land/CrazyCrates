@@ -193,6 +193,6 @@ public class BonusPityMenu extends InventoryBuilder {
     }
 
     private static ItemStack glass(Material item) {
-        return new ItemBuilder(item).setCustomModelData(1000001).setDisplayName("&7").getStack();
+        return new ItemBuilder(item).setCustomModelData(1000001).setDisplayName("<gray>").getStack();
     }
 }

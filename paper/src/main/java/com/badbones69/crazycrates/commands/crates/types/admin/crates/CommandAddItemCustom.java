@@ -37,7 +37,7 @@ public class CommandAddItemCustom extends BaseCommand {
             return;
         }
 
-        ItemAddMenu inventory = new ItemAddMenu(player, 54, "&c&lAdd Items", crate, crateRarity, RewardType.fromString(type));
+        ItemAddMenu inventory = new ItemAddMenu(player, 54, "<red><b>Add Items</red>", crate, crateRarity, RewardType.fromString(type));
         player.openInventory(inventory.build().getInventory());
     }
 }

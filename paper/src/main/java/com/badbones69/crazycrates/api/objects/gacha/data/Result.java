@@ -56,7 +56,7 @@ public class Result implements Serializable {
 
     private String itemName(String type) {
         StringBuilder out = new StringBuilder();
-        out.append("&7");
+        out.append("<gray>");
         for (String s : type.toLowerCase().split("_")) {
             out.append(s.substring(0, 1).toUpperCase()).append(s.substring(1)).append(" ");
         }

@@ -90,14 +90,19 @@ public final class ComponentBuilder {
     public static int getSize(String name) {
         int size = 0;
         boolean color = false;
+
         for (char c : name.toCharArray()) {
-            if (c == '&') {
+            if (c == '<') {
                 color = true;
                 continue;
             }
 
-            if (color) {
+            if (c == '>') {
                 color = false;
+                continue;
+            }
+
+            if (color) {
                 continue;
             }
 
@@ -114,7 +119,7 @@ public final class ComponentBuilder {
                      'ý','á','í','é','Ě','Š','Č',
                      'Ř','Ž','Ý','Á','Í','É' -> 6;
                 case 't', 'I', ' ' -> 4;
-                case 'i', ':' -> 2;
+                case 'i', ':', '.' -> 2;
                 case 'f','k' -> 5;
                 case 'l', '│' -> 3;
                 default -> 0;

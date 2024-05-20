@@ -90,14 +90,14 @@ public class CommandManager {
         });
 
         commandManager.registerSuggestion(SuggestionKey.of("types"), (sender, context) -> {
-            Crate crate = plugin.getCrateManager().getCrateFromName(context.get(2));
+            Crate crate = plugin.getCrateManager().getCrateFromName(context.getFirst());
             if (crate == null) return Collections.emptyList();
             CrateSettings crateSettings = crate.getCrateSettings();
             if (crateSettings == null) return Collections.emptyList();
-            if (context.get(2).equalsIgnoreCase("EXTRA_REWARD")) {
+            if (context.get(1).equalsIgnoreCase("EXTRA_REWARD")) {
                 return Collections.singletonList("EXTRA_REWARD");
             } else {
-                RaritySettings raritySettings = crateSettings.getRarityMap().get(Rarity.valueOf(context.get(2)));
+                RaritySettings raritySettings = crateSettings.getRarityMap().get(Rarity.valueOf(context.get(1)));
                 if (raritySettings.is5050Enabled()) {
                     return List.of("LIMITED", "STANDARD");
                 } else {
