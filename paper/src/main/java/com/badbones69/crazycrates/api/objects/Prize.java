@@ -1,9 +1,8 @@
 package com.badbones69.crazycrates.api.objects;
 
 import com.badbones69.crazycrates.api.enums.PersistentKeys;
-import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
-import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.api.utils.ItemUtils;
+import com.ryderbelserion.vital.paper.builders.items.ItemBuilder;
 import com.ryderbelserion.vital.util.builders.items.ItemBuilder;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import lombok.Getter;
@@ -187,7 +186,7 @@ public class Prize {
     public @NotNull final List<String> getCommands() {
         return this.commands;
     }
-
+    
     /**
      * @return the ItemBuilders for all the custom items made from the Items: option.
      */

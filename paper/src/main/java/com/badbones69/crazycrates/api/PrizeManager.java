@@ -1,8 +1,8 @@
 package com.badbones69.crazycrates.api;
 
 import com.badbones69.crazycrates.api.objects.Tier;
-import com.ryderbelserion.vital.enums.Support;
-import com.ryderbelserion.vital.util.builders.items.ItemBuilder;
+import com.ryderbelserion.vital.paper.builders.items.ItemBuilder;
+import com.ryderbelserion.vital.paper.enums.Support;
 import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.events.PlayerPrizeEvent;
 import com.badbones69.crazycrates.api.objects.Crate;
@@ -170,11 +170,13 @@ public class PrizeManager {
 
     public static @Nullable Tier getTier(@NotNull final Crate crate) {
         if (!crate.getTiers().isEmpty()) {
+            Random random = MiscUtils.useOtherRandom() ? ThreadLocalRandom.current() : new Random();
+
             for (int stopLoop = 0; stopLoop <= 100; stopLoop++) {
                 for (final Tier tier : crate.getTiers()) {
                     final double chance = tier.getChance();
 
-                    final double num = MiscUtils.useOtherRandom() ? ThreadLocalRandom.current().nextDouble(tier.getMaxRange()) : new Random().nextDouble(tier.getMaxRange());
+                    final double num = random.nextDouble(tier.getMaxRange());
 
                     if (num >= 1 && num <= chance) {
                         return tier;

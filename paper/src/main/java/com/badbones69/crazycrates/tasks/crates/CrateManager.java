@@ -2,30 +2,24 @@ package com.badbones69.crazycrates.tasks.crates;
 
 import ch.jalu.configme.SettingsManager;
 import com.Zrips.CMI.Modules.ModuleHandling.CMIModule;
-import com.badbones69.crazycrates.CrazyCrates;
-import com.badbones69.crazycrates.api.ChestManager;
 import com.badbones69.crazycrates.api.builders.CrateBuilder;
-import com.badbones69.crazycrates.api.builders.types.CrateMainMenu;
 import com.badbones69.crazycrates.api.enums.DataFiles;
-import com.badbones69.crazycrates.api.enums.Messages;
-import com.badbones69.crazycrates.api.enums.PersistentKeys;
-import com.badbones69.crazycrates.api.objects.Crate;
-import com.badbones69.crazycrates.api.objects.Prize;
-import com.badbones69.crazycrates.api.objects.Tier;
-import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
-import com.badbones69.crazycrates.api.objects.gacha.gacha.GachaSystem;
 import com.badbones69.crazycrates.api.objects.other.BrokeLocation;
-import com.badbones69.crazycrates.api.objects.other.CrateLocation;
-import com.badbones69.crazycrates.api.utils.ItemUtils;
+import com.badbones69.crazycrates.api.ChestManager;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
-import com.badbones69.crazycrates.config.ConfigManager;
-import com.badbones69.crazycrates.config.impl.ConfigKeys;
-import com.badbones69.crazycrates.support.holograms.HologramManager;
-import com.badbones69.crazycrates.support.holograms.types.CMIHologramsSupport;
-import com.badbones69.crazycrates.support.holograms.types.DecentHologramsSupport;
 import com.badbones69.crazycrates.support.holograms.types.FancyHologramsSupport;
 import com.badbones69.crazycrates.tasks.InventoryManager;
-import com.badbones69.crazycrates.tasks.crates.types.*;
+import com.badbones69.crazycrates.tasks.crates.types.CasinoCrate;
+import com.badbones69.crazycrates.tasks.crates.types.CosmicCrate;
+import com.badbones69.crazycrates.tasks.crates.types.CrateOnTheGo;
+import com.badbones69.crazycrates.tasks.crates.types.CsgoCrate;
+import com.badbones69.crazycrates.tasks.crates.types.FireCrackerCrate;
+import com.badbones69.crazycrates.tasks.crates.types.QuadCrate;
+import com.badbones69.crazycrates.tasks.crates.types.QuickCrate;
+import com.badbones69.crazycrates.tasks.crates.types.RouletteCrate;
+import com.badbones69.crazycrates.tasks.crates.types.WarCrate;
+import com.badbones69.crazycrates.tasks.crates.types.WheelCrate;
+import com.badbones69.crazycrates.tasks.crates.types.WonderCrate;
 import com.ryderbelserion.vital.common.configuration.YamlFile;
 import com.ryderbelserion.vital.common.configuration.YamlManager;
 import com.ryderbelserion.vital.common.configuration.objects.CustomFile;
@@ -33,8 +27,27 @@ import com.ryderbelserion.vital.common.util.FileUtil;
 import com.ryderbelserion.vital.enums.Support;
 import com.ryderbelserion.vital.util.builders.items.ItemBuilder;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
-import lombok.Getter;
 import org.apache.commons.lang.WordUtils;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionDefault;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.Nullable;
+import org.simpleyaml.configuration.ConfigurationSection;
+import org.simpleyaml.configuration.file.FileConfiguration;
+import us.crazycrew.crazycrates.api.enums.types.CrateType;
+import us.crazycrew.crazycrates.api.enums.types.KeyType;
+import com.badbones69.crazycrates.api.enums.PersistentKeys;
+import com.badbones69.crazycrates.config.ConfigManager;
+import com.badbones69.crazycrates.config.impl.ConfigKeys;
+import com.badbones69.crazycrates.api.builders.types.CrateMainMenu;
+import com.badbones69.crazycrates.api.enums.Messages;
+import com.badbones69.crazycrates.support.holograms.HologramManager;
+import com.badbones69.crazycrates.api.objects.Crate;
+import com.badbones69.crazycrates.api.objects.other.CrateLocation;
+import com.badbones69.crazycrates.api.objects.Prize;
+import com.badbones69.crazycrates.api.objects.Tier;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -42,23 +55,23 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.permissions.Permission;
-import org.bukkit.permissions.PermissionDefault;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.simpleyaml.configuration.ConfigurationSection;
-import org.simpleyaml.configuration.file.FileConfiguration;
 import us.crazycrew.crazycrates.api.crates.CrateHologram;
 import us.crazycrew.crazycrates.api.crates.quadcrates.CrateSchematic;
-import us.crazycrew.crazycrates.api.enums.types.CrateType;
-import us.crazycrew.crazycrates.api.enums.types.KeyType;
-
+import com.badbones69.crazycrates.CrazyCrates;
+import com.badbones69.crazycrates.support.holograms.types.CMIHologramsSupport;
+import com.badbones69.crazycrates.support.holograms.types.DecentHologramsSupport;
+import com.badbones69.crazycrates.api.utils.ItemUtils;
 import java.io.File;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.TimerTask;
+import java.util.UUID;
 import java.util.logging.Level;
 
 public class CrateManager {
@@ -300,8 +313,7 @@ public class CrateManager {
                                 final boolean isEnabled = alternativeSection.getBoolean("Toggle");
 
                                 if (isEnabled) {
-                                    alternativePrize = new Prize(prizeSection.getString("DisplayName", WordUtils.capitalizeFully(prizeSection.getString("DisplayItem", "Stone")
-                                            .replaceAll("_", " "))), prizeSection.getName(), alternativeSection);
+                                    alternativePrize = new Prize(prizeSection.getString("DisplayName", "<lang:item.minecraft." + prizeSection.getString("DisplayItem", "stone") + ">"), prizeSection.getName(), alternativeSection);
                                 }
                             }
 
@@ -352,7 +364,7 @@ public class CrateManager {
             ).forEach(line -> this.plugin.getLogger().info(line));
         }
 
-        final YamlFile locations = DataFiles.locations.getYamlFile();
+        final YamlFile locations = CustomFiles.locations.getYamlFile();
 
         int loadedAmount = 0;
         int brokeAmount = 0;
@@ -888,7 +900,7 @@ public class CrateManager {
      * @param crate the crate which you would like to set it to.
      */
     public void addCrateLocation(@NotNull final Location location, @NotNull final Crate crate) {
-        final YamlFile locations = DataFiles.locations.getYamlFile();
+        final YamlFile locations = CustomFiles.locations.getYamlFile();
         String id = "1"; // Location ID
 
         for (int i = 1; locations.contains("Locations." + i); i++) {
@@ -909,7 +921,7 @@ public class CrateManager {
         locations.set("Locations." + id + ".Y", location.getBlockY());
         locations.set("Locations." + id + ".Z", location.getBlockZ());
 
-        DataFiles.locations.save();
+        CustomFiles.locations.save();
 
         addLocation(new CrateLocation(id, crate, location));
 
@@ -922,8 +934,8 @@ public class CrateManager {
      * @param id the id of the location.
      */
     public void removeCrateLocation(@NotNull final String id) {
-        DataFiles.locations.getYamlFile().set("Locations." + id, null);
-        DataFiles.locations.save();
+        CustomFiles.locations.getYamlFile().set("Locations." + id, null);
+        CustomFiles.locations.save();
 
         CrateLocation location = null;
 
@@ -1200,7 +1212,7 @@ public class CrateManager {
     /**
      * @return an unmodifiable list of crate locations.
      */
-    public List<CrateLocation> getCrateLocations() {
+    public @NotNull final List<CrateLocation> getCrateLocations() {
         return Collections.unmodifiableList(this.crateLocations);
     }
 
@@ -1256,7 +1268,7 @@ public class CrateManager {
 
     // Cleans the data file.
     private void cleanDataFile() {
-        final YamlFile data = DataFiles.data.getYamlFile();
+        final YamlFile data = CustomFiles.data.getYamlFile();
 
         if (!data.contains("Players")) return;
 
@@ -1299,7 +1311,7 @@ public class CrateManager {
 
         if (MiscUtils.isLogging()) this.plugin.getLogger().info("The data.yml file has been cleaned.");
 
-        DataFiles.data.save();
+        CustomFiles.data.save();
     }
 
     // War Crate

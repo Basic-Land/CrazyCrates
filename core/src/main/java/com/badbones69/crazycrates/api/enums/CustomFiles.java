@@ -1,10 +1,10 @@
 package com.badbones69.crazycrates.api.enums;
 
 import com.badbones69.crazycrates.config.ConfigManager;
-import com.ryderbelserion.vital.common.configuration.YamlFile;
+import com.ryderbelserion.vital.core.config.YamlFile;
 import org.jetbrains.annotations.NotNull;
 
-public enum DataFiles {
+public enum CustomFiles {
 
     locations("locations.yml"),
     data("data.yml");
@@ -17,9 +17,9 @@ public enum DataFiles {
      *
      * @param fileName the name of the file
      */
-    DataFiles(@NotNull final String fileName) {
+    CustomFiles(final String fileName) {
         this.fileName = fileName;
-        this.yamlFile = ConfigManager.getYamlManager().getStaticFile(this.fileName);
+        this.yamlFile = ConfigManager.getYamlManager().getFile(this.fileName);
     }
 
     /**
@@ -37,6 +37,6 @@ public enum DataFiles {
     }
 
     public void save() {
-        ConfigManager.getYamlManager().saveStaticFile(getFileName());
+        ConfigManager.getYamlManager().saveFile(getFileName());
     }
 }

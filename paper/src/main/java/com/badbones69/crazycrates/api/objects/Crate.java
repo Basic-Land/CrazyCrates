@@ -1,33 +1,21 @@
 package com.badbones69.crazycrates.api.objects;
 
-import com.badbones69.crazycrates.CrazyCrates;
-import com.badbones69.crazycrates.api.builders.types.CratePreviewMenu;
 import com.badbones69.crazycrates.api.builders.types.CrateTierMenu;
 import com.badbones69.crazycrates.api.enums.PersistentKeys;
-import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
-import com.badbones69.crazycrates.api.utils.MiscUtils;
 import com.badbones69.crazycrates.config.ConfigManager;
 import com.badbones69.crazycrates.tasks.BukkitUserManager;
-import com.badbones69.crazycrates.tasks.InventoryManager;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
 import com.badbones69.crazycrates.tasks.crates.effects.SoundEffect;
-import com.badbones69.crazycrates.tasks.crates.other.AbstractCrateManager;
-import com.badbones69.crazycrates.tasks.crates.other.CosmicCrateManager;
-import com.ryderbelserion.vital.common.configuration.objects.CustomFile;
-import com.ryderbelserion.vital.common.util.AdvUtil;
-import com.ryderbelserion.vital.util.DyeUtil;
-import com.ryderbelserion.vital.util.ItemUtil;
-import com.ryderbelserion.vital.util.builders.items.ItemBuilder;
-import lombok.Getter;
+import com.ryderbelserion.vital.core.config.objects.CustomFile;
+import com.ryderbelserion.vital.core.util.AdvUtil;
+import com.ryderbelserion.vital.paper.builders.items.ItemBuilder;
+import com.ryderbelserion.vital.paper.util.DyeUtil;
+import com.ryderbelserion.vital.paper.util.ItemUtil;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.Color;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ArmorMeta;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -35,13 +23,22 @@ import org.bukkit.inventory.meta.trim.ArmorTrim;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.simpleyaml.configuration.ConfigurationSection;
 import org.simpleyaml.configuration.file.FileConfiguration;
-import us.crazycrew.crazycrates.api.crates.CrateHologram;
 import us.crazycrew.crazycrates.api.enums.types.CrateType;
-
+import com.badbones69.crazycrates.CrazyCrates;
+import com.badbones69.crazycrates.tasks.crates.other.CosmicCrateManager;
+import com.badbones69.crazycrates.tasks.crates.other.AbstractCrateManager;
+import org.jetbrains.annotations.NotNull;
+import us.crazycrew.crazycrates.api.crates.CrateHologram;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import com.badbones69.crazycrates.tasks.InventoryManager;
+import com.badbones69.crazycrates.api.builders.types.CratePreviewMenu;
+import com.badbones69.crazycrates.api.utils.MiscUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -237,7 +234,7 @@ public class Crate {
     public @NotNull final AbstractCrateManager getManager() {
         return this.manager;
     }
-
+    
     /**
      * Set the preview lines for a Crate.
      *
@@ -267,7 +264,7 @@ public class Crate {
 
         this.previewTierCrateRows = finalAmount;
     }
-
+    
     /**
      * Get the amount of lines the preview will show.
      *
@@ -276,7 +273,7 @@ public class Crate {
     public final int getPreviewChestLines() {
         return this.previewChestLines;
     }
-
+    
     /**
      * Get the max amount of slots in the preview.
      *
@@ -285,7 +282,7 @@ public class Crate {
     public final int getMaxSlots() {
         return this.maxSlots;
     }
-
+    
     /**
      * Check to see if a player can win a prize from a crate.
      *
@@ -329,11 +326,13 @@ public class Crate {
             }
         }
 
+        Random random = MiscUtils.useOtherRandom() ? ThreadLocalRandom.current() : new Random();
+
         // ================= Chance Check ================= //
-        chanceCheck(prizes, usablePrizes);
+        chanceCheck(prizes, usablePrizes, random);
 
         try {
-            return prizes.get(MiscUtils.useOtherRandom() ? ThreadLocalRandom.current().nextInt(prizes.size()) : new Random().nextInt(prizes.size()));
+            return prizes.get(random.nextInt(prizes.size()));
         } catch (IllegalArgumentException exception) {
             this.plugin.getLogger().log(Level.WARNING, "Failed to find prize from the " + name + " crate for player " + player.getName() + ".", exception);
 
@@ -344,18 +343,19 @@ public class Crate {
     /**
      * Checks the chances and returns usable prizes.
      *
-     * @param prizes The prizes to check
+     * @param prizes       The prizes to check
      * @param usablePrizes The usable prizes to check
+     * @param random The random variable
      */
-    private void chanceCheck(@NotNull final List<Prize> prizes, @NotNull final List<Prize> usablePrizes) {
+    private void chanceCheck(@NotNull final List<Prize> prizes, @NotNull final List<Prize> usablePrizes, Random random) {
         for (int stop = 0; prizes.isEmpty() && stop <= 2000; stop++) {
             for (Prize prize : usablePrizes) {
-                double max = prize.getMaxRange();
-                double chance = prize.getChance();
-                double num;
+                int max = prize.getMaxRange();
+                int chance = prize.getChance();
+                int num;
 
-                for (int counter = 1; counter == 1; counter++) {
-                    num = MiscUtils.useOtherRandom() ? 1 + ThreadLocalRandom.current().nextDouble(max) : 1 + new Random().nextDouble(max);
+                for (int counter = 1; counter <= 1; counter++) {
+                    num = 1 + random.nextInt(max);
 
                     if (num <= chance) prizes.add(prize);
                 }
@@ -422,12 +422,14 @@ public class Crate {
             }
         }
 
+        Random random = MiscUtils.useOtherRandom() ? ThreadLocalRandom.current() : new Random();
+
         // ================= Chance Check ================= //
-        chanceCheck(prizes, usablePrizes);
+        chanceCheck(prizes, usablePrizes, random);
 
-        return prizes.get(MiscUtils.useOtherRandom() ? ThreadLocalRandom.current().nextInt(prizes.size()) : new Random().nextInt(prizes.size()));
+        return prizes.get(random.nextInt(prizes.size()));
     }
-
+    
     /**
      * Picks a random prize based on BlackList Permissions and the Chance System. Spawns the display item at the location.
      *
@@ -442,21 +444,21 @@ public class Crate {
 
         return prize;
     }
-
+    
     /**
      * @return name the name of the crate.
      */
     public @NotNull final String getName() {
         return this.name;
     }
-
+    
     /**
      * @return the name of the crate's preview page.
      */
     public @NotNull final String getPreviewName() {
         return this.previewName;
     }
-
+    
     /**
      * Get if the preview is toggled on.
      *
@@ -465,7 +467,7 @@ public class Crate {
     public final boolean isPreviewEnabled() {
         return this.previewToggle;
     }
-
+    
     /**
      * Get if the preview has an item border.
      *
@@ -474,7 +476,7 @@ public class Crate {
     public final boolean isBorderToggle() {
         return this.borderToggle;
     }
-
+    
     /**
      * Get the item that shows as the preview border if enabled.
      *
@@ -483,7 +485,7 @@ public class Crate {
     public @NotNull final ItemBuilder getBorderItem() {
         return this.borderItem;
     }
-
+    
     /**
      * Get the name of the inventory the crate will have.
      *
@@ -492,7 +494,7 @@ public class Crate {
     public @NotNull final String getCrateInventoryName() {
         return this.crateInventoryName;
     }
-
+    
     /**
      * Gets the inventory of a preview of prizes for the crate.
      *
@@ -501,7 +503,7 @@ public class Crate {
     public @NotNull final Inventory getPreview(Player player) {
         return getPreview(player, this.inventoryManager.getPage(player), false, null);
     }
-
+    
     /**
      * Gets the inventory of a preview of prizes for the crate.
      *
@@ -523,14 +525,14 @@ public class Crate {
 
         return crateTierMenu.build().getInventory();
     }
-
+    
     /**
      * @return the crate type of the crate.
      */
     public final CrateType getCrateType() {
         return this.crateType;
     }
-
+    
     /**
      * @return the key as an item stack.
      */
@@ -557,7 +559,7 @@ public class Crate {
 
         return key.getStack();
     }
-
+    
     /**
      * @param amount The amount of keys you want.
      * @param player The player getting the key.
@@ -577,14 +579,14 @@ public class Crate {
     public @NotNull final FileConfiguration getFile() {
         return this.file;
     }
-
+    
     /**
      * @return the prizes in the crate.
      */
     public @NotNull final ArrayList<Prize> getPrizes() {
         return this.prizes;
     }
-
+    
     /**
      * @param name name of the prize you want.
      * @return the prize you asked for.
@@ -603,7 +605,7 @@ public class Crate {
 
         return prize;
     }
-
+    
     public final @Nullable Prize getPrize(@NotNull final ItemStack item) {
         ItemMeta itemMeta = item.getItemMeta();
 
@@ -611,14 +613,14 @@ public class Crate {
 
         return getPrize(container.get(PersistentKeys.crate_prize.getNamespacedKey(), PersistentDataType.STRING));
     }
-
+    
     /**
      * @return true if new players get keys and false if they do not.
      */
     public final boolean doNewPlayersGetKeys() {
         return this.giveNewPlayerKeys;
     }
-
+    
     /**
      * @return the number of keys new players get.
      */
@@ -787,7 +789,7 @@ public class Crate {
     public final int getMaxPage() {
         return this.maxPage;
     }
-
+    
     /**
      * @return a list of the tiers for the crate. Will be empty if there are none.
      */
@@ -879,7 +881,7 @@ public class Crate {
 
         return items;
     }
-
+    
     /**
      * Loads all the preview items and puts them into a list.
      *
