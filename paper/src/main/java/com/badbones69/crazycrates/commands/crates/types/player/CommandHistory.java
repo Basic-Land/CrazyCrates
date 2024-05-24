@@ -6,7 +6,7 @@ import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.commands.crates.types.BaseCommand;
 import com.badbones69.crazycrates.tasks.BukkitUserManager;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
-import com.ryderbelserion.vital.util.builders.PlayerBuilder;
+import com.ryderbelserion.vital.paper.builders.PlayerBuilder;
 import dev.triumphteam.cmd.bukkit.annotation.Permission;
 import dev.triumphteam.cmd.core.annotations.Command;
 import dev.triumphteam.cmd.core.annotations.Optional;

@@ -2,6 +2,7 @@ package com.badbones69.crazycrates.api.objects;
 
 import com.badbones69.crazycrates.api.builders.types.CrateTierMenu;
 import com.badbones69.crazycrates.api.enums.PersistentKeys;
+import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.config.ConfigManager;
 import com.badbones69.crazycrates.tasks.BukkitUserManager;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
@@ -11,6 +12,7 @@ import com.ryderbelserion.vital.core.util.AdvUtil;
 import com.ryderbelserion.vital.paper.builders.items.ItemBuilder;
 import com.ryderbelserion.vital.paper.util.DyeUtil;
 import com.ryderbelserion.vital.paper.util.ItemUtil;
+import lombok.Getter;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -351,11 +353,11 @@ public class Crate {
         for (int stop = 0; prizes.isEmpty() && stop <= 2000; stop++) {
             for (Prize prize : usablePrizes) {
                 int max = prize.getMaxRange();
-                int chance = prize.getChance();
-                int num;
+                double chance = prize.getChance();
+                double num;
 
-                for (int counter = 1; counter <= 1; counter++) {
-                    num = 1 + random.nextInt(max);
+                for (int counter = 1; counter == 1; counter++) {
+                    num = 1 + random.nextDouble(max);
 
                     if (num <= chance) prizes.add(prize);
                 }

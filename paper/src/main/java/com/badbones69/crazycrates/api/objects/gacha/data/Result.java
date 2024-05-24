@@ -3,7 +3,6 @@ package com.badbones69.crazycrates.api.objects.gacha.data;
 import com.badbones69.crazycrates.api.objects.Prize;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.enums.ResultType;
-import com.ryderbelserion.vital.util.builders.items.ItemBuilder;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import lombok.Getter;
 import lombok.Setter;

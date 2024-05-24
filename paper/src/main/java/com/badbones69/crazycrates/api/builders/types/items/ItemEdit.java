@@ -1,7 +1,7 @@
 package com.badbones69.crazycrates.api.builders.types.items;
 
 import com.badbones69.crazycrates.api.builders.InventoryBuilder;
-import com.ryderbelserion.vital.util.builders.items.ItemBuilder;
+import com.ryderbelserion.vital.paper.builders.items.ItemBuilder;
 import cz.basicland.blibs.spigot.utils.item.DBItemStack;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import org.bukkit.Material;

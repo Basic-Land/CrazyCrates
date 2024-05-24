@@ -10,7 +10,7 @@ import com.badbones69.crazycrates.api.objects.gacha.data.PlayerBaseProfile;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ComponentBuilder;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuStuff;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
-import com.ryderbelserion.vital.util.builders.items.ItemBuilder;
+import com.ryderbelserion.vital.paper.builders.items.ItemBuilder;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

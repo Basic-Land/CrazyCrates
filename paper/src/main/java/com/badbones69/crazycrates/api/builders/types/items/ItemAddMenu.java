@@ -5,7 +5,7 @@ import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
-import com.ryderbelserion.vital.util.builders.items.ItemBuilder;
+import com.ryderbelserion.vital.paper.builders.items.ItemBuilder;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;

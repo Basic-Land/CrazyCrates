@@ -10,7 +10,7 @@ import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuStuff;
 import com.badbones69.crazycrates.config.ConfigManager;
 import com.badbones69.crazycrates.config.impl.ConfigKeys;
-import com.ryderbelserion.vital.util.builders.items.ItemBuilder;
+import com.ryderbelserion.vital.paper.builders.items.ItemBuilder;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

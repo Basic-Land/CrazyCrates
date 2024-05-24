@@ -10,6 +10,7 @@ import com.badbones69.crazycrates.tasks.InventoryManager;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
 import com.ryderbelserion.vital.paper.enums.Support;
 import com.ryderbelserion.vital.paper.util.MiscUtil;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
 import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket;
 import net.minecraft.server.level.ServerPlayer;

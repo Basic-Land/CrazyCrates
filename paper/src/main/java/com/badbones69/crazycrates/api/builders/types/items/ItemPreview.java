@@ -8,7 +8,7 @@ import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 import com.google.common.collect.Lists;
-import com.ryderbelserion.vital.util.builders.items.ItemBuilder;
+import com.ryderbelserion.vital.paper.builders.items.ItemBuilder;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
