@@ -1,6 +1,7 @@
 package com.badbones69.crazycrates.api.objects.gacha.ultimatemenu;
 
 import com.badbones69.crazycrates.CrazyCrates;
+import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -17,11 +18,15 @@ public final class ComponentBuilder {
     private static final Component SPACE_BACK = Component.translatable("space.-45", "").font(KEY);
     private static final Component SPACE_NEGATIVE = Component.translatable("space.-1", "").font(KEY);
     private static final Component SPACE_PAGE = Component.translatable("space.223", "").font(KEY);
-    private static final Component FILL = Component.translatable("fill", "").color(COLOR).append(SPACE_NEGATIVE);
-    private static final Component FILL_ = Component.translatable("fill_", "").color(COLOR).append(SPACE_NEGATIVE);
+    private static final Component SPACE_TIME = Component.translatable("space.-335", "").font(KEY);
+    private static final Component FILL_TOP = Component.translatable("fill_top", "").color(COLOR).append(SPACE_NEGATIVE);
+    private static final Component FILL_DOWN = Component.translatable("fill_down", "").color(COLOR).append(SPACE_NEGATIVE);
+    private static final Component FILL_TIME = Component.translatable("fill_time", "").color(COLOR).append(SPACE_NEGATIVE);
 
-    public static Component trans(UUID uniqueId, String crateName, int mysticTokens, int stellarShards) {
+    public static Component trans(UUID uniqueId, CrateSettings crateSettings, int mysticTokens, int stellarShards) {
         TextComponent.Builder builder = Component.text();
+        String crateName = crateSettings.getCrateName();
+
         int virtualKeys = CrazyCrates.getPlugin(CrazyCrates.class).getUserManager().getVirtualKeys(uniqueId, crateName);
 
         crateName = crateName + " ";
@@ -33,22 +38,47 @@ public final class ComponentBuilder {
         String mystic = String.valueOf(mysticTokens);
         String stellar = String.valueOf(stellarShards);
         String virtual = String.valueOf(virtualKeys);
+        String time = crateSettings.getBannerPackage().getRemainingDuration();
 
         int mysticSpace = mystic.length() * 6;
         int stellarSpace = stellar.length() * 6;
         int virtualSpace = virtual.length() * 6;
+        int timeSpace = getSize(time) - 2;
 
         for (int i = 0; i < mystic.length(); i++) {
-            builder.append(sw(mystic.charAt(i), true));
+            builder.append(sw(mystic.charAt(i), NumberType.TOP));
         }
 
-        down(builder, stellar, mysticSpace, FILL, SPACE_BACK);
+        down(builder, stellar, mysticSpace, FILL_TOP, SPACE_BACK);
 
-        down(builder, virtual, stellarSpace, FILL_, SPACE_PAGE);
+        down(builder, virtual, stellarSpace, FILL_DOWN, SPACE_PAGE);
 
         while (virtualSpace < 45) {
-            builder.append(FILL_);
+            builder.append(FILL_DOWN);
             virtualSpace += 3;
+        }
+
+        builder.append(SPACE_TIME);
+
+        int middle = Math.ceilDiv(69 - timeSpace, 2);
+        int left = middle;
+        int right = middle;
+
+        while (--left > 0) {
+            builder.append(FILL_TIME);
+        }
+
+        for (int i = 0; i < time.length(); i++) {
+            char c = time.charAt(i);
+            builder.append(sw(c, NumberType.TIME));
+            if (c == ' ') {
+                builder.append(FILL_TIME);
+                builder.append(FILL_TIME);
+            }
+        }
+
+        while (right-- > 0) {
+            builder.append(FILL_TIME);
         }
 
         return builder.build();
@@ -63,15 +93,15 @@ public final class ComponentBuilder {
         builder.append(space);
 
         for (int i = 0; i < amount.length(); i++) {
-            builder.append(sw(amount.charAt(i), false));
+            builder.append(sw(amount.charAt(i), NumberType.DOWN));
         }
     }
 
-    private static Component sw(char c, boolean top) {
-        return Component.translatable(charSwap(c, top), "").color(COLOR).append(SPACE_NEGATIVE);
+    private static Component sw(char c, NumberType numberType) {
+        return Component.translatable(charSwap(c, numberType), "").color(COLOR).append(SPACE_NEGATIVE);
     }
 
-    private static String charSwap(char c, boolean top) {
+    private static String charSwap(char c, NumberType numberType) {
         return switch (c) {
             case '0' -> "num0";
             case '1' -> "num1";
@@ -83,8 +113,16 @@ public final class ComponentBuilder {
             case '7' -> "num7";
             case '8' -> "num8";
             case '9' -> "num9";
+            case 'd' -> "days";
+            case 'h' -> "hours";
+            case 'm' -> "minutes";
+            case ' ' -> "fill";
             default -> c + "";
-        } + (top ? "" : "_");
+        } + switch (numberType) {
+            case TOP -> "_top";
+            case DOWN -> "_down";
+            case TIME -> "_time";
+        };
     }
 
     public static int getSize(String name) {
@@ -116,12 +154,12 @@ public final class ComponentBuilder {
                      'V','B','N','M','0','1','2',
                      '3','4','5','6','7','8','9',
                      '/','%','ě','š','č','ř','ž',
-                     'ý','á','í','é','Ě','Š','Č',
-                     'Ř','Ž','Ý','Á','Í','É' -> 6;
-                case 't', 'I', ' ' -> 4;
+                     'ý','á','é','Ě','Š','Č',
+                     'Ř','Ž','Ý','Á','É' -> 6;
+                case 't', 'I', ' ', 'Í' -> 4;
                 case 'i', ':', '.' -> 2;
                 case 'f','k' -> 5;
-                case 'l', '│' -> 3;
+                case 'l', '│', 'í' -> 3;
                 default -> 0;
             };
         }

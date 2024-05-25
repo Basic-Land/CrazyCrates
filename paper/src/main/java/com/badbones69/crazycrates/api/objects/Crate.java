@@ -122,13 +122,6 @@ public class Crate {
                  @NotNull final List<String> prizeMessage,
                  @NotNull final List<String> prizeCommands,
                  @NotNull final CrateHologram hologram) {
-        ConfigurationSection gachaSection = file.getConfigurationSection("Crate.Gacha");
-        CrateSettings crateSettings = null;
-        if (gachaSection != null) {
-            crateSettings = new CrateSettings(file, name, this);
-        }
-        this.crateSettings = crateSettings;
-
         this.keyBuilder = key.setDisplayName(keyName).setPersistentString(PersistentKeys.crate_key.getNamespacedKey(), name);
         this.keyName = keyName;
 
@@ -187,6 +180,13 @@ public class Crate {
         if (crateType == CrateType.cosmic) {
             if (this.file != null) this.manager = new CosmicCrateManager(this.file);
         }
+
+        ConfigurationSection gachaSection = file.getConfigurationSection("Crate.Gacha");
+        CrateSettings crateSettings = null;
+        if (gachaSection != null) {
+            crateSettings = new CrateSettings(file, name, this);
+        }
+        this.crateSettings = crateSettings;
     }
 
     public Crate(@NotNull final String name) {

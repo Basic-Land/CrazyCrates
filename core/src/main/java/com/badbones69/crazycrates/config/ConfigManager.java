@@ -49,6 +49,7 @@ public class ConfigManager {
         yamlManager.addFile("locations.yml").addFile("data.yml")
                 .addFolder("crates")
                 .addFolder("schematics")
+                .addFolder("banners")
                 .init();
     }
 

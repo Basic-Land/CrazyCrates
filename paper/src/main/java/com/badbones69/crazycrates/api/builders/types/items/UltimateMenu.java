@@ -113,7 +113,7 @@ public class UltimateMenu extends InventoryBuilder {
             PlayerBaseProfile profile = plugin.getBaseProfileManager().getPlayerBaseProfile(player.getName());
             CrateSettings newCrate = manager.getCrateSettingsSplit().get(ultimateMenu.currentPage).get(newCrateNum);
 
-            Component trans = ComponentBuilder.trans(player.getUniqueId(), newCrate.getCrateName(), profile.getMysticTokens(), profile.getStellarShards());
+            Component trans = ComponentBuilder.trans(player.getUniqueId(), newCrate, profile.getMysticTokens(), profile.getStellarShards());
 
             player.openInventory(new UltimateMenu(ultimateMenu, trans, newCrateNum).build().getInventory());
         }

@@ -36,7 +36,7 @@ public class UltimateMenuManager {
         items.put(player.getName(), player.getInventory().getContents());
         databaseManager.saveInventory(player);
 
-        UltimateMenu menu = new UltimateMenu(crate, player, ComponentBuilder.trans(player.getUniqueId(), crate.getName(), mysticTokens, stellarShards));
+        UltimateMenu menu = new UltimateMenu(crate, player, ComponentBuilder.trans(player.getUniqueId(), crate.getCrateSettings(), mysticTokens, stellarShards));
         player.openInventory(menu.build().getInventory());
     }
 

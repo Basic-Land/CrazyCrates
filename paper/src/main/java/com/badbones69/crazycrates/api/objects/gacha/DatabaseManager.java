@@ -4,6 +4,7 @@ import com.Zrips.CMI.CMI;
 import com.Zrips.CMI.Containers.CMIUser;
 import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.objects.Crate;
+import com.badbones69.crazycrates.api.objects.gacha.banners.BannerPackage;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.api.objects.gacha.data.PlayerBaseProfile;
 import com.badbones69.crazycrates.api.objects.gacha.data.PlayerProfile;
@@ -51,7 +52,10 @@ public class DatabaseManager {
         for (Crate crate : crateList) {
             CrateSettings settings = crate.getCrateSettings();
             if (settings == null) continue;
-            settings.loadItems(crate, crate.getPrizes(), this);
+            BannerPackage bannerPackage = settings.getBannerPackage();
+            if (bannerPackage.isBannerActive()) {
+                settings.loadItems(crate, crate.getPrizes(), this);
+            }
         }
     }
 
@@ -71,7 +75,7 @@ public class DatabaseManager {
             }
         }).join();
 
-        connection.query("PRAGMA table_info(PlayerData)").thenAccept(rs -> {
+        connection.querySQLite("PRAGMA table_info(PlayerData)").thenAccept(rs -> {
             try {
                 Set<String> columnNames = new HashSet<>();
                 while (rs.next()) {
@@ -165,7 +169,7 @@ public class DatabaseManager {
 
         query.append(")");
 
-        connection.update(query.toString()).join();
+        connection.updateSQLite(query.toString()).join();
 
         return newProfile;
     }
@@ -178,7 +182,7 @@ public class DatabaseManager {
         }
 
         String profileString = serializeProfile(profile);
-        connection.update("UPDATE PlayerData SET " + name + " = ? WHERE playerName = ?", profileString, playerName);
+        connection.updateSQLite("UPDATE PlayerData SET " + name + " = ? WHERE playerName = ?", profileString, playerName);
     }
 
     public PlayerProfile getPlayerProfile(String playerName, CrateSettings crateSettings, boolean override) {
@@ -197,7 +201,7 @@ public class DatabaseManager {
             }
         }
 
-        return connection.query("SELECT " + crateName + " FROM PlayerData WHERE playerName = ?", playerName).thenApply(rs -> {
+        return connection.querySQLite("SELECT " + crateName + " FROM PlayerData WHERE playerName = ?", playerName).thenApply(rs -> {
             try {
                 if (rs.next()) {
                     String profileString = rs.getString(crateName);
@@ -215,7 +219,7 @@ public class DatabaseManager {
             addBlankPlayerData(playerName, null);
         }
 
-        return connection.query("SELECT baseData FROM PlayerData WHERE playerName = ?", playerName).thenApply(rs -> {
+        return connection.querySQLite("SELECT baseData FROM PlayerData WHERE playerName = ?", playerName).thenApply(rs -> {
             try {
                 if (rs.next()) {
                     String profileString = rs.getString("baseData");
@@ -230,7 +234,7 @@ public class DatabaseManager {
 
     public void savePlayerBaseProfile(String playerName, PlayerBaseProfile profile) {
         String profileString = serializeProfile(profile);
-        connection.update("UPDATE PlayerData SET baseData = ? WHERE playerName = ?", profileString, playerName);
+        connection.updateSQLite("UPDATE PlayerData SET baseData = ? WHERE playerName = ?", profileString, playerName);
     }
 
     public CrateSettings getCrateSettings(String crateName) {
@@ -248,11 +252,11 @@ public class DatabaseManager {
         }
         String inventory = String.join("\n", items);
 
-        connection.update("INSERT OR REPLACE INTO Backup(uuid, inventory) VALUES(?, ?)", uuid, inventory);
+        connection.updateSQLite("INSERT OR REPLACE INTO Backup(uuid, inventory) VALUES(?, ?)", uuid, inventory);
     }
 
     public void clearInventory(Player player) {
-        connection.update("DELETE FROM Backup WHERE uuid = ?", player.getUniqueId());
+        connection.updateSQLite("DELETE FROM Backup WHERE uuid = ?", player.getUniqueId());
     }
 
     private String serializeProfile(Object profile) {

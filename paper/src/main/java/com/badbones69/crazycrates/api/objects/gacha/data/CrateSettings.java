@@ -4,12 +4,19 @@ import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.Prize;
 import com.badbones69.crazycrates.api.objects.Tier;
 import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
+import com.badbones69.crazycrates.api.objects.gacha.banners.BannerData;
+import com.badbones69.crazycrates.api.objects.gacha.banners.BannerItem;
+import com.badbones69.crazycrates.api.objects.gacha.banners.BannerPackage;
 import com.badbones69.crazycrates.api.objects.gacha.enums.GachaType;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ComponentBuilder;
 import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 import com.badbones69.crazycrates.api.objects.gacha.util.TierInfo;
+import com.badbones69.crazycrates.config.ConfigManager;
+import com.ryderbelserion.vital.core.config.YamlFile;
+import com.ryderbelserion.vital.core.config.YamlManager;
+import com.ryderbelserion.vital.core.config.objects.CustomFile;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import lombok.Getter;
 import lombok.ToString;
@@ -19,13 +26,15 @@ import org.jetbrains.annotations.NotNull;
 import org.simpleyaml.configuration.ConfigurationSection;
 import org.simpleyaml.configuration.file.FileConfiguration;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Getter
 @ToString
 public class CrateSettings {
-    private final String crateName;
+    private final YamlManager yamlManager = ConfigManager.getYamlManager();
+    private final String crateName, bannerFile;
     private final boolean fatePointEnabled, overrideEnabled, extraRewardEnabled;
     private final int fatePointAmount, bonusPity, modelDataPreviewName, modelDataMainMenu;
 
@@ -34,12 +43,14 @@ public class CrateSettings {
     private final Map<Rarity, RaritySettings> rarityMap = new LinkedHashMap<>();
     private final GachaType gachaType;
     private final Crate crate;
+    private final BannerPackage bannerPackage;
 
     public CrateSettings(FileConfiguration config, String crateName, Crate crate) {
         String path = "Crate.Gacha.settings";
 
         this.crateName = crateName;
         this.crate = crate;
+        this.bannerFile = config.getString(path + ".banner-file");
         this.fatePointEnabled = config.getBoolean(path + ".fate-point.enabled");
         this.fatePointAmount = config.getInt(path + ".fate-point.amount");
         this.overrideEnabled = config.getBoolean(path + ".override");
@@ -72,6 +83,118 @@ public class CrateSettings {
 
             rarityMap.put(rarity, raritySettings);
         }
+
+        CustomFile customFile = yamlManager.getCustomFile(bannerFile);
+        if (customFile == null) {
+            bannerPackage = null;
+            return;
+        }
+
+        YamlFile yamlFile = customFile.getYamlFile();
+
+        BannerData currentBanner = getBanner(yamlFile, "currentBanner");
+        BannerData nextBanner = getBanner(yamlFile, "nextBanner");
+
+        bannerPackage = new BannerPackage(currentBanner, nextBanner);
+        updateItems();
+    }
+
+    private void updateItems() {
+        BannerData currentBanner = bannerPackage.getBanner();
+        if (currentBanner == null) return;
+
+        FileConfiguration crateFile = crate.getFile();
+        String path = "Crate.Gacha";
+        crateFile.remove(path + ".standard");
+        crateFile.remove(path + ".limited");
+
+        List<BannerItem> items = currentBanner.items();
+
+        for (BannerItem item : items) {
+            int id = item.number();
+            Rarity rarity = item.rarity();
+            RewardType type = item.rewardType();
+            List<String> commands = item.commands();
+            List<String> messages = item.messages();
+            boolean give = item.give();
+            String rarityPath = path + "." + type.name().toLowerCase() + "." + rarity.name().toLowerCase();
+
+            if (give && commands.isEmpty() && messages.isEmpty()) {
+                String listPath = rarityPath + ".list";
+                List<String> list = crateFile.getStringList(listPath);
+                list.add(String.valueOf(id));
+                crateFile.set(listPath, list);
+                continue;
+            }
+
+            crateFile.set(rarityPath + "." + id + ".commands", commands);
+            crateFile.set(rarityPath + "." + id + ".messages", messages);
+            crateFile.set(rarityPath + "." + id + ".give", give);
+        }
+
+        crate.saveFile();
+
+    }
+
+    private BannerData getBanner(YamlFile file, String banner) {
+        String bannerName = file.getString("Banner.Name");
+
+        String path = banner + ".duration.start";
+        LocalDateTime start = getTime(file, path);
+
+        path = banner + ".duration.end";
+        LocalDateTime end = getTime(file, path);
+
+        return new BannerData(bannerName, start, end, getItems(file, banner));
+    }
+
+    private List<BannerItem> getItems(YamlFile file, String banner) {
+        List<BannerItem> items = new ArrayList<>();
+        ConfigurationSection section = file.getConfigurationSection(banner + ".items");
+        if (section == null) return items;
+
+        addItems(file, banner, RewardType.STANDARD, items);
+        addItems(file, banner, RewardType.LIMITED, items);
+
+        return items;
+    }
+
+    private void addItems(YamlFile file, String banner, RewardType type, List<BannerItem> items) {
+        ConfigurationSection section = file.getConfigurationSection(banner + ".items." + type.name().toLowerCase());
+
+        if (section != null) {
+            for (String rarity : section.getKeys(false)) {
+                ConfigurationSection raritySection = section.getConfigurationSection(rarity.toLowerCase());
+
+                if (raritySection == null) continue;
+
+                Rarity rarityEnum = Rarity.valueOf(rarity.toUpperCase());
+
+                for (String key : raritySection.getKeys(false)) {
+                    if (key.equals("list")) {
+                        for (String id : raritySection.getStringList("list")) {
+                            items.add(new BannerItem(rarityEnum, type, Integer.parseInt(id), Collections.emptyList(), Collections.emptyList(), true));
+                        }
+                        continue;
+                    }
+
+                    List<String> commands = raritySection.getStringList(key + ".commands");
+                    List<String> messages = raritySection.getStringList(key + ".messages");
+                    boolean give = raritySection.getBoolean(key + ".give", true);
+                    items.add(new BannerItem(rarityEnum, type, Integer.parseInt(key), commands, messages, give));
+                }
+            }
+        }
+    }
+
+    private LocalDateTime getTime(YamlFile file, String path) {
+        int year, month, day, hour, minute;
+        year = file.getInt(path + ".year");
+        month = file.getInt(path + ".month");
+        day = file.getInt(path + ".day");
+        hour = file.getInt(path + ".hour");
+        minute = file.getInt(path + ".minute");
+        return LocalDateTime.of(year, month, day, hour, minute);
     }
 
     public void loadItems(Crate crate, List<Prize> prizes, DatabaseManager databaseManager) {
@@ -96,7 +219,7 @@ public class CrateSettings {
             String rarityName = rarity.name().toLowerCase();
             RaritySettings raritySettings = entry.getValue();
 
-            @NotNull TierInfo tierInfo = getTierInfo(rarity, raritySettings);
+            TierInfo tierInfo = getTierInfo(rarity, raritySettings);
 
             Tier tier;
             if (emptyTiers) {

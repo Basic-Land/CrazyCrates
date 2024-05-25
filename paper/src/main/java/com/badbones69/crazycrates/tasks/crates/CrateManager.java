@@ -340,7 +340,7 @@ public class CrateManager {
 
         addCrate(new Crate("Menu"));
 
-        this.databaseManager = new DatabaseManager(getCrates());
+        databaseManager = new DatabaseManager(getCrates());
 
 
         if (MiscUtils.isLogging()) {

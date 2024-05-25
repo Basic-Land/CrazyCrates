@@ -1,0 +1,88 @@
+currentBanner:
+  nameOfBanner: "Test Banner"
+  duration:
+    start:
+      year: 2021
+      month: 10
+      day: 20
+      hour: 11
+      minute: 0
+    end:
+      year: 2021
+      month: 11
+      day: 3
+      hour: 3
+      minute: 59
+  items:
+    standard:
+      epic:
+        list:
+          - 7
+          - 8
+          - 9
+          - 6
+        '10':
+          commands: []
+          messages: []
+
+      legendary:
+        list:
+          - 16
+          - 17
+          - 18
+          - 19
+        '20':
+          commands: []
+          messages: []
+
+    limited:
+      common:
+        list:
+          - 1
+          - 2
+          - 3
+          - 4
+        '5':
+          commands:
+            - say %reward%
+          messages:
+            - kokot
+          give: false
+      epic:
+        list:
+          - 11
+          - 12
+          - 13
+          - 14
+        '15':
+          commands: []
+          messages: []
+
+      legendary:
+        list:
+          - 21
+          - 22
+          - 23
+          - 24
+        '25':
+          commands: []
+          messages: []
+
+
+
+nextBanner:
+  name: "Test Banner 2"
+  duration:
+    start:
+      year: 2021
+      month: 11
+      day: 3
+      hour: 4
+      minute: 0
+    end:
+      year: 2021
+      month: 11
+      day: 17
+      hour: 3
+      minute: 59
+  items: []
