@@ -30,7 +30,7 @@ dependencies {
 
     api(projects.crazycratesCore)
 
-    compileOnly("cz.basicland:bLibs:2.0.0-WIP-b24")
+    compileOnly("cz.basicland:bLibs:2.0.0-WIP-b25")
 
     compileOnly ("org.projectlombok:lombok:1.18.32")
     annotationProcessor ("org.projectlombok:lombok:1.18.32")

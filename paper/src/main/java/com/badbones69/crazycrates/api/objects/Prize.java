@@ -107,7 +107,7 @@ public class Prize {
         if (updatedLore == null) updatedLore = new ArrayList<>();
         updatedLore.addFirst("");
         updatedLore.addFirst(type.name());
-        display.setDisplayLore(updatedLore);
+        display.setDisplayLore(updatedLore.stream().map(s -> s.replace("§", "&")).toList());
 
         this.displayItem = display;
         this.prizeItem = display;

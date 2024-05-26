@@ -3,10 +3,10 @@ package com.badbones69.crazycrates.api.objects.gacha.banners;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-public record BannerPackage(BannerData currentBanner, BannerData nextBanner) {
+public record BannerPackage(BannerData currentBanner, BannerData nextBanner, boolean enabled) {
 
     public BannerData getBanner() {
-        return currentBanner.isBannerActive() ? currentBanner : nextBanner.isBannerActive() ? nextBanner : null;
+        return enabled ? currentBanner.isBannerActive() ? currentBanner : nextBanner.isBannerActive() ? nextBanner : null : null;
     }
 
     public boolean isBannerActive() {

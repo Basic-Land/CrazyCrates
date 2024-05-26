@@ -86,7 +86,7 @@ public class CrateSettings {
 
         CustomFile customFile = yamlManager.getCustomFile(bannerFile);
         if (customFile == null) {
-            bannerPackage = null;
+            bannerPackage = new BannerPackage(null, null, false);
             return;
         }
 
@@ -95,7 +95,7 @@ public class CrateSettings {
         BannerData currentBanner = getBanner(yamlFile, "currentBanner");
         BannerData nextBanner = getBanner(yamlFile, "nextBanner");
 
-        bannerPackage = new BannerPackage(currentBanner, nextBanner);
+        bannerPackage = new BannerPackage(currentBanner, nextBanner, true);
         updateItems();
     }
 

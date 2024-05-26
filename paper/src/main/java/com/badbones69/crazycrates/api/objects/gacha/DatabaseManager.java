@@ -53,7 +53,7 @@ public class DatabaseManager {
             CrateSettings settings = crate.getCrateSettings();
             if (settings == null) continue;
             BannerPackage bannerPackage = settings.getBannerPackage();
-            if (bannerPackage.isBannerActive()) {
+            if (bannerPackage.isBannerActive() || !bannerPackage.enabled()) {
                 settings.loadItems(crate, crate.getPrizes(), this);
             }
         }
