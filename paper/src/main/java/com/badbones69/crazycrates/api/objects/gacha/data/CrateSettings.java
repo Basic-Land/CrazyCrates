@@ -23,6 +23,7 @@ import lombok.ToString;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.simpleyaml.configuration.ConfigurationSection;
 import org.simpleyaml.configuration.file.FileConfiguration;
 
@@ -84,16 +85,14 @@ public class CrateSettings {
             rarityMap.put(rarity, raritySettings);
         }
 
-        CustomFile customFile = yamlManager.getCustomFile(bannerFile);
+        @Nullable YamlFile customFile = yamlManager.getFile(bannerFile);
         if (customFile == null) {
             bannerPackage = new BannerPackage(null, null, false);
             return;
         }
 
-        YamlFile yamlFile = customFile.getYamlFile();
-
-        BannerData currentBanner = getBanner(yamlFile, "currentBanner");
-        BannerData nextBanner = getBanner(yamlFile, "nextBanner");
+        BannerData currentBanner = getBanner(customFile, "currentBanner");
+        BannerData nextBanner = getBanner(customFile, "nextBanner");
 
         bannerPackage = new BannerPackage(currentBanner, nextBanner, true);
         updateItems();

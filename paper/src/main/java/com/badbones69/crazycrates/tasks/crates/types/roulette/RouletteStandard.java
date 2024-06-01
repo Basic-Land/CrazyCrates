@@ -46,6 +46,7 @@ public class RouletteStandard extends FoliaRunnable {
     }
 
     private int modelData = 1;
+    private int open = 0;
 
     @Override
     public void run() {
@@ -56,7 +57,12 @@ public class RouletteStandard extends FoliaRunnable {
         builder.setItem(36, glass.setCustomModelData(modelData).getStack());
 
         modelData++;
-        player.openInventory(inventory);
+        open++;
+
+        if (open == 3) {
+            open = 0;
+            player.openInventory(inventory);
+        }
 
         if (modelData == 38) {
             modelData += getPortalData();
