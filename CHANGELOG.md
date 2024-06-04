@@ -1,8 +1,12 @@
-## Changes:
-* Updated the message in commands, instead of `misc.no-virtual-keys`, It will be using `misc.no-keys` message
-
 ## Fixes:
-* Send the message to the command sender instead of the player when using `/crates forceopen`
+* Fixed an issue where new players if the config option `Crate.StartingKeys` is not 0 weren't getting keys
+  * While I was working on improving the FileManager... I forgot to uncomment this bit of code.
+
+## Changes:
+* Removed `unsupported-settings` from the example `config.yml`
+
+## Minor Optimizations:
+* Update the order some if checks go in to prevent potentially unnecessarily heavy calls when not needed.
 
 ## Other:
 * [Feature Requests](https://github.com/Crazy-Crew/CrazyCrates/discussions/categories/features)

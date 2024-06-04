@@ -7,6 +7,8 @@ import com.badbones69.crazycrates.api.utils.ItemUtils;
 import com.ryderbelserion.vital.paper.builders.items.ItemBuilder;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -251,7 +253,7 @@ public class Prize {
     }
 
     private @NotNull ItemBuilder display() {
-        final ItemBuilder builder = new ItemBuilder();
+        ItemBuilder builder = new ItemBuilder();
 
         try {
             final String material = this.section.getString("DisplayItem", "red_terracotta");
@@ -259,11 +261,24 @@ public class Prize {
 
             builder.withType(material).setAmount(amount).setDisplayName(this.prizeName);
 
+            if (this.section.contains("DisplayLore")) {
+                // Temp fix until I update the ItemBuilder
+                List<Component> displayLore = new ArrayList<>();
+
+                this.section.getStringList("DisplayLore").forEach(line -> displayLore.add(JSONComponentSerializer.json().deserialize(line)));
+
+                ItemStack itemStack = builder.getStack();
+
+                itemStack.editMeta(itemMeta -> itemMeta.lore(displayLore));
+
+                builder = new ItemBuilder(itemStack);
+            } else {
+                builder.setDisplayLore(this.section.getStringList("Lore"));
+            }
+
             builder.setGlowing(this.section.contains("Glowing") ? section.getBoolean("Glowing") : null);
 
             builder.setDamage(this.section.getInt("DisplayDamage", 0));
-
-            builder.setDisplayLore(this.section.getStringList("Lore"));
 
             builder.addPatterns(this.section.getStringList("Patterns"));
 

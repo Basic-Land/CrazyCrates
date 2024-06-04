@@ -68,7 +68,7 @@ public class CrateTierMenu extends InventoryBuilder {
 
         final PersistentDataContainer container = itemMeta.getPersistentDataContainer();
 
-        if (container.has(PersistentKeys.main_menu_button.getNamespacedKey()) && this.config.getProperty(ConfigKeys.enable_crate_menu)) {
+        if (this.config.getProperty(ConfigKeys.enable_crate_menu) && container.has(PersistentKeys.main_menu_button.getNamespacedKey())) {
             if (this.inventoryManager.inCratePreview(player)) {
                 if (holder.overrideMenu()) return;
 
@@ -115,7 +115,6 @@ public class CrateTierMenu extends InventoryBuilder {
         final Inventory inventory = getInventory();
         final Player player = getPlayer();
         final Crate crate = getCrate();
-        final boolean gacha = getCrate().getCrateType() == CrateType.gacha;
 
         getTiers().forEach(tier -> inventory.setItem(tier.getSlot(), tier.getTierItem(player)));
 
