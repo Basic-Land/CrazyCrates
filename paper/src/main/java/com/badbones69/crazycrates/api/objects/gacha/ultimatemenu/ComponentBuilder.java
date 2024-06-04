@@ -11,20 +11,23 @@ import net.kyori.adventure.text.format.TextColor;
 
 import java.util.UUID;
 
+import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.Component.translatable;
+
 @UtilityClass
 public final class ComponentBuilder {
     private static final Key KEY = Key.key("minecraft", "spaces");
     private static final TextColor COLOR = NamedTextColor.WHITE;
-    private static final Component SPACE_BACK = Component.translatable("space.-45", "").font(KEY);
-    private static final Component SPACE_NEGATIVE = Component.translatable("space.-1", "").font(KEY);
-    private static final Component SPACE_PAGE = Component.translatable("space.223", "").font(KEY);
-    private static final Component SPACE_TIME = Component.translatable("space.-335", "").font(KEY);
-    private static final Component FILL_TOP = Component.translatable("fill_top", "").color(COLOR).append(SPACE_NEGATIVE);
-    private static final Component FILL_DOWN = Component.translatable("fill_down", "").color(COLOR).append(SPACE_NEGATIVE);
-    private static final Component FILL_TIME = Component.translatable("fill_time", "").color(COLOR).append(SPACE_NEGATIVE);
+    private static final Component SPACE_BACK = translatable("space.-45", "").font(KEY);
+    private static final Component SPACE_NEGATIVE = translatable("space.-1", "").font(KEY);
+    private static final Component SPACE_PAGE = translatable("space.223", "").font(KEY);
+    private static final Component SPACE_TIME = translatable("space.-335", "").font(KEY);
+    private static final Component FILL_TOP = translatable("fill_top", "").color(COLOR).append(SPACE_NEGATIVE);
+    private static final Component FILL_DOWN = translatable("fill_down", "").color(COLOR).append(SPACE_NEGATIVE);
+    private static final Component FILL_TIME = translatable("fill_time", "").color(COLOR).append(SPACE_NEGATIVE);
 
     public static Component trans(UUID uniqueId, CrateSettings crateSettings, int mysticTokens, int stellarShards) {
-        TextComponent.Builder builder = Component.text();
+        TextComponent.Builder builder = text();
         String crateName = crateSettings.getCrateName();
 
         int virtualKeys = CrazyCrates.getPlugin(CrazyCrates.class).getUserManager().getVirtualKeys(uniqueId, crateName);
@@ -32,8 +35,8 @@ public final class ComponentBuilder {
         crateName = crateName + " ";
 
         int spaceSize = getSize(crateName) + 62;
-        builder.append(Component.text(crateName));
-        builder.append(Component.translatable("space.-" + spaceSize, "").font(KEY));
+        builder.append(text(crateName));
+        builder.append(translatable("space.-" + spaceSize, "").font(KEY));
 
         String mystic = String.valueOf(mysticTokens);
         String stellar = String.valueOf(stellarShards);
@@ -72,8 +75,7 @@ public final class ComponentBuilder {
             char c = time.charAt(i);
             builder.append(sw(c, NumberType.TIME));
             if (c == ' ') {
-                builder.append(FILL_TIME);
-                builder.append(FILL_TIME);
+                builder.append(FILL_TIME).append(FILL_TIME);
             }
         }
 
@@ -98,7 +100,7 @@ public final class ComponentBuilder {
     }
 
     private static Component sw(char c, NumberType numberType) {
-        return Component.translatable(charSwap(c, numberType), "").color(COLOR).append(SPACE_NEGATIVE);
+        return translatable(charSwap(c, numberType), "").color(COLOR).append(SPACE_NEGATIVE);
     }
 
     private static String charSwap(char c, NumberType numberType) {

@@ -95,12 +95,12 @@ public class ItemManager {
      */
     public int addItem(ItemStack item) {
         try {
-            connection.update("INSERT INTO AllItems(itemStack) VALUES(?)", DBItemStack.encodeItem(item)).join();
+            connection.updateSQLite("INSERT INTO AllItems(itemStack) VALUES(?)", DBItemStack.encodeItem(item)).join();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        int id = connection.query("SELECT last_insert_rowid()").thenApply(rs -> {
+        int id = connection.querySQLite("SELECT last_insert_rowid()").thenApply(rs -> {
             try {
                 if (rs.next()) {
                     return rs.getInt(1);

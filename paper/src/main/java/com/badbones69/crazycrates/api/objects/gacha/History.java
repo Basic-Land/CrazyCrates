@@ -28,7 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.Component.*;
 
 public class History {
     private final DatabaseManager playerDataManager;
@@ -78,28 +78,24 @@ public class History {
             Result history = historyList.get(size - i - 1);
             Rarity rarity = history.getRarity();
 
-            Component component = text()
-                    .append(text("» ", NamedTextColor.DARK_GRAY, TextDecoration.BOLD))
+            Component component = text("» ", NamedTextColor.DARK_GRAY, TextDecoration.BOLD)
                     .append(LegacyComponentSerializer.legacy('&').deserialize(history.getItemName()).hoverEvent(getHover(history, rarity, crateSettings)))
                     .append(text(" - ", NamedTextColor.GRAY)
-                            .append(text(rarity.name(), rarity.getColor()).hoverEvent(HoverEvent.showText(getHoverText(history, crateSettings)))))
-                    .build();
+                            .append(text(rarity.name(), rarity.getColor()).hoverEvent(HoverEvent.showText(getHoverText(history, crateSettings)))));
             player.sendMessage(component);
         }
 
         int pageMinus = pageNumber - 1;
         int pagePlus = pageNumber + 1;
 
-        Component pages = text()
-                .appendNewline()
+        Component pages = newline()
                 .append(text("<<<<", NamedTextColor.DARK_GRAY, TextDecoration.BOLD)
                         .clickEvent(ClickEvent.callback((clickEvent) -> sendHistory(player, target, pageMinus <= 0 ? maxPage : pageMinus, crateSettings)))
                         .hoverEvent(text("Předchozí stránka", NamedTextColor.GRAY)))
                 .append(text(" Strana " + pageNumber + "/" + maxPage + " ", color))
                 .append(text(">>>>", NamedTextColor.DARK_GRAY, TextDecoration.BOLD)
                         .clickEvent(ClickEvent.callback((clickEvent) -> sendHistory(player, target, pagePlus > maxPage ? 1 : pagePlus, crateSettings)))
-                        .hoverEvent(text("Další stránka", NamedTextColor.GRAY)))
-                .build();
+                        .hoverEvent(text("Další stránka", NamedTextColor.GRAY)));
         player.sendMessage(pages);
     }
 
@@ -111,13 +107,11 @@ public class History {
             return;
         }
 
-        Component header = text()
-                .appendNewline()
+        Component header = newline()
                 .append(text("Pity pro ", NamedTextColor.GRAY))
                 .append(text(crateSettings.getCrateName(), NamedTextColor.AQUA))
                 .append(text(" crate", NamedTextColor.GRAY))
-                .appendNewline()
-                .build();
+                .appendNewline();
         player.sendMessage(header);
 
         crateSettings.getRarityMap().keySet().forEach(rarity -> {
@@ -126,13 +120,11 @@ public class History {
             ResultType won5050 = pair.second();
             int color = getColor(pity);
 
-            Component component = text()
-                    .append(text(rarity.name(), rarity.getColor()))
+            Component component = text(rarity.name(), rarity.getColor())
                     .append(text(" pity: ", NamedTextColor.GRAY))
                     .append(text(pity, TextColor.color(color)))
                     .append(text(" last 50/50: ", NamedTextColor.GRAY))
-                    .append(text(won5050.name(), won5050.getColor()))
-                    .build();
+                    .append(text(won5050.name(), won5050.getColor()));
             player.sendMessage(component);
         });
     }
@@ -170,9 +162,9 @@ public class History {
                 .append(text("- pity: ", NamedTextColor.GRAY)
                         .append(text(history.getPity(), TextColor.color(color))))
                 .append(raritySettings.is5050Enabled() ?
-                        Component.newline().append(text("- 50/50: ", NamedTextColor.GRAY))
+                        newline().append(text("- 50/50: ", NamedTextColor.GRAY))
                                 .append(text(won5050.name(), won5050.getColor())) :
-                        Component.empty())
+                        empty())
                 .build();
     }
 

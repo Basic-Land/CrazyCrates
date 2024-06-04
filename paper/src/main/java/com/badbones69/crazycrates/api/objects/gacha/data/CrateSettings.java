@@ -16,14 +16,12 @@ import com.badbones69.crazycrates.api.objects.gacha.util.TierInfo;
 import com.badbones69.crazycrates.config.ConfigManager;
 import com.ryderbelserion.vital.core.config.YamlFile;
 import com.ryderbelserion.vital.core.config.YamlManager;
-import com.ryderbelserion.vital.core.config.objects.CustomFile;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import lombok.Getter;
 import lombok.ToString;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.simpleyaml.configuration.ConfigurationSection;
 import org.simpleyaml.configuration.file.FileConfiguration;
 
@@ -85,7 +83,7 @@ public class CrateSettings {
             rarityMap.put(rarity, raritySettings);
         }
 
-        @Nullable YamlFile customFile = yamlManager.getFile(bannerFile);
+        YamlFile customFile = yamlManager.getFile(bannerFile);
         if (customFile == null) {
             bannerPackage = new BannerPackage(null, null, false);
             return;
@@ -281,7 +279,7 @@ public class CrateSettings {
         NBT nbt = new NBT(stack);
         nbt.setString("rewardName", rewardName);
 
-        if (type == RewardType.EXTRA_REWARD) {
+        if (type.equals(RewardType.EXTRA_REWARD)) {
             extraRewards.add(stack);
             return;
         }
@@ -347,7 +345,7 @@ public class CrateSettings {
     }
 
     public List<Integer> getIDsFromRarityType(Rarity rarity, RewardType type) {
-        return crate.getPrizes().stream().filter(prize -> prize.getRarity() == rarity && prize.getType() == type).map(prize -> prize.getSectionName().split("_")[0]).map(Integer::parseInt).toList();
+        return crate.getPrizes().stream().filter(prize -> prize.getRarity().equals(rarity) && prize.getType().equals(type)).map(prize -> prize.getSectionName().split("_")[0]).map(Integer::parseInt).toList();
     }
 
     public Prize findLegendary(String chosenReward) {
@@ -363,22 +361,22 @@ public class CrateSettings {
     public Set<Prize> getLegendaryStandard() {
         RewardType type = RewardType.STANDARD;
         Rarity rarity = Rarity.LEGENDARY;
-        return crate.getPrizes().stream().filter(item -> item.getRarity() == rarity && item.getType().equals(type)).collect(Collectors.toSet());
+        return crate.getPrizes().stream().filter(item -> item.getRarity().equals(rarity) && item.getType().equals(type)).collect(Collectors.toSet());
     }
 
     public Set<Prize> getLegendaryLimited() {
         RewardType type = RewardType.LIMITED;
         Rarity rarity = Rarity.LEGENDARY;
-        return crate.getPrizes().stream().filter(item -> item.getRarity() == rarity && item.getType().equals(type)).collect(Collectors.toSet());
+        return crate.getPrizes().stream().filter(item -> item.getRarity().equals(rarity) && item.getType().equals(type)).collect(Collectors.toSet());
     }
 
     public Set<Prize> getLimited() {
         RewardType type = RewardType.LIMITED;
-        return crate.getPrizes().stream().filter(item -> item.getType() == type).collect(Collectors.toSet());
+        return crate.getPrizes().stream().filter(item -> item.getType().equals(type)).collect(Collectors.toSet());
     }
 
     public Set<Prize> getStandard() {
         RewardType type = RewardType.STANDARD;
-        return crate.getPrizes().stream().filter(item -> item.getType() == type).collect(Collectors.toSet());
+        return crate.getPrizes().stream().filter(item -> item.getType().equals(type)).collect(Collectors.toSet());
     }
 }

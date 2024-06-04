@@ -38,7 +38,7 @@ public class Result implements Serializable {
     }
 
     public boolean isWon5050() {
-        return won5050 == ResultType.WON || won5050 == ResultType.GUARANTEED || won5050 == ResultType.WON_OF_RATE_UP;
+        return won5050 != ResultType.LOST;
     }
 
     public void setItemData(Prize prize) {
