@@ -82,18 +82,18 @@ public class CrateSettings {
 
             rarityMap.put(rarity, raritySettings);
         }
-
-        YamlFile customFile = yamlManager.getFile(bannerFile);
-        if (customFile == null) {
-            bannerPackage = new BannerPackage(null, null, false);
-            return;
-        }
-
-        BannerData currentBanner = getBanner(customFile, "currentBanner");
-        BannerData nextBanner = getBanner(customFile, "nextBanner");
-
-        bannerPackage = new BannerPackage(currentBanner, nextBanner, true);
-        updateItems();
+        bannerPackage = new BannerPackage(null, null, false);
+//        YamlFile customFile = yamlManager.getFile(bannerFile);
+//        if (customFile == null) {
+//            bannerPackage = new BannerPackage(null, null, false);
+//            return;
+//        }
+//
+//        BannerData currentBanner = getBanner(customFile, "currentBanner");
+//        BannerData nextBanner = getBanner(customFile, "nextBanner");
+//
+//        bannerPackage = new BannerPackage(currentBanner, nextBanner, true);
+//        updateItems();
     }
 
     private void updateItems() {
