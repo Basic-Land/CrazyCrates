@@ -199,7 +199,7 @@ public class CrateManager {
      * @return a list of crate names.
      */
     public List<String> getCrateNames() {
-        return new ArrayList<>(this.plugin.getInstance().getCrateFiles());
+        return this.plugin.getInstance().getCrateFiles();
     }
 
     /**

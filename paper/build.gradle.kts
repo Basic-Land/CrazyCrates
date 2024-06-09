@@ -26,8 +26,6 @@ dependencies {
 
     compileOnly(libs.fancy.holograms)
 
-    compileOnly(libs.placeholderapi)
-
     api(projects.crazycratesCore)
 
     compileOnly("cz.basicland:bLibs:2.0.0-WIP-b25")
