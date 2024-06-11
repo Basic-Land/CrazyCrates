@@ -10,7 +10,6 @@ import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.enums.ResultType;
 import com.badbones69.crazycrates.api.objects.gacha.util.HSLColor;
 import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
-import cz.basicland.blibs.spigot.utils.item.NBT;
 import io.papermc.paper.adventure.PaperAdventure;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
