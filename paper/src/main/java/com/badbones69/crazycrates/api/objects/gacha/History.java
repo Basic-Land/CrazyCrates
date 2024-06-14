@@ -17,7 +17,7 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
 import org.bukkit.NamespacedKey;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
@@ -80,7 +80,7 @@ public class History {
             Rarity rarity = history.getRarity();
 
             Component component = text("» ", NamedTextColor.DARK_GRAY, TextDecoration.BOLD)
-                    .append(LegacyComponentSerializer.legacy('&').deserialize(history.getItemName()).hoverEvent(getHover(history, rarity, crateSettings)))
+                    .append(JSONComponentSerializer.json().deserialize(history.getItemName()).hoverEvent(getHover(history, rarity, crateSettings)))
                     .append(text(" - ", NamedTextColor.GRAY)
                             .append(text(rarity.name(), rarity.getColor()).hoverEvent(HoverEvent.showText(getHoverText(history, crateSettings)))));
             player.sendMessage(component);

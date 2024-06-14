@@ -1,9 +1,13 @@
 package com.badbones69.crazycrates;
 
+import com.badbones69.crazycrates.api.builders.InventoryBuilder;
+import com.badbones69.crazycrates.api.builders.InventoryListener;
 import com.badbones69.crazycrates.api.builders.types.CrateAdminMenu;
 import com.badbones69.crazycrates.api.builders.types.CrateMainMenu;
 import com.badbones69.crazycrates.api.builders.types.CratePreviewMenu;
 import com.badbones69.crazycrates.api.builders.types.CrateTierMenu;
+import com.badbones69.crazycrates.api.builders.types.items.UltimateMenu;
+import com.badbones69.crazycrates.api.objects.gacha.BaseProfileManager;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
 import com.badbones69.crazycrates.commands.CommandManager;
 import com.badbones69.crazycrates.config.ConfigManager;
@@ -23,7 +27,10 @@ import com.badbones69.crazycrates.support.placeholders.PlaceholderAPISupport;
 import com.badbones69.crazycrates.tasks.BukkitUserManager;
 import com.badbones69.crazycrates.tasks.InventoryManager;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
+import com.google.common.reflect.ClassPath;
 import com.ryderbelserion.vital.paper.enums.Support;
+import com.ryderbelserion.vital.paper.files.config.FileManager;
+import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import java.util.List;
@@ -45,7 +52,6 @@ public class CrazyCrates extends JavaPlugin {
     @Getter
     private BaseProfileManager baseProfileManager;
     private FileManager fileManager;
-
     private Server instance;
 
     @Override

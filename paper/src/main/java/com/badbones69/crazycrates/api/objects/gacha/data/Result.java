@@ -7,11 +7,17 @@ import cz.basicland.blibs.spigot.utils.item.NBT;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serial;
 import java.io.Serializable;
+
+import static net.kyori.adventure.text.Component.text;
 
 @ToString
 @Getter
@@ -46,20 +52,23 @@ public class Result implements Serializable {
         if (prize == null) return;
         @NotNull ItemStack item = prize.getDisplayItem();
         NBT nbt = new NBT(item);
-        this.rewardName = nbt.getString("rewardName");
-        this.itemName = item.getItemMeta().getDisplayName();
-        if (itemName.isEmpty()) {
+        rewardName = nbt.getString("rewardName");
+        Component displayName = item.getItemMeta().displayName();
+        if (displayName != null) {
+            itemName = JSONComponentSerializer.json().serialize(displayName);
+        } else {
             itemName = itemName(item.getType().name());
         }
     }
 
     private String itemName(String type) {
-        StringBuilder out = new StringBuilder();
-        out.append("<gray>");
+        TextComponent.Builder out = text();
+        out.color(NamedTextColor.GRAY);
+
         for (String s : type.toLowerCase().split("_")) {
-            out.append(s.substring(0, 1).toUpperCase()).append(s.substring(1)).append(" ");
+            out.append(text(s.substring(0, 1).toUpperCase())).append(text(s.substring(1))).appendSpace();
         }
 
-        return out.toString().trim();
+        return JSONComponentSerializer.json().serialize(out.build());
     }
 }

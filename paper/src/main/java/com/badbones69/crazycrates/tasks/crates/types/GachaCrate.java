@@ -12,6 +12,8 @@ import com.badbones69.crazycrates.api.utils.MiscUtils;
 import com.badbones69.crazycrates.tasks.BukkitUserManager;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
 import com.badbones69.crazycrates.tasks.crates.types.roulette.RouletteStandard;
+import com.ryderbelserion.vital.paper.builders.items.ItemBuilder;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import us.crazycrew.crazycrates.api.enums.types.KeyType;
@@ -100,6 +102,9 @@ public class GachaCrate extends CrateBuilder {
 
         baseProfile.addMysticTokens(mysticTokens);
         baseProfile.addStellarShards(stellarShards);
+
+        setItem(8, new ItemBuilder(Material.PLAYER_HEAD).setDisplayName("<green>Skip").getStack());
+
 
         addCrateTask(new RouletteStandard(getPlayer().getScheduler(), this, items, sneak).runAtFixedRate(this.plugin, 1, 2));
 

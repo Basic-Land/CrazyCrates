@@ -14,16 +14,15 @@ import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ComponentBuilde
 import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 import com.badbones69.crazycrates.api.objects.gacha.util.TierInfo;
 import com.badbones69.crazycrates.config.ConfigManager;
-import com.ryderbelserion.vital.core.config.YamlFile;
-import com.ryderbelserion.vital.core.config.YamlManager;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import lombok.Getter;
 import lombok.ToString;
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.simpleyaml.configuration.ConfigurationSection;
-import org.simpleyaml.configuration.file.FileConfiguration;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -32,7 +31,6 @@ import java.util.stream.Collectors;
 @Getter
 @ToString
 public class CrateSettings {
-    private final YamlManager yamlManager = ConfigManager.getYamlManager();
     private final String crateName, bannerFile;
     private final boolean fatePointEnabled, overrideEnabled, extraRewardEnabled;
     private final int fatePointAmount, bonusPity, modelDataPreviewName, modelDataMainMenu;
@@ -102,8 +100,8 @@ public class CrateSettings {
 
         FileConfiguration crateFile = crate.getFile();
         String path = "Crate.Gacha";
-        crateFile.remove(path + ".standard");
-        crateFile.remove(path + ".limited");
+        crateFile.set(path + ".standard", null);
+        crateFile.set(path + ".limited", null);
 
         List<BannerItem> items = currentBanner.items();
 
@@ -133,7 +131,7 @@ public class CrateSettings {
 
     }
 
-    private BannerData getBanner(YamlFile file, String banner) {
+    private BannerData getBanner(YamlConfiguration file, String banner) {
         String bannerName = file.getString("Banner.Name");
 
         String path = banner + ".duration.start";
@@ -145,7 +143,7 @@ public class CrateSettings {
         return new BannerData(bannerName, start, end, getItems(file, banner));
     }
 
-    private List<BannerItem> getItems(YamlFile file, String banner) {
+    private List<BannerItem> getItems(YamlConfiguration file, String banner) {
         List<BannerItem> items = new ArrayList<>();
         ConfigurationSection section = file.getConfigurationSection(banner + ".items");
         if (section == null) return items;
@@ -156,7 +154,7 @@ public class CrateSettings {
         return items;
     }
 
-    private void addItems(YamlFile file, String banner, RewardType type, List<BannerItem> items) {
+    private void addItems(YamlConfiguration file, String banner, RewardType type, List<BannerItem> items) {
         ConfigurationSection section = file.getConfigurationSection(banner + ".items." + type.name().toLowerCase());
 
         if (section != null) {
@@ -184,7 +182,7 @@ public class CrateSettings {
         }
     }
 
-    private LocalDateTime getTime(YamlFile file, String path) {
+    private LocalDateTime getTime(YamlConfiguration file, String path) {
         int year, month, day, hour, minute;
         year = file.getInt(path + ".year");
         month = file.getInt(path + ".month");

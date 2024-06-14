@@ -20,7 +20,6 @@ public class PlayerProfile implements Serializable {
     private final Map<Rarity, Pair<Integer, ResultType>> map = new HashMap<>();
     @Getter
     private final List<Result> history = new ArrayList<>();
-
     @Getter
     private boolean nextLegendaryLimited;
     @Getter
