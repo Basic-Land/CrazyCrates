@@ -767,7 +767,11 @@ public class Crate {
                 }
 
                 if (itemMeta.hasDisplayName()) {
-                    section.set(getPath(prizeName, "DisplayName"), AdvUtil.getRichMessage(itemMeta.displayName()));
+                    Component display = itemMeta.displayName();
+
+                    if (display != null) {
+                        section.set(getPath(prizeName, "DisplayName"), MiniMessage.miniMessage().serialize(display));
+                    }
                 } else {
                     section.set(getPath(prizeName, "DisplayName"), material.isBlock() ? "<lang:" + material.getBlockTranslationKey() + ">" : "<lang:" + material.getItemTranslationKey() + ">");
                 }
@@ -789,7 +793,7 @@ public class Crate {
     public void saveFile() {
         if (this.name.isEmpty()) return;
 
-        CustomFile customFile = ConfigManager.getYamlManager().getCustomFile(this.name);
+        CustomFile customFile = this.plugin.getFileManager().getCustomFile(this.name);
 
         if (customFile != null) customFile.save();
 

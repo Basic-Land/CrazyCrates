@@ -5,7 +5,6 @@ import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.api.utils.ItemUtils;
 import com.ryderbelserion.vital.paper.builders.items.ItemBuilder;
-import cz.basicland.blibs.spigot.utils.item.NBT;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
@@ -314,14 +313,12 @@ public class Prize {
 
             return builder;
         } catch (Exception exception) {
-            final List<String> list = new ArrayList<>() {{
-               add("<red>There was an error with one of your prizes!");
-               add("<red>The reward in question is labeled: <yellow>" + section.getName() + " <red>in crate: <yellow>" + crateName);
-               add("<red>Name of the reward is " + section.getString("DisplayName"));
-               add("<red>If you are confused, Stop by our discord for support!");
-            }};
-
-            return new ItemBuilder(Material.RED_TERRACOTTA).setDisplayName("<bold><red>ERROR</bold>").setDisplayLore(list);
+            return new ItemBuilder(Material.RED_TERRACOTTA).setDisplayName("<bold><red>ERROR</bold>").setDisplayLore(new ArrayList<>() {{
+                add("<red>There was an error with one of your prizes!");
+                add("<red>The reward in question is labeled: <yellow>" + section.getName() + " <red>in crate: <yellow>" + crateName);
+                add("<red>Name of the reward is " + section.getString("DisplayName"));
+                add("<red>If you are confused, Stop by our discord for support!");
+            }});
         }
     }
 }

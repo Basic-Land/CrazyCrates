@@ -6,6 +6,10 @@ import com.badbones69.crazycrates.api.objects.gacha.data.RaritySettings;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.api.objects.other.CrateLocation;
+import com.badbones69.crazycrates.commands.crates.types.admin.crates.CommandAddItem;
+import com.badbones69.crazycrates.commands.crates.types.admin.crates.CommandMigrate;
+import com.badbones69.crazycrates.commands.relations.ArgumentRelations;
+import com.badbones69.crazycrates.commands.crates.types.player.CommandHelp;
 import com.badbones69.crazycrates.commands.crates.types.admin.CommandAdmin;
 import com.badbones69.crazycrates.commands.crates.types.admin.CommandReload;
 import com.badbones69.crazycrates.commands.crates.types.admin.crates.*;
@@ -145,6 +149,7 @@ public class CommandManager {
                 new CommandOpen(),
                 new CommandTake(),
 
+                new CommandMigrate(),
                 new CommandReload(),
                 new CommandAdmin(),
 

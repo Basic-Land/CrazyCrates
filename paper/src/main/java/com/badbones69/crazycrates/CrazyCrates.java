@@ -1,9 +1,9 @@
 package com.badbones69.crazycrates;
 
-import com.badbones69.crazycrates.api.builders.InventoryBuilder;
-import com.badbones69.crazycrates.api.builders.InventoryListener;
-import com.badbones69.crazycrates.api.builders.types.items.UltimateMenu;
-import com.badbones69.crazycrates.api.objects.gacha.BaseProfileManager;
+import com.badbones69.crazycrates.api.builders.types.CrateAdminMenu;
+import com.badbones69.crazycrates.api.builders.types.CrateMainMenu;
+import com.badbones69.crazycrates.api.builders.types.CratePreviewMenu;
+import com.badbones69.crazycrates.api.builders.types.CrateTierMenu;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
 import com.badbones69.crazycrates.commands.CommandManager;
 import com.badbones69.crazycrates.config.ConfigManager;
@@ -11,7 +11,11 @@ import com.badbones69.crazycrates.config.impl.ConfigKeys;
 import com.badbones69.crazycrates.listeners.BrokeLocationsListener;
 import com.badbones69.crazycrates.listeners.CrateControlListener;
 import com.badbones69.crazycrates.listeners.MiscListener;
-import com.badbones69.crazycrates.listeners.crates.*;
+import com.badbones69.crazycrates.listeners.crates.CosmicCrateListener;
+import com.badbones69.crazycrates.listeners.crates.CrateOpenListener;
+import com.badbones69.crazycrates.listeners.crates.MobileCrateListener;
+import com.badbones69.crazycrates.listeners.crates.QuadCrateListener;
+import com.badbones69.crazycrates.listeners.crates.WarCrateListener;
 import com.badbones69.crazycrates.listeners.other.EntityDamageListener;
 import com.badbones69.crazycrates.support.MetricsWrapper;
 import com.badbones69.crazycrates.support.holograms.HologramManager;
@@ -19,15 +23,11 @@ import com.badbones69.crazycrates.support.placeholders.PlaceholderAPISupport;
 import com.badbones69.crazycrates.tasks.BukkitUserManager;
 import com.badbones69.crazycrates.tasks.InventoryManager;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
-import com.google.common.reflect.ClassPath;
 import com.ryderbelserion.vital.paper.enums.Support;
-import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.List;
 import java.util.Timer;
-
 import static com.badbones69.crazycrates.api.utils.MiscUtils.registerPermissions;
 
 public class CrazyCrates extends JavaPlugin {
@@ -44,6 +44,7 @@ public class CrazyCrates extends JavaPlugin {
     private CrateManager crateManager;
     @Getter
     private BaseProfileManager baseProfileManager;
+    private FileManager fileManager;
 
     private Server instance;
 
@@ -51,6 +52,12 @@ public class CrazyCrates extends JavaPlugin {
     public void onEnable() {
         this.instance = new Server(getDataFolder(), getLogger());
         this.instance.apply();
+
+        this.fileManager = new FileManager();
+        this.fileManager.addFile("locations.yml").addFile("data.yml")
+                .addFolder("crates")
+                .addFolder("schematics")
+                .init();
 
         // Register permissions that we need.
         registerPermissions();
@@ -149,8 +156,8 @@ public class CrazyCrates extends JavaPlugin {
 
             final HologramManager holograms = this.crateManager.getHolograms();
 
-            if (holograms != null && !holograms.isEmpty()) {
-                holograms.removeAllHolograms(true);
+            if (holograms != null) {
+                holograms.purge(true);
             }
         }
 
@@ -169,6 +176,10 @@ public class CrazyCrates extends JavaPlugin {
 
     public @NotNull final CrateManager getCrateManager() {
         return this.crateManager;
+    }
+
+    public @NotNull final FileManager getFileManager() {
+        return this.fileManager;
     }
 
     public @NotNull final Server getInstance() {
