@@ -6,7 +6,7 @@ import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
 import cz.basicland.blibs.shared.databases.hikari.DatabaseConnection;
 import cz.basicland.blibs.spigot.utils.item.DBItemStack;
-import me.ztowne13.customcrates.crates.options.CReward;
+import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.IOException;
@@ -34,18 +34,20 @@ public class ItemManager {
         CrazyCrates plugin = CrazyCrates.getPlugin(CrazyCrates.class);
         CrateManager crateManager = plugin.getCrateManager();
 
+        if (!Bukkit.getPluginManager().isPluginEnabled("bSpecializedCrates")) return;
+
         Crate crate = crateManager.getCrateFromName("AllItems");
 
         if (crate == null) return;
 
-        CReward.getAllRewards().forEach((id, reward) -> {
+        me.ztowne13.customcrates.crates.options.CReward.getAllRewards().forEach((id, reward) -> {
             ItemStack item = reward.getSaveBuilder().getStack();
             String rewardName = reward.getRewardName();
             double chance = reward.getChance();
             List<String> commands = reward.getCommands();
             boolean give = reward.isGiveDisplayItem();
 
-            crate.addEditorItem(item, null, rewardName, chance);
+            crate.addEditorItem(item, id, chance, commands);
         });
     }
 

@@ -1,5 +1,6 @@
 package com.badbones69.crazycrates.api.objects.gacha.data;
 
+import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.Prize;
 import com.badbones69.crazycrates.api.objects.Tier;
@@ -13,7 +14,8 @@ import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ComponentBuilder;
 import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 import com.badbones69.crazycrates.api.objects.gacha.util.TierInfo;
-import com.badbones69.crazycrates.config.ConfigManager;
+import com.ryderbelserion.vital.paper.files.config.CustomFile;
+import com.ryderbelserion.vital.paper.files.config.FileManager;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import lombok.Getter;
 import lombok.ToString;
@@ -22,6 +24,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
@@ -31,6 +34,8 @@ import java.util.stream.Collectors;
 @Getter
 @ToString
 public class CrateSettings {
+    private final CrazyCrates plugin = JavaPlugin.getPlugin(CrazyCrates.class);
+    private final FileManager yamlManager = plugin.getFileManager();
     private final String crateName, bannerFile;
     private final boolean fatePointEnabled, overrideEnabled, extraRewardEnabled;
     private final int fatePointAmount, bonusPity, modelDataPreviewName, modelDataMainMenu;
@@ -47,7 +52,7 @@ public class CrateSettings {
 
         this.crateName = crateName;
         this.crate = crate;
-        this.bannerFile = config.getString(path + ".banner-file");
+        this.bannerFile = config.getString(path + ".banner-file", "");
         this.fatePointEnabled = config.getBoolean(path + ".fate-point.enabled");
         this.fatePointAmount = config.getInt(path + ".fate-point.amount");
         this.overrideEnabled = config.getBoolean(path + ".override");
@@ -80,18 +85,21 @@ public class CrateSettings {
 
             rarityMap.put(rarity, raritySettings);
         }
-        bannerPackage = new BannerPackage(null, null, false);
-//        YamlFile customFile = yamlManager.getFile(bannerFile);
-//        if (customFile == null) {
-//            bannerPackage = new BannerPackage(null, null, false);
-//            return;
-//        }
-//
-//        BannerData currentBanner = getBanner(customFile, "currentBanner");
-//        BannerData nextBanner = getBanner(customFile, "nextBanner");
-//
-//        bannerPackage = new BannerPackage(currentBanner, nextBanner, true);
-//        updateItems();
+
+        CustomFile customFile = yamlManager.getCustomFile(bannerFile);
+
+        if (customFile == null) {
+            bannerPackage = new BannerPackage(null, null, false);
+            return;
+        }
+
+        YamlConfiguration yaml = customFile.getConfiguration();
+
+        BannerData currentBanner = getBanner(yaml, "currentBanner");
+        BannerData nextBanner = getBanner(yaml, "nextBanner");
+
+        bannerPackage = new BannerPackage(currentBanner, nextBanner, true);
+        updateItems();
     }
 
     private void updateItems() {

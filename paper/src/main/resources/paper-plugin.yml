@@ -34,3 +34,7 @@ dependencies:
       load: BEFORE
       required: true
       join-classpath: true
+    bSpecializedCrates:
+      load: BEFORE
+      required: false
+      join-classpath: true

@@ -43,10 +43,8 @@ import org.bukkit.inventory.ItemStack;
 import com.badbones69.crazycrates.tasks.InventoryManager;
 import com.badbones69.crazycrates.api.builders.types.CratePreviewMenu;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 
@@ -637,6 +635,16 @@ public class Crate {
         return this.newPlayerKeys;
     }
 
+    public void addEditorItem(@Nullable final ItemStack itemStack, @NotNull final String prizeName, final double chance, List<String> commands) {
+        if (itemStack == null || prizeName.isEmpty() || chance <= 0) return;
+
+        ConfigurationSection section = getPrizeSection();
+
+        if (section == null) return;
+
+        setItem(itemStack, prizeName, section, chance, "", commands);
+    }
+
     /**
      * Add a new editor item to a prize in the crate.
      *
@@ -651,7 +659,7 @@ public class Crate {
 
         if (section == null) return;
 
-        setItem(itemStack, prizeName, section, chance, "");
+        setItem(itemStack, prizeName, section, chance, "", Collections.emptyList());
     }
 
     /**
@@ -669,7 +677,7 @@ public class Crate {
 
         if (section == null) return;
 
-        setItem(itemStack, prizeName, section, chance, tier);
+        setItem(itemStack, prizeName, section, chance, tier, Collections.emptyList());
     }
 
     /**
@@ -691,7 +699,7 @@ public class Crate {
      * @param section the prizes section.
      * @param chance the chance of the prize.
      */
-    private void setItem(@Nullable final ItemStack itemStack, @NotNull final String prizeName, @Nullable final ConfigurationSection section, final double chance, final String tier) {
+    private void setItem(@Nullable final ItemStack itemStack, @NotNull final String prizeName, @Nullable final ConfigurationSection section, final double chance, final String tier, List<String> commands) {
         if (prizeName.isEmpty() || section == null || chance <= 0 || itemStack == null) return;
 
         final String tiers = getPath(prizeName, "Tiers");
@@ -781,6 +789,8 @@ public class Crate {
                 }
             });
         }
+
+        section.set(getPath(prizeName, "Commands"), commands);
 
         saveFile();
     }

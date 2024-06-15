@@ -52,6 +52,7 @@ public class CrazyCrates extends JavaPlugin {
     @Getter
     private BaseProfileManager baseProfileManager;
     private FileManager fileManager;
+
     private Server instance;
 
     @Override
@@ -63,6 +64,7 @@ public class CrazyCrates extends JavaPlugin {
         this.fileManager.addFile("locations.yml").addFile("data.yml")
                 .addFolder("crates")
                 .addFolder("schematics")
+                .addFolder("banners")
                 .init();
 
         // Register permissions that we need.
