@@ -2,10 +2,6 @@ package com.badbones69.crazycrates;
 
 import com.badbones69.crazycrates.api.builders.InventoryBuilder;
 import com.badbones69.crazycrates.api.builders.InventoryListener;
-import com.badbones69.crazycrates.api.builders.types.CrateAdminMenu;
-import com.badbones69.crazycrates.api.builders.types.CrateMainMenu;
-import com.badbones69.crazycrates.api.builders.types.CratePreviewMenu;
-import com.badbones69.crazycrates.api.builders.types.CrateTierMenu;
 import com.badbones69.crazycrates.api.builders.types.items.UltimateMenu;
 import com.badbones69.crazycrates.api.objects.gacha.BaseProfileManager;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
@@ -15,11 +11,7 @@ import com.badbones69.crazycrates.config.impl.ConfigKeys;
 import com.badbones69.crazycrates.listeners.BrokeLocationsListener;
 import com.badbones69.crazycrates.listeners.CrateControlListener;
 import com.badbones69.crazycrates.listeners.MiscListener;
-import com.badbones69.crazycrates.listeners.crates.CosmicCrateListener;
-import com.badbones69.crazycrates.listeners.crates.CrateOpenListener;
-import com.badbones69.crazycrates.listeners.crates.MobileCrateListener;
-import com.badbones69.crazycrates.listeners.crates.QuadCrateListener;
-import com.badbones69.crazycrates.listeners.crates.WarCrateListener;
+import com.badbones69.crazycrates.listeners.crates.*;
 import com.badbones69.crazycrates.listeners.other.EntityDamageListener;
 import com.badbones69.crazycrates.support.MetricsWrapper;
 import com.badbones69.crazycrates.support.holograms.HologramManager;
@@ -33,8 +25,10 @@ import com.ryderbelserion.vital.paper.files.config.FileManager;
 import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 import java.util.Timer;
+
 import static com.badbones69.crazycrates.api.utils.MiscUtils.registerPermissions;
 
 public class CrazyCrates extends JavaPlugin {
@@ -121,6 +115,7 @@ public class CrazyCrates extends JavaPlugin {
                 new CrateOpenListener(),
                 new WarCrateListener(),
                 new MiscListener(),
+                new GachaCrateListener(),
                 baseProfileManager
         ).forEach(listener -> getServer().getPluginManager().registerEvents(listener, this));
 

@@ -9,9 +9,10 @@ import com.badbones69.crazycrates.api.objects.gacha.data.Result;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuStuff;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
+import com.badbones69.crazycrates.tasks.crates.other.GachaCrateManager;
 import com.ryderbelserion.vital.paper.builders.items.ItemBuilder;
 import com.ryderbelserion.vital.paper.util.scheduler.FoliaRunnable;
-import io.papermc.paper.threadedregions.scheduler.EntityScheduler;
+import lombok.Getter;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -27,15 +28,20 @@ public class RouletteStandard extends FoliaRunnable {
     private final Crate crate;
     private final Player player;
     private final Inventory inventory;
+    @Getter
     private final List<Result> prize;
     private final CrazyCrates plugin = JavaPlugin.getPlugin(CrazyCrates.class);
     private final CrateManager crateManager = plugin.getCrateManager();
     private final Rarity highestRarity;
     private final boolean sneak;
     private final ItemBuilder glass = new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE);
+    @Getter
+    private int count = 1;
+    @Getter
+    private long time = System.currentTimeMillis();
 
-    public RouletteStandard(EntityScheduler entityScheduler, CrateBuilder builder, List<Result> prize, boolean sneak) {
-        super(entityScheduler, null);
+    public RouletteStandard(CrateBuilder builder, List<Result> prize, boolean sneak) {
+        super(builder.getPlayer().getScheduler(), null);
         this.builder = builder;
         this.crate = builder.getCrate();
         this.player = builder.getPlayer();
@@ -46,6 +52,8 @@ public class RouletteStandard extends FoliaRunnable {
     }
 
     private int modelData = 1;
+    private boolean first = false;
+    private boolean lock = false;
 
     @Override
     public void run() {
@@ -53,7 +61,7 @@ public class RouletteStandard extends FoliaRunnable {
             player.playSound(UltimateMenuStuff.OPEN);
         }
 
-        builder.setItem(36, glass.setCustomModelData(modelData).getStack());
+        if (!first) builder.setItem(36, glass.setCustomModelData(modelData).getStack());
 
         if (!player.getOpenInventory().getTopInventory().equals(inventory)) {
             player.openInventory(inventory);
@@ -68,11 +76,25 @@ public class RouletteStandard extends FoliaRunnable {
         }
 
         if (modelData == 64) {
+            if (!first && sneak) {
+                first = true;
+                lock = true;
+                GachaCrateManager gachaCrateManager = (GachaCrateManager) crate.getManager();
+                gachaCrateManager.getGachaRunnables().put(player.getUniqueId(), this);
+                builder.setItem(36, glass.setCustomModelData(600).getStack());
+                builder.setItem(22, prize.getFirst().getPrize().getDisplayItem());
+                return;
+            }
+
+            if (sneak) {
+                if (check()) return;
+            }
+
             endTask();
             cancel();
         }
 
-        modelData++;
+        if (!lock) modelData++;
     }
 
     private int getPortalData() {
@@ -86,12 +108,14 @@ public class RouletteStandard extends FoliaRunnable {
         };
     }
 
+    private boolean check() {
+        return ((GachaCrateManager) crate.getManager()).getGachaRunnables().get(player.getUniqueId()) != null;
+    }
+
     private void endTask() {
         builder.setItem(36, glass.setCustomModelData(600).getStack());
         if (!sneak) {
             builder.setItem(22, prize.getFirst().getPrize().getDisplayItem());
-        } else {
-            //TODO: MAKE THIS WORK
         }
 
         builder.playSound("stop-sound", Sound.Source.PLAYER, "entity.player.levelup");
@@ -116,5 +140,13 @@ public class RouletteStandard extends FoliaRunnable {
                 plugin.getCrateManager().getDatabaseManager().getUltimateMenuManager().open(player, crate);
             }
         }.runTaskLater(plugin, 60);
+    }
+
+    public void incrementCount() {
+        count++;
+    }
+
+    public void updateTimer() {
+        time = System.currentTimeMillis();
     }
 }

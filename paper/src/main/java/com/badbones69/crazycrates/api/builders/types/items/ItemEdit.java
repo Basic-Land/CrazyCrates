@@ -70,9 +70,10 @@ public class ItemEdit extends InventoryBuilder {
                     ItemStack stack = inventory.getItem(15);
                     if (stack == null || stack.getType() == Material.AIR) return;
                     NBT nbt = new NBT(holder.itemStack);
-                    String[] rewardName = nbt.getString("rewardName").split("_");
-                    int id = Integer.parseInt(rewardName[0]);
-                    if (id == 0) return;
+                    System.out.println("holder: " + nbt.getTags());
+                    System.out.println("save: " + new NBT(stack).getTags());
+                    Integer id = nbt.getInteger("itemID");
+                    if (id == null || id == 0) return;
                     try {
                         holder.plugin.getCrateManager().getDatabaseManager().getItemManager().updateItem(id, DBItemStack.encodeItem(stack));
                     } catch (IOException e) {
