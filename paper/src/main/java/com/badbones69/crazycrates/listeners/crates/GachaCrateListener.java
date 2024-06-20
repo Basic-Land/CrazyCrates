@@ -4,7 +4,6 @@ import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.builders.types.CratePrizeMenu;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.data.Result;
-import com.badbones69.crazycrates.tasks.BukkitUserManager;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
 import com.badbones69.crazycrates.tasks.crates.other.GachaCrateManager;
 import com.badbones69.crazycrates.tasks.crates.types.roulette.RouletteStandard;
@@ -54,6 +53,7 @@ public class GachaCrateListener implements Listener {
 
         List<Result> prize = rouletteStandard.getPrize();
         int count = rouletteStandard.getCount();
+        Inventory inv = event.getView().getTopInventory();
         long time = rouletteStandard.getTime();
 
         if (System.currentTimeMillis() - time < 400) return;
@@ -74,7 +74,6 @@ public class GachaCrateListener implements Listener {
             return;
         }
 
-        Inventory inv = event.getView().getTopInventory();
         inv.setItem(22, prize.get(count).getPrize().getDisplayItem());
         rouletteStandard.incrementCount();
     }

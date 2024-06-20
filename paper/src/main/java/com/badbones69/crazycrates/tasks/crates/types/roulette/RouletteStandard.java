@@ -63,6 +63,8 @@ public class RouletteStandard extends FoliaRunnable {
 
         if (!first) builder.setItem(36, glass.setCustomModelData(modelData).getStack());
 
+        System.out.println("modelData: " + modelData);
+
         if (!player.getOpenInventory().getTopInventory().equals(inventory)) {
             player.openInventory(inventory);
         }
@@ -139,7 +141,7 @@ public class RouletteStandard extends FoliaRunnable {
                 crateManager.removePlayerFromOpeningList(player);
                 plugin.getCrateManager().getDatabaseManager().getUltimateMenuManager().open(player, crate);
             }
-        }.runTaskLater(plugin, 60);
+        }.runTaskLater(plugin, 40);
     }
 
     public void incrementCount() {

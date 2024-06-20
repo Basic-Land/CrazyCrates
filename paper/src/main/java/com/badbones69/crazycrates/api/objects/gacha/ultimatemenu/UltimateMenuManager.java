@@ -4,7 +4,6 @@ import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.builders.types.items.UltimateMenu;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
-import com.badbones69.crazycrates.api.objects.gacha.data.PlayerBaseProfile;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -28,15 +27,10 @@ public class UltimateMenuManager {
     }
 
     public void open(Player player, Crate crate) {
-        PlayerBaseProfile playerBaseProfile = plugin.getBaseProfileManager().getPlayerBaseProfile(player.getName());
-
-        int mysticTokens = playerBaseProfile.getMysticTokens();
-        int stellarShards = playerBaseProfile.getStellarShards();
-
         items.put(player.getName(), player.getInventory().getContents());
         databaseManager.saveInventory(player);
 
-        UltimateMenu menu = new UltimateMenu(crate, player, ComponentBuilder.trans(player.getUniqueId(), crate.getCrateSettings(), mysticTokens, stellarShards));
+        UltimateMenu menu = new UltimateMenu(crate, player, ComponentBuilder.trans(player, crate.getCrateSettings()));
         player.openInventory(menu.build().getInventory());
     }
 

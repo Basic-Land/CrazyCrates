@@ -2,35 +2,44 @@ package com.badbones69.crazycrates.api.objects.gacha.ultimatemenu;
 
 import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
+import com.badbones69.crazycrates.api.objects.gacha.data.PlayerBaseProfile;
+import com.badbones69.crazycrates.api.objects.gacha.data.PlayerProfile;
+import com.badbones69.crazycrates.api.objects.gacha.data.RaritySettings;
+import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
-
-import java.util.UUID;
+import org.bukkit.entity.Player;
 
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.Component.translatable;
 
 @UtilityClass
 public final class ComponentBuilder {
+    private static final CrazyCrates plugin = CrazyCrates.getPlugin(CrazyCrates.class);
     private static final Key KEY = Key.key("minecraft", "spaces");
     private static final TextColor COLOR = NamedTextColor.WHITE;
     private static final Component SPACE_BACK = translatable("space.-45", "").font(KEY);
     private static final Component SPACE_NEGATIVE = translatable("space.-1", "").font(KEY);
     private static final Component SPACE_PAGE = translatable("space.223", "").font(KEY);
     private static final Component SPACE_TIME = translatable("space.-335", "").font(KEY);
+    private static final Component SPACE_PITY = translatable("space.-40", "").font(KEY);
+    private static final Component SPACE_SLASH = translatable("space.9", "").font(KEY);
+    private static final Component SPACE_TEST = translatable("space.-41", "").font(KEY);
     private static final Component FILL_TOP = translatable("fill_top", "").color(COLOR).append(SPACE_NEGATIVE);
     private static final Component FILL_DOWN = translatable("fill_down", "").color(COLOR).append(SPACE_NEGATIVE);
     private static final Component FILL_TIME = translatable("fill_time", "").color(COLOR).append(SPACE_NEGATIVE);
 
-    public static Component trans(UUID uniqueId, CrateSettings crateSettings, int mysticTokens, int stellarShards) {
+    public static Component trans(Player player, CrateSettings crateSettings) {
         TextComponent.Builder builder = text();
         String crateName = crateSettings.getCrateName();
 
-        int virtualKeys = CrazyCrates.getPlugin(CrazyCrates.class).getUserManager().getVirtualKeys(uniqueId, crateName);
+        int virtualKeys = plugin.getUserManager().getVirtualKeys(player.getUniqueId(), crateName);
+        PlayerProfile playerProfile = plugin.getCrateManager().getDatabaseManager().getPlayerProfile(player.getName(), crateSettings, false);
+        PlayerBaseProfile baseProfile = plugin.getBaseProfileManager().getPlayerBaseProfile(player.getName());
 
         crateName = crateName + " ";
 
@@ -38,8 +47,8 @@ public final class ComponentBuilder {
         builder.append(text(crateName));
         builder.append(translatable("space.-" + spaceSize, "").font(KEY));
 
-        String mystic = String.valueOf(mysticTokens);
-        String stellar = String.valueOf(stellarShards);
+        String mystic = String.valueOf(baseProfile.getMysticTokens());
+        String stellar = String.valueOf(baseProfile.getStellarShards());
         String virtual = String.valueOf(virtualKeys);
         String time = crateSettings.getBannerPackage().getRemainingDuration();
 
@@ -48,9 +57,7 @@ public final class ComponentBuilder {
         int virtualSpace = virtual.length() * 6;
         int timeSpace = getSize(time) - 2;
 
-        for (int i = 0; i < mystic.length(); i++) {
-            builder.append(sw(mystic.charAt(i), NumberType.TOP));
-        }
+        appendChars(builder, mystic, NumberType.TOP);
 
         down(builder, stellar, mysticSpace, FILL_TOP, SPACE_BACK);
 
@@ -71,8 +78,7 @@ public final class ComponentBuilder {
             builder.append(FILL_TIME);
         }
 
-        for (int i = 0; i < time.length(); i++) {
-            char c = time.charAt(i);
+        for (char c : time.toCharArray()) {
             builder.append(sw(c, NumberType.TIME));
             if (c == ' ') {
                 builder.append(FILL_TIME).append(FILL_TIME);
@@ -83,7 +89,25 @@ public final class ComponentBuilder {
             builder.append(FILL_TIME);
         }
 
+        builder.append(SPACE_PITY);
+
+        crateSettings.getRarityMap().forEach((rarity, settings) -> {
+            if (rarity.equals(Rarity.COMMON)) return;
+            pity(builder, playerProfile, rarity, settings);
+        });
+
         return builder.build();
+    }
+
+    private static void pity(TextComponent.Builder builder, PlayerProfile playerProfile, Rarity rarity, RaritySettings settings) {
+        int currentPity = playerProfile.getPity(rarity).first();
+        String current = String.format("%02d", currentPity);
+        String pity = String.format("%02d", settings.pity());
+
+        appendChars(builder, current, rarity.getPity());
+        builder.append(SPACE_SLASH);
+        appendChars(builder, pity, rarity.getPity());
+        builder.append(SPACE_TEST);
     }
 
     private static void down(TextComponent.Builder builder, String amount, int spaceLength, Component filler, Component space) {
@@ -94,8 +118,12 @@ public final class ComponentBuilder {
 
         builder.append(space);
 
-        for (int i = 0; i < amount.length(); i++) {
-            builder.append(sw(amount.charAt(i), NumberType.DOWN));
+        appendChars(builder, amount, NumberType.DOWN);
+    }
+
+    private void appendChars(TextComponent.Builder builder, String str, NumberType numberType) {
+        for (char c : str.toCharArray()) {
+            builder.append(sw(c, numberType));
         }
     }
 
@@ -124,6 +152,11 @@ public final class ComponentBuilder {
             case TOP -> "_top";
             case DOWN -> "_down";
             case TIME -> "_time";
+            case LEGENDARY_PITY -> "_leg";
+            case EPIC_PITY -> "_epic";
+            case RARE_PITY -> "_rare";
+            case UNCOMMON_PITY -> "_unc";
+            case NONE -> "";
         };
     }
 

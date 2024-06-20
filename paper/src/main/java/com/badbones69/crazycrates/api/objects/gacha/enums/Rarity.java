@@ -1,5 +1,6 @@
 package com.badbones69.crazycrates.api.objects.gacha.enums;
 
+import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.NumberType;
 import lombok.Getter;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -19,6 +20,16 @@ public enum Rarity {
     Rarity(TextColor color, int modelData) {
         this.color = color;
         this.modelData = modelData;
+    }
+
+    public NumberType getPity() {
+        return switch (this) {
+            case LEGENDARY -> NumberType.LEGENDARY_PITY;
+            case EPIC -> NumberType.EPIC_PITY;
+            case RARE -> NumberType.RARE_PITY;
+            case UNCOMMON -> NumberType.UNCOMMON_PITY;
+            default -> NumberType.NONE;
+        };
     }
 
     public static Rarity getRarity(String name) {
