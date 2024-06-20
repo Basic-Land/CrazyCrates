@@ -16,4 +16,12 @@ public enum ResultType {
     ResultType(TextColor color) {
         this.color = color;
     }
+
+    public String getNext() {
+        return switch (this) {
+            case LOST -> "c";
+            case GUARANTEED, WON -> "b";
+            default -> "";
+        };
+    }
 }

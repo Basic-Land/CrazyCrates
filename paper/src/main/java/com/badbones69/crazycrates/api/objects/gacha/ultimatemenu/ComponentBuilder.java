@@ -6,6 +6,8 @@ import com.badbones69.crazycrates.api.objects.gacha.data.PlayerBaseProfile;
 import com.badbones69.crazycrates.api.objects.gacha.data.PlayerProfile;
 import com.badbones69.crazycrates.api.objects.gacha.data.RaritySettings;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
+import com.badbones69.crazycrates.api.objects.gacha.enums.ResultType;
+import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -26,9 +28,9 @@ public final class ComponentBuilder {
     private static final Component SPACE_NEGATIVE = translatable("space.-1", "").font(KEY);
     private static final Component SPACE_PAGE = translatable("space.223", "").font(KEY);
     private static final Component SPACE_TIME = translatable("space.-335", "").font(KEY);
-    private static final Component SPACE_PITY = translatable("space.-40", "").font(KEY);
+    private static final Component SPACE_PITY = translatable("space.-71", "").font(KEY);
     private static final Component SPACE_SLASH = translatable("space.9", "").font(KEY);
-    private static final Component SPACE_TEST = translatable("space.-41", "").font(KEY);
+    private static final Component SPACE_NEWLINE = translatable("space.-72", "").font(KEY);
     private static final Component FILL_TOP = translatable("fill_top", "").color(COLOR).append(SPACE_NEGATIVE);
     private static final Component FILL_DOWN = translatable("fill_down", "").color(COLOR).append(SPACE_NEGATIVE);
     private static final Component FILL_TIME = translatable("fill_time", "").color(COLOR).append(SPACE_NEGATIVE);
@@ -79,7 +81,7 @@ public final class ComponentBuilder {
         }
 
         for (char c : time.toCharArray()) {
-            builder.append(sw(c, NumberType.TIME));
+            builder.append(sw(c, NumberType.TIME, true));
             if (c == ' ') {
                 builder.append(FILL_TIME).append(FILL_TIME);
             }
@@ -100,14 +102,19 @@ public final class ComponentBuilder {
     }
 
     private static void pity(TextComponent.Builder builder, PlayerProfile playerProfile, Rarity rarity, RaritySettings settings) {
-        int currentPity = playerProfile.getPity(rarity).first();
+        Pair<Integer, ResultType> result = playerProfile.getPity(rarity);
+        int currentPity = result.first();
+        String resultType = result.second().getNext();
         String current = String.format("%02d", currentPity);
         String pity = String.format("%02d", settings.pity());
 
-        appendChars(builder, current, rarity.getPity());
+        NumberType numberType = rarity.getNumberType();
+
+        appendChars(builder, resultType, numberType, false);
+        appendChars(builder, current, numberType);
         builder.append(SPACE_SLASH);
-        appendChars(builder, pity, rarity.getPity());
-        builder.append(SPACE_TEST);
+        appendChars(builder, pity, numberType);
+        builder.append(SPACE_NEWLINE);
     }
 
     private static void down(TextComponent.Builder builder, String amount, int spaceLength, Component filler, Component space) {
@@ -121,14 +128,18 @@ public final class ComponentBuilder {
         appendChars(builder, amount, NumberType.DOWN);
     }
 
-    private void appendChars(TextComponent.Builder builder, String str, NumberType numberType) {
+    private static void appendChars(TextComponent.Builder builder, String str, NumberType numberType) {
+        appendChars(builder, str, numberType, true);
+    }
+
+    private void appendChars(TextComponent.Builder builder, String str, NumberType numberType, boolean space) {
         for (char c : str.toCharArray()) {
-            builder.append(sw(c, numberType));
+            builder.append(sw(c, numberType, space));
         }
     }
 
-    private static Component sw(char c, NumberType numberType) {
-        return translatable(charSwap(c, numberType), "").color(COLOR).append(SPACE_NEGATIVE);
+    private static Component sw(char c, NumberType numberType, boolean space) {
+        return translatable(charSwap(c, numberType), "").color(COLOR).append(space ? SPACE_NEGATIVE : Component.empty());
     }
 
     private static String charSwap(char c, NumberType numberType) {
@@ -147,6 +158,8 @@ public final class ComponentBuilder {
             case 'h' -> "hours";
             case 'm' -> "minutes";
             case ' ' -> "fill";
+            case 'c' -> "color";
+            case 'b' -> "black";
             default -> c + "";
         } + switch (numberType) {
             case TOP -> "_top";

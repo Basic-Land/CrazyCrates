@@ -22,7 +22,7 @@ public enum Rarity {
         this.modelData = modelData;
     }
 
-    public NumberType getPity() {
+    public NumberType getNumberType() {
         return switch (this) {
             case LEGENDARY -> NumberType.LEGENDARY_PITY;
             case EPIC -> NumberType.EPIC_PITY;
