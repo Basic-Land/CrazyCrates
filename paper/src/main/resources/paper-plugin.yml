@@ -30,6 +30,10 @@ dependencies:
      load: BEFORE
      required: false
      join-classpath: true
+    HeadDatabase:
+      load: BEFORE
+      required: false
+      join-classpath: true
     bLibs:
       load: BEFORE
       required: true

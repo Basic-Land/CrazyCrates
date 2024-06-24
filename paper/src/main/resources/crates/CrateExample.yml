@@ -160,6 +160,8 @@ Crate:
       Chance: 7
       # An example of a custom player head using minecraft players.
       Player: "Rukkhadevata"
+      # Only uncomment this if using HeadDatabase by Arcaniax
+      # Skull: "7129"
     '3':
       # The name of the item to display in the gui.
       DisplayName: "<red>Diamond Sword"
@@ -192,7 +194,7 @@ Crate:
       # The amount to display in the gui.
       DisplayAmount: 1
       # The lore of the item.
-      Lore:
+      DisplayLore:
         - "<gradient:#8fcfa0:#32a852>A gradient lore!"
       # The max range i.e. 15/100 = 15% chance to win.
       MaxRange: 100
@@ -209,7 +211,7 @@ Crate:
       # The amount to display in the gui.
       DisplayAmount: 3
       # The lore of the item.
-      Lore:
+      DisplayLore:
         - "<gradient:#8fcfa0:#32a852>A gradient lore!"
       # The max range i.e. 25/100 = 15% chance to win.
       MaxRange: 100
@@ -224,7 +226,7 @@ Crate:
       # The amount to display in the gui.
       DisplayAmount: 5
       # The lore of the item.
-      Lore:
+      DisplayLore:
         - "<gray>Make it rain Money."
         - "<bold><gold>Chance: <red>20%</bold>"
       # The max range i.e. 20/100 = 25% chance to win.

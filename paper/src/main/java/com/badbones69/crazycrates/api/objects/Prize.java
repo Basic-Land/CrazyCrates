@@ -21,6 +21,8 @@ import java.util.List;
 
 public class Prize {
 
+    private final CrazyCrates plugin = JavaPlugin.getPlugin(CrazyCrates.class);
+
     private final ConfigurationSection section;
     private final List<ItemBuilder> builders;
     private final List<String> commands;
@@ -56,9 +58,24 @@ public class Prize {
 
         this.alternativePrize = alternativePrize;
 
-        Material material = new ItemBuilder().withType(section.getString("DisplayItem", "stone")).getType();
+        Material material = null;
 
-        this.prizeName = section.getString("DisplayName", material.isBlock() ? "<lang:" + material.getBlockTranslationKey() + ">" : "<lang:" + material.getItemTranslationKey() + ">");
+        if (section.contains("DisplayItem")) {
+            material = ItemUtil.getMaterial(section.getString("DisplayItem", "stone"));
+        }
+
+        // Only run this if DisplayItem isn't found.
+        if (section.contains("DisplayData") && !section.contains("DisplayItem")) {
+            material = ItemUtil.fromBase64(section.getString("DisplayData", "")).getType();
+        }
+
+        String key = "";
+
+        if (material != null) {
+            key = material.isBlock() ? "<lang:" + material.getBlockTranslationKey() + ">" : "<lang:" + material.getItemTranslationKey() + ">";
+        }
+
+        this.prizeName = section.getString("DisplayName", key.isBlank() ? "<red>No valid display name found." : key);
         this.maxRange = section.getInt("MaxRange", 100);
         this.chance = section.getDouble("Chance", 50);
         this.firework = section.getBoolean("Firework", false);
@@ -256,23 +273,32 @@ public class Prize {
         ItemBuilder builder = new ItemBuilder();
 
         try {
-            final String material = this.section.getString("DisplayItem", "red_terracotta");
-            final int amount = this.section.getInt("DisplayAmount", 1);
+            if (this.section.contains("DisplayData")) {
+                builder = builder.fromBase64(this.section.getString("DisplayData"));
+            }
 
-            builder.withType(material).setAmount(amount).setDisplayName(this.prizeName);
+            if (this.section.contains("DisplayItem")) {
+                builder.withType(this.section.getString("DisplayItem", "red_terracotta"));
+            }
 
-            if (this.section.contains("DisplayLore")) {
-                // Temp fix until I update the ItemBuilder
-                List<Component> displayLore = new ArrayList<>();
+            if (this.section.contains("DisplayAmount")) {
+                builder.setAmount(this.section.getInt("DisplayAmount", 1));
+            }
 
-                this.section.getStringList("DisplayLore").forEach(line -> displayLore.add(JSONComponentSerializer.json().deserialize(line)));
+            builder.setDisplayName(this.prizeName);
 
-                ItemStack itemStack = builder.getStack();
+            if (this.section.contains("DisplayLore") && !this.section.contains("Lore")) {
+                builder.setDisplayLore(this.section.getStringList("DisplayLore"));
+            }
 
-                itemStack.editMeta(itemMeta -> itemMeta.lore(displayLore));
+            if (this.section.contains("Lore")) {
+                if (MiscUtils.isLogging()) {
+                    List.of(
+                            "Detected deprecated usage of Lore in " + this.sectionName + ", please change Lore to DisplayLore",
+                            "Lore will be removed in the next major version of Minecraft in favor of DisplayLore."
+                    ).forEach(this.plugin.getLogger()::warning);
+                }
 
-                builder = new ItemBuilder(itemStack);
-            } else {
                 builder.setDisplayLore(this.section.getStringList("Lore"));
             }
 
@@ -288,9 +314,9 @@ public class Prize {
 
             builder.setUnbreakable(section.getBoolean("Unbreakable", false));
 
-            //if (this.section.contains("Skull")) {
-            //    builder.setSkull(section.getString("Skull", ""), HeadDatabaseListener.getHeads());
-            //}
+            if (this.section.contains("Skull") && this.plugin.getApi() != null) {
+                builder.setSkull(section.getString("Skull", ""), this.plugin.getApi());
+            }
 
             if (this.section.contains("Player")) {
                 builder.setPlayer(this.section.getString("Player", ""));

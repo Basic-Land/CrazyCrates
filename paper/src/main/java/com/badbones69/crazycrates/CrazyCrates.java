@@ -23,12 +23,14 @@ import com.google.common.reflect.ClassPath;
 import com.ryderbelserion.vital.paper.enums.Support;
 import com.ryderbelserion.vital.paper.files.config.FileManager;
 import lombok.Getter;
+import me.arcaniax.hdb.api.HeadDatabaseAPI;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 import java.util.Timer;
-
 import static com.badbones69.crazycrates.api.utils.MiscUtils.registerPermissions;
 
 public class CrazyCrates extends JavaPlugin {
@@ -46,6 +48,7 @@ public class CrazyCrates extends JavaPlugin {
     @Getter
     private BaseProfileManager baseProfileManager;
     private FileManager fileManager;
+    private HeadDatabaseAPI api;
 
     private Server instance;
 
@@ -63,6 +66,10 @@ public class CrazyCrates extends JavaPlugin {
 
         // Register permissions that we need.
         registerPermissions();
+
+        if (Support.head_database.isEnabled()) {
+            this.api = new HeadDatabaseAPI();
+        }
 
         this.inventoryManager = new InventoryManager();
         this.crateManager = new CrateManager();
@@ -183,6 +190,14 @@ public class CrazyCrates extends JavaPlugin {
 
     public @NotNull final FileManager getFileManager() {
         return this.fileManager;
+    }
+
+    public @Nullable final HeadDatabaseAPI getApi() {
+        if (this.api == null) {
+            return null;
+        }
+
+        return this.api;
     }
 
     public @NotNull final Server getInstance() {
