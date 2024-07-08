@@ -90,8 +90,6 @@ public class UltimateMenu extends InventoryBuilder {
         int slot = e.getRawSlot();
         if (slot < 0) return;
 
-        System.out.println("Slot: " + slot);
-
         CrazyCrates plugin = ultimateMenu.plugin;
         Player player = ultimateMenu.getPlayer();
         Crate crate = ultimateMenu.getCrate();
@@ -128,7 +126,9 @@ public class UltimateMenu extends InventoryBuilder {
                 plugin.getInventoryManager().openNewCratePreview(player, crate);
             }
             case 83 -> {
-                //TODO: Open shop
+                player.playSound(UltimateMenuStuff.CLICK);
+                close(player);
+                player.openInventory(new ShopMenu(crate, player).build().getInventory());
             }
             case 84 -> {
                 //TODO: handle page back
@@ -145,6 +145,7 @@ public class UltimateMenu extends InventoryBuilder {
                 close(player);
                 player.setSneaking(true);
                 open(ultimateMenu, player, crate, crateManager, 10);
+                player.setSneaking(false);
             }
         }
     }

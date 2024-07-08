@@ -38,14 +38,20 @@ public class UltimateMenuStuff {
             .setDisplayName("<white><b>10x")
             .addDisplayLore("<gray>Kliknutím otevřeš truhlu 10x");
 
-    private static ItemBuilder getItem(Material material, int modelData) {
-        return new ItemBuilder(material).setCustomModelData(modelData).setDisplayName("<white>");
-    }
+    public static final ItemBuilder SHOP_BANNER = getItem(Material.LIGHT_GRAY_STAINED_GLASS_PANE, 1000007);
+    public static final ItemBuilder SHOP_SELECTED = getItem(Material.GREEN_STAINED_GLASS_PANE, 1000007)
+            .addDisplayLore("<gray>Právě vybraný obchod");
+    public static final ItemBuilder SHOP_UNSELECTED = getItem(Material.RED_STAINED_GLASS_PANE, 1000007)
+            .addDisplayLore("<gray>Kliknutím vyberete tento obchod");
 
     public static final Sound CLICK = Sound.sound(Key.key("crate", "click"), Sound.Source.MASTER, 1f, 1f);
     public static final Sound BACK = Sound.sound(Key.key("crate", "back"), Sound.Source.MASTER, 1f, 1f);
     public static final Sound ERROR = Sound.sound(Key.key("crate", "error"), Sound.Source.MASTER, 1f, 1f);
     public static final Sound CRATE = Sound.sound(Key.key("crate", "crate"), Sound.Source.MASTER, 1f, 1f);
     public static final Sound OPEN = Sound.sound(Key.key("crate", "open"), Sound.Source.MASTER, 1f, 1f);
+
+    private static ItemBuilder getItem(Material material, int modelData) {
+        return new ItemBuilder(material).setCustomModelData(modelData).setDisplayName("<white>");
+    }
 
 }

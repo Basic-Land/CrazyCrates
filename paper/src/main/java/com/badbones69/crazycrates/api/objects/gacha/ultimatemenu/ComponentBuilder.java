@@ -101,6 +101,37 @@ public final class ComponentBuilder {
         return builder.build();
     }
 
+    public static Component trans(Player player, String name) {
+        TextComponent.Builder builder = text();
+
+        PlayerBaseProfile baseProfile = plugin.getBaseProfileManager().getPlayerBaseProfile(player.getName());
+
+        int spaceSize = getSize(name) + 62;
+        builder.append(text(name));
+        builder.append(translatable("space.-" + spaceSize, "").font(KEY));
+
+        String mystic = String.valueOf(baseProfile.getMysticTokens());
+        String stellar = String.valueOf(baseProfile.getStellarShards());
+        String vote = String.valueOf(baseProfile.getVoteTokens());
+
+        int mysticSpace = mystic.length() * 6;
+        int stellarSpace = stellar.length() * 6;
+        int virtualSpace = vote.length() * 6;
+
+        appendChars(builder, mystic, NumberType.TOP);
+
+        down(builder, stellar, mysticSpace, FILL_TOP, SPACE_BACK);
+
+        down(builder, vote, stellarSpace, FILL_DOWN, SPACE_PAGE);
+
+        while (virtualSpace < 45) {
+            builder.append(FILL_DOWN);
+            virtualSpace += 3;
+        }
+
+        return builder.build();
+    }
+
     private static void pity(TextComponent.Builder builder, PlayerProfile playerProfile, Rarity rarity, RaritySettings settings) {
         Pair<Integer, ResultType> result = playerProfile.getPity(rarity);
         int currentPity = result.first();
