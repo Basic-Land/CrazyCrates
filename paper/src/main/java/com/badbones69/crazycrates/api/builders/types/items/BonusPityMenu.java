@@ -106,7 +106,6 @@ public class BonusPityMenu extends InventoryBuilder {
             confirm.setDisplayName("#f0af37You have not reached the required pity");
         }
 
-
         getInventory().setItem(33, confirm.getStack());
 
         return this;

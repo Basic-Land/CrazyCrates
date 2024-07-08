@@ -22,11 +22,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
+import java.util.UUID;
 
 public class RouletteStandard extends FoliaRunnable {
     private final CrateBuilder builder;
     private final Crate crate;
     private final Player player;
+    private final UUID uuid;
     private final Inventory inventory;
     @Getter
     private final List<Result> prize;
@@ -45,6 +47,7 @@ public class RouletteStandard extends FoliaRunnable {
         this.builder = builder;
         this.crate = builder.getCrate();
         this.player = builder.getPlayer();
+        this.uuid = player.getUniqueId();
         this.inventory = builder.getInventory();
         this.prize = prize;
         this.highestRarity = prize.stream().map(Result::getRarity).max(Rarity::compareTo).orElse(Rarity.COMMON);
@@ -57,13 +60,19 @@ public class RouletteStandard extends FoliaRunnable {
 
     @Override
     public void run() {
+        if (!player.isOnline()) {
+            ((GachaCrateManager) crate.getManager()).getGachaRunnables().remove(uuid);
+            crateManager.endCrate(player);
+            crateManager.removePlayerFromOpeningList(player);
+            cancel();
+            return;
+        }
+
         if (modelData == 8) {
             player.playSound(UltimateMenuStuff.OPEN);
         }
 
         if (!first) builder.setItem(36, glass.setCustomModelData(modelData).getStack());
-
-        System.out.println("modelData: " + modelData);
 
         if (!player.getOpenInventory().getTopInventory().equals(inventory)) {
             player.openInventory(inventory);
@@ -82,7 +91,7 @@ public class RouletteStandard extends FoliaRunnable {
                 first = true;
                 lock = true;
                 GachaCrateManager gachaCrateManager = (GachaCrateManager) crate.getManager();
-                gachaCrateManager.getGachaRunnables().put(player.getUniqueId(), this);
+                gachaCrateManager.getGachaRunnables().put(uuid, this);
                 builder.setItem(36, glass.setCustomModelData(600).getStack());
                 builder.setItem(22, prize.getFirst().getPrize().getDisplayItem());
                 return;
@@ -111,7 +120,7 @@ public class RouletteStandard extends FoliaRunnable {
     }
 
     private boolean check() {
-        return ((GachaCrateManager) crate.getManager()).getGachaRunnables().get(player.getUniqueId()) != null;
+        return ((GachaCrateManager) crate.getManager()).getGachaRunnables().get(uuid) != null;
     }
 
     private void endTask() {
