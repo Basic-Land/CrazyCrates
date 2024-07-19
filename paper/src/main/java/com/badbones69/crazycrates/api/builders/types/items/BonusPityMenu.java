@@ -39,7 +39,7 @@ public class BonusPityMenu extends InventoryBuilder {
         int extraRewardPity = playerProfile.getExtraRewardPity();
 
         // Calculate the total number of pages
-        totalPages = (int) Math.ceil((double) extraRewards.size() / 7);
+        totalPages = Math.ceilDiv(extraRewards.size(), 7);
         if (totalPages == 0) totalPages = 1;
 
         // Set the orange glass pane at the border positions

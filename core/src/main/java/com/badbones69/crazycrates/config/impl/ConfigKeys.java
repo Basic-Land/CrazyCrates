@@ -168,6 +168,9 @@ public class ConfigKeys implements SettingsHolder {
             "<gray>Return to the menu."
     ));
 
+    @Comment("The lore of the item.")
+    public static final Property<Integer> menu_button_custom_model_data = newProperty("gui.inventory.buttons.menu.cmd", -1);
+
     @Comment("The item the button should be.")
     public static final Property<String> next_button_item = newProperty("gui.inventory.buttons.next.item", "feather");
 

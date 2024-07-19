@@ -13,10 +13,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 public class GachaSystem {
-    private final Random random = new Random(System.nanoTime() * new Random(System.nanoTime()).nextLong());
+    private final ThreadLocalRandom random = ThreadLocalRandom.current();
 
     public GachaSystem() {
     }
@@ -138,7 +139,6 @@ public class GachaSystem {
     }
 
     private Prize pickRandomPrice(Result result, CrateSettings itemSet, Set<Prize> overrideSet) {
-        random.setSeed(System.nanoTime() * new Random(System.nanoTime()).nextLong());
         if (overrideSet != null)
             return overrideSet.stream().skip(random.nextInt(overrideSet.size())).findFirst().orElse(null);
 

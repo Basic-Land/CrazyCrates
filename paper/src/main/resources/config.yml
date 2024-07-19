@@ -45,6 +45,8 @@ gui:
         # The lore of the item.
         lore:
           - "<gray>Return to the menu."
+        # Model data of the item.
+        cmd: -1
       # The next button.
       next:
         # The item the button should be.

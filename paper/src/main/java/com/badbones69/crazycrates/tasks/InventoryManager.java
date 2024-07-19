@@ -30,6 +30,10 @@ public class InventoryManager {
                 .setDisplayName(this.config.getProperty(ConfigKeys.menu_button_name))
                 .setDisplayLore(this.config.getProperty(ConfigKeys.menu_button_lore))
                 .setPersistentString(PersistentKeys.main_menu_button.getNamespacedKey(), "none");
+        int cmd = this.config.getProperty(ConfigKeys.menu_button_custom_model_data);
+        if (cmd != -1) {
+            this.menuButton.setCustomModelData(cmd);
+        }
 
         this.nextButton = new ItemBuilder().withType(this.config.getProperty(ConfigKeys.next_button_item))
                 .setDisplayName(this.config.getProperty(ConfigKeys.next_button_name))

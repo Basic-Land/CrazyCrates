@@ -31,6 +31,7 @@ import com.badbones69.crazycrates.CrazyCrates;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class CommandManager {
 
@@ -85,13 +86,9 @@ public class CommandManager {
             return tiers;
         });
 
-        commandManager.registerSuggestion(SuggestionKey.of("numbers"), (sender, context) -> {
-            final List<String> numbers = new ArrayList<>();
-
-            for (int i = 1; i <= 100; i++) numbers.add(String.valueOf(i));
-
-            return numbers;
-        });
+        commandManager.registerSuggestion(SuggestionKey.of("numbers"), (sender, context) -> IntStream.rangeClosed(1, 100)
+                .mapToObj(String::valueOf)
+                .collect(Collectors.toList()));
 
         commandManager.registerSuggestion(SuggestionKey.of("types"), (sender, context) -> {
             Crate crate = plugin.getCrateManager().getCrateFromName(context.getFirst());
@@ -133,6 +130,10 @@ public class CommandManager {
             return collect;
         });
 
+        commandManager.registerSuggestion(SuggestionKey.of("cmdd"), (sender, context) -> {
+            return List.of("vote", "premium");
+        });
+
         commandManager.registerArgument(PlayerBuilder.class, (sender, context) -> new PlayerBuilder(context));
 
         List.of(
@@ -144,6 +145,7 @@ public class CommandManager {
                 new CommandSet(),
                 new CommandAddItemCustom(),
                 new CommandEditItems(),
+                new CommandAdd(),
 
                 new CommandGive(),
                 new CommandOpen(),

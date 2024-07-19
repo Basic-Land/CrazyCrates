@@ -11,6 +11,7 @@ import com.badbones69.crazycrates.api.objects.gacha.enums.ResultType;
 import com.badbones69.crazycrates.api.objects.gacha.util.HSLColor;
 import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 import io.papermc.paper.adventure.PaperAdventure;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -40,7 +41,7 @@ public class History {
         this.playerDataManager = playerDataManager;
     }
 
-    public void sendHistory(Player player, String target, int pageNumber, CrateSettings crateSettings) {
+    public void sendHistory(Audience player, String target, int pageNumber, CrateSettings crateSettings) {
         PlayerProfile profile = playerDataManager.getPlayerProfile(target, crateSettings, true);
 
         if (profile == null) {
@@ -91,11 +92,11 @@ public class History {
 
         Component pages = newline()
                 .append(text("<<<<", NamedTextColor.DARK_GRAY, TextDecoration.BOLD)
-                        .clickEvent(ClickEvent.callback((clickEvent) -> sendHistory(player, target, pageMinus <= 0 ? maxPage : pageMinus, crateSettings)))
+                        .clickEvent(ClickEvent.callback(clickEvent -> sendHistory(clickEvent, target, pageMinus <= 0 ? maxPage : pageMinus, crateSettings)))
                         .hoverEvent(text("Předchozí stránka", NamedTextColor.GRAY)))
                 .append(text(" Strana " + pageNumber + "/" + maxPage + " ", color))
                 .append(text(">>>>", NamedTextColor.DARK_GRAY, TextDecoration.BOLD)
-                        .clickEvent(ClickEvent.callback((clickEvent) -> sendHistory(player, target, pagePlus > maxPage ? 1 : pagePlus, crateSettings)))
+                        .clickEvent(ClickEvent.callback(clickEvent -> sendHistory(clickEvent, target, pagePlus > maxPage ? 1 : pagePlus, crateSettings)))
                         .hoverEvent(text("Další stránka", NamedTextColor.GRAY)));
         player.sendMessage(pages);
     }

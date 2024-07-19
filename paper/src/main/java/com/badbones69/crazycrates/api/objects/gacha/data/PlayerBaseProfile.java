@@ -10,7 +10,7 @@ public class PlayerBaseProfile implements Serializable {
     @Serial
     private static final long serialVersionUID = 4019127885119793810L;
     private final String playerName;
-    private int stellarShards, mysticTokens, voteTokens;
+    private int stellarShards, mysticTokens, voteTokens, premiumCurrency;
 
     public void addStellarShards(int amount) {
         stellarShards += amount;
@@ -22,6 +22,10 @@ public class PlayerBaseProfile implements Serializable {
 
     public void addVoteTokens(int amount) {
         voteTokens += amount;
+    }
+
+    public void addPremiumCurrency(int amount) {
+        premiumCurrency += amount;
     }
 
     public void removeStellarShards(int amount) {
@@ -36,6 +40,10 @@ public class PlayerBaseProfile implements Serializable {
         voteTokens -= amount;
     }
 
+    public void removePremiumCurrency(int amount) {
+        premiumCurrency -= amount;
+    }
+
     public boolean hasStellarShards(int amount) {
         return stellarShards >= amount;
     }
@@ -46,5 +54,48 @@ public class PlayerBaseProfile implements Serializable {
 
     public boolean hasVoteTokens(int amount) {
         return voteTokens >= amount;
+    }
+
+    public boolean hasPremiumCurrency(int amount) {
+        return premiumCurrency >= amount;
+    }
+
+    public boolean removeStellarShardsIfHas(int amount) {
+        if (hasStellarShards(amount)) {
+            removeStellarShards(amount);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean removeMysticTokensIfHas(int amount) {
+        if (hasMysticTokens(amount)) {
+            removeMysticTokens(amount);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean removeVoteTokensIfHas(int amount) {
+        if (hasVoteTokens(amount)) {
+            removeVoteTokens(amount);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean removePremiumCurrencyIfHas(int amount) {
+        if (hasPremiumCurrency(amount)) {
+            removePremiumCurrency(amount);
+            return true;
+        }
+        return false;
+    }
+
+    public void convertPremiumToVote(int amount) {
+        if (hasPremiumCurrency(amount)) {
+            removePremiumCurrency(amount);
+            addVoteTokens(amount);
+        }
     }
 }

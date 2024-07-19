@@ -30,7 +30,7 @@ public class UltimateMenuManager {
         items.put(player.getName(), player.getInventory().getContents());
         databaseManager.saveInventory(player);
 
-        UltimateMenu menu = new UltimateMenu(crate, player, ComponentBuilder.trans(player, crate.getCrateSettings()));
+        UltimateMenu menu = new UltimateMenu(crate, player, ComponentBuilder.mainMenu(player, crate.getCrateSettings()));
         player.openInventory(menu.build().getInventory());
     }
 

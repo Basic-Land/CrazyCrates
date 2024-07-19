@@ -27,11 +27,11 @@ public class ShopMenu extends InventoryBuilder {
     }
 
     public ShopMenu(ShopMenu menu, int page) {
-        this(menu.getCrate(), menu.getPlayer(), ComponentBuilder.trans(menu.getPlayer(), names.get(page)), page);
+        this(menu.getCrate(), menu.getPlayer(), ComponentBuilder.shop(menu.getPlayer(), names.get(page)), page);
     }
 
     public ShopMenu(Crate crate, Player player) {
-        this(crate, player, ComponentBuilder.trans(player, names.get(0)), 0);
+        this(crate, player, ComponentBuilder.shop(player, names.get(0)), 0);
     }
 
     @Override

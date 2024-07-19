@@ -8,6 +8,7 @@ import com.badbones69.crazycrates.api.objects.Prize;
 import com.badbones69.crazycrates.api.objects.gacha.data.Result;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuStuff;
+import com.badbones69.crazycrates.api.utils.MiscUtils;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
 import com.badbones69.crazycrates.tasks.crates.other.GachaCrateManager;
 import com.ryderbelserion.vital.paper.builders.items.ItemBuilder;
@@ -66,6 +67,11 @@ public class RouletteStandard extends FoliaRunnable {
             crateManager.removePlayerFromOpeningList(player);
             cancel();
             return;
+        }
+
+        for (int i = 0; i < 45; i++) {
+            if (i == 36 || i == 37) continue;
+            builder.setItem(i, MiscUtils.getRandomPaneColor().setCustomModelData(2000000).getStack());
         }
 
         if (modelData == 8) {

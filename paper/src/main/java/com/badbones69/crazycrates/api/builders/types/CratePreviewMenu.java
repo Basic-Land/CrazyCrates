@@ -10,6 +10,7 @@ import com.badbones69.crazycrates.api.objects.gacha.enums.GachaType;
 import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuStuff;
 import com.badbones69.crazycrates.tasks.InventoryManager;
+import com.ryderbelserion.vital.paper.builders.items.ItemBuilder;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.Material;
@@ -74,7 +75,10 @@ public class CratePreviewMenu extends InventoryBuilder {
         if (crate.isBorderToggle()) {
             final List<Integer> borderItems = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8);
 
-            final ItemStack itemStack = crate.getBorderItem().setPlayer(player).getStack();
+            ItemBuilder itemBuilder = crate.getBorderItem().setPlayer(player);
+            itemBuilder.setCustomModelData(1000001);
+
+            final ItemStack itemStack = itemBuilder.getStack();
 
             for (int i : borderItems) { // Top Border slots
                 inventory.setItem(i, itemStack);

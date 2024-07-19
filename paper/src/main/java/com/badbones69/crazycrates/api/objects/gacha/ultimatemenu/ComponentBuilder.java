@@ -35,7 +35,7 @@ public final class ComponentBuilder {
     private static final Component FILL_DOWN = translatable("fill_down", "").color(COLOR).append(SPACE_NEGATIVE);
     private static final Component FILL_TIME = translatable("fill_time", "").color(COLOR).append(SPACE_NEGATIVE);
 
-    public static Component trans(Player player, CrateSettings crateSettings) {
+    public static Component mainMenu(Player player, CrateSettings crateSettings) {
         TextComponent.Builder builder = text();
         String crateName = crateSettings.getCrateName();
 
@@ -49,19 +49,19 @@ public final class ComponentBuilder {
         builder.append(text(crateName));
         builder.append(translatable("space.-" + spaceSize, "").font(KEY));
 
-        String mystic = String.valueOf(baseProfile.getMysticTokens());
-        String stellar = String.valueOf(baseProfile.getStellarShards());
+        String voteTokens = String.valueOf(baseProfile.getVoteTokens());
+        String premiumCurrency = String.valueOf(baseProfile.getPremiumCurrency());
         String virtual = String.valueOf(virtualKeys);
         String time = crateSettings.getBannerPackage().getRemainingDuration();
 
-        int mysticSpace = mystic.length() * 6;
-        int stellarSpace = stellar.length() * 6;
+        int mysticSpace = voteTokens.length() * 6;
+        int stellarSpace = premiumCurrency.length() * 6;
         int virtualSpace = virtual.length() * 6;
         int timeSpace = getSize(time) - 2;
 
-        appendChars(builder, mystic, NumberType.TOP);
+        appendChars(builder, voteTokens, NumberType.TOP);
 
-        down(builder, stellar, mysticSpace, FILL_TOP, SPACE_BACK);
+        down(builder, premiumCurrency, mysticSpace, FILL_TOP, SPACE_BACK);
 
         down(builder, virtual, stellarSpace, FILL_DOWN, SPACE_PAGE);
 
@@ -101,7 +101,7 @@ public final class ComponentBuilder {
         return builder.build();
     }
 
-    public static Component trans(Player player, String name) {
+    public static Component shop(Player player, String name) {
         TextComponent.Builder builder = text();
 
         PlayerBaseProfile baseProfile = plugin.getBaseProfileManager().getPlayerBaseProfile(player.getName());

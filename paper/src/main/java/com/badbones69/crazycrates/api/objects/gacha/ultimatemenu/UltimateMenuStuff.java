@@ -5,6 +5,8 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.Material;
 
+import java.util.List;
+
 public class UltimateMenuStuff {
     public static final ItemBuilder SELECTED = getItem(Material.GREEN_STAINED_GLASS_PANE, 1000002)
             .addDisplayLore("<gray>Právě vybraná truhla");
@@ -37,12 +39,47 @@ public class UltimateMenuStuff {
     public static final ItemBuilder BUILDER_X10 = getItem(Material.BLUE_STAINED_GLASS_PANE, 1000001)
             .setDisplayName("<white><b>10x")
             .addDisplayLore("<gray>Kliknutím otevřeš truhlu 10x");
+    public static final ItemBuilder TOKEN_SHOP = getItem(Material.LIGHT_GRAY_STAINED_GLASS_PANE, 1000008);
+    public static final ItemBuilder PREMIUM_SHOP = getItem(Material.LIGHT_GRAY_STAINED_GLASS_PANE, 1000009);
+    public static final ItemBuilder STORE_MENU = getItem(Material.LIGHT_GRAY_STAINED_GLASS_PANE, 1000010);
+
 
     public static final ItemBuilder SHOP_BANNER = getItem(Material.LIGHT_GRAY_STAINED_GLASS_PANE, 1000007);
     public static final ItemBuilder SHOP_SELECTED = getItem(Material.GREEN_STAINED_GLASS_PANE, 1000007)
             .addDisplayLore("<gray>Právě vybraný obchod");
     public static final ItemBuilder SHOP_UNSELECTED = getItem(Material.RED_STAINED_GLASS_PANE, 1000007)
             .addDisplayLore("<gray>Kliknutím vyberete tento obchod");
+
+
+
+    public static final ItemBuilder SHOP_BACK_MENU = getItem(Material.RED_STAINED_GLASS_PANE, 1000001)
+            .setDisplayName("<white><b>Zpět")
+            .setDisplayLore(List.of(
+                    "<white>Kliknutím se vrátíš zpět",
+                    "<white>na hlavní menu"
+            ));
+    public static final ItemBuilder SHOP_VOTE_TOKENS_YES = getItem(Material.GREEN_STAINED_GLASS_PANE, 1000003)
+            .setDisplayName("<white><b>Potvrdit")
+            .setDisplayLore(List.of(
+                    "<white>Kliknutím si koupíš <yellow>{keys}</yellow>",
+                    "<white>za <yellow>{vote}</yellow> vote tokenů"
+            ));
+
+    public static final ItemBuilder SHOP_VOTE_PREMIUM_YES = getItem(Material.GREEN_STAINED_GLASS_PANE, 1000003)
+            .setDisplayName("<white><b>Potvrdit")
+            .setDisplayLore(List.of(
+                    "<white>Kliknutím si převedeš <yellow>{premium}</yellow>",
+                    "<white>na vote tokeny"
+            ));
+
+    public static final ItemBuilder OPEN_STORE = getItem(Material.GREEN_STAINED_GLASS_PANE, 1000003)
+            .setDisplayName("<white><b>Potvrdit")
+            .setDisplayLore(List.of(
+                    "<white>Kliknutím dostaneš link",
+                    "<white>na webový obchod"
+            ));
+
+    public static final ItemBuilder BORDER = getItem(Material.LIGHT_GRAY_STAINED_GLASS_PANE, 1000011);
 
     public static final Sound CLICK = Sound.sound(Key.key("crate", "click"), Sound.Source.MASTER, 1f, 1f);
     public static final Sound BACK = Sound.sound(Key.key("crate", "back"), Sound.Source.MASTER, 1f, 1f);

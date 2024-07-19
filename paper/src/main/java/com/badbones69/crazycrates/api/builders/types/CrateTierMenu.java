@@ -35,8 +35,6 @@ public class CrateTierMenu extends InventoryBuilder {
         super(player, title, size, crate, tiers);
     }
 
-    public CrateTierMenu() {}
-
     @Override
     public InventoryBuilder build() {
         setDefaultItems();
@@ -148,10 +146,8 @@ public class CrateTierMenu extends InventoryBuilder {
     }
 
     private void setItemsGacha() {
-        CrateSettings settings = getCrate().getCrateSettings();
-
         ItemBuilder item = new ItemBuilder(Material.PLAYER_HEAD).setDisplayName("<green><b>Bonus pity prize").addDisplayLore("<gray>Click to preview/pick a prize");
-        item.setCustomModelData(settings.getModelDataPreviewName());
+        item.setCustomModelData(1000001);
         getInventory().setItem(getCrate().getAbsolutePreviewItemPosition(8), item.getStack());
 
         ItemBuilder paper = new ItemBuilder(Material.PAPER).setCustomModelData(11).setDisplayName("Info");

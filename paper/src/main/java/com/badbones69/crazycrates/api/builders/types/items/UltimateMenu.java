@@ -2,16 +2,17 @@ package com.badbones69.crazycrates.api.builders.types.items;
 
 import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.builders.InventoryBuilder;
-import com.badbones69.crazycrates.api.enums.Messages;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
+import com.badbones69.crazycrates.api.objects.gacha.data.OpenData;
 import com.badbones69.crazycrates.api.objects.gacha.data.PlayerBaseProfile;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ComponentBuilder;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuStuff;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
 import com.ryderbelserion.vital.paper.builders.items.ItemBuilder;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,15 +24,19 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.java.JavaPlugin;
 import us.crazycrew.crazycrates.api.enums.types.KeyType;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import static net.kyori.adventure.text.Component.empty;
+import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.minimessage.MiniMessage.miniMessage;
 
 public class UltimateMenu extends InventoryBuilder {
     private static final DatabaseManager manager = JavaPlugin.getPlugin(CrazyCrates.class).getCrateManager().getDatabaseManager();
     private final int selectedCrate;
     private final int totalPageAmount;
     private int currentPage;
+    private boolean voteShop, premiumShop, store = false;
+    private OpenData openData = null;
 
     public UltimateMenu(Crate crate, Player player, Component trans) {
         super(crate, player, 54, trans);
@@ -70,6 +75,16 @@ public class UltimateMenu extends InventoryBuilder {
         this(ultimateMenu.getPlayer(), title, ultimateMenu.currentPage, selectedCrate);
     }
 
+    private UltimateMenu(UltimateMenu ultimateMenu) {
+        this(ultimateMenu.getPlayer(),
+                ComponentBuilder.mainMenu(
+                        ultimateMenu.getPlayer(),
+                        ultimateMenu.getCrate().getCrateSettings()),
+                ultimateMenu.currentPage,
+                ultimateMenu.selectedCrate
+        );
+    }
+
 
     @Override
     public InventoryBuilder build() {
@@ -90,11 +105,12 @@ public class UltimateMenu extends InventoryBuilder {
         int slot = e.getRawSlot();
         if (slot < 0) return;
 
+        System.out.println("Slot: " + slot);
+        System.out.println("Slot inv: " + e.getSlot());
+
         CrazyCrates plugin = ultimateMenu.plugin;
         Player player = ultimateMenu.getPlayer();
         Crate crate = ultimateMenu.getCrate();
-
-        CrateManager crateManager = plugin.getCrateManager();
 
         int newCrateNum;
 
@@ -109,12 +125,43 @@ public class UltimateMenu extends InventoryBuilder {
         if (newCrateNum != -1) {
             player.playSound(UltimateMenuStuff.CLICK);
             CrateSettings newCrate = manager.getCrateSettingsSplit().get(ultimateMenu.currentPage).get(newCrateNum);
-            Component trans = ComponentBuilder.trans(player, newCrate);
+            Component trans = ComponentBuilder.mainMenu(player, newCrate);
 
             player.openInventory(new UltimateMenu(ultimateMenu, trans, newCrateNum).build().getInventory());
         }
 
         switch (slot) {
+            case 65, 66 -> {
+                if (voteShop || premiumShop || store) {
+                    setTextureGlass();
+                    voteShop = false;
+                    premiumShop = false;
+                }
+
+                PlayerInventory playerInventory = player.getInventory();
+                for (int i = 20; i < 25; i++) {
+                    playerInventory.setItem(i, null);
+                }
+            }
+
+            case 68, 69 -> {
+                if (voteShop && !premiumShop) {
+                    if (openFrom(player, crate)) return;
+                    plugin.getBaseProfileManager().getPlayerBaseProfile(player.getName()).removeVoteTokens(openData.currencyTake());
+                } else if (premiumShop && !voteShop) {
+                    plugin.getBaseProfileManager().getPlayerBaseProfile(player.getName()).convertPremiumToVote(openData.currencyTake());
+                    voteShop = false;
+                    premiumShop = false;
+                    player.openInventory(new UltimateMenu(this).build().getInventory());
+                } else if (store) {
+                    player.sendMessage(empty()
+                            .append(miniMessage().deserialize("<red><b>Server <dark_gray>» </b><gray>Klikni pro otevření stránky obchodu"))
+                            .hoverEvent(text("https://store.basicland.cz/"))
+                            .clickEvent(ClickEvent.openUrl("https://store.basicland.cz/")));
+                    close(player);
+                }
+            }
+
             case 81 -> {
                 player.playSound(UltimateMenuStuff.CLICK);
                 close(player);
@@ -136,27 +183,114 @@ public class UltimateMenu extends InventoryBuilder {
             case 85 -> {
                 //TODO: handle page forward
             }
-            case 86, 87 -> {
-                close(player);
-                player.setSneaking(false);
-                open(ultimateMenu, player, crate, crateManager, 1);
-            }
-            case 88, 89 -> {
-                close(player);
-                player.setSneaking(true);
-                open(ultimateMenu, player, crate, crateManager, 10);
-                player.setSneaking(false);
+            case 86, 87 -> open1(player, crate);
+            case 88, 89 -> open10(player, crate);
+        }
+    }
+
+    private boolean openFrom(Player player, Crate crate) {
+        if (openData.isZero()) return true;
+        addKeys(player, crate, openData.neededKeys());
+        int selectAmount = openData.selectAmount();
+
+        if (selectAmount == 1) {
+            open1(player, crate);
+        } else if (selectAmount == 10) {
+            open10(player, crate);
+        }
+        return false;
+    }
+
+    private void open10(Player player, Crate crate) {
+        open(player, crate, crateManager, 10, () -> {
+            close(player);
+            player.setSneaking(true);
+        });
+        player.setSneaking(false);
+    }
+
+    private void open1(Player player, Crate crate) {
+        open(player, crate, crateManager, 1, () -> {
+            close(player);
+            player.setSneaking(false);
+        });
+    }
+
+    private void open(Player player, Crate crate, CrateManager crateManager, int size, Runnable runnable) {
+        int keys = getKeys(player, crate);
+        if (keys >= size) {
+            runnable.run();
+            player.playSound(UltimateMenuStuff.CRATE);
+            crateManager.openCrate(player, crate, KeyType.virtual_key, player.getLocation(), false, false);
+        } else {
+            PlayerBaseProfile playerBaseProfile = plugin.getBaseProfileManager().getPlayerBaseProfile(player.getName());
+            int cost = size * 160;
+            int keysNeeded = size - keys;
+            int vote = keysNeeded * 160;
+            int premium = cost - (cost - vote) - playerBaseProfile.getVoteTokens();
+
+            if (playerBaseProfile.hasVoteTokens(vote)) {
+                setVoteMenu(player, keysNeeded, vote);
+                openData = new OpenData(size, keysNeeded, vote);
+            } else if (playerBaseProfile.hasPremiumCurrency(premium)) {
+                setPremiumMenu(player, premium);
+                openData = new OpenData(size, keysNeeded, premium);
+            } else {
+                openStoreMenu(player);
             }
         }
     }
 
-    private void open(UltimateMenu ultimateMenu, Player player, Crate crate, CrateManager crateManager, int size) {
-        if (ultimateMenu.hasKeys(player, crate, size)) {
-            player.playSound(UltimateMenuStuff.CRATE);
-            crateManager.openCrate(player, crate, KeyType.virtual_key, player.getLocation(), false, false);
-        } else {
-            message(crate, player);
-        }
+    private void setVoteMenu(Player player, int keysNeeded, int voteTokensNeeded) {
+        PlayerInventory playerInventory = player.getInventory();
+        playerInventory.setItem(28, UltimateMenuStuff.TOKEN_SHOP.getStack());
+
+        ItemStack no = UltimateMenuStuff.SHOP_BACK_MENU.getStack();
+        playerInventory.setItem(20, no);
+        playerInventory.setItem(21, no);
+
+        ItemBuilder shopVoteTokensYes = UltimateMenuStuff.SHOP_VOTE_TOKENS_YES;
+
+        shopVoteTokensYes.addLorePlaceholder("{keys}", keysNeeded + "");
+        shopVoteTokensYes.addLorePlaceholder("{vote}", voteTokensNeeded + "");
+
+        playerInventory.setItem(23, shopVoteTokensYes.getStack());
+        playerInventory.setItem(24, shopVoteTokensYes.getStack());
+        voteShop = true;
+        premiumShop = false;
+    }
+
+    private void setPremiumMenu(Player player, int premiumNeeded) {
+        PlayerInventory playerInventory = player.getInventory();
+        playerInventory.setItem(28, UltimateMenuStuff.PREMIUM_SHOP.getStack());
+
+        ItemStack no = UltimateMenuStuff.SHOP_BACK_MENU.getStack();
+        playerInventory.setItem(20, no);
+        playerInventory.setItem(21, no);
+
+        ItemBuilder shopVoteTokensYes = UltimateMenuStuff.SHOP_VOTE_PREMIUM_YES;
+
+        shopVoteTokensYes.addLorePlaceholder("{premium}", premiumNeeded + "");
+
+        playerInventory.setItem(23, shopVoteTokensYes.getStack());
+        playerInventory.setItem(24, shopVoteTokensYes.getStack());
+        premiumShop = true;
+        voteShop = false;
+    }
+
+    private void openStoreMenu(Player player) {
+        PlayerInventory playerInventory = player.getInventory();
+        playerInventory.setItem(28, UltimateMenuStuff.STORE_MENU.getStack());
+
+        ItemStack no = UltimateMenuStuff.SHOP_BACK_MENU.getStack();
+        playerInventory.setItem(20, no);
+        playerInventory.setItem(21, no);
+
+        ItemBuilder shopVoteTokensYes = UltimateMenuStuff.OPEN_STORE;
+
+        playerInventory.setItem(23, shopVoteTokensYes.getStack());
+        playerInventory.setItem(24, shopVoteTokensYes.getStack());
+        store = true;
     }
 
     private void setTopCrates() {
@@ -233,19 +367,12 @@ public class UltimateMenu extends InventoryBuilder {
         playerInventory.setItem(8, x10);
     }
 
-    private boolean hasKeys(Player player, Crate crate, int amount) {
-        return plugin.getUserManager().getVirtualKeys(player.getUniqueId(), crate.getName()) >= amount;
+    private int getKeys(Player player, Crate crate) {
+        return plugin.getUserManager().getVirtualKeys(player.getUniqueId(), crate.getName());
     }
 
-    private void message(Crate crate, Player player) {
-        player.playSound(UltimateMenuStuff.ERROR);
-
-        Map<String, String> placeholders = new HashMap<>();
-
-        placeholders.put("{crate}", crate.getName());
-        placeholders.put("{key}", crate.getKeyName());
-
-        player.sendMessage(Messages.no_keys.getMessage(player, placeholders));
+    private void addKeys(Player player, Crate crate, int amount) {
+        plugin.getUserManager().addVirtualKeys(player.getUniqueId(), crate.getName(), amount);
     }
 
     private void close(Player player) {
@@ -255,8 +382,8 @@ public class UltimateMenu extends InventoryBuilder {
     public static class TestMenuListener implements Listener {
         @EventHandler
         public void Close(InventoryCloseEvent e) {
-            if (e.getInventory().getHolder(false) instanceof UltimateMenu testMenu && e.getReason().equals(InventoryCloseEvent.Reason.PLAYER)) {
-                testMenu.plugin.getCrateManager().getDatabaseManager().getUltimateMenuManager().remove(testMenu.getPlayer());
+            if (e.getInventory().getHolder(false) instanceof UltimateMenu ultimateMenu && e.getReason().equals(InventoryCloseEvent.Reason.PLAYER)) {
+                ultimateMenu.plugin.getCrateManager().getDatabaseManager().getUltimateMenuManager().remove(ultimateMenu.getPlayer());
             }
         }
 
