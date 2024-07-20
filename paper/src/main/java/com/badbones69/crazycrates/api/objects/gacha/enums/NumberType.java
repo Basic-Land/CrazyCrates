@@ -1,4 +1,4 @@
-package com.badbones69.crazycrates.api.objects.gacha.ultimatemenu;
+package com.badbones69.crazycrates.api.objects.gacha.enums;
 
 public enum NumberType {
     TOP,

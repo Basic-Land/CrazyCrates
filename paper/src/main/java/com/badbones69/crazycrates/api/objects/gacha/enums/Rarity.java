@@ -1,6 +1,5 @@
 package com.badbones69.crazycrates.api.objects.gacha.enums;
 
-import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.NumberType;
 import lombok.Getter;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;

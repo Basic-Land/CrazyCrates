@@ -69,16 +69,17 @@ public class RouletteStandard extends FoliaRunnable {
             return;
         }
 
-        for (int i = 0; i < 45; i++) {
-            if (i == 36 || i == 37) continue;
-            builder.setItem(i, MiscUtils.getRandomPaneColor().setCustomModelData(2000000).getStack());
-        }
-
         if (modelData == 8) {
             player.playSound(UltimateMenuStuff.OPEN);
         }
 
-        if (!first) builder.setItem(36, glass.setCustomModelData(modelData).getStack());
+        if (!first) {
+            builder.setItem(36, glass.setCustomModelData(modelData).getStack());
+            for (int i = 0; i < 45; i++) {
+                if (i == 36 || i == 37) continue;
+                builder.setItem(i, MiscUtils.getRandomPaneColor().setCustomModelData(2000000).getStack());
+            }
+        }
 
         if (!player.getOpenInventory().getTopInventory().equals(inventory)) {
             player.openInventory(inventory);

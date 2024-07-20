@@ -125,9 +125,10 @@ public class UltimateMenu extends InventoryBuilder {
         if (newCrateNum != -1) {
             player.playSound(UltimateMenuStuff.CLICK);
             CrateSettings newCrate = manager.getCrateSettingsSplit().get(ultimateMenu.currentPage).get(newCrateNum);
-            Component trans = ComponentBuilder.mainMenu(player, newCrate);
+            Component component = ComponentBuilder.mainMenu(player, newCrate);
 
-            player.openInventory(new UltimateMenu(ultimateMenu, trans, newCrateNum).build().getInventory());
+            player.openInventory(new UltimateMenu(ultimateMenu, component, newCrateNum).build().getInventory());
+            return;
         }
 
         switch (slot) {
