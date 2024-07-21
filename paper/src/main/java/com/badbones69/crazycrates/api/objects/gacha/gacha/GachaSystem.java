@@ -27,6 +27,7 @@ public class GachaSystem {
 
         playerProfile.incrementTotalPity();
         double roll = random.nextDouble(100);
+        System.out.println("Roll: " + roll);
         double chance5050 = random.nextDouble(100);
         Rarity finalRarity = Rarity.COMMON;
         ResultType final5050 = ResultType.WON;

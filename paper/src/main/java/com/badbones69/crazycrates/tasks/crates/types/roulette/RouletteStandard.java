@@ -58,6 +58,9 @@ public class RouletteStandard extends FoliaRunnable {
     private int modelData = 1;
     private boolean first = false;
     private boolean lock = false;
+    private boolean put = false;
+    @Getter
+    private boolean skip = false;
 
     @Override
     public void run() {
@@ -69,14 +72,20 @@ public class RouletteStandard extends FoliaRunnable {
             return;
         }
 
+        if (!put) {
+            GachaCrateManager gachaCrateManager = (GachaCrateManager) crate.getManager();
+            gachaCrateManager.getGachaRunnables().putIfAbsent(uuid, this);
+            put = true;
+        }
+
         if (modelData == 8) {
             player.playSound(UltimateMenuStuff.OPEN);
         }
 
-        if (!first) {
+        if (!first && !skip) {
             builder.setItem(36, glass.setCustomModelData(modelData).getStack());
             for (int i = 0; i < 45; i++) {
-                if (i == 36 || i == 37) continue;
+                if (i == 36 || i == 37 || i == 8) continue;
                 builder.setItem(i, MiscUtils.getRandomPaneColor().setCustomModelData(2000000).getStack());
             }
         }
@@ -97,10 +106,8 @@ public class RouletteStandard extends FoliaRunnable {
             if (!first && sneak) {
                 first = true;
                 lock = true;
-                GachaCrateManager gachaCrateManager = (GachaCrateManager) crate.getManager();
-                gachaCrateManager.getGachaRunnables().put(uuid, this);
                 builder.setItem(36, glass.setCustomModelData(600).getStack());
-                builder.setItem(22, prize.getFirst().getPrize().getDisplayItem());
+                if (!skip) builder.setItem(22, prize.getFirst().getPrize().getDisplayItem());
                 return;
             }
 
@@ -157,11 +164,17 @@ public class RouletteStandard extends FoliaRunnable {
                 crateManager.removePlayerFromOpeningList(player);
                 plugin.getCrateManager().getDatabaseManager().getUltimateMenuManager().open(player, crate);
             }
-        }.runTaskLater(plugin, 40);
+        }.runTaskLater(plugin, 20);
     }
 
     public void incrementCount() {
         count++;
+    }
+
+    public void skip() {
+        modelData = 64;
+        count = 10;
+        skip = true;
     }
 
     public void updateTimer() {

@@ -51,6 +51,12 @@ public class GachaCrateListener implements Listener {
 
         if (rouletteStandard == null) return;
 
+        if (event.getRawSlot() == 8) {
+            rouletteStandard.skip();
+        }
+
+        if (!rouletteStandard.isSkip()) return;
+
         List<Result> prize = rouletteStandard.getPrize();
         int count = rouletteStandard.getCount();
         Inventory inv = event.getView().getTopInventory();
