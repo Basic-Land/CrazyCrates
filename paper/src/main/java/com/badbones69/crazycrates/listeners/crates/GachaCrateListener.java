@@ -61,8 +61,12 @@ public class GachaCrateListener implements Listener {
         int count = rouletteStandard.getCount();
         Inventory inv = event.getView().getTopInventory();
         long time = rouletteStandard.getTime();
+        long diff = System.currentTimeMillis() - time;
 
-        if (System.currentTimeMillis() - time < 400) return;
+        if (diff < 400) return;
+
+        System.out.println("Count: " + count);
+        System.out.println("Diff: " + diff);
 
         rouletteStandard.updateTimer();
 

@@ -61,7 +61,7 @@ public class UltimateMenu extends InventoryBuilder {
         this.totalPageAmount = crateSettingsSplit.size();
     }
 
-    public UltimateMenu(Player player, Component trans, int page, int selectedCrate) {
+    private UltimateMenu(Player player, Component trans, int page, int selectedCrate) {
         super(manager.getCrateSettingsSplit().get(page).get(selectedCrate).getCrate(), player, 54, trans);
         this.currentPage = page;
         this.selectedCrate = selectedCrate;
@@ -71,7 +71,7 @@ public class UltimateMenu extends InventoryBuilder {
         player.getInventory().clear();
     }
 
-    public UltimateMenu(UltimateMenu ultimateMenu, Component title, int selectedCrate) {
+    private UltimateMenu(UltimateMenu ultimateMenu, Component title, int selectedCrate) {
         this(ultimateMenu.getPlayer(), title, ultimateMenu.currentPage, selectedCrate);
     }
 

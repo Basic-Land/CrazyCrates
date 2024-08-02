@@ -38,6 +38,7 @@ public class ShopMenu extends InventoryBuilder {
     public InventoryBuilder build() {
         setTopCrates();
         setTextureGlass();
+        setBackButton();
         return this;
     }
 
@@ -64,6 +65,10 @@ public class ShopMenu extends InventoryBuilder {
         if (newCrateNum != -1) {
             player.playSound(UltimateMenuStuff.CLICK);
             player.openInventory(new ShopMenu(shopMenu, newCrateNum).build().getInventory());
+        }
+
+        if (slot == 49) {
+            plugin.getCrateManager().getDatabaseManager().getUltimateMenuManager().open(player, shopMenu.getCrate());
         }
     }
 
@@ -99,5 +104,9 @@ public class ShopMenu extends InventoryBuilder {
 
     private void setTextureGlass() {
         getInventory().setItem(45, UltimateMenuStuff.SHOP_BANNER.getStack());
+    }
+
+    private void setBackButton() {
+        getInventory().setItem(49, UltimateMenuStuff.MAIN_MENU_SHOP.getStack());
     }
 }

@@ -49,6 +49,7 @@ public class UltimateMenuStuff {
             .addDisplayLore("<gray>Právě vybraný obchod");
     public static final ItemBuilder SHOP_UNSELECTED = getItem(Material.RED_STAINED_GLASS_PANE, 1000007)
             .addDisplayLore("<gray>Kliknutím vyberete tento obchod");
+    public static final ItemBuilder MAIN_MENU_SHOP = getItem(Material.CHEST, 1000008);
 
 
 

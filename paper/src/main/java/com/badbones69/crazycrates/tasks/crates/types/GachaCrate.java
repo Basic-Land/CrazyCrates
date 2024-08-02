@@ -106,7 +106,7 @@ public class GachaCrate extends CrateBuilder {
 
 
         setItem(37, UltimateMenuStuff.BORDER.getStack());
-        setItem(8, new ItemBuilder(Material.PLAYER_HEAD).setDisplayName("<green>Skip").getStack());
+        setItem(8, new ItemBuilder(Material.PLAYER_HEAD).setDisplayName("<green>Skip").setCustomModelData(1000002).getStack());
 
         addCrateTask(new RouletteStandard(this, items, sneak).runAtFixedRate(this.plugin, 1, 2));
 
