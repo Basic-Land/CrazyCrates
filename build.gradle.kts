@@ -1,94 +1,174 @@
 plugins {
+    alias(libs.plugins.paperweight)
+    alias(libs.plugins.shadowJar)
+    alias(libs.plugins.runPaper)
     alias(libs.plugins.minotaur)
     alias(libs.plugins.hangar)
 
-    `java-plugin`
+    `paper-plugin`
 }
 
 val buildNumber: String? = System.getenv("BUILD_NUMBER")
 
-rootProject.version = if (buildNumber != null) "3.3-$buildNumber" else "3.3.1"
+rootProject.version = if (buildNumber != null) "${libs.versions.minecraft.get()}-$buildNumber" else "3.6"
 
 val isSnapshot = false
 
 val content: String = rootProject.file("CHANGELOG.md").readText(Charsets.UTF_8)
 
-subprojects.filter { it.name != "api" }.forEach {
-    it.project.version = rootProject.version
+repositories {
+    maven("https://repo.fancyplugins.de/releases")
 }
 
-modrinth {
-    token.set(System.getenv("MODRINTH_TOKEN"))
+dependencies {
+    paperweight.paperDevBundle(libs.versions.paper)
 
-    projectId.set(rootProject.name.lowercase())
+    compileOnly(fileTree("$projectDir/libs/compile").include("*.jar"))
 
-    versionType.set(if (isSnapshot) "beta" else "release")
+    implementation(libs.triumph.cmds)
 
-    versionName.set("${rootProject.name} ${rootProject.version}")
-    versionNumber.set(rootProject.version as String)
+    implementation(libs.vital.paper)
 
-    changelog.set(content)
+    compileOnly(libs.decent.holograms)
 
-    uploadFile.set(rootProject.projectDir.resolve("jars/${rootProject.name}-${rootProject.version}.jar"))
+    compileOnly(libs.fancy.holograms)
 
-    gameVersions.set(listOf(
-        "1.20.6"
-    ))
+    compileOnly(libs.headdatabaseapi)
 
-    loaders.add("paper")
-    loaders.add("purpur")
-    loaders.add("folia")
+    compileOnly(libs.placeholderapi)
 
-    autoAddDependsOn.set(false)
-    detectLoaders.set(false)
+    compileOnly(libs.oraxen)
 
-    dependencies {
-        optional.version("fancyholograms", "2.0.6")
+    api(project(":api"))
+}
+
+paperweight {
+    reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
+}
+
+tasks {
+    runServer {
+        jvmArgs("-Dnet.kyori.ansi.colorLevel=truecolor")
+
+        defaultCharacterEncoding = Charsets.UTF_8.name()
+
+        minecraftVersion(libs.versions.minecraft.get())
     }
-}
 
-hangarPublish {
-    publications.register("plugin") {
-        apiKey.set(System.getenv("HANGAR_KEY"))
+    assemble {
+        dependsOn(shadowJar)
 
-        id.set(rootProject.name.lowercase())
+        doLast {
+            copy {
+                from(shadowJar.get())
+                into(rootProject.projectDir.resolve("jars"))
+            }
+        }
+    }
 
-        version.set(rootProject.version as String)
+    shadowJar {
+        archiveBaseName.set(rootProject.name)
+        archiveClassifier.set("")
 
-        channel.set(if (isSnapshot) "Snapshot" else "Release")
+        listOf(
+            "com.ryderbelserion.vital",
+            "dev.triumphteam.cmds"
+        ).forEach {
+            relocate(it, "libs.$it")
+        }
+    }
+
+    processResources {
+        inputs.properties("name" to rootProject.name)
+        inputs.properties("version" to project.version)
+        inputs.properties("group" to project.group)
+        inputs.properties("apiVersion" to libs.versions.minecraft.get())
+        inputs.properties("description" to project.properties["description"])
+        inputs.properties("website" to project.properties["website"])
+
+        filesMatching("paper-plugin.yml") {
+            expand(inputs.properties)
+        }
+    }
+
+    modrinth {
+        token.set(System.getenv("MODRINTH_TOKEN"))
+
+        projectId.set(rootProject.name.lowercase())
+
+        versionType.set(if (isSnapshot) "beta" else "release")
+
+        versionName.set("${rootProject.name} ${rootProject.version}")
+        versionNumber.set(rootProject.version as String)
 
         changelog.set(content)
 
-        platforms {
-            paper {
-                jar.set(rootProject.projectDir.resolve("jars/${rootProject.name}-${rootProject.version}.jar"))
+        uploadFile.set(rootProject.projectDir.resolve("jars/${rootProject.name}-${rootProject.version}.jar"))
 
-                platformVersions.set(listOf(
-                    "1.20.6"
-                ))
+        gameVersions.set(listOf(libs.versions.minecraft.get()))
 
-                dependencies {
-                    hangar("PlaceholderAPI") {
-                        required = false
-                    }
+        loaders.addAll(listOf("purpur", "paper", "folia"))
 
-                    hangar("FancyHolograms") {
-                        required = false
-                    }
+        syncBodyFrom.set(rootProject.file("README.md").readText(Charsets.UTF_8))
 
-                    url("Oraxen", "https://www.spigotmc.org/resources/%E2%98%84%EF%B8%8F-oraxen-custom-items-blocks-emotes-furniture-resourcepack-and-gui-1-18-1-20-4.72448/") {
-                        required = false
-                    }
+        autoAddDependsOn.set(false)
+        detectLoaders.set(false)
 
-                    url("CMI", "https://www.spigotmc.org/resources/cmi-298-commands-insane-kits-portals-essentials-economy-mysql-sqlite-much-more.3742/") {
-                        required = false
-                    }
+        dependencies {
+            optional.version("fancyholograms", "2.3.0")
+        }
+    }
 
-                    url("DecentHolograms", "https://www.spigotmc.org/resources/decentholograms-1-8-1-20-4-papi-support-no-dependencies.96927/") {
-                        required = false
+    hangarPublish {
+        publications.register("plugin") {
+            apiKey.set(System.getenv("HANGAR_KEY"))
+
+            id.set(rootProject.name.lowercase())
+
+            version.set(rootProject.version as String)
+
+            channel.set(if (isSnapshot) "Beta" else "Release")
+
+            changelog.set(content)
+
+            platforms {
+                paper {
+                    jar.set(rootProject.projectDir.resolve("jars/${rootProject.name}-${rootProject.version}.jar"))
+
+                    platformVersions.set(listOf(libs.versions.minecraft.get()))
+
+                    dependencies {
+                        hangar("PlaceholderAPI") {
+                            required = false
+                        }
+
+                        hangar("FancyHolograms") {
+                            required = false
+                        }
+
+                        url("Oraxen", "https://www.spigotmc.org/resources/%E2%98%84%EF%B8%8F-oraxen-custom-items-blocks-emotes-furniture-resourcepack-and-gui-1-18-1-20-4.72448/") {
+                            required = false
+                        }
+
+                        url("CMI", "https://www.spigotmc.org/resources/cmi-298-commands-insane-kits-portals-essentials-economy-mysql-sqlite-much-more.3742/") {
+                            required = false
+                        }
+
+                        url("DecentHolograms", "https://www.spigotmc.org/resources/decentholograms-1-8-1-20-4-papi-support-no-dependencies.96927/") {
+                            required = false
+                        }
                     }
                 }
             }
         }
     }
+}
+
+tasks.withType(xyz.jpenilla.runtask.task.AbstractRun::class) {
+    javaLauncher = javaToolchains.launcherFor {
+        vendor = JvmVendorSpec.JETBRAINS
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+
+    jvmArgs("-XX:+AllowEnhancedClassRedefinition", "-XX:+AllowRedefinitionToAddDeleteMethods")
 }

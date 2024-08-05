@@ -1,7 +1,4 @@
 import com.ryderbelserion.feather.enums.Repository
-import org.gradle.accessors.dm.LibrariesForLibs
-
-val libs = the<LibrariesForLibs>()
 
 plugins {
     id("com.ryderbelserion.feather-core")
@@ -12,6 +9,16 @@ plugins {
 }
 
 repositories {
+    maven("https://repo.extendedclip.com/content/repositories/placeholderapi")
+
+    maven("https://repo.codemc.io/repository/maven-public")
+
+    maven("https://repo.oraxen.com/releases")
+
+    maven(Repository.CrazyCrewReleases.url)
+
+    maven(Repository.Jitpack.url)
+
     flatDir { dirs("libs") }
 
     maven("http://nexus.basicland.cz:8081/repository/dev-private/") {
@@ -23,11 +30,6 @@ repositories {
     }
 
     mavenCentral()
-    //mavenLocal()
-}
-
-dependencies {
-    compileOnlyApi(libs.annotations)
 }
 
 java {
@@ -49,12 +51,4 @@ tasks {
     processResources {
         filteringCharset = Charsets.UTF_8.name()
     }
-}
-
-feather {
-    repository("https://repo.codemc.io/repository/maven-public")
-
-    repository(Repository.CrazyCrewReleases.url)
-
-    repository(Repository.Jitpack.url)
 }
