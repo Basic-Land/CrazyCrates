@@ -18,6 +18,8 @@ val content: String = rootProject.file("CHANGELOG.md").readText(Charsets.UTF_8)
 
 repositories {
     maven("https://repo.fancyplugins.de/releases")
+
+
 }
 
 dependencies {
@@ -38,6 +40,10 @@ dependencies {
     compileOnly(libs.placeholderapi)
 
     compileOnly(libs.oraxen)
+
+    compileOnly ("cz.basicland:bLibs:2.0.0-WIP-b36")
+    compileOnly ("org.projectlombok:lombok:1.18.32")
+    annotationProcessor ("org.projectlombok:lombok:1.18.32")
 
     api(project(":api"))
 }
