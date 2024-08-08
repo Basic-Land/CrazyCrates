@@ -1,4 +1,4 @@
-package com.badbones69.crazycrates.commands.crates.types.admin.crates;
+package com.badbones69.crazycrates.commands.crates.types.custom;
 
 import com.badbones69.crazycrates.api.builders.types.items.ItemPreview;
 import com.badbones69.crazycrates.api.builders.types.items.RaritiesMenu;
@@ -11,7 +11,7 @@ import dev.triumphteam.cmd.core.annotations.Suggestion;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionDefault;
 
-public class CommandEditItems extends BaseCommand {
+public class EditItems extends BaseCommand {
     @Command("edititems")
     @Permission(value = "crazycrates.command.admin.edititems", def = PermissionDefault.OP)
     public void editItems(Player player, @Suggestion("both") String type) {

@@ -73,23 +73,30 @@ public final class ComponentBuilder {
 
         builder.append(SPACE_TIME);
 
-        int middle = Math.ceilDiv(69 - timeSpace, 2);
-        int left = middle;
-        int right = middle;
+        if (!time.isEmpty()) {
+            int middle = Math.ceilDiv(69 - timeSpace, 2);
+            int left = middle;
+            int right = middle;
 
-        while (--left > 0) {
-            builder.append(FILL_TIME);
-        }
-
-        for (char c : time.toCharArray()) {
-            builder.append(sw(c, NumberType.TIME, true));
-            if (c == ' ') {
-                builder.append(FILL_TIME).append(FILL_TIME);
+            while (--left > 0) {
+                builder.append(FILL_TIME);
             }
-        }
 
-        while (right-- > 0) {
-            builder.append(FILL_TIME);
+            for (char c : time.toCharArray()) {
+                builder.append(sw(c, NumberType.TIME, true));
+                if (c == ' ') {
+                    builder.append(FILL_TIME).append(FILL_TIME);
+                }
+            }
+
+            while (right-- > 0) {
+                builder.append(FILL_TIME);
+            }
+        } else {
+            int i = 0;
+            while (i++ < 69) {
+                builder.append(FILL_TIME);
+            }
         }
 
         builder.append(SPACE_PITY);

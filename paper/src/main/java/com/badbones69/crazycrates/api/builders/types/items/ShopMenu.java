@@ -26,7 +26,7 @@ public class ShopMenu extends InventoryBuilder {
         this.selectedCrate = selectedCrate;
     }
 
-    public ShopMenu(ShopMenu menu, int page) {
+    private ShopMenu(ShopMenu menu, int page) {
         this(menu.getCrate(), menu.getPlayer(), ComponentBuilder.shop(menu.getPlayer(), names.get(page)), page);
     }
 

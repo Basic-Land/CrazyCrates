@@ -62,6 +62,7 @@ public class CrazyCrates extends JavaPlugin {
                 .addFolder("crates")
                 .addFolder("schematics")
                 .addFolder("banners")
+                .addFolder("shops")
                 .init();
 
         // Register permissions that we need.

@@ -9,6 +9,7 @@ import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.api.objects.gacha.data.PlayerBaseProfile;
 import com.badbones69.crazycrates.api.objects.gacha.data.PlayerProfile;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
+import com.badbones69.crazycrates.api.objects.gacha.shop.ShopManager;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuManager;
 import com.google.common.collect.Lists;
 import cz.basicland.blibs.shared.databases.hikari.DatabaseConnection;
@@ -38,6 +39,8 @@ public class DatabaseManager {
     private final ItemManager itemManager;
     @Getter
     private final UltimateMenuManager ultimateMenuManager;
+    @Getter
+    private final ShopManager shopManager;
 
     public DatabaseManager(List<Crate> crateList) {
         connection = BLibs.getApi().getDatabaseHandler().loadSQLite(JavaPlugin.getPlugin(CrazyCrates.class), "gamba", "crates.db");
@@ -48,6 +51,7 @@ public class DatabaseManager {
         history = new History(this);
         itemManager = new ItemManager(connection);
         ultimateMenuManager = new UltimateMenuManager(this);
+        shopManager = new ShopManager(this);
 
         for (Crate crate : crateList) {
             CrateSettings settings = crate.getCrateSettings();
@@ -62,6 +66,7 @@ public class DatabaseManager {
     private void createCrateTable() {
         connection.updateSQLite("CREATE TABLE IF NOT EXISTS PlayerData(playerName VARCHAR(16) PRIMARY KEY, baseData VARCHAR NULL)").join();
         connection.updateSQLite("CREATE TABLE IF NOT EXISTS AllItems(id INTEGER PRIMARY KEY AUTOINCREMENT, itemStack VARCHAR NULL)").join();
+        connection.updateSQLite("CREATE TABLE IF NOT EXISTS ShopItems(id INTEGER PRIMARY KEY AUTOINCREMENT, itemStack VARCHAR NULL, price DOUBLE NULL, currency VARCHAR NULL)").join();
         connection.updateSQLite("CREATE TABLE IF NOT EXISTS Backup(uuid VARCHAR(36) PRIMARY KEY, inventory VARCHAR NULL)").join();
 
         Set<String> playernames = new HashSet<>();

@@ -1,5 +1,6 @@
 package com.badbones69.crazycrates.api.objects.gacha.data;
 
+import com.badbones69.crazycrates.api.objects.gacha.enums.CurrencyTypes;
 import lombok.*;
 
 import java.io.Serial;
@@ -28,6 +29,15 @@ public class PlayerBaseProfile implements Serializable {
         premiumCurrency += amount;
     }
 
+    public void add(int amount, CurrencyTypes currencyType) {
+        switch (currencyType) {
+            case VOTE_TOKENS -> addVoteTokens(amount);
+            case MYSTIC_TOKENS -> addMysticTokens(amount);
+            case STELLAR_SHARDS -> addStellarShards(amount);
+            case PREMIUM_CURRENCY -> addPremiumCurrency(amount);
+        }
+    }
+
     public void removeStellarShards(int amount) {
         stellarShards -= amount;
     }
@@ -44,6 +54,15 @@ public class PlayerBaseProfile implements Serializable {
         premiumCurrency -= amount;
     }
 
+    public void remove(int amount, CurrencyTypes currencyType) {
+        switch (currencyType) {
+            case VOTE_TOKENS -> removeVoteTokens(amount);
+            case MYSTIC_TOKENS -> removeMysticTokens(amount);
+            case STELLAR_SHARDS -> removeStellarShards(amount);
+            case PREMIUM_CURRENCY -> removePremiumCurrency(amount);
+        }
+    }
+
     public boolean hasStellarShards(int amount) {
         return stellarShards >= amount;
     }
@@ -58,6 +77,15 @@ public class PlayerBaseProfile implements Serializable {
 
     public boolean hasPremiumCurrency(int amount) {
         return premiumCurrency >= amount;
+    }
+
+    public boolean has(int amount, CurrencyTypes currencyType) {
+        return switch (currencyType) {
+            case VOTE_TOKENS -> hasVoteTokens(amount);
+            case MYSTIC_TOKENS -> hasMysticTokens(amount);
+            case STELLAR_SHARDS -> hasStellarShards(amount);
+            case PREMIUM_CURRENCY -> hasPremiumCurrency(amount);
+        };
     }
 
     public boolean removeStellarShardsIfHas(int amount) {
@@ -90,6 +118,15 @@ public class PlayerBaseProfile implements Serializable {
             return true;
         }
         return false;
+    }
+
+    public boolean removeIfHas(int amount, CurrencyTypes currencyType) {
+        return switch (currencyType) {
+            case VOTE_TOKENS -> removeVoteTokensIfHas(amount);
+            case MYSTIC_TOKENS -> removeMysticTokensIfHas(amount);
+            case STELLAR_SHARDS -> removeStellarShardsIfHas(amount);
+            case PREMIUM_CURRENCY -> removePremiumCurrencyIfHas(amount);
+        };
     }
 
     public void convertPremiumToVote(int amount) {

@@ -1,4 +1,4 @@
-package com.badbones69.crazycrates.commands.crates.types.player;
+package com.badbones69.crazycrates.commands.crates.types.custom;
 
 import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.commands.crates.types.BaseCommand;

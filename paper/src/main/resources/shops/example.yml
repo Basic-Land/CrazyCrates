@@ -1,0 +1,17 @@
+place: 0
+name: "rare shop example"
+currency: "STELLAR_SHARDS"
+
+items:
+  1:
+    id: 1 # DATABASE ID
+    price: 100 # PRICE
+    place: 0 # PLACE IN SHOP
+  2:
+    id: 2 # DATABASE ID
+    price: 200 # PRICE
+    place: 1 # PLACE IN SHOP
+  3:
+    id: 3 # DATABASE ID
+    price: 300 # PRICE
+    place: 2 # PLACE IN SHOP

@@ -112,7 +112,7 @@ public class UltimateMenu extends InventoryBuilder {
         Player player = ultimateMenu.getPlayer();
         Crate crate = ultimateMenu.getCrate();
 
-        int newCrateNum;
+        int newCrateNum = -1;
 
         if (slot < 3) {
             newCrateNum = 0;
@@ -120,7 +120,7 @@ public class UltimateMenu extends InventoryBuilder {
             newCrateNum = 1;
         } else if (slot < 9) {
             newCrateNum = 2;
-        } else newCrateNum = -1;
+        }
 
         if (newCrateNum != -1) {
             player.playSound(UltimateMenuStuff.CLICK);

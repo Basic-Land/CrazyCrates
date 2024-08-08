@@ -8,6 +8,7 @@ import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.api.objects.other.CrateLocation;
 import com.badbones69.crazycrates.commands.crates.types.admin.crates.CommandAddItem;
 import com.badbones69.crazycrates.commands.crates.types.admin.crates.CommandMigrate;
+import com.badbones69.crazycrates.commands.crates.types.custom.*;
 import com.badbones69.crazycrates.commands.relations.ArgumentRelations;
 import com.badbones69.crazycrates.commands.crates.types.player.CommandHelp;
 import com.badbones69.crazycrates.commands.crates.types.admin.CommandAdmin;
@@ -17,11 +18,9 @@ import com.badbones69.crazycrates.commands.crates.types.admin.keys.CommandGive;
 import com.badbones69.crazycrates.commands.crates.types.admin.keys.CommandOpen;
 import com.badbones69.crazycrates.commands.crates.types.admin.keys.CommandTake;
 import com.badbones69.crazycrates.commands.crates.types.player.*;
-import com.badbones69.crazycrates.commands.relations.ArgumentRelations;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
 import com.ryderbelserion.vital.paper.builders.PlayerBuilder;
 import dev.triumphteam.cmd.bukkit.BukkitCommandManager;
-import dev.triumphteam.cmd.core.argument.keyed.ArgumentKey;
 import dev.triumphteam.cmd.core.suggestion.SuggestionKey;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -143,9 +142,9 @@ public class CommandManager {
                 new CommandDebug(),
                 new CommandList(),
                 new CommandSet(),
-                new CommandAddItemCustom(),
-                new CommandEditItems(),
-                new CommandAdd(),
+                new AddItemCustom(),
+                new EditItems(),
+                new AddCurrency(),
 
                 new CommandGive(),
                 new CommandOpen(),

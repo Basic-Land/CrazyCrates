@@ -1,4 +1,4 @@
-package com.badbones69.crazycrates.commands.crates.types.admin.crates;
+package com.badbones69.crazycrates.commands.crates.types.custom;
 
 import com.badbones69.crazycrates.api.builders.types.items.ItemAddMenu;
 import com.badbones69.crazycrates.api.enums.Messages;
@@ -14,7 +14,7 @@ import dev.triumphteam.cmd.core.annotations.Suggestion;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionDefault;
 
-public class CommandAddItemCustom extends BaseCommand {
+public class AddItemCustom extends BaseCommand {
 
     @Command(value = "additems")
     @Permission(value = "crazycrates.command.admin.additems", def = PermissionDefault.OP)
