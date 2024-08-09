@@ -5,6 +5,7 @@ import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
+import com.badbones69.crazycrates.api.objects.gacha.enums.Table;
 import com.ryderbelserion.vital.paper.builders.items.ItemBuilder;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -78,7 +79,7 @@ public class ItemAddMenu extends InventoryBuilder {
         for (ItemStack item : items) {
             if (item == null || item.getType() == Material.AIR) continue;
 
-            int id = holder.plugin.getCrateManager().getDatabaseManager().getItemManager().addItem(item);
+            int id = holder.plugin.getCrateManager().getDatabaseManager().getItemManager().addItem(item, Table.ALL_ITEMS);
             if (id == -1) continue;
 
             crateSettings.addItem(type, id, rarity, item, crate);

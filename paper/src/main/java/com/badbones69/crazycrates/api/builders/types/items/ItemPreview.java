@@ -6,6 +6,7 @@ import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.ItemManager;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
+import com.badbones69.crazycrates.api.objects.gacha.enums.Table;
 import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 import com.google.common.collect.Lists;
 import com.ryderbelserion.vital.paper.builders.items.ItemBuilder;
@@ -37,7 +38,7 @@ public class ItemPreview extends InventoryBuilder {
         this.raritiesMenu = null;
         this.leftClick = true;
         ItemManager itemManager = JavaPlugin.getPlugin(CrazyCrates.class).getCrateManager().getDatabaseManager().getItemManager();
-        items = itemManager.getAllItemsFromCache().entrySet().stream()
+        items = itemManager.getAllItemsFromCache(Table.ALL_ITEMS).entrySet().stream()
                 .map(entry -> new Pair<>(entry.getKey(), entry.getValue().clone()))
                 .collect(Collectors.toList());
     }
@@ -50,7 +51,7 @@ public class ItemPreview extends InventoryBuilder {
         this.editing = true;
         this.rarity = rarity;
         ItemManager itemManager = JavaPlugin.getPlugin(CrazyCrates.class).getCrateManager().getDatabaseManager().getItemManager();
-        items = itemManager.getAllItemsFromCache().entrySet().stream()
+        items = itemManager.getAllItemsFromCache(Table.ALL_ITEMS).entrySet().stream()
                 .filter(entry -> leftClick != ids.contains(entry.getKey()))
                 .map(entry -> new Pair<>(entry.getKey(), entry.getValue().clone()))
                 .collect(Collectors.toList());

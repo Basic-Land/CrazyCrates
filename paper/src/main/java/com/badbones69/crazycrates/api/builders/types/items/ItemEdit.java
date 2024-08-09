@@ -1,6 +1,7 @@
 package com.badbones69.crazycrates.api.builders.types.items;
 
 import com.badbones69.crazycrates.api.builders.InventoryBuilder;
+import com.badbones69.crazycrates.api.objects.gacha.enums.Table;
 import com.ryderbelserion.vital.paper.builders.items.ItemBuilder;
 import cz.basicland.blibs.spigot.utils.item.DBItemStack;
 import cz.basicland.blibs.spigot.utils.item.NBT;
@@ -73,7 +74,7 @@ public class ItemEdit extends InventoryBuilder {
                     Integer id = nbt.getInteger("itemID");
                     if (id == null || id == 0) return;
                     try {
-                        holder.plugin.getCrateManager().getDatabaseManager().getItemManager().updateItem(id, DBItemStack.encodeItem(stack));
+                        holder.plugin.getCrateManager().getDatabaseManager().getItemManager().updateItem(id, DBItemStack.encodeItem(stack), Table.ALL_ITEMS);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }

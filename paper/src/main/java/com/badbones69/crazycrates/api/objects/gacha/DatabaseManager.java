@@ -66,7 +66,7 @@ public class DatabaseManager {
     private void createCrateTable() {
         connection.updateSQLite("CREATE TABLE IF NOT EXISTS PlayerData(playerName VARCHAR(16) PRIMARY KEY, baseData VARCHAR NULL)").join();
         connection.updateSQLite("CREATE TABLE IF NOT EXISTS AllItems(id INTEGER PRIMARY KEY AUTOINCREMENT, itemStack VARCHAR NULL)").join();
-        connection.updateSQLite("CREATE TABLE IF NOT EXISTS ShopItems(id INTEGER PRIMARY KEY AUTOINCREMENT, itemStack VARCHAR NULL, price DOUBLE NULL, currency VARCHAR NULL)").join();
+        connection.updateSQLite("CREATE TABLE IF NOT EXISTS ShopItems(id INTEGER PRIMARY KEY AUTOINCREMENT, itemStack VARCHAR NULL)").join();
         connection.updateSQLite("CREATE TABLE IF NOT EXISTS Backup(uuid VARCHAR(36) PRIMARY KEY, inventory VARCHAR NULL)").join();
 
         Set<String> playernames = new HashSet<>();
@@ -278,19 +278,19 @@ public class DatabaseManager {
     }
 
     private PlayerProfile deserializeProfile(String profileString) {
-        return (PlayerProfile) deserialize(profileString);
+        return deserialize(profileString);
     }
 
     private PlayerBaseProfile deserializeBaseProfile(String profileString) {
-        return (PlayerBaseProfile) deserialize(profileString);
+        return deserialize(profileString);
     }
 
-    private Object deserialize(String profileString) {
+    private <OUT> OUT deserialize(String profileString) {
         try {
             byte[] bytes = Base64.getDecoder().decode(profileString);
             ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
             ObjectInputStream ois = new ObjectInputStream(bais);
-            return ois.readObject();
+            return (OUT) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
             return null;

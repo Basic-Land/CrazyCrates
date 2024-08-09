@@ -1,17 +1,20 @@
-place: 0
-name: "rare shop example"
-currency: "STELLAR_SHARDS"
+name: "rare shop example" # SHOP NAME
+currency: "STELLAR_SHARDS" # CURRENCY ID
+id: "STELLAR_SHOP" # SHOP ID
 
 items:
-  1:
-    id: 1 # DATABASE ID
-    price: 100 # PRICE
+  item1:
+    id: 1 # ITEM FROM DATABASE ID
+    price: 100 # PRICE IN CURRENCY
     place: 0 # PLACE IN SHOP
-  2:
-    id: 2 # DATABASE ID
-    price: 200 # PRICE
+    limit: 1 # LIMIT OF ITEM TO BUY PER MONTH FOR EACH PLAYER
+  item2:
+    id: 2 # ITEM FROM DATABASE ID
+    price: 200 # PRICE IN CURRENCY
     place: 1 # PLACE IN SHOP
-  3:
-    id: 3 # DATABASE ID
-    price: 300 # PRICE
+    limit: 2 # LIMIT OF ITEM TO BUY PER MONTH FOR EACH PLAYER
+  item3:
+    id: 3 # ITEM FROM DATABASE ID
+    price: 300 # PRICE IN CURRENCY
     place: 2 # PLACE IN SHOP
+    limit: 3 # LIMIT OF ITEM TO BUY PER MONTH FOR EACH PLAYER

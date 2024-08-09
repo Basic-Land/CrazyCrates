@@ -1,12 +1,9 @@
 package com.badbones69.crazycrates.api.objects.gacha;
 
-import com.badbones69.crazycrates.CrazyCrates;
-import com.badbones69.crazycrates.api.objects.Crate;
+import com.badbones69.crazycrates.api.objects.gacha.enums.Table;
 import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
-import com.badbones69.crazycrates.tasks.crates.CrateManager;
 import cz.basicland.blibs.shared.databases.hikari.DatabaseConnection;
 import cz.basicland.blibs.spigot.utils.item.DBItemStack;
-import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.IOException;
@@ -18,6 +15,7 @@ import java.util.Map;
 public class ItemManager {
     private final DatabaseConnection connection;
     private final Map<Integer, ItemStack> allItems = new HashMap<>();
+    private final Map<Integer, ItemStack> shopItems = new HashMap<>();
 
     /**
      * Constructor for the ItemManager class.
@@ -26,29 +24,8 @@ public class ItemManager {
      */
     public ItemManager(DatabaseConnection connection) {
         this.connection = connection;
-        allItems.putAll(getAllItems());
-        convertItems();
-    }
-
-    private void convertItems() {
-        CrazyCrates plugin = CrazyCrates.getPlugin(CrazyCrates.class);
-        CrateManager crateManager = plugin.getCrateManager();
-
-        if (!Bukkit.getPluginManager().isPluginEnabled("bSpecializedCrates")) return;
-
-        Crate crate = crateManager.getCrateFromName("AllItems");
-
-        if (crate == null) return;
-
-        me.ztowne13.customcrates.crates.options.CReward.getAllRewards().forEach((id, reward) -> {
-            ItemStack item = reward.getSaveBuilder().getStack();
-            String rewardName = reward.getRewardName();
-            double chance = reward.getChance();
-            List<String> commands = reward.getCommands();
-            boolean give = reward.isGiveDisplayItem();
-
-            crate.addEditorItem(item, id, chance, commands);
-        });
+        allItems.putAll(getAllItems(Table.ALL_ITEMS));
+        shopItems.putAll(getAllItems(Table.SHOP_ITEMS));
     }
 
     /**
@@ -56,8 +33,8 @@ public class ItemManager {
      *
      * @return A list of pairs, where each pair consists of an item ID and an ItemStack.
      */
-    private Map<Integer, ItemStack> getAllItems() {
-        return connection.querySQLite("SELECT * FROM AllItems").thenApply(rs -> {
+    private Map<Integer, ItemStack> getAllItems(Table table) {
+        return connection.querySQLite("SELECT * FROM " + table.getTable()).thenApply(rs -> {
             Map<Integer, ItemStack> items = new HashMap<>();
             try {
                 while (rs.next()) {
@@ -82,12 +59,13 @@ public class ItemManager {
      * @param id The ID of the item to retrieve.
      * @return A pair consisting of the item ID and an ItemStack, or null if the item is not found.
      */
-    public Pair<Integer, ItemStack> getItemFromCache(int id) {
-        return new Pair<>(id, allItems.get(id).clone());
+    public ItemStack getItemFromCache(int id, Table table) {
+        ItemStack stack = getAllItemsFromCache(table).get(id);
+        return stack == null ? null : stack.clone();
     }
 
-    public Map<Integer, ItemStack> getAllItemsFromCache() {
-        return allItems;
+    public Map<Integer, ItemStack> getAllItemsFromCache(Table table) {
+        return table.equals(Table.ALL_ITEMS) ? allItems : shopItems;
     }
 
     /**
@@ -96,9 +74,9 @@ public class ItemManager {
      * @param item  The ItemStack to add.
      * @return The ID of the added item, or -1 if the item could not be added.
      */
-    public int addItem(ItemStack item) {
+    public int addItem(ItemStack item, Table table) {
         try {
-            connection.updateSQLite("INSERT INTO AllItems(itemStack) VALUES(?)", DBItemStack.encodeItem(item)).join();
+            connection.updateSQLite("INSERT INTO " + table.getTable() + "(itemStack) VALUES(?)", DBItemStack.encodeItem(item)).join();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -116,7 +94,11 @@ public class ItemManager {
 
         if (id == -1) return id;
 
-        allItems.put(id, item);
+        if (table.equals(Table.ALL_ITEMS)) {
+            allItems.put(id, item);
+        } else {
+            shopItems.put(id, item);
+        }
 
         return id;
     }
@@ -127,7 +109,7 @@ public class ItemManager {
      * @param id         The ID of the item to update.
      * @param item       The new ItemStack to replace the old one.
      */
-    public void updateItem(int id, String item) {
-        connection.updateSQLite("UPDATE AllItems SET itemStack = ? WHERE id = ?", item, id);
+    public void updateItem(int id, String item, Table table) {
+        connection.updateSQLite("UPDATE " + table.getTable() + " SET itemStack = ? WHERE id = ?", item, id);
     }
 }

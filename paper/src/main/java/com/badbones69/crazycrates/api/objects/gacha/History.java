@@ -8,6 +8,7 @@ import com.badbones69.crazycrates.api.objects.gacha.data.Result;
 import com.badbones69.crazycrates.api.objects.gacha.enums.GachaType;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.enums.ResultType;
+import com.badbones69.crazycrates.api.objects.gacha.enums.Table;
 import com.badbones69.crazycrates.api.objects.gacha.util.HSLColor;
 import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 import io.papermc.paper.adventure.PaperAdventure;
@@ -140,7 +141,7 @@ public class History {
             String[] split = history.getRewardName().split("_");
             int id = Integer.parseInt(split[0]);
 
-            item = playerDataManager.getItemManager().getItemFromCache(id).second();
+            item = playerDataManager.getItemManager().getItemFromCache(id, Table.ALL_ITEMS);
             if (item == null) {
                 throw new NullPointerException("Item with rewardName: " + history.getRewardName() + " does not exist, rarity: " + rarity + " 5050: " + history.isWon5050());
             }

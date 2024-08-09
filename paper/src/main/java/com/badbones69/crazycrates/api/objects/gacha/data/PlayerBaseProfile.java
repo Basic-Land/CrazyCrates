@@ -1,6 +1,6 @@
 package com.badbones69.crazycrates.api.objects.gacha.data;
 
-import com.badbones69.crazycrates.api.objects.gacha.enums.CurrencyTypes;
+import com.badbones69.crazycrates.api.objects.gacha.enums.CurrencyType;
 import lombok.*;
 
 import java.io.Serial;
@@ -29,7 +29,7 @@ public class PlayerBaseProfile implements Serializable {
         premiumCurrency += amount;
     }
 
-    public void add(int amount, CurrencyTypes currencyType) {
+    public void add(int amount, CurrencyType currencyType) {
         switch (currencyType) {
             case VOTE_TOKENS -> addVoteTokens(amount);
             case MYSTIC_TOKENS -> addMysticTokens(amount);
@@ -54,7 +54,7 @@ public class PlayerBaseProfile implements Serializable {
         premiumCurrency -= amount;
     }
 
-    public void remove(int amount, CurrencyTypes currencyType) {
+    public void remove(int amount, CurrencyType currencyType) {
         switch (currencyType) {
             case VOTE_TOKENS -> removeVoteTokens(amount);
             case MYSTIC_TOKENS -> removeMysticTokens(amount);
@@ -79,7 +79,7 @@ public class PlayerBaseProfile implements Serializable {
         return premiumCurrency >= amount;
     }
 
-    public boolean has(int amount, CurrencyTypes currencyType) {
+    public boolean has(int amount, CurrencyType currencyType) {
         return switch (currencyType) {
             case VOTE_TOKENS -> hasVoteTokens(amount);
             case MYSTIC_TOKENS -> hasMysticTokens(amount);
@@ -120,7 +120,7 @@ public class PlayerBaseProfile implements Serializable {
         return false;
     }
 
-    public boolean removeIfHas(int amount, CurrencyTypes currencyType) {
+    public boolean removeIfHas(int amount, CurrencyType currencyType) {
         return switch (currencyType) {
             case VOTE_TOKENS -> removeVoteTokensIfHas(amount);
             case MYSTIC_TOKENS -> removeMysticTokensIfHas(amount);

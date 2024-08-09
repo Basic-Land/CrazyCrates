@@ -11,6 +11,7 @@ import com.badbones69.crazycrates.api.objects.gacha.banners.BannerPackage;
 import com.badbones69.crazycrates.api.objects.gacha.enums.GachaType;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
+import com.badbones69.crazycrates.api.objects.gacha.enums.Table;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ComponentBuilder;
 import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 import com.badbones69.crazycrates.api.objects.gacha.util.TierInfo;
@@ -210,8 +211,8 @@ public class CrateSettings {
 
         if (section != null) {
             for (int key : section.getIntegerList("items")) {
-                Pair<Integer, ItemStack> pair = databaseManager.getItemManager().getItemFromCache(key);
-                extraRewards.add(pair.second());
+                ItemStack item = databaseManager.getItemManager().getItemFromCache(key, Table.ALL_ITEMS);
+                extraRewards.add(item);
             }
         }
 
@@ -264,7 +265,7 @@ public class CrateSettings {
         String rewardName = key + "_" + type.name();
         int id = Integer.parseInt(key);
 
-        ItemStack item = databaseManager.getItemManager().getItemFromCache(id).second();
+        ItemStack item = databaseManager.getItemManager().getItemFromCache(id, Table.ALL_ITEMS);
         if (item == null) {
             return;
         }
