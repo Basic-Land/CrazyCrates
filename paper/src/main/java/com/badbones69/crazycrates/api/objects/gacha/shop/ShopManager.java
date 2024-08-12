@@ -119,16 +119,18 @@ public class ShopManager {
                 .stream()
                 .sorted()
                 .limit(18)
-                .map(shopItem -> {
-                    //TODO: add logic for limit
-                    if (shopItem == null) return null;
-                    ItemBuilder itemBuilder = new ItemBuilder(shopItem.stack());
-                    itemBuilder.addDisplayLore("<green><b>Price: <white>" + shopItem.price());
-                    itemBuilder.addDisplayLore("<green><b>Limit: <white>" + shopItem.limit());
-                    return itemBuilder.getStack();
-                })
+                .map(this::apply)
                 .filter(Objects::nonNull)
                 .forEach(itemStack -> inventory.setItem(slot.getAndIncrement(), itemStack));
+    }
+
+    private ItemStack apply(ShopItem shopItem) {
+        //TODO: add logic for limit
+        if (shopItem == null) return null;
+        ItemBuilder itemBuilder = new ItemBuilder(shopItem.stack());
+        itemBuilder.addDisplayLore("<green><b>Price: <white>" + shopItem.price());
+        itemBuilder.addDisplayLore("<green><b>Limit: <white>" + shopItem.limit());
+        return itemBuilder.getStack();
     }
 
     public void buildGUI(InventoryBuilder builder, ShopID selected) {
