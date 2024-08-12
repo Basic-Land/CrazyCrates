@@ -34,7 +34,7 @@ public class UltimateMenu extends InventoryBuilder {
     private static final DatabaseManager manager = JavaPlugin.getPlugin(CrazyCrates.class).getCrateManager().getDatabaseManager();
     private final int selectedCrate;
     private final int totalPageAmount;
-    private int currentPage;
+    private final int currentPage;
     private boolean voteShop, premiumShop, store = false;
     private OpenData openData = null;
 
@@ -85,15 +85,16 @@ public class UltimateMenu extends InventoryBuilder {
         );
     }
 
+    private UltimateMenu(CrateSettings settings, Player player) {
+        this(settings.getCrate(), player, ComponentBuilder.mainMenu(player, settings));
+    }
+
 
     @Override
     public InventoryBuilder build() {
         setTopCrates();
-
         setTextureGlass();
-
         setItemsPlayerInv();
-
         return this;
     }
 
@@ -123,8 +124,12 @@ public class UltimateMenu extends InventoryBuilder {
         }
 
         if (newCrateNum != -1) {
+            List<CrateSettings> settings = manager.getCrateSettingsSplit().get(ultimateMenu.currentPage);
+            if (settings.size() <= newCrateNum) return;
+
+            CrateSettings newCrate = settings.get(newCrateNum);
+
             player.playSound(UltimateMenuStuff.CLICK);
-            CrateSettings newCrate = manager.getCrateSettingsSplit().get(ultimateMenu.currentPage).get(newCrateNum);
             Component component = ComponentBuilder.mainMenu(player, newCrate);
 
             player.openInventory(new UltimateMenu(ultimateMenu, component, newCrateNum).build().getInventory());
@@ -176,13 +181,21 @@ public class UltimateMenu extends InventoryBuilder {
             case 83 -> {
                 player.playSound(UltimateMenuStuff.CLICK);
                 close(player);
-                player.openInventory(new ShopMenu(crate, player).build().getInventory());
+                manager.getShopManager().openFirst(crate, player);
             }
             case 84 -> {
-                //TODO: handle page back
+                if (totalPageAmount == 1 || currentPage == 0) return;
+                if (currentPage > 0) {
+                    CrateSettings first = manager.getCrateSettingsSplit().get(currentPage - 1).getFirst();
+                    player.openInventory(new UltimateMenu(first, player).build().getInventory());
+                }
             }
             case 85 -> {
-                //TODO: handle page forward
+                if (totalPageAmount == 1 || currentPage == totalPageAmount - 1) return;
+                if (currentPage < totalPageAmount - 1) {
+                    CrateSettings first = manager.getCrateSettingsSplit().get(currentPage + 1).getFirst();
+                    player.openInventory(new UltimateMenu(first, player).build().getInventory());
+                }
             }
             case 86, 87 -> open1(player, crate);
             case 88, 89 -> open10(player, crate);
@@ -348,14 +361,13 @@ public class UltimateMenu extends InventoryBuilder {
         playerInventory.setItem(2, UltimateMenuStuff.SHOP.getStack());
 
         if (totalPageAmount > 1) {
-            if (currentPage > 0) {
-                playerInventory.setItem(3, UltimateMenuStuff.BACK_ITEM.getStack());
-                playerInventory.setItem(30, UltimateMenuStuff.ARROW_LEFT.getStack());
-            }
-
-            if (currentPage < totalPageAmount - 1) {
+            if (currentPage == 0) {
                 playerInventory.setItem(4, UltimateMenuStuff.FORWARD.getStack());
-                playerInventory.setItem(31, UltimateMenuStuff.ARROW_RIGHT.getStack());
+            } else if (currentPage < totalPageAmount - 1) {
+                playerInventory.setItem(3, UltimateMenuStuff.BACK_ITEM.getStack());
+                playerInventory.setItem(4, UltimateMenuStuff.FORWARD.getStack());
+            } else if (currentPage == totalPageAmount - 1) {
+                playerInventory.setItem(3, UltimateMenuStuff.BACK_ITEM.getStack());
             }
         }
 

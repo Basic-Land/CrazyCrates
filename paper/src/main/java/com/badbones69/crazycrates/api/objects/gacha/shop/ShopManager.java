@@ -1,28 +1,39 @@
 package com.badbones69.crazycrates.api.objects.gacha.shop;
 
 import com.badbones69.crazycrates.CrazyCrates;
+import com.badbones69.crazycrates.api.builders.InventoryBuilder;
+import com.badbones69.crazycrates.api.builders.types.items.ShopMenu;
+import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
 import com.badbones69.crazycrates.api.objects.gacha.enums.CurrencyType;
 import com.badbones69.crazycrates.api.objects.gacha.enums.ShopID;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Table;
+import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ComponentBuilder;
+import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuStuff;
+import com.ryderbelserion.vital.paper.builders.items.ItemBuilder;
 import com.ryderbelserion.vital.paper.files.config.CustomFile;
 import com.ryderbelserion.vital.paper.files.config.FileManager;
+import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
+@Getter
 public class ShopManager {
-    private final CrazyCrates plugin = JavaPlugin.getPlugin(CrazyCrates.class);
-    private final FileManager yamlManager = plugin.getFileManager();
-    private final DatabaseManager databaseManager;
     private final List<ShopData> shops = new ArrayList<>();
 
     public ShopManager(DatabaseManager databaseManager) {
-        this.databaseManager = databaseManager;
+        CrazyCrates plugin = JavaPlugin.getPlugin(CrazyCrates.class);
+        FileManager yamlManager = plugin.getFileManager();
+
         yamlManager.getCustomFiles()
                 .stream()
                 .filter(customFile -> customFile.getFile().getParent().contains("shops"))
@@ -67,6 +78,92 @@ public class ShopManager {
                     return new ShopData(shopID, currencyType, name, shopItems);
                 })
                 .filter(Objects::nonNull)
+                .sorted()
                 .forEach(shops::add);
+
+        shops.forEach(System.out::println);
+    }
+
+    public void openFirst(Crate crate, Player player) {
+        if (shops.isEmpty()) return;
+        ShopData shopData = shops.getFirst();
+
+        shop(crate, player, shopData);
+    }
+
+    public void openID(Crate crate, Player player, int id) {
+        if (shops.isEmpty()) return;
+        if (id < 0 || id >= shops.size()) return;
+        ShopData shopData = shops.get(id);
+
+        shop(crate, player, shopData);
+    }
+
+    private void shop(Crate crate, Player player, ShopData shopData) {
+        Component shop = ComponentBuilder.shop(player, shopData.shopName());
+        ShopMenu shopMenu = new ShopMenu(crate, player, shop, this);
+
+        Inventory inventory = shopMenu.getInventory();
+        inventory.setItem(45, UltimateMenuStuff.SHOP_BANNER.getStack());
+        inventory.setItem(49, UltimateMenuStuff.MAIN_MENU_SHOP.getStack());
+
+        buildGUI(shopMenu, shopData.shopID());
+        buildItems(inventory, shopData);
+
+        player.openInventory(shopMenu.getInventory());
+    }
+
+    private void buildItems(Inventory inventory, ShopData shopData) {
+        AtomicInteger slot = new AtomicInteger(27);
+        shopData.items()
+                .stream()
+                .sorted()
+                .limit(18)
+                .map(shopItem -> {
+                    //TODO: add logic for limit
+                    if (shopItem == null) return null;
+                    ItemBuilder itemBuilder = new ItemBuilder(shopItem.stack());
+                    itemBuilder.addDisplayLore("<green><b>Price: <white>" + shopItem.price());
+                    itemBuilder.addDisplayLore("<green><b>Limit: <white>" + shopItem.limit());
+                    return itemBuilder.getStack();
+                })
+                .filter(Objects::nonNull)
+                .forEach(itemStack -> inventory.setItem(slot.getAndIncrement(), itemStack));
+    }
+
+    public void buildGUI(InventoryBuilder builder, ShopID selected) {
+        if (shops.isEmpty()) return;
+
+        int slot = 0;
+
+        ItemBuilder selectedMain = UltimateMenuStuff.SHOP_SELECTED;
+        ItemBuilder unselectedMain = UltimateMenuStuff.SHOP_UNSELECTED;
+        Inventory inv = builder.getInventory();
+
+        for (ShopData shopData : shops) {
+            selectedMain.setDisplayName("<green><b>" + shopData.shopName());
+            unselectedMain.setDisplayName("<red><b>" + shopData.shopName());
+
+            ShopID shopID = shopData.shopID();
+            int ordinal = shopID.ordinal();
+
+            if (selected == shopID) {
+                selectedMain.setCustomModelData(1000007 - ordinal);
+                inv.setItem(slot, selectedMain.getStack());
+
+                selectedMain.setCustomModelData(1000003);
+                inv.setItem(slot + 1, selectedMain.getStack());
+                inv.setItem(slot + 2, selectedMain.getStack());
+            } else {
+                unselectedMain.setCustomModelData(1000007 - ordinal);
+                inv.setItem(slot, unselectedMain.getStack());
+
+                unselectedMain.setCustomModelData(1000001);
+                inv.setItem(slot + 1, unselectedMain.getStack());
+                inv.setItem(slot + 2, unselectedMain.getStack());
+            }
+
+            slot += 3;
+        }
     }
 }

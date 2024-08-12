@@ -8,8 +8,19 @@ public record ShopItem(ItemStack stack,
                        int limit,
                        int place)
         implements Comparable<ShopItem> {
+
     @Override
     public int compareTo(@NotNull ShopItem o) {
         return Integer.compare(place, o.place);
+    }
+
+    @Override
+    public String toString() {
+        return "ShopItem{" +
+                "stack=" + stack +
+                ", price=" + price +
+                ", limit=" + limit +
+                ", place=" + place +
+                '}';
     }
 }

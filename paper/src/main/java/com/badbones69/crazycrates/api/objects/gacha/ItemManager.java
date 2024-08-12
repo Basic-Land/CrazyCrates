@@ -14,8 +14,7 @@ import java.util.Map;
 
 public class ItemManager {
     private final DatabaseConnection connection;
-    private final Map<Integer, ItemStack> allItems = new HashMap<>();
-    private final Map<Integer, ItemStack> shopItems = new HashMap<>();
+    private final Map<Table, Map<Integer, ItemStack>> items = new HashMap<>();
 
     /**
      * Constructor for the ItemManager class.
@@ -24,8 +23,9 @@ public class ItemManager {
      */
     public ItemManager(DatabaseConnection connection) {
         this.connection = connection;
-        allItems.putAll(getAllItems(Table.ALL_ITEMS));
-        shopItems.putAll(getAllItems(Table.SHOP_ITEMS));
+        for (Table table : Table.values()) {
+            items.put(table, getAllItems(table));
+        }
     }
 
     /**
@@ -65,7 +65,7 @@ public class ItemManager {
     }
 
     public Map<Integer, ItemStack> getAllItemsFromCache(Table table) {
-        return table.equals(Table.ALL_ITEMS) ? allItems : shopItems;
+        return items.get(table);
     }
 
     /**
@@ -94,11 +94,7 @@ public class ItemManager {
 
         if (id == -1) return id;
 
-        if (table.equals(Table.ALL_ITEMS)) {
-            allItems.put(id, item);
-        } else {
-            shopItems.put(id, item);
-        }
+        getAllItemsFromCache(table).put(id, item);
 
         return id;
     }

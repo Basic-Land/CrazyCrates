@@ -247,7 +247,10 @@ public final class ComponentBuilder {
                 case 'i', ':', '.' -> 2;
                 case 'f','k' -> 5;
                 case 'l', '│', 'í' -> 3;
-                default -> 0;
+                default -> {
+                    System.out.println("Unknown character: " + c);
+                    yield 0;
+                }
             };
         }
         return size;
