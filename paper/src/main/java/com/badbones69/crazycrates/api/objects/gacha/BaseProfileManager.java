@@ -45,16 +45,10 @@ public class BaseProfileManager implements Listener {
     }
 
     public void startSavingTask() {
-        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
-            for (Map.Entry<String, PlayerBaseProfile> entry : profilesCache.entrySet()) {
-                databaseManager.savePlayerBaseProfile(entry.getKey(), entry.getValue());
-            }
-        }, 0L, 20L * 60 * 5); // Run every 5 minutes
+        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> profilesCache.forEach(databaseManager::savePlayerBaseProfile), 0L, 20L * 60 * 5); // Run every 5 minutes
     }
 
     public void save() {
-        for (Map.Entry<String, PlayerBaseProfile> entry : profilesCache.entrySet()) {
-            databaseManager.savePlayerBaseProfile(entry.getKey(), entry.getValue());
-        }
+        profilesCache.forEach(databaseManager::savePlayerBaseProfile);
     }
 }

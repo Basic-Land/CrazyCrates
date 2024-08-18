@@ -1,10 +1,13 @@
 package com.badbones69.crazycrates.api.objects.gacha.data;
 
 import com.badbones69.crazycrates.api.objects.gacha.enums.CurrencyType;
+import com.badbones69.crazycrates.api.objects.gacha.enums.ShopID;
 import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 public class PlayerBaseProfile implements Serializable {
@@ -12,6 +15,7 @@ public class PlayerBaseProfile implements Serializable {
     private static final long serialVersionUID = 4019127885119793810L;
     private final String playerName;
     private int stellarShards, mysticTokens, voteTokens, premiumCurrency;
+    private final Map<ShopID, Map<Integer, Integer>> shops = new HashMap<>();
 
     public void addStellarShards(int amount) {
         stellarShards += amount;
@@ -134,5 +138,9 @@ public class PlayerBaseProfile implements Serializable {
             removePremiumCurrency(amount);
             addVoteTokens(amount);
         }
+    }
+
+    public void resetShopLimits() {
+        shops.forEach((shopID, shop) -> shop.clear());
     }
 }

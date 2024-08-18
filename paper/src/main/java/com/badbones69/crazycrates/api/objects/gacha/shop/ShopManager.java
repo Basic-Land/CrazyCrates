@@ -29,10 +29,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Getter
 public class ShopManager {
     private final List<ShopData> shops = new ArrayList<>();
+    private final LimitManager limitManager;
 
     public ShopManager(DatabaseManager databaseManager) {
         CrazyCrates plugin = JavaPlugin.getPlugin(CrazyCrates.class);
         FileManager yamlManager = plugin.getFileManager();
+        limitManager = new LimitManager();
 
         yamlManager.getCustomFiles()
                 .stream()
@@ -58,9 +60,10 @@ public class ShopManager {
                             .map(items::getConfigurationSection)
                             .filter(Objects::nonNull)
                             .map(item -> {
+                                int id = item.getInt("id");
                                 ItemStack itemFromCache = databaseManager
                                         .getItemManager()
-                                        .getItemFromCache(item.getInt("id"), Table.SHOP_ITEMS);
+                                        .getItemFromCache(id, Table.SHOP_ITEMS);
 
                                 if (itemFromCache == null) {
                                     return null;
@@ -70,7 +73,8 @@ public class ShopManager {
                                         itemFromCache,
                                         item.getInt("price"),
                                         item.getInt("limit"),
-                                        item.getInt("place"));
+                                        item.getInt("place"),
+                                        id);
                             })
                             .filter(Objects::nonNull)
                             .toList();
@@ -101,7 +105,7 @@ public class ShopManager {
 
     private void shop(Crate crate, Player player, ShopData shopData) {
         Component shop = ComponentBuilder.shop(player, shopData.shopName());
-        ShopMenu shopMenu = new ShopMenu(crate, player, shop, this);
+        ShopMenu shopMenu = new ShopMenu(crate, player, shop, this, shopData);
 
         Inventory inventory = shopMenu.getInventory();
         inventory.setItem(45, UltimateMenuStuff.SHOP_BANNER.getStack());
@@ -115,9 +119,7 @@ public class ShopManager {
 
     private void buildItems(Inventory inventory, ShopData shopData) {
         AtomicInteger slot = new AtomicInteger(27);
-        shopData.items()
-                .stream()
-                .sorted()
+        shopData.sorted()
                 .limit(18)
                 .map(this::apply)
                 .filter(Objects::nonNull)
@@ -125,7 +127,6 @@ public class ShopManager {
     }
 
     private ItemStack apply(ShopItem shopItem) {
-        //TODO: add logic for limit
         if (shopItem == null) return null;
         ItemBuilder itemBuilder = new ItemBuilder(shopItem.stack());
         itemBuilder.addDisplayLore("<green><b>Price: <white>" + shopItem.price());

@@ -6,7 +6,8 @@ import org.jetbrains.annotations.NotNull;
 public record ShopItem(ItemStack stack,
                        int price,
                        int limit,
-                       int place)
+                       int place,
+                       int id)
         implements Comparable<ShopItem> {
 
     @Override

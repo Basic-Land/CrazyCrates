@@ -24,6 +24,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.*;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -68,6 +71,7 @@ public class DatabaseManager {
         connection.updateSQLite("CREATE TABLE IF NOT EXISTS AllItems(id INTEGER PRIMARY KEY AUTOINCREMENT, itemStack VARCHAR NULL)").join();
         connection.updateSQLite("CREATE TABLE IF NOT EXISTS ShopItems(id INTEGER PRIMARY KEY AUTOINCREMENT, itemStack VARCHAR NULL)").join();
         connection.updateSQLite("CREATE TABLE IF NOT EXISTS Backup(uuid VARCHAR(36) PRIMARY KEY, inventory VARCHAR NULL)").join();
+        connection.updateSQLite("CREATE TABLE IF NOT EXISTS ShopInfo(nextReset VARCHAR)").join();
 
         Set<String> playernames = new HashSet<>();
         connection.querySQLite("SELECT playerName FROM PlayerData").thenAccept(rs -> {
@@ -106,6 +110,49 @@ public class DatabaseManager {
         }).join();
 
         restoreInv(null);
+        checkAndResetShopInfo(LocalDate.now());
+    }
+
+    private void checkAndResetShopInfo(LocalDate date) {
+        LocalDate firstDayOfNextMonth = date.with(TemporalAdjusters.firstDayOfNextMonth());
+
+        connection.querySQLite("SELECT * FROM ShopInfo").thenAccept(rs -> {
+            try {
+                if (rs.next()) {
+                    LocalDate nextReset = LocalDate.parse(rs.getString("nextReset"));
+
+                    System.out.println("Date: " + date + " Next reset: " + nextReset);
+
+                    if (date.equals(nextReset)) {
+                        connection.updateSQLite("UPDATE ShopInfo SET nextReset = ?", firstDayOfNextMonth.toString()).join();
+                        System.out.println("Reset date: " + firstDayOfNextMonth);
+                        resetLimits();
+                    }
+                } else {
+                    connection.updateSQLite("INSERT INTO ShopInfo(nextReset) VALUES(?)", firstDayOfNextMonth.toString()).join();
+                    checkAndResetShopInfo(date);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }).join();
+    }
+
+    private void resetLimits() {
+        connection.querySQLite("SELECT baseData from PlayerData").thenAccept(rs -> {
+            try {
+                while (rs.next()) {
+                    String baseData = rs.getString("baseData");
+                    PlayerBaseProfile baseProfile = deserializeBaseProfile(baseData);
+
+                    baseProfile.resetShopLimits();
+                    savePlayerBaseProfile(baseProfile.getPlayerName(), baseProfile);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }).join();
+
     }
 
     public void restoreInv(UUID target) {
