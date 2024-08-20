@@ -103,6 +103,18 @@ public class ShopManager {
         shop(crate, player, shopData);
     }
 
+    public void openShop(Crate crate, Player player, ShopID shopID) {
+        if (shops.isEmpty()) return;
+        ShopData shopData = shops.stream()
+                .filter(shop -> shop.shopID() == shopID)
+                .findFirst()
+                .orElse(null);
+
+        if (shopData == null) return;
+
+        shop(crate, player, shopData);
+    }
+
     private void shop(Crate crate, Player player, ShopData shopData) {
         Component shop = ComponentBuilder.shop(player, shopData.shopName());
         ShopMenu shopMenu = new ShopMenu(crate, player, shop, this, shopData);
@@ -112,25 +124,33 @@ public class ShopManager {
         inventory.setItem(49, UltimateMenuStuff.MAIN_MENU_SHOP.getStack());
 
         buildGUI(shopMenu, shopData.shopID());
-        buildItems(inventory, shopData);
+        buildItems(player, inventory, shopData);
 
         player.openInventory(shopMenu.getInventory());
     }
 
-    private void buildItems(Inventory inventory, ShopData shopData) {
+    private void buildItems(Player player, Inventory inventory, ShopData shopData) {
         AtomicInteger slot = new AtomicInteger(27);
         shopData.sorted()
                 .limit(18)
-                .map(this::apply)
+                .map(shopItem -> apply(player, shopItem, shopData))
                 .filter(Objects::nonNull)
                 .forEach(itemStack -> inventory.setItem(slot.getAndIncrement(), itemStack));
     }
 
-    private ItemStack apply(ShopItem shopItem) {
+    private ItemStack apply(Player player, ShopItem shopItem, ShopData shopData) {
         if (shopItem == null) return null;
-        ItemBuilder itemBuilder = new ItemBuilder(shopItem.stack());
+        ShopPurchase shopPurchase = limitManager.getData(player, shopData.shopID(), shopItem, false);
+        ItemStack stack = shopItem.stack().clone();
+        ItemBuilder itemBuilder = new ItemBuilder(stack);
         itemBuilder.addDisplayLore("<green><b>Price: <white>" + shopItem.price());
-        itemBuilder.addDisplayLore("<green><b>Limit: <white>" + shopItem.limit());
+
+        switch (shopPurchase.limitType()) {
+            case SUCCESS -> itemBuilder.addDisplayLore("<green><b>Bought: <white>" + shopPurchase.bought() + "/" +  shopItem.limit());
+            case LIMIT_REACHED -> itemBuilder.addDisplayLore("<red><b>Limit Reached");
+            case UNLIMITED -> itemBuilder.addDisplayLore("<green><b>Limit: <white>Unlimited");
+        }
+
         return itemBuilder.getStack();
     }
 

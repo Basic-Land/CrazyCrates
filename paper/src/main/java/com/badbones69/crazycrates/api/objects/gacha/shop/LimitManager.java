@@ -1,7 +1,6 @@
 package com.badbones69.crazycrates.api.objects.gacha.shop;
 
 import com.badbones69.crazycrates.CrazyCrates;
-import com.badbones69.crazycrates.api.objects.gacha.BaseProfileManager;
 import com.badbones69.crazycrates.api.objects.gacha.data.PlayerBaseProfile;
 import com.badbones69.crazycrates.api.objects.gacha.enums.LimitType;
 import com.badbones69.crazycrates.api.objects.gacha.enums.ShopID;
@@ -11,26 +10,26 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.HashMap;
 
 public class LimitManager {
-    private final BaseProfileManager baseProfileManager;
+    private final CrazyCrates plugin = JavaPlugin.getPlugin(CrazyCrates.class);
 
-    public LimitManager() {
-        baseProfileManager = JavaPlugin.getPlugin(CrazyCrates.class).getBaseProfileManager();
-    }
-
-    public LimitType canPurchase(Player player, ShopID shopID, ShopItem item) {
-        PlayerBaseProfile playerBaseProfile = baseProfileManager.getPlayerBaseProfile(player.getName());
+    public ShopPurchase getData(Player player, ShopID shopID, ShopItem item, boolean increment) {
+        PlayerBaseProfile playerBaseProfile = plugin.getBaseProfileManager().getPlayerBaseProfile(player.getName());
         int bought = playerBaseProfile.getShops().computeIfAbsent(shopID, k -> new HashMap<>()).computeIfAbsent(item.id(), k -> 0);
 
+        LimitType limitType;
+
         if (item.limit() == -1) {
-            return LimitType.UNLIMITED;
+            limitType = LimitType.UNLIMITED;
+        } else if (bought >= item.limit()) {
+            limitType = LimitType.LIMIT_REACHED;
+        } else {
+            limitType = LimitType.SUCCESS;
         }
 
-        return bought < item.limit() ? LimitType.SUCCESS : LimitType.LIMIT_REACHED;
-    }
+        if (increment && limitType == LimitType.SUCCESS) {
+            playerBaseProfile.getShops().get(shopID).put(item.id(), bought + 1);
+        }
 
-    public void purchaseItem(Player player, ShopID shopID, ShopItem item) {
-        PlayerBaseProfile playerBaseProfile = baseProfileManager.getPlayerBaseProfile(player.getName());
-        playerBaseProfile.getShops().computeIfAbsent(shopID, k -> new HashMap<>()).compute(item.id(), (id, bought) -> bought == null ? 1 : bought + 1);
-        baseProfileManager.save();
+        return new ShopPurchase(limitType, bought);
     }
 }

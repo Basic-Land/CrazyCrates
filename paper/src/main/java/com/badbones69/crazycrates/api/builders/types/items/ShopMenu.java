@@ -2,8 +2,11 @@ package com.badbones69.crazycrates.api.builders.types.items;
 
 import com.badbones69.crazycrates.api.builders.InventoryBuilder;
 import com.badbones69.crazycrates.api.objects.Crate;
+import com.badbones69.crazycrates.api.objects.gacha.data.PlayerBaseProfile;
 import com.badbones69.crazycrates.api.objects.gacha.shop.ShopData;
+import com.badbones69.crazycrates.api.objects.gacha.shop.ShopItem;
 import com.badbones69.crazycrates.api.objects.gacha.shop.ShopManager;
+import com.badbones69.crazycrates.api.objects.gacha.shop.ShopPurchase;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuStuff;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
@@ -36,26 +39,40 @@ public class ShopMenu extends InventoryBuilder {
 
         Player player = shopMenu.getPlayer();
 
-        int shopID;
-
-        if (slot < 3) {
-            shopID = 0;
-        } else if (slot < 6) {
-            shopID = 1;
-        } else if (slot < 9) {
-            shopID = 2;
-        } else shopID = -1;
+        int shopID = switch (slot) {
+            case 0, 1, 2 -> 0;
+            case 3, 4, 5 -> 1;
+            case 6, 7, 8 -> 2;
+            default -> -1;
+        };
 
         if (shopID != -1) {
             player.playSound(UltimateMenuStuff.CLICK);
-            System.out.println("slot: " + slot);
             shopManager.openID(getCrate(), getPlayer(), shopID);
+            return;
         }
 
         ItemStack item = e.getCurrentItem();
 
         if (slot >= 27 && slot < 45 && item != null) {
-            System.out.println(shopData.getItemByPlace(slot - 27));
+            ShopItem itemByPlace = shopData.getItemByPlace(slot - 27);
+
+            PlayerBaseProfile playerBaseProfile = plugin.getBaseProfileManager().getPlayerBaseProfile(player.getName());
+            if (playerBaseProfile.has(itemByPlace.price(), shopData.currencyType())) {
+                ShopPurchase data = shopManager.getLimitManager().getData(player, shopData.shopID(), itemByPlace, true);
+
+                if (data.isSuccess()) {
+                    playerBaseProfile.remove(itemByPlace.price(), shopData.currencyType());
+                    player.getInventory().addItem(itemByPlace.stack());
+                    shopManager.openShop(getCrate(), getPlayer(), shopData.shopID());
+                } else {
+                    player.sendMessage("You have reached the limit for this item.");
+                }
+            } else {
+                player.sendMessage("You don't have enough money to buy this item.");
+            }
+
+            return;
         }
 
         if (slot == 49) {

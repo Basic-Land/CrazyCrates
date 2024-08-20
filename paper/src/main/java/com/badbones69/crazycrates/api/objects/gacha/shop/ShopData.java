@@ -17,10 +17,6 @@ public record ShopData(ShopID shopID,
         return items.stream().sorted();
     }
 
-    public ShopItem getItemByDatabaseID(int id) {
-        return items.stream().filter(item -> item.id() == id).findFirst().orElse(null);
-    }
-
     public ShopItem getItemByPlace(int place) {
         return items.stream().filter(item -> item.place() == place).findFirst().orElse(null);
     }

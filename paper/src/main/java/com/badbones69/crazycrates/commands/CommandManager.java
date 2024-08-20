@@ -145,6 +145,7 @@ public class CommandManager {
                 new AddItemCustom(),
                 new EditItems(),
                 new AddCurrency(),
+                new Clear(),
 
                 new CommandGive(),
                 new CommandOpen(),
