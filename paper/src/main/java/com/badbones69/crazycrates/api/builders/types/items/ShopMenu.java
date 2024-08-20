@@ -65,7 +65,7 @@ public class ShopMenu extends InventoryBuilder {
                     playerBaseProfile.remove(itemByPlace.price(), shopData.currencyType());
                     player.getInventory().addItem(itemByPlace.stack());
                     shopManager.openShop(getCrate(), getPlayer(), shopData.shopID());
-                } else {
+                } else if (data.isLimitReached()) {
                     player.sendMessage("You have reached the limit for this item.");
                 }
             } else {
