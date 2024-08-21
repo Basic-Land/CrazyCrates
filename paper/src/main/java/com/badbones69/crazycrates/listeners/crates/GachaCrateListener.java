@@ -75,16 +75,21 @@ public class GachaCrateListener implements Listener {
             return;
         }
 
-        if (count == 10) {
-            int i = 0;
-            for (Integer slot : slots) {
-                inventory.setItem(slot, prize.get(i++).getPrize().getDisplayItem());
+        if (rouletteStandard.isSneak()) {
+            if (count == 10) {
+                int i = 0;
+                for (Integer slot : slots) {
+                    inventory.setItem(slot, prize.get(i++).getPrize().getDisplayItem());
+                }
+                rouletteStandard.incrementCount();
+                return;
             }
-            rouletteStandard.incrementCount();
-            return;
-        }
 
-        inv.setItem(22, prize.get(count).getPrize().getDisplayItem());
-        rouletteStandard.incrementCount();
+            inv.setItem(22, prize.get(count).getPrize().getDisplayItem());
+            rouletteStandard.incrementCount();
+        } else {
+            rouletteStandard.incrementCount();
+            if (count == 1) manager.getGachaRunnables().remove(uuid);
+        }
     }
 }

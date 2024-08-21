@@ -11,7 +11,6 @@ import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;

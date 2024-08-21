@@ -36,6 +36,7 @@ public class RouletteStandard extends FoliaRunnable {
     private final CrazyCrates plugin = JavaPlugin.getPlugin(CrazyCrates.class);
     private final CrateManager crateManager = plugin.getCrateManager();
     private final Rarity highestRarity;
+    @Getter
     private final boolean sneak;
     private final ItemBuilder glass = new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE);
     @Getter
@@ -65,17 +66,12 @@ public class RouletteStandard extends FoliaRunnable {
     @Override
     public void run() {
         if (!player.isOnline()) {
-            ((GachaCrateManager) crate.getManager()).getGachaRunnables().remove(uuid);
-            crateManager.endCrate(player);
-            crateManager.removePlayerFromOpeningList(player);
-            cancel();
+            endCrate();
             return;
         }
 
         if (!put) {
-            GachaCrateManager gachaCrateManager = (GachaCrateManager) crate.getManager();
-            gachaCrateManager.getGachaRunnables().putIfAbsent(uuid, this);
-            put = true;
+            putGachaRunnable();
         }
 
         if (modelData == 8) {
@@ -83,11 +79,7 @@ public class RouletteStandard extends FoliaRunnable {
         }
 
         if (!first && !skip) {
-            builder.setItem(36, glass.setCustomModelData(modelData).getStack());
-            for (int i = 0; i < 45; i++) {
-                if (i == 36 || i == 37 || i == 8) continue;
-                builder.setItem(i, MiscUtils.getRandomPaneColor().setCustomModelData(2000000).getStack());
-            }
+            setupInventory();
         }
 
         if (!player.getOpenInventory().getTopInventory().equals(inventory)) {
@@ -103,24 +95,47 @@ public class RouletteStandard extends FoliaRunnable {
         }
 
         if (modelData == 64) {
-            if (!first && sneak) {
-                first = true;
-                lock = true;
-                builder.setItem(36, glass.setCustomModelData(600).getStack());
-                if (!skip) builder.setItem(22, prize.getFirst().getPrize().getDisplayItem());
-                skip = true;
-                return;
-            }
-
-            if (sneak) {
-                if (check()) return;
-            }
-
-            endTask();
-            cancel();
+            handleModelData64();
         }
 
         if (!lock) modelData++;
+    }
+
+    private void endCrate() {
+        ((GachaCrateManager) crate.getManager()).getGachaRunnables().remove(uuid);
+        crateManager.endCrate(player);
+        crateManager.removePlayerFromOpeningList(player);
+        cancel();
+    }
+
+    private void putGachaRunnable() {
+        GachaCrateManager gachaCrateManager = (GachaCrateManager) crate.getManager();
+        gachaCrateManager.getGachaRunnables().putIfAbsent(uuid, this);
+        put = true;
+    }
+
+    private void setupInventory() {
+        builder.setItem(36, glass.setCustomModelData(modelData).getStack());
+        for (int i = 0; i < 45; i++) {
+            if (i == 36 || i == 37 || i == 8) continue;
+            builder.setItem(i, MiscUtils.getRandomPaneColor().setCustomModelData(2000000).getStack());
+        }
+    }
+
+    private void handleModelData64() {
+        if (!first) {
+            first = true;
+            lock = true;
+            builder.setItem(36, glass.setCustomModelData(600).getStack());
+            builder.setItem(22, prize.getFirst().getPrize().getDisplayItem());
+            skip = true;
+            return;
+        }
+
+        if (check()) return;
+
+        endTask();
+        cancel();
     }
 
     private int getPortalData() {
