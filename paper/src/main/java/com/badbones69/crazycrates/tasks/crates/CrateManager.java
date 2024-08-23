@@ -356,7 +356,6 @@ public class CrateManager {
 
         databaseManager = new DatabaseManager(getCrates());
 
-
         if (MiscUtils.isLogging()) {
             List.of(
                     "All crate information has been loaded.",

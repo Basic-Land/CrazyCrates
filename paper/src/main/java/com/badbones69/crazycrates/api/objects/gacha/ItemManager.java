@@ -1,5 +1,6 @@
 package com.badbones69.crazycrates.api.objects.gacha;
 
+import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Table;
 import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 import cz.basicland.blibs.shared.databases.hikari.DatabaseConnection;
@@ -11,6 +12,8 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.badbones69.crazycrates.CrazyCrates.LOGGER;
 
 public class ItemManager {
     private final DatabaseConnection connection;
@@ -43,7 +46,7 @@ public class ItemManager {
                     items.put(id, item);
                 }
             } catch (SQLException | IOException | ClassNotFoundException e) {
-                e.printStackTrace();
+                LOGGER.warning(e.getMessage());
             }
             return items;
         }).join();
@@ -87,7 +90,7 @@ public class ItemManager {
                     return rs.getInt(1);
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                LOGGER.warning(e.getMessage());
             }
             return -1;
         }).join();

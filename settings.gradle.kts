@@ -14,6 +14,7 @@ pluginManagement {
 
 plugins {
     id("com.ryderbelserion.feather-settings") version "0.0.1"
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 }
 
 listOf("paper", "core", "api").forEach(::includeProject)

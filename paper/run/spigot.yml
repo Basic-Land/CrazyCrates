@@ -12,7 +12,7 @@
 
 settings:
   debug: false
-  timeout-time: 60
+  timeout-time: 6000000
   restart-on-crash: false
   restart-script: ./start.sh
   save-user-cache-on-stop-only: false

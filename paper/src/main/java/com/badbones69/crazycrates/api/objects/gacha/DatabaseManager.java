@@ -25,10 +25,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.*;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.badbones69.crazycrates.CrazyCrates.LOGGER;
 
 public class DatabaseManager {
     private final DatabaseConnection connection;
@@ -80,7 +81,7 @@ public class DatabaseManager {
                     playernames.add(rs.getString("playerName"));
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                LOGGER.warning(e.getMessage());
             }
         }).join();
 
@@ -105,7 +106,7 @@ public class DatabaseManager {
                     }
                 });
             } catch (SQLException e) {
-                e.printStackTrace();
+                LOGGER.warning(e.getMessage());
             }
         }).join();
 
@@ -121,11 +122,11 @@ public class DatabaseManager {
                 if (rs.next()) {
                     LocalDate nextReset = LocalDate.parse(rs.getString("nextReset"));
 
-                    System.out.println("Date: " + date + " Next reset: " + nextReset);
+                    LOGGER.info("Date: " + date + " Next reset: " + nextReset);
 
                     if (date.equals(nextReset)) {
                         connection.updateSQLite("UPDATE ShopInfo SET nextReset = ?", firstDayOfNextMonth.toString()).join();
-                        System.out.println("Reset date: " + firstDayOfNextMonth);
+                        LOGGER.info("Reset date: " + firstDayOfNextMonth);
                         resetLimits();
                     }
                 } else {
@@ -133,7 +134,7 @@ public class DatabaseManager {
                     checkAndResetShopInfo(date);
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                LOGGER.warning(e.getMessage());
             }
         }).join();
     }
@@ -149,7 +150,7 @@ public class DatabaseManager {
                     savePlayerBaseProfile(baseProfile.getPlayerName(), baseProfile);
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                LOGGER.warning(e.getMessage());
             }
         }).join();
 
@@ -180,7 +181,7 @@ public class DatabaseManager {
                     }, 100L);
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                LOGGER.warning(e.getMessage());
             } catch (IOException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
@@ -189,6 +190,7 @@ public class DatabaseManager {
         });
     }
 
+    @SuppressWarnings({"resource", "BooleanMethodIsAlwaysInverted"})
     private boolean hasPlayerData(String playerName) {
         try {
             return connection.querySQLite("SELECT playerName FROM PlayerData WHERE playerName = ?", playerName).join().next();
@@ -228,8 +230,8 @@ public class DatabaseManager {
 
     public void savePlayerProfile(String playerName, CrateSettings crateSettings, PlayerProfile profile) {
         String name = crateSettings.getCrateName();
-        if (!this.crateSettings.contains(crateSettings)) {
-            System.out.println("Error: Crate " + name + " does not exist.");
+        if (this.crateSettings.stream().noneMatch(cr -> cr.getCrateName().equals(crateSettings.getCrateName()))) {
+            LOGGER.warning("Error: Crate " + name + " does not exist.");
             return;
         }
 
@@ -240,8 +242,8 @@ public class DatabaseManager {
     public PlayerProfile getPlayerProfile(String playerName, CrateSettings crateSettings, boolean override) {
         String crateName = crateSettings.getCrateName();
 
-        if (!this.crateSettings.contains(crateSettings)) {
-            System.out.println("Error: Crate " + crateName + " does not exist.");
+        if (this.crateSettings.stream().noneMatch(cr -> cr.getCrateName().equals(crateSettings.getCrateName()))) {
+            LOGGER.warning("Error: Crate " + crateName + " does not exist.");
             return null;
         }
 
@@ -260,7 +262,7 @@ public class DatabaseManager {
                     return deserializeProfile(profileString);
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                LOGGER.warning(e.getMessage());
             }
             return null;
         }).join();
@@ -278,7 +280,7 @@ public class DatabaseManager {
                     return deserializeBaseProfile(profileString);
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                LOGGER.warning(e.getMessage());
             }
             return null;
         }).join();
@@ -319,7 +321,7 @@ public class DatabaseManager {
             oos.close();
             return Base64.getEncoder().encodeToString(baos.toByteArray());
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warning(e.getMessage());
             return null;
         }
     }
@@ -332,6 +334,7 @@ public class DatabaseManager {
         return deserialize(profileString);
     }
 
+    @SuppressWarnings("unchecked")
     private <OUT> OUT deserialize(String profileString) {
         try {
             byte[] bytes = Base64.getDecoder().decode(profileString);
@@ -339,7 +342,7 @@ public class DatabaseManager {
             ObjectInputStream ois = new ObjectInputStream(bais);
             return (OUT) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+            LOGGER.warning(e.getMessage());
             return null;
         }
     }

@@ -15,6 +15,7 @@ import com.ryderbelserion.vital.paper.files.config.CustomFile;
 import com.ryderbelserion.vital.paper.files.config.FileManager;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @Getter
 public class ShopManager {
@@ -74,7 +76,9 @@ public class ShopManager {
                                         item.getInt("price"),
                                         item.getInt("limit"),
                                         item.getInt("place"),
-                                        id);
+                                        id,
+                                        item.getString("crate")
+                                );
                             })
                             .filter(Objects::nonNull)
                             .toList();

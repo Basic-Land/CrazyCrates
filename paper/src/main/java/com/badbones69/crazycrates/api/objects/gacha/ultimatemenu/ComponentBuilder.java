@@ -121,19 +121,31 @@ public final class ComponentBuilder {
         String mystic = String.valueOf(baseProfile.getMysticTokens());
         String stellar = String.valueOf(baseProfile.getStellarShards());
         String vote = String.valueOf(baseProfile.getVoteTokens());
+        String premium = String.valueOf(baseProfile.getPremiumCurrency());
 
         int mysticSpace = mystic.length() * 6;
         int stellarSpace = stellar.length() * 6;
         int virtualSpace = vote.length() * 6;
+        int premiumSpace = premium.length() * 6;
 
         appendChars(builder, mystic, NumberType.TOP);
 
         down(builder, stellar, mysticSpace, FILL_TOP, SPACE_BACK);
 
-        down(builder, vote, stellarSpace, FILL_DOWN, SPACE_PAGE);
+        down(builder, premium, stellarSpace, FILL_DOWN, SPACE_PAGE);
+
+        while (premiumSpace < 45) {
+            builder.append(FILL_DOWN);
+            premiumSpace += 3;
+        }
+
+        builder.append(SPACE_BACK);
+        builder.append(SPACE_NEGATIVE);
+
+        appendChars(builder, vote, NumberType.TOP);
 
         while (virtualSpace < 45) {
-            builder.append(FILL_DOWN);
+            builder.append(FILL_TOP);
             virtualSpace += 3;
         }
 
@@ -248,7 +260,7 @@ public final class ComponentBuilder {
                 case 'f','k' -> 5;
                 case 'l', '│', 'í' -> 3;
                 default -> {
-                    System.out.println("Unknown character: " + c);
+                    plugin.getLogger().warning("Unknown character: " + c);
                     yield 0;
                 }
             };

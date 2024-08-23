@@ -1,5 +1,6 @@
 package com.badbones69.crazycrates.tasks.crates.types;
 
+import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.builders.CrateBuilder;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.Prize;
@@ -22,6 +23,8 @@ import us.crazycrew.crazycrates.api.enums.types.KeyType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static com.badbones69.crazycrates.CrazyCrates.LOGGER;
 
 public class GachaCrate extends CrateBuilder {
     @NotNull
@@ -57,7 +60,7 @@ public class GachaCrate extends CrateBuilder {
             return;
         }
 
-        System.out.println("Chosen reward: " + chosenReward);
+        LOGGER.info("Chosen reward: " + chosenReward);
 
         boolean sneak = getPlayer().isSneaking();
         int amount = sneak ? 10 : 1;
@@ -92,7 +95,7 @@ public class GachaCrate extends CrateBuilder {
                 case OVERRIDE -> gachaSystem.rollOverrideSet(playerProfile, crateSettings, prize);
             };
 
-            System.out.println(result);
+            plugin.getLogger().info("Result: " + result);
 
             Rarity rarity = result.getRarity();
             stellarShards += rarityMap.get(rarity).stellarShards();

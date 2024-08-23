@@ -106,22 +106,16 @@ public class UltimateMenu extends InventoryBuilder {
         int slot = e.getRawSlot();
         if (slot < 0) return;
 
-        System.out.println("Slot: " + slot);
-        System.out.println("Slot inv: " + e.getSlot());
-
         CrazyCrates plugin = ultimateMenu.plugin;
         Player player = ultimateMenu.getPlayer();
         Crate crate = ultimateMenu.getCrate();
 
-        int newCrateNum = -1;
-
-        if (slot < 3) {
-            newCrateNum = 0;
-        } else if (slot < 6) {
-            newCrateNum = 1;
-        } else if (slot < 9) {
-            newCrateNum = 2;
-        }
+        int newCrateNum = switch (slot) {
+            case 0, 1, 2 -> 0;
+            case 3, 4, 5 -> 1;
+            case 6, 7, 8 -> 2;
+            default -> -1;
+        };
 
         if (newCrateNum != -1) {
             List<CrateSettings> settings = manager.getCrateSettingsSplit().get(ultimateMenu.currentPage);

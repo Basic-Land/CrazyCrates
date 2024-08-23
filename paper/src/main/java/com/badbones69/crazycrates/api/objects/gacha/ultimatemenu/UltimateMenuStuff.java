@@ -14,8 +14,6 @@ public class UltimateMenuStuff {
             .addDisplayLore("<gray>Kliknutím vyberete tuto truhlu");
     public static final ItemBuilder MAIN_MENU = getItem(Material.LIGHT_GRAY_STAINED_GLASS_PANE, 1000001);
     public static final ItemBuilder BANNER = getItem(Material.LIGHT_GRAY_STAINED_GLASS_PANE, 1000002);
-    public static final ItemBuilder ARROW_LEFT = getItem(Material.LIGHT_GRAY_STAINED_GLASS_PANE, 1000003);
-    public static final ItemBuilder ARROW_RIGHT = getItem(Material.LIGHT_GRAY_STAINED_GLASS_PANE, 1000004);
     public static final ItemBuilder MAIN_MENU_NAME = getItem(Material.LIGHT_GRAY_STAINED_GLASS_PANE, 0);
     public static final ItemBuilder BOOK = getItem(Material.BOOK, 10)
             .setDisplayName("<white><b>Historie truhly")
@@ -27,10 +25,10 @@ public class UltimateMenuStuff {
     public static final ItemBuilder SHOP = getItem(Material.EMERALD, 1000001)
             .setDisplayName("<white><b>Obchod")
             .addDisplayLore("<gray>Kliknutím otevřeš obchod");
-    public static final ItemBuilder BACK_ITEM = getItem(Material.ARROW, 1000002)
+    public static final ItemBuilder BACK_ITEM = getItem(Material.ARROW, 1000003)
             .setDisplayName("<white><b>Zpět")
             .addDisplayLore("<gray>Kliknutím se vrátíš o stránku zpět");
-    public static final ItemBuilder FORWARD = getItem(Material.ARROW, 1000002)
+    public static final ItemBuilder FORWARD = getItem(Material.ARROW, 1000004)
             .setDisplayName("<white><b>Vpřed")
             .addDisplayLore("<gray>Kliknutím se dostaneš o stránku vpřed");
     public static final ItemBuilder BUILDER_X1 = getItem(Material.LIGHT_BLUE_STAINED_GLASS_PANE, 1000001)

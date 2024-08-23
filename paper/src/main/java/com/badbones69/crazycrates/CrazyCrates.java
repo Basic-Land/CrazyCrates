@@ -31,8 +31,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Timer;
+import java.util.logging.Logger;
+
 import static com.badbones69.crazycrates.api.utils.MiscUtils.registerPermissions;
 
+@SuppressWarnings("unchecked")
 public class CrazyCrates extends JavaPlugin {
 
     private final Timer timer;
@@ -51,11 +54,13 @@ public class CrazyCrates extends JavaPlugin {
     private HeadDatabaseAPI api;
 
     private Server instance;
+    public static Logger LOGGER;
 
     @Override
     public void onEnable() {
         this.instance = new Server(getDataFolder(), getLogger());
         this.instance.apply();
+        LOGGER = getLogger();
 
         this.fileManager = new FileManager();
         this.fileManager.addFile("locations.yml").addFile("data.yml")
@@ -102,10 +107,10 @@ public class CrazyCrates extends JavaPlugin {
                     .map(clazz -> (Class<? extends InventoryBuilder>) clazz)
                     .forEach(aClass -> {
                         inventoryListener.addMenu(aClass);
-                        System.out.println("Added " + aClass.getSimpleName());
+                        getLogger().info("Added " + aClass.getSimpleName());
                     });
         } catch (Exception e) {
-            e.printStackTrace();
+            getLogger().warning(e.getMessage());
         }
 
         List.of(

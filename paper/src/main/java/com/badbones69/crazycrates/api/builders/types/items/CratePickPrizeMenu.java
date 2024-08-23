@@ -69,7 +69,7 @@ public class CratePickPrizeMenu extends InventoryBuilder {
 
             String rewardName = nbt.getString("rewardName");
 
-            System.out.println("Chosen reward: " + rewardName);
+            plugin.getLogger().info("Chosen reward: " + rewardName);
 
             playerProfile.setChosenReward(rewardName);
             holder.databaseManager.savePlayerProfile(player.getName(), crateSettings, playerProfile);

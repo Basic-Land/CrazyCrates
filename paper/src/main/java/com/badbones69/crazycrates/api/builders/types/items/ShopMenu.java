@@ -61,9 +61,16 @@ public class ShopMenu extends InventoryBuilder {
             if (playerBaseProfile.has(itemByPlace.price(), shopData.currencyType())) {
                 ShopPurchase data = shopManager.getLimitManager().getData(player, shopData.shopID(), itemByPlace, true);
 
-                if (data.isSuccess()) {
+                if (data.isSuccess() || data.isUnlimited()) {
                     playerBaseProfile.remove(itemByPlace.price(), shopData.currencyType());
-                    player.getInventory().addItem(itemByPlace.stack());
+                    String crate = itemByPlace.crate();
+
+                    if (crate == null) {
+                        player.getInventory().addItem(itemByPlace.stack());
+                    } else {
+                        plugin.getUserManager().addVirtualKeys(player.getUniqueId(), crate, 1);
+                    }
+
                     shopManager.openShop(getCrate(), getPlayer(), shopData.shopID());
                 } else if (data.isLimitReached()) {
                     player.sendMessage("You have reached the limit for this item.");

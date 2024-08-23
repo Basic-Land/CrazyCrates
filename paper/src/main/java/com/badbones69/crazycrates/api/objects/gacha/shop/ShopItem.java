@@ -7,7 +7,8 @@ public record ShopItem(ItemStack stack,
                        int price,
                        int limit,
                        int place,
-                       int id)
+                       int id,
+                       String crate)
         implements Comparable<ShopItem> {
 
     @Override
@@ -22,6 +23,8 @@ public record ShopItem(ItemStack stack,
                 ", price=" + price +
                 ", limit=" + limit +
                 ", place=" + place +
+                ", id=" + id +
+                ", crate='" + crate + '\'' +
                 '}';
     }
 }

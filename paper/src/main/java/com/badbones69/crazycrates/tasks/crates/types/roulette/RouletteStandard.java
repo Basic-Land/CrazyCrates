@@ -127,7 +127,7 @@ public class RouletteStandard extends FoliaRunnable {
             first = true;
             lock = true;
             builder.setItem(36, glass.setCustomModelData(600).getStack());
-            builder.setItem(22, prize.getFirst().getPrize().getDisplayItem());
+            if (!sneak || !skip) builder.setItem(22, prize.getFirst().getPrize().getDisplayItem());
             skip = true;
             return;
         }

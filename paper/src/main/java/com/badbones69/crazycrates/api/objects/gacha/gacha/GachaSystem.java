@@ -15,6 +15,8 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
+import static com.badbones69.crazycrates.CrazyCrates.LOGGER;
+
 public class GachaSystem {
     private final ThreadLocalRandom random = ThreadLocalRandom.current();
 
@@ -26,7 +28,7 @@ public class GachaSystem {
 
         playerProfile.incrementTotalPity();
         double roll = random.nextDouble(100);
-        System.out.println("Roll: " + roll);
+        LOGGER.info("Roll: " + roll);
         double chance5050 = random.nextDouble(100);
         Rarity finalRarity = Rarity.COMMON;
         ResultType final5050 = ResultType.WON;

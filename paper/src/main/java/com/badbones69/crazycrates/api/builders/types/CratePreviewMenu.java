@@ -191,7 +191,7 @@ public class CratePreviewMenu extends InventoryBuilder {
             String rewardName = nbt.getString("rewardName");
             if (rewardName.isEmpty()) return;
 
-            System.out.println("Item type: " + rewardName);
+            plugin.getLogger().info("Chosen reward: " + rewardName);
             boolean standard = rewardName.split("_")[1].equals(RewardType.STANDARD.name());
 
             switch (gachaType) {

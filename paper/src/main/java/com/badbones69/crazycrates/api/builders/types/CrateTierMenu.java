@@ -98,7 +98,7 @@ public class CrateTierMenu extends InventoryBuilder {
 
         if (!gacha) return;
 
-        if (event.getSlot() == holder.getCrate().getAbsolutePreviewItemPosition(8)) {
+        if (event.getSlot() == holder.getCrate().getAbsolutePreviewItemPosition(8) && player.hasPermission("omegalul")) {
             player.playSound(UltimateMenuStuff.CLICK);
             player.openInventory(new BonusPityMenu(crate, player, 36, "<green><b>Bonus pity prize", holder).build().getInventory());
         }
@@ -146,14 +146,18 @@ public class CrateTierMenu extends InventoryBuilder {
     }
 
     private void setItemsGacha() {
-        ItemBuilder item = new ItemBuilder(Material.PLAYER_HEAD).setDisplayName("<green><b>Bonus pity prize").addDisplayLore("<gray>Click to preview/pick a prize");
+        ItemBuilder item = new ItemBuilder(Material.PLAYER_HEAD).setDisplayName("<green><b>Bonus pity cena")
+                .addDisplayLore("<gray>Klikni pro otevření")
+                .addDisplayLore("<gray>bonusového výběru ceny")
+                .addDisplayLore("<gray>po dostatku otevření");
         item.setCustomModelData(1000001);
         getInventory().setItem(getCrate().getAbsolutePreviewItemPosition(8), item.getStack());
 
         ItemBuilder paper = new ItemBuilder(Material.PAPER).setCustomModelData(11).setDisplayName("Info");
+        paper.addDisplayLore("<gray>Click to open the main menu");
         getInventory().setItem(getCrate().getAbsolutePreviewItemPosition(4), paper.getStack());
 
-        ItemBuilder mainMenu = new ItemBuilder(Material.CHEST).setDisplayName("<green><b>Main menu");
+        ItemBuilder mainMenu = new ItemBuilder(Material.CHEST).setDisplayName("<green><b>Hlavní Menu");
         mainMenu.setCustomModelData(1000001);
         getInventory().setItem(getCrate().getAbsolutePreviewItemPosition(0), mainMenu.getStack());
     }
