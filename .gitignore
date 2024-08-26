@@ -1,31 +1,22 @@
 .gradle
 .idea
-
 build
 
 buildSrc/.gradle
 buildSrc/build
-
-common/.gradle
-common/build
 
 api/.gradle
 api/build
 libs/compile/bLibs-2.0.0-WIP.jar
 libs/compile/bSpecializedCrates-1.2.1.jar
 
-paper/.gradle
-paper/build
-paper/run
+run
 
-paper/run/
-
-!paper/run/config/paper-global.yml
-!paper/run/config/paper-world-defaults.yml
-!paper/run/bukkit.yml
-!paper/run/eula.txt
-!paper/run/ops.json
-!paper/run/server.properties
-!paper/run/spigot.yml
+!run/config/paper-global.yml
+!run/config/paper-world-defaults.yml
+!run/bukkit.yml
+!run/eula.txt
+!run/server.properties
+!run/spigot.yml
 
 jars
