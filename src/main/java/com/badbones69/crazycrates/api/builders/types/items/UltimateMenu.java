@@ -375,11 +375,11 @@ public class UltimateMenu extends InventoryBuilder {
     }
 
     private int getKeys(Player player, Crate crate) {
-        return plugin.getUserManager().getVirtualKeys(player.getUniqueId(), crate.getCrateName());
+        return plugin.getUserManager().getVirtualKeys(player.getUniqueId(), crate.getFileName());
     }
 
     private void addKeys(Player player, Crate crate, int amount) {
-        plugin.getUserManager().addVirtualKeys(player.getUniqueId(), crate.getCrateName(), amount);
+        plugin.getUserManager().addVirtualKeys(player.getUniqueId(), crate.getFileName(), amount);
     }
 
     private void close(Player player) {

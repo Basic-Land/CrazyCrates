@@ -41,7 +41,6 @@ public class CratePreviewMenu extends InventoryBuilder {
 
     public CratePreviewMenu(@NotNull final Player player, @NotNull final String title, final int size, final int page, @NotNull final Crate crate, @Nullable final Tier tier) {
         super(player, title, size, page, crate);
-
         this.tier = tier;
     }
 
@@ -182,14 +181,13 @@ public class CratePreviewMenu extends InventoryBuilder {
             }
         }
 
-        if (crate.getCrateType() == CrateType.gacha && holder.tier.getName().equals("legendary")) {
+        if (gacha && holder.tier.getName().equals("legendary")) {
             GachaType gachaType = crate.getCrateSettings().getGachaType();
 
             NBT nbt = new NBT(item);
             String rewardName = nbt.getString("rewardName");
-            if (rewardName.isEmpty()) return;
+            if (rewardName == null || rewardName.isEmpty()) return;
 
-            plugin.getLogger().info("Chosen reward: " + rewardName);
             boolean standard = rewardName.split("_")[1].equals(RewardType.STANDARD.name());
 
             switch (gachaType) {

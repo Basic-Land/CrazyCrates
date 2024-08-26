@@ -125,7 +125,7 @@ public class CommandManager {
         commandManager.registerSuggestion(SuggestionKey.of("both"), (sender, context) -> {
             List<String> collect = plugin.getCrateManager().getCrates().stream()
                     .filter(crate -> crate.getCrateSettings() != null)
-                    .map(Crate::getCrateName)
+                    .map(Crate::getFileName)
                     .collect(Collectors.toList());
 
             Arrays.stream(RewardType.values())

@@ -3,6 +3,7 @@ package com.badbones69.crazycrates.api.objects.gacha;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Table;
 import cz.basicland.blibs.shared.databases.hikari.DatabaseConnection;
 import cz.basicland.blibs.spigot.utils.item.DBItemStack;
+import cz.basicland.blibs.spigot.utils.item.NBT;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.IOException;

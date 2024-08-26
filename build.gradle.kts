@@ -56,7 +56,7 @@ paperweight {
 
 tasks {
     runServer {
-        jvmArgs("-Dnet.kyori.ansi.colorLevel=truecolor")
+        jvmArgs("-Dnet.kyori.ansi.colorLevel=truecolor", "-XX:+AllowEnhancedClassRedefinition", "-XX:+AllowRedefinitionToAddDeleteMethods")
 
         defaultCharacterEncoding = Charsets.UTF_8.name()
 
@@ -78,12 +78,12 @@ tasks {
         archiveBaseName.set(rootProject.name)
         archiveClassifier.set("")
 
-        listOf(
-            "com.ryderbelserion.vital",
-            "dev.triumphteam.cmd"
-        ).forEach {
-            relocate(it, "libs.$it")
-        }
+//        listOf(
+//            "com.ryderbelserion.vital",
+//            "dev.triumphteam.cmd"
+//        ).forEach {
+//            relocate(it, "libs.$it")
+//        }
     }
 
     processResources {

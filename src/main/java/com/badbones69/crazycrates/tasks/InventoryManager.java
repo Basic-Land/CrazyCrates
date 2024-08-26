@@ -96,7 +96,7 @@ public class InventoryManager {
     public void openNewCratePreview(@NotNull final Player player, @NotNull final Crate crate) {
         this.crateViewers.put(player.getUniqueId(), crate);
 
-        if (crate.getCrateType() == CrateType.casino || crate.getCrateType() == CrateType.cosmic && crate.isPreviewTierToggle()) {
+        if (crate.getCrateType().hasPreview() && crate.isPreviewTierToggle()) {
             player.openInventory(crate.getTierPreview(player));
 
             return;

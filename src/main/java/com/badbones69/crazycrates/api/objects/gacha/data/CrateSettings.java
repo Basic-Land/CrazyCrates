@@ -13,7 +13,6 @@ import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Table;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ComponentBuilder;
-import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 import com.badbones69.crazycrates.api.objects.gacha.util.TierInfo;
 import com.ryderbelserion.vital.paper.api.files.CustomFile;
 import com.ryderbelserion.vital.paper.api.files.FileManager;
@@ -25,7 +24,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
@@ -35,8 +33,7 @@ import java.util.stream.Collectors;
 @Getter
 @ToString
 public class CrateSettings {
-    private final CrazyCrates plugin = JavaPlugin.getPlugin(CrazyCrates.class);
-    private final FileManager yamlManager = plugin.getFileManager();
+    private final CrazyCrates plugin = CrazyCrates.getPlugin();
     private final String crateName, bannerFile;
     private final boolean fatePointEnabled, overrideEnabled, extraRewardEnabled;
     private final int fatePointAmount, bonusPity, modelDataPreviewName, modelDataMainMenu;
@@ -87,7 +84,7 @@ public class CrateSettings {
             rarityMap.put(rarity, raritySettings);
         }
 
-        CustomFile customFile = yamlManager.getFile(bannerFile);
+        CustomFile customFile = plugin.getFileManager().getFile(true, bannerFile);
 
         if (customFile == null) {
             bannerPackage = new BannerPackage(null, null, false);

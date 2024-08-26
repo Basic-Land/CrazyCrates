@@ -21,9 +21,9 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -47,6 +47,7 @@ public class Prize {
     private String crateName = "";
     private int maxRange = 100;
     private double chance = 0;
+    private boolean custom = false;
 
     private List<Tier> tiers = new ArrayList<>();
     private Prize alternativePrize;
@@ -63,15 +64,10 @@ public class Prize {
 
     public Prize(@NotNull final ConfigurationSection section, List<ItemStack> editorItems, @NotNull final List<Tier> tierPrizes, @NotNull final String crateName, @Nullable final Prize alternativePrize) {
         this.section = section;
-
         this.sectionName = section.getName();
-
         this.crateName = crateName;
-
         this.builders = ItemUtils.convertStringList(this.section.getStringList("Items"), this.sectionName);
-
         this.tiers = tierPrizes;
-
         this.alternativePrize = alternativePrize;
 
         this.prizeName = section.getString("DisplayName", "");
@@ -116,7 +112,7 @@ public class Prize {
 
         this.alternativePrize = null;
 
-        this.prizeName = stack.getItemMeta().getDisplayName();
+        this.prizeName = "";
         this.maxRange = 100;
         this.chance = 100;
         this.firework = false;
@@ -127,14 +123,9 @@ public class Prize {
         this.permissions = Collections.emptyList();
 
         ItemBuilder display = new ItemBuilder(stack.clone());
-        List<String> updatedLore = display.getStack().getLore();
-        if (updatedLore == null) updatedLore = new ArrayList<>();
-        updatedLore.addFirst("");
-        updatedLore.addFirst(type.name());
-        display.setDisplayLore(updatedLore.stream().map(s -> s.replace("§", "&")).toList());
-
         this.displayItem = display;
         this.prizeItem = display;
+        this.custom = true;
     }
 
     /**
@@ -193,6 +184,7 @@ public class Prize {
      * @return the display item that is shown for the preview and the winning prize.
      */
     public @NotNull final ItemStack getDisplayItem(@NotNull final Player player) {
+        if (custom) return displayItem.getStack();
         if (Support.placeholder_api.isEnabled()) {
             final String displayName = this.displayItem.getDisplayName();
 

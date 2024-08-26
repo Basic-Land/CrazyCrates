@@ -88,6 +88,14 @@ public enum CrateType {
         return CrateType.csgo;
     }
 
+    public boolean hasPreview() {
+        return this == CrateType.cosmic || this == CrateType.casino || this == CrateType.gacha;
+    }
+
+    public boolean isGacha() {
+        return this == CrateType.gacha;
+    }
+
     /**
      * Get the name of the crate.
      *

@@ -46,7 +46,7 @@ public class GachaCrate extends CrateBuilder {
         }
 
         String playerName = getPlayer().getName();
-        CrateSettings crateSettings = playerDataManager.getCrateSettings(getCrate().getCrateName());
+        CrateSettings crateSettings = playerDataManager.getCrateSettings(getCrate().getFileName());
 
         PlayerProfile playerProfile = playerDataManager.getPlayerProfile(playerName, crateSettings, false);
         PlayerBaseProfile baseProfile = this.plugin.getBaseProfileManager().getPlayerBaseProfile(playerName);
@@ -65,11 +65,11 @@ public class GachaCrate extends CrateBuilder {
         boolean sneak = getPlayer().isSneaking();
         int amount = sneak ? 10 : 1;
 
-        boolean keyCheck = this.userManager.takeKeys(getPlayer().getUniqueId(), getCrate().getCrateName(), type, amount, checkHand);
+        boolean keyCheck = this.userManager.takeKeys(getPlayer().getUniqueId(), getCrate().getFileName(), type, amount, checkHand);
 
         if (!keyCheck) {
             // Send the message about failing to take the key.
-            MiscUtils.failedToTakeKey(getPlayer(), getCrate().getCrateName());
+            MiscUtils.failedToTakeKey(getPlayer(), getCrate().getFileName());
             // Remove from opening list.
             this.crateManager.removePlayerFromOpeningList(getPlayer());
             return;

@@ -88,8 +88,6 @@ public class ShopManager {
                 .filter(Objects::nonNull)
                 .sorted()
                 .forEach(shops::add);
-
-        shops.forEach(System.out::println);
     }
 
     public void openFirst(Crate crate, Player player) {

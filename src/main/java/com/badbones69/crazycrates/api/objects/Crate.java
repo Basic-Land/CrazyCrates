@@ -495,7 +495,8 @@ public class Crate {
      * @return the preview as an Inventory object.
      */
     public @NotNull final Inventory getPreview(Player player, int page, @Nullable Tier tier) {
-        CratePreviewMenu cratePreviewMenu = new CratePreviewMenu(player, getPreviewName(), !this.borderToggle && this.maxSlots == 9 ? this.maxSlots + 9 : this.maxSlots, page, this, tier);
+        int size = getCrateType() == CrateType.gacha ? 45 : !this.borderToggle && this.maxSlots == 9 ? this.maxSlots + 9 : this.maxSlots;
+        CratePreviewMenu cratePreviewMenu = new CratePreviewMenu(player, getPreviewName(), size, page, this, tier);
 
         return cratePreviewMenu.build().getInventory();
     }
@@ -839,7 +840,7 @@ public class Crate {
      * @return the finalized slot.
      */
     public final int getAbsoluteItemPosition(final int baseSlot) {
-        return baseSlot + (this.previewChestLines > 1 ? this.previewChestLines - 1 : 1) * 9;
+        return baseSlot + (this.previewChestLines > 1 ? this.previewChestLines - (getCrateType().isGacha() ? 0 : 1) : 1) * 9;
     }
 
     /**
