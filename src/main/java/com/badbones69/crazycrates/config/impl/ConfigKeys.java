@@ -5,6 +5,8 @@ import ch.jalu.configme.SettingsHolder;
 import ch.jalu.configme.configurationdata.CommentsConfiguration;
 import ch.jalu.configme.properties.Property;
 import com.badbones69.crazycrates.api.enums.State;
+import com.ryderbelserion.vital.paper.api.enums.Support;
+
 import java.util.Collections;
 import java.util.List;
 import static ch.jalu.configme.properties.PropertyInitializer.newBeanProperty;
