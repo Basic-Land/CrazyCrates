@@ -21,14 +21,6 @@ repositories {
 
     flatDir { dirs("libs") }
 
-    maven("http://nexus.basicland.cz:8081/repository/dev-private/") {
-        isAllowInsecureProtocol = true
-        credentials {
-            username = "dev"
-            password = "rtVXgxFyWkiVfU3"
-        }
-    }
-
     mavenCentral()
 }
 

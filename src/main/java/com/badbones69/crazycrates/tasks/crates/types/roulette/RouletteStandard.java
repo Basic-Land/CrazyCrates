@@ -3,6 +3,7 @@ package com.badbones69.crazycrates.tasks.crates.types.roulette;
 import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.PrizeManager;
 import com.badbones69.crazycrates.api.builders.CrateBuilder;
+import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.Prize;
 import com.badbones69.crazycrates.api.objects.gacha.data.Result;
@@ -11,7 +12,6 @@ import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuStu
 import com.badbones69.crazycrates.api.utils.MiscUtils;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
 import com.badbones69.crazycrates.tasks.crates.other.GachaCrateManager;
-import com.ryderbelserion.vital.paper.builders.items.ItemBuilder;
 import com.ryderbelserion.vital.paper.util.scheduler.FoliaRunnable;
 import lombok.Getter;
 import net.kyori.adventure.sound.Sound;

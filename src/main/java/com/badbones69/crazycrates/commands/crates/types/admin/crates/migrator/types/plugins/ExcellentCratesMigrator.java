@@ -62,7 +62,7 @@ public class ExcellentCratesMigrator extends ICrateMigrator {
                 failed.add("<red>⤷ " + crateName);
             }
 
-            final CustomFile customFile = new CustomFile(crateName, crateFile);
+            final CustomFile customFile = new CustomFile(crateName, crateFile).load();
 
             final YamlConfiguration configuration = customFile.getConfiguration();
 
@@ -139,6 +139,7 @@ public class ExcellentCratesMigrator extends ICrateMigrator {
 
             set(root, "Preview.Toggle", true);
             set(root, "Preview.ChestLines", 6);
+            set(root, "Preview.Name", crate.getName());
             set(root, "Preview.Glass.Toggle", true);
             set(root, "Preview.Glass.Name", " ");
             set(root, "Preview.Glass.Item", "gray_stained_glass_pane");

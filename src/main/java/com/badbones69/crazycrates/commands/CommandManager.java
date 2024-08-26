@@ -1,9 +1,15 @@
 package com.badbones69.crazycrates.commands;
 
 import com.badbones69.crazycrates.api.objects.Crate;
+import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
+import com.badbones69.crazycrates.api.objects.gacha.data.RaritySettings;
+import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
+import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.api.objects.other.CrateLocation;
 import com.badbones69.crazycrates.commands.crates.types.admin.crates.CommandAddItem;
 import com.badbones69.crazycrates.commands.crates.types.admin.crates.CommandMigrate;
+import com.badbones69.crazycrates.commands.crates.types.admin.crates.migrator.enums.MigrationType;
+import com.badbones69.crazycrates.commands.crates.types.custom.*;
 import com.badbones69.crazycrates.commands.relations.ArgumentRelations;
 import com.badbones69.crazycrates.commands.crates.types.player.CommandHelp;
 import com.badbones69.crazycrates.commands.crates.types.admin.CommandAdmin;
@@ -19,7 +25,7 @@ import com.badbones69.crazycrates.commands.crates.types.admin.keys.CommandTake;
 import com.badbones69.crazycrates.commands.crates.types.player.CommandKey;
 import com.badbones69.crazycrates.commands.crates.types.player.CommandTransfer;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
-import com.ryderbelserion.vital.paper.builders.PlayerBuilder;
+import com.ryderbelserion.vital.paper.api.builders.PlayerBuilder;
 import dev.triumphteam.cmd.bukkit.BukkitCommandManager;
 import dev.triumphteam.cmd.core.suggestion.SuggestionKey;
 import org.bukkit.command.CommandSender;
@@ -27,8 +33,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import com.badbones69.crazycrates.CrazyCrates;
-import java.util.ArrayList;
-import java.util.List;
+
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class CommandManager {
 
@@ -117,7 +125,7 @@ public class CommandManager {
         commandManager.registerSuggestion(SuggestionKey.of("both"), (sender, context) -> {
             List<String> collect = plugin.getCrateManager().getCrates().stream()
                     .filter(crate -> crate.getCrateSettings() != null)
-                    .map(Crate::getName)
+                    .map(Crate::getCrateName)
                     .collect(Collectors.toList());
 
             Arrays.stream(RewardType.values())

@@ -2,23 +2,21 @@ package com.badbones69.crazycrates.api.builders.types;
 
 import ch.jalu.configme.SettingsManager;
 import com.badbones69.crazycrates.api.builders.InventoryBuilder;
+import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.builders.types.items.BonusPityMenu;
 import com.badbones69.crazycrates.api.enums.PersistentKeys;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.Tier;
-import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuStuff;
 import com.badbones69.crazycrates.config.ConfigManager;
 import com.badbones69.crazycrates.config.impl.ConfigKeys;
-import com.ryderbelserion.vital.paper.builders.items.ItemBuilder;
+import io.papermc.paper.persistence.PersistentDataContainerView;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import us.crazycrew.crazycrates.api.enums.types.CrateType;
@@ -34,6 +32,8 @@ public class CrateTierMenu extends InventoryBuilder {
     public CrateTierMenu(@NotNull final Player player, @NotNull final String title, final int size, @NotNull final Crate crate, @NotNull final List<Tier> tiers) {
         super(player, title, size, crate, tiers);
     }
+
+    public CrateTierMenu() {}
 
     @Override
     public InventoryBuilder build() {
@@ -56,15 +56,11 @@ public class CrateTierMenu extends InventoryBuilder {
 
         if (item == null || item.getType() == Material.AIR) return;
 
-        if (!item.hasItemMeta()) return;
-
         final Crate crate = this.inventoryManager.getCratePreview(player);
 
         if (crate == null) return;
 
-        final ItemMeta itemMeta = item.getItemMeta();
-
-        final PersistentDataContainer container = itemMeta.getPersistentDataContainer();
+        final PersistentDataContainerView container = item.getPersistentDataContainer();
 
         if (this.config.getProperty(ConfigKeys.enable_crate_menu) && container.has(PersistentKeys.main_menu_button.getNamespacedKey())) {
             if (this.inventoryManager.inCratePreview(player)) {
@@ -91,7 +87,7 @@ public class CrateTierMenu extends InventoryBuilder {
 
             final Tier tier = crate.getTier(tierName);
 
-            final Inventory cratePreviewMenu = crate.getPreview(player, this.inventoryManager.getPage(player), true, tier);
+            final Inventory cratePreviewMenu = crate.getPreview(player, this.inventoryManager.getPage(player), tier);
 
             player.openInventory(cratePreviewMenu);
         }
@@ -136,12 +132,12 @@ public class CrateTierMenu extends InventoryBuilder {
             }
         }
 
-        if (this.inventoryManager.inCratePreview(getPlayer()) && this.config.getProperty(ConfigKeys.enable_crate_menu)) {
+        if (this.config.getProperty(ConfigKeys.enable_crate_menu) && this.inventoryManager.inCratePreview(player)) {
             if (gacha) {
                 setItemsGacha();
                 return;
             }
-            getInventory().setItem(getCrate().getAbsolutePreviewItemPosition(4), this.inventoryManager.getMenuButton(getPlayer()));
+            inventory.setItem(crate.getAbsolutePreviewItemPosition(4), this.inventoryManager.getMenuButton(player));
         }
     }
 

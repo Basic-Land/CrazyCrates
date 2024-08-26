@@ -29,7 +29,6 @@ shadowJar = "8.3.0"
 
 # Modrinth
 minotaur = "2.+"
-hangar = "0.1.2"
 
 [plugins]
 paperweight = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight" }

@@ -2,78 +2,64 @@ package com.badbones69.crazycrates.tasks.crates;
 
 import ch.jalu.configme.SettingsManager;
 import com.Zrips.CMI.Modules.ModuleHandling.CMIModule;
+import com.badbones69.crazycrates.CrazyCrates;
+import com.badbones69.crazycrates.api.ChestManager;
 import com.badbones69.crazycrates.api.builders.CrateBuilder;
+import com.badbones69.crazycrates.api.builders.ItemBuilder;
+import com.badbones69.crazycrates.api.builders.types.CrateMainMenu;
 import com.badbones69.crazycrates.api.crates.CrateHologram;
 import com.badbones69.crazycrates.api.crates.quadcrates.CrateSchematic;
 import com.badbones69.crazycrates.api.enums.Files;
+import com.badbones69.crazycrates.api.enums.Messages;
+import com.badbones69.crazycrates.api.enums.PersistentKeys;
+import com.badbones69.crazycrates.api.objects.Crate;
+import com.badbones69.crazycrates.api.objects.Prize;
+import com.badbones69.crazycrates.api.objects.Tier;
+import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
+import com.badbones69.crazycrates.api.objects.gacha.gacha.GachaSystem;
 import com.badbones69.crazycrates.api.objects.other.BrokeLocation;
-import com.badbones69.crazycrates.api.ChestManager;
+import com.badbones69.crazycrates.api.objects.other.CrateLocation;
+import com.badbones69.crazycrates.api.utils.ItemUtils;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
+import com.badbones69.crazycrates.config.ConfigManager;
+import com.badbones69.crazycrates.config.impl.ConfigKeys;
+import com.badbones69.crazycrates.support.holograms.HologramManager;
 import com.badbones69.crazycrates.support.holograms.types.CMIHologramsSupport;
 import com.badbones69.crazycrates.support.holograms.types.DecentHologramsSupport;
 import com.badbones69.crazycrates.support.holograms.types.FancyHologramsSupport;
 import com.badbones69.crazycrates.tasks.InventoryManager;
-import com.badbones69.crazycrates.tasks.crates.types.CasinoCrate;
-import com.badbones69.crazycrates.tasks.crates.types.CosmicCrate;
-import com.badbones69.crazycrates.tasks.crates.types.CrateOnTheGo;
-import com.badbones69.crazycrates.tasks.crates.types.CsgoCrate;
-import com.badbones69.crazycrates.tasks.crates.types.FireCrackerCrate;
-import com.badbones69.crazycrates.tasks.crates.types.QuadCrate;
-import com.badbones69.crazycrates.tasks.crates.types.QuickCrate;
-import com.badbones69.crazycrates.tasks.crates.types.RouletteCrate;
-import com.badbones69.crazycrates.tasks.crates.types.WarCrate;
-import com.badbones69.crazycrates.tasks.crates.types.WheelCrate;
-import com.badbones69.crazycrates.tasks.crates.types.WonderCrate;
-import com.ryderbelserion.vital.core.util.FileUtil;
-import com.ryderbelserion.vital.paper.builders.items.ItemBuilder;
-import com.ryderbelserion.vital.paper.enums.Support;
-import com.ryderbelserion.vital.paper.files.config.CustomFile;
-import com.ryderbelserion.vital.paper.files.config.FileManager;
+import com.badbones69.crazycrates.tasks.crates.types.*;
+import com.ryderbelserion.vital.common.utils.FileUtil;
+import com.ryderbelserion.vital.paper.api.enums.Support;
+import com.ryderbelserion.vital.paper.api.files.CustomFile;
+import com.ryderbelserion.vital.paper.api.files.FileManager;
+import io.papermc.paper.persistence.PersistentDataContainerView;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
+import lombok.Getter;
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.permissions.Permission;
-import org.bukkit.permissions.PermissionDefault;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.Nullable;
-import us.crazycrew.crazycrates.api.enums.types.CrateType;
-import us.crazycrew.crazycrates.api.enums.types.KeyType;
-import com.badbones69.crazycrates.api.enums.PersistentKeys;
-import com.badbones69.crazycrates.config.ConfigManager;
-import com.badbones69.crazycrates.config.impl.ConfigKeys;
-import com.badbones69.crazycrates.api.builders.types.CrateMainMenu;
-import com.badbones69.crazycrates.api.enums.Messages;
-import com.badbones69.crazycrates.support.holograms.HologramManager;
-import com.badbones69.crazycrates.api.objects.Crate;
-import com.badbones69.crazycrates.api.objects.other.CrateLocation;
-import com.badbones69.crazycrates.api.objects.Prize;
-import com.badbones69.crazycrates.api.objects.Tier;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionDefault;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.PluginManager;
 import org.jetbrains.annotations.NotNull;
-import com.badbones69.crazycrates.CrazyCrates;
-import com.badbones69.crazycrates.api.utils.ItemUtils;
+import org.jetbrains.annotations.Nullable;
+import us.crazycrew.crazycrates.api.enums.types.CrateType;
+import us.crazycrew.crazycrates.api.enums.types.KeyType;
+
 import java.io.File;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.TimerTask;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.*;
 
 public class CrateManager {
 
@@ -132,7 +118,7 @@ public class CrateManager {
             // If crate null, return.
             if (crate == null) return;
 
-            final String fileName = crate.getFileName();
+            //final String fileName = crate.getFileName();
 
             // Grab the new file.
             FileConfiguration file = crate.getFile();
@@ -202,7 +188,6 @@ public class CrateManager {
             }
 
             crate.setPrize(prizes);
-            crate.setPreviewItems(crate.getPreviewItems());
 
             for (UUID uuid : this.plugin.getInventoryManager().getViewers()) {
                 final Player player = this.plugin.getServer().getPlayer(uuid);
@@ -226,23 +211,51 @@ public class CrateManager {
      * Load the holograms.
      */
     public void loadHolograms() {
-        if (this.holograms != null) {
-            return;
+        final String pluginName = this.config.getProperty(ConfigKeys.hologram_plugin);
+
+        if (this.holograms != null && !pluginName.isEmpty()) {
+            this.holograms.purge(false);
         }
-      
-        if (Support.decent_holograms.isEnabled()) {
-            this.holograms = new DecentHologramsSupport();
 
-            if (MiscUtils.isLogging()) this.plugin.getComponentLogger().info("DecentHolograms support has been enabled.");
-        } else if (Support.cmi.isEnabled() && CMIModule.holograms.isEnabled()) {
-            this.holograms = new CMIHologramsSupport();
+        switch (pluginName) {
+            case "DecentHolograms" -> {
+                if (!Support.decent_holograms.isEnabled()) return;
 
-            if (MiscUtils.isLogging()) this.plugin.getComponentLogger().info("CMI Hologram support has been enabled.");
-        } else if (Support.fancy_holograms.isEnabled()) {
-            this.holograms = new FancyHologramsSupport();
+                this.holograms = new DecentHologramsSupport();
+            }
 
-            if (MiscUtils.isLogging()) this.plugin.getComponentLogger().info("FancyHolograms support has been enabled.");
-        } else {
+            case "FancyHolograms" -> {
+                if (!Support.fancy_holograms.isEnabled()) return;
+
+                this.holograms = new FancyHologramsSupport();
+            }
+
+            case "CMI" -> {
+                if (!Support.cmi.isEnabled() && !CMIModule.holograms.isEnabled()) return;
+
+                this.holograms = new CMIHologramsSupport();
+            }
+
+            default -> {
+                if (Support.decent_holograms.isEnabled()) {
+                    this.holograms = new DecentHologramsSupport();
+
+                    break;
+                }
+
+                if (Support.fancy_holograms.isEnabled()) {
+                    this.holograms = new FancyHologramsSupport();
+
+                    break;
+                }
+
+                if (Support.cmi.isEnabled() && CMIModule.holograms.isEnabled()) {
+                    this.holograms = new CMIHologramsSupport();
+                }
+            }
+        }
+
+        if (this.holograms == null) {
             if (MiscUtils.isLogging()) {
                 List.of(
                         "There was no hologram plugin found on the server. If you are using CMI",
@@ -250,7 +263,11 @@ public class CrateManager {
                         "You can run /crazycrates reload if using CMI otherwise restart your server."
                 ).forEach(this.plugin.getComponentLogger()::warn);
             }
+
+            return;
         }
+
+        if (MiscUtils.isLogging()) this.plugin.getComponentLogger().info("{} support has been enabled.", this.holograms.getName());
     }
 
     /**
@@ -259,6 +276,8 @@ public class CrateManager {
     public List<String> getCrateNames() {
         return this.plugin.getInstance().getCrateFiles();
     }
+
+    private final SettingsManager config = ConfigManager.getConfig();
 
     /**
      * Loads the crates.
@@ -413,12 +432,14 @@ public class CrateManager {
 
                 final PluginManager server = this.plugin.getServer().getPluginManager();
 
-                if (server.getPermission("crazycrates.deny.open." + crateName) == null) {
-                    Permission permission = new Permission(
-                            "crazycrates.deny.open." + crateName,
-                            "Prevents you from opening " + crateName,
-                            PermissionDefault.FALSE
-                    );
+                final boolean isNewSystemEnabled = this.config.getProperty(ConfigKeys.use_new_permission_system);
+
+                final String node = isNewSystemEnabled ? "crazycrates.deny.open." + crateName : "crazycrates.open." + crateName;
+                final String description = isNewSystemEnabled ? "Prevents you from opening " + crateName : "Allows you to open " + crateName;
+                final PermissionDefault permissionDefault = isNewSystemEnabled ? PermissionDefault.FALSE : PermissionDefault.TRUE;
+
+                if (server.getPermission(node) == null) {
+                    final Permission permission = new Permission(node, description, permissionDefault);
 
                     server.addPermission(permission);
                 }

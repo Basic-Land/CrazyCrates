@@ -1,8 +1,8 @@
 package com.badbones69.crazycrates.api.builders.types.items;
 
 import com.badbones69.crazycrates.api.builders.InventoryBuilder;
+import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Table;
-import com.ryderbelserion.vital.paper.builders.items.ItemBuilder;
 import cz.basicland.blibs.spigot.utils.item.DBItemStack;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import org.bukkit.Material;

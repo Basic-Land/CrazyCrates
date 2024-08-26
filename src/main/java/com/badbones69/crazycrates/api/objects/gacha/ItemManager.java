@@ -1,8 +1,6 @@
 package com.badbones69.crazycrates.api.objects.gacha;
 
-import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Table;
-import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 import cz.basicland.blibs.shared.databases.hikari.DatabaseConnection;
 import cz.basicland.blibs.spigot.utils.item.DBItemStack;
 import org.bukkit.inventory.ItemStack;

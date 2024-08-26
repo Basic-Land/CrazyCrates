@@ -2,6 +2,7 @@ package com.badbones69.crazycrates.api.objects.gacha.shop;
 
 import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.builders.InventoryBuilder;
+import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.builders.types.items.ShopMenu;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
@@ -10,12 +11,10 @@ import com.badbones69.crazycrates.api.objects.gacha.enums.ShopID;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Table;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ComponentBuilder;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuStuff;
-import com.ryderbelserion.vital.paper.builders.items.ItemBuilder;
-import com.ryderbelserion.vital.paper.files.config.CustomFile;
-import com.ryderbelserion.vital.paper.files.config.FileManager;
+import com.ryderbelserion.vital.paper.api.files.CustomFile;
+import com.ryderbelserion.vital.paper.api.files.FileManager;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -26,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 @Getter
 public class ShopManager {
@@ -39,9 +37,11 @@ public class ShopManager {
         limitManager = new LimitManager();
 
         yamlManager.getCustomFiles()
+                .values()
                 .stream()
                 .filter(customFile -> customFile.getFile().getParent().contains("shops"))
                 .map(CustomFile::getConfiguration)
+                .filter(Objects::nonNull)
                 .map(cfg -> {
                     ShopID shopID = ShopID.getShopID(cfg.getString("id"));
                     CurrencyType currencyType = CurrencyType.getCurrencyType(cfg.getString("currency"));

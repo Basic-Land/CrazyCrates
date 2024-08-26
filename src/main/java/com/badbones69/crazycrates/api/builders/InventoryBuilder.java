@@ -8,8 +8,9 @@ import com.badbones69.crazycrates.api.utils.MiscUtils;
 import com.badbones69.crazycrates.tasks.BukkitUserManager;
 import com.badbones69.crazycrates.tasks.InventoryManager;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
-import com.ryderbelserion.vital.paper.enums.Support;
+import com.ryderbelserion.vital.paper.api.enums.Support;
 import com.ryderbelserion.vital.paper.util.AdvUtil;
+import com.ryderbelserion.vital.paper.util.ItemUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
 import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket;
@@ -22,7 +23,6 @@ import org.bukkit.craftbukkit.util.CraftChatMessage;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.plugin.java.JavaPlugin;
 import com.badbones69.crazycrates.config.ConfigManager;
 import com.badbones69.crazycrates.config.impl.ConfigKeys;
 import me.clip.placeholderapi.PlaceholderAPI;
@@ -36,7 +36,7 @@ import static java.util.regex.Matcher.quoteReplacement;
 
 public abstract class InventoryBuilder implements InventoryHolder, Listener {
 
-    protected @NotNull final CrazyCrates plugin = JavaPlugin.getPlugin(CrazyCrates.class);
+    protected @NotNull final CrazyCrates plugin = CrazyCrates.getPlugin();
 
     protected @NotNull final BukkitUserManager userManager = this.plugin.getUserManager();
 
@@ -61,7 +61,11 @@ public abstract class InventoryBuilder implements InventoryHolder, Listener {
 
         String inventoryTitle = Support.placeholder_api.isEnabled() ? PlaceholderAPI.setPlaceholders(getPlayer(), this.title) : this.title;
 
-        this.inventory = this.server.createInventory(this, this.size, AdvUtil.parse(inventoryTitle));
+        if (this.plugin.isLegacy()) {
+            this.inventory = this.server.createInventory(this, this.size, ItemUtil.color(inventoryTitle));
+        } else {
+            this.inventory = this.server.createInventory(this, this.size, AdvUtil.parse(inventoryTitle));
+        }
     }
 
     public InventoryBuilder(@NotNull final Player player, @NotNull final String title, final int size, @NotNull final Crate crate) {
@@ -73,7 +77,11 @@ public abstract class InventoryBuilder implements InventoryHolder, Listener {
 
         String inventoryTitle = Support.placeholder_api.isEnabled() ? PlaceholderAPI.setPlaceholders(getPlayer(), this.title) : this.title;
 
-        this.inventory = this.server.createInventory(this, this.size, AdvUtil.parse(inventoryTitle));
+        if (this.plugin.isLegacy()) {
+            this.inventory = this.server.createInventory(this, this.size, ItemUtil.color(inventoryTitle));
+        } else {
+            this.inventory = this.server.createInventory(this, this.size, AdvUtil.parse(inventoryTitle));
+        }
     }
 
     public InventoryBuilder(@NotNull final Player player, @NotNull final String title, final int size, final int page, @NotNull final Crate crate) {
@@ -86,7 +94,11 @@ public abstract class InventoryBuilder implements InventoryHolder, Listener {
 
         String inventoryTitle = Support.placeholder_api.isEnabled() ? PlaceholderAPI.setPlaceholders(getPlayer(), this.title) : this.title;
 
-        this.inventory = this.server.createInventory(this, this.size, AdvUtil.parse(inventoryTitle));
+        if (this.plugin.isLegacy()) {
+            this.inventory = this.server.createInventory(this, this.size, ItemUtil.color(inventoryTitle));
+        } else {
+            this.inventory = this.server.createInventory(this, this.size, AdvUtil.parse(inventoryTitle));
+        }
     }
 
     public InventoryBuilder(@NotNull final Player player, @NotNull final String title, final int size, @NotNull final Crate crate, @NotNull final List<Tier> tiers) {
@@ -99,7 +111,11 @@ public abstract class InventoryBuilder implements InventoryHolder, Listener {
 
         String inventoryTitle = Support.placeholder_api.isEnabled() ? PlaceholderAPI.setPlaceholders(getPlayer(), this.title) : this.title;
 
-        this.inventory = this.server.createInventory(this, this.size, AdvUtil.parse(inventoryTitle));
+        if (this.plugin.isLegacy()) {
+            this.inventory = this.server.createInventory(this, this.size, ItemUtil.color(inventoryTitle));
+        } else {
+            this.inventory = this.server.createInventory(this, this.size, AdvUtil.parse(inventoryTitle));
+        }
     }
 
     public InventoryBuilder() {}
@@ -121,7 +137,7 @@ public abstract class InventoryBuilder implements InventoryHolder, Listener {
 
             if (!commands.isEmpty()) {
                 commands.forEach(value -> {
-                    String command = value.replaceAll("%player%", quoteReplacement(this.player.getName())).replaceAll("%crate%", quoteReplacement(this.crate.getName()));
+                    String command = value.replaceAll("%player%", quoteReplacement(this.player.getName())).replaceAll("%crate%", quoteReplacement(this.crate.getFileName()));
 
                     MiscUtils.sendCommand(command);
                 });
@@ -129,7 +145,7 @@ public abstract class InventoryBuilder implements InventoryHolder, Listener {
                 return true;
             }
 
-            if (MiscUtils.isLogging()) this.plugin.getLogger().warning("The property " + ConfigKeys.menu_button_command_list.getPath() + " is empty so no commands were run.");
+            if (MiscUtils.isLogging()) plugin.getComponentLogger().warn("The property {} is empty so no commands were run.", ConfigKeys.menu_button_command_list.getPath());
 
             return true;
         }
@@ -152,6 +168,10 @@ public abstract class InventoryBuilder implements InventoryHolder, Listener {
 
     public final int getSize() {
         return this.size;
+    }
+
+    public final int getSize(final boolean isBorderEnabled) {
+        return this.size - (isBorderEnabled ? 18 : this.size != 9 ? 9 : 0);
     }
 
     public void setPage(final int page) {
@@ -187,6 +207,10 @@ public abstract class InventoryBuilder implements InventoryHolder, Listener {
     }
 
     public void sendTitleChange() {
+        if (this.plugin.isLegacy()) {
+            return;
+        }
+
         ServerPlayer entityPlayer = (ServerPlayer) ((CraftHumanEntity) getView().getPlayer()).getHandle();
         int containerId = entityPlayer.containerMenu.containerId;
         MenuType<?> windowType = CraftContainer.getNotchInventoryType(getView().getTopInventory());

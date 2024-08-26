@@ -2,6 +2,7 @@ package com.badbones69.crazycrates.tasks.crates.types;
 
 import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.builders.CrateBuilder;
+import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.Prize;
 import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
@@ -14,7 +15,6 @@ import com.badbones69.crazycrates.api.utils.MiscUtils;
 import com.badbones69.crazycrates.tasks.BukkitUserManager;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
 import com.badbones69.crazycrates.tasks.crates.types.roulette.RouletteStandard;
-import com.ryderbelserion.vital.paper.builders.items.ItemBuilder;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -46,7 +46,7 @@ public class GachaCrate extends CrateBuilder {
         }
 
         String playerName = getPlayer().getName();
-        CrateSettings crateSettings = playerDataManager.getCrateSettings(getCrate().getName());
+        CrateSettings crateSettings = playerDataManager.getCrateSettings(getCrate().getCrateName());
 
         PlayerProfile playerProfile = playerDataManager.getPlayerProfile(playerName, crateSettings, false);
         PlayerBaseProfile baseProfile = this.plugin.getBaseProfileManager().getPlayerBaseProfile(playerName);
@@ -65,11 +65,11 @@ public class GachaCrate extends CrateBuilder {
         boolean sneak = getPlayer().isSneaking();
         int amount = sneak ? 10 : 1;
 
-        boolean keyCheck = this.userManager.takeKeys(getPlayer().getUniqueId(), getCrate().getName(), type, amount, checkHand);
+        boolean keyCheck = this.userManager.takeKeys(getPlayer().getUniqueId(), getCrate().getCrateName(), type, amount, checkHand);
 
         if (!keyCheck) {
             // Send the message about failing to take the key.
-            MiscUtils.failedToTakeKey(getPlayer(), getCrate().getName());
+            MiscUtils.failedToTakeKey(getPlayer(), getCrate().getCrateName());
             // Remove from opening list.
             this.crateManager.removePlayerFromOpeningList(getPlayer());
             return;

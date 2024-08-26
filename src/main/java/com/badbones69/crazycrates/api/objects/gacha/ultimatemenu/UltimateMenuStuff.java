@@ -1,6 +1,6 @@
 package com.badbones69.crazycrates.api.objects.gacha.ultimatemenu;
 
-import com.ryderbelserion.vital.paper.builders.items.ItemBuilder;
+import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.Material;

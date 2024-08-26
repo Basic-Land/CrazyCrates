@@ -1,7 +1,9 @@
 package com.badbones69.crazycrates.api.objects;
 
+import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.enums.PersistentKeys;
-import com.ryderbelserion.vital.paper.builders.items.ItemBuilder;
+import com.badbones69.crazycrates.api.objects.gacha.util.TierInfo;
+import com.ryderbelserion.vital.common.utils.StringUtil;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -71,7 +73,7 @@ public class Tier {
      * @return the total chance divided
      */
     public final String getTotalChance() {
-        return StringUtil.formatDouble((double) getChance() / getMaxRange() * 100) + "%";
+        return StringUtil.formatDouble(getChance() / getMaxRange() * 100) + "%";
     }
 
     /**

@@ -10,7 +10,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class BaseProfileManager implements Listener {

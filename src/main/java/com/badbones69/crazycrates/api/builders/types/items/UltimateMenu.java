@@ -2,6 +2,7 @@ package com.badbones69.crazycrates.api.builders.types.items;
 
 import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.builders.InventoryBuilder;
+import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
@@ -10,7 +11,6 @@ import com.badbones69.crazycrates.api.objects.gacha.data.PlayerBaseProfile;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ComponentBuilder;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuStuff;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
-import com.ryderbelserion.vital.paper.builders.items.ItemBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import org.bukkit.entity.Player;
@@ -375,11 +375,11 @@ public class UltimateMenu extends InventoryBuilder {
     }
 
     private int getKeys(Player player, Crate crate) {
-        return plugin.getUserManager().getVirtualKeys(player.getUniqueId(), crate.getName());
+        return plugin.getUserManager().getVirtualKeys(player.getUniqueId(), crate.getCrateName());
     }
 
     private void addKeys(Player player, Crate crate, int amount) {
-        plugin.getUserManager().addVirtualKeys(player.getUniqueId(), crate.getName(), amount);
+        plugin.getUserManager().addVirtualKeys(player.getUniqueId(), crate.getCrateName(), amount);
     }
 
     private void close(Player player) {

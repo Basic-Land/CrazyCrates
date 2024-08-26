@@ -46,7 +46,7 @@ public class History {
         PlayerProfile profile = playerDataManager.getPlayerProfile(target, crateSettings, true);
 
         if (profile == null) {
-            player.sendMessage(text("Hráč " + target + " nemá žádnou historii otevření " + crateSettings.getCrateName() + " crate", NamedTextColor.RED));
+            player.sendMessage(Component.text("Hráč " + target + " nemá žádnou historii otevření " + crateSettings.getCrateName() + " crate", NamedTextColor.RED));
             return;
         }
 
@@ -54,7 +54,7 @@ public class History {
         TextColor color = TextColor.fromHexString("#de7a00");
 
         if (historyList.isEmpty()) {
-            player.sendMessage(text("Nemáte žádnou historii otevření " + crateSettings.getCrateName() + " crate", NamedTextColor.RED));
+            player.sendMessage(Component.text("Nemáte žádnou historii otevření " + crateSettings.getCrateName() + " crate", NamedTextColor.RED));
             return;
         }
 
@@ -68,11 +68,11 @@ public class History {
         int endIndex = Math.min(startIndex + HISTORY_PER_PAGE, size);
         int maxPage = (size / HISTORY_PER_PAGE) + (size % HISTORY_PER_PAGE == 0 ? 0 : 1);
 
-        Component header = text()
+        Component header = Component.text()
                 .appendNewline()
-                .append(text("Historie otevření ", color))
-                .append(text(crateSettings.getCrateName(), NamedTextColor.AQUA))
-                .append(text(" crate", color))
+                .append(Component.text("Historie otevření ", color))
+                .append(Component.text(crateSettings.getCrateName(), NamedTextColor.AQUA))
+                .append(Component.text(" crate", color))
                 .appendNewline()
                 .build();
         player.sendMessage(header);
@@ -81,24 +81,24 @@ public class History {
             Result history = historyList.get(size - i - 1);
             Rarity rarity = history.getRarity();
 
-            Component component = text("» ", NamedTextColor.DARK_GRAY, TextDecoration.BOLD)
+            Component component = Component.text("» ", NamedTextColor.DARK_GRAY, TextDecoration.BOLD)
                     .append(JSONComponentSerializer.json().deserialize(history.getItemName()).hoverEvent(getHover(history, rarity, crateSettings)))
-                    .append(text(" - ", NamedTextColor.GRAY)
-                            .append(text(rarity.name(), rarity.getColor()).hoverEvent(HoverEvent.showText(getHoverText(history, crateSettings)))));
+                    .append(Component.text(" - ", NamedTextColor.GRAY)
+                            .append(Component.text(rarity.name(), rarity.getColor()).hoverEvent(HoverEvent.showText(getHoverText(history, crateSettings)))));
             player.sendMessage(component);
         }
 
         int pageMinus = pageNumber - 1;
         int pagePlus = pageNumber + 1;
 
-        Component pages = newline()
-                .append(text("<<<<", NamedTextColor.DARK_GRAY, TextDecoration.BOLD)
+        Component pages = Component.newline()
+                .append(Component.text("<<<<", NamedTextColor.DARK_GRAY, TextDecoration.BOLD)
                         .clickEvent(ClickEvent.callback(clickEvent -> sendHistory(clickEvent, target, pageMinus <= 0 ? maxPage : pageMinus, crateSettings)))
-                        .hoverEvent(text("Předchozí stránka", NamedTextColor.GRAY)))
-                .append(text(" Strana " + pageNumber + "/" + maxPage + " ", color))
-                .append(text(">>>>", NamedTextColor.DARK_GRAY, TextDecoration.BOLD)
+                        .hoverEvent(Component.text("Předchozí stránka", NamedTextColor.GRAY)))
+                .append(Component.text(" Strana " + pageNumber + "/" + maxPage + " ", color))
+                .append(Component.text(">>>>", NamedTextColor.DARK_GRAY, TextDecoration.BOLD)
                         .clickEvent(ClickEvent.callback(clickEvent -> sendHistory(clickEvent, target, pagePlus > maxPage ? 1 : pagePlus, crateSettings)))
-                        .hoverEvent(text("Další stránka", NamedTextColor.GRAY)));
+                        .hoverEvent(Component.text("Další stránka", NamedTextColor.GRAY)));
         player.sendMessage(pages);
     }
 
@@ -106,14 +106,14 @@ public class History {
         PlayerProfile profile = playerDataManager.getPlayerProfile(target, crateSettings, true);
 
         if (profile == null) {
-            player.sendMessage(text("Hráč " + target + " nemá žádnou historii otevření " + crateSettings.getCrateName() + " crate", NamedTextColor.RED));
+            player.sendMessage(Component.text("Hráč " + target + " nemá žádnou historii otevření " + crateSettings.getCrateName() + " crate", NamedTextColor.RED));
             return;
         }
 
-        Component header = newline()
-                .append(text("Pity pro ", NamedTextColor.GRAY))
-                .append(text(crateSettings.getCrateName(), NamedTextColor.AQUA))
-                .append(text(" crate", NamedTextColor.GRAY))
+        Component header = Component.newline()
+                .append(Component.text("Pity pro ", NamedTextColor.GRAY))
+                .append(Component.text(crateSettings.getCrateName(), NamedTextColor.AQUA))
+                .append(Component.text(" crate", NamedTextColor.GRAY))
                 .appendNewline();
         player.sendMessage(header);
 
@@ -123,11 +123,11 @@ public class History {
             ResultType won5050 = pair.second();
             int color = getColor(pity);
 
-            Component component = text(rarity.name(), rarity.getColor())
-                    .append(text(" pity: ", NamedTextColor.GRAY))
-                    .append(text(pity, TextColor.color(color)))
-                    .append(text(" last 50/50: ", NamedTextColor.GRAY))
-                    .append(text(won5050.name(), won5050.getColor()));
+            Component component = Component.text(rarity.name(), rarity.getColor())
+                    .append(Component.text(" pity: ", NamedTextColor.GRAY))
+                    .append(Component.text(pity, TextColor.color(color)))
+                    .append(Component.text(" last 50/50: ", NamedTextColor.GRAY))
+                    .append(Component.text(won5050.name(), won5050.getColor()));
             player.sendMessage(component);
         });
     }
@@ -158,16 +158,16 @@ public class History {
         int color = getColor(history.getPity());
         ResultType won5050 = history.getWon5050();
 
-        return text()
-                .append(text("- čas: ", NamedTextColor.GRAY)
-                        .append(text(dateFormat.format(history.getTimestamp()), NamedTextColor.GOLD)))
+        return Component.text()
+                .append(Component.text("- čas: ", NamedTextColor.GRAY)
+                        .append(Component.text(dateFormat.format(history.getTimestamp()), NamedTextColor.GOLD)))
                 .appendNewline()
-                .append(text("- pity: ", NamedTextColor.GRAY)
-                        .append(text(history.getPity(), TextColor.color(color))))
+                .append(Component.text("- pity: ", NamedTextColor.GRAY)
+                        .append(Component.text(history.getPity(), TextColor.color(color))))
                 .append(raritySettings.is5050Enabled() ?
-                        newline().append(text("- 50/50: ", NamedTextColor.GRAY))
-                                .append(text(won5050.name(), won5050.getColor())) :
-                        empty())
+                        Component.newline().append(Component.text("- 50/50: ", NamedTextColor.GRAY))
+                                .append(Component.text(won5050.name(), won5050.getColor())) :
+                        Component.empty())
                 .build();
     }
 

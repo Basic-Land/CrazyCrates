@@ -22,6 +22,6 @@ public class EditItems extends BaseCommand {
             return;
         }
 
-        player.openInventory(new RaritiesMenu(crate, player, 27, "Rarities of " + crate.getName()).build().getInventory());
+        player.openInventory(new RaritiesMenu(crate, player, 27, "Rarities of " + crate.getCrateName()).build().getInventory());
     }
 }
