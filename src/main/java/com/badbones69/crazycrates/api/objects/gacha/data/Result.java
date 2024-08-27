@@ -43,6 +43,10 @@ public class Result implements Serializable {
         return rarity == Rarity.LEGENDARY;
     }
 
+    public boolean isEpic() {
+        return rarity == Rarity.EPIC;
+    }
+
     public boolean isWon5050() {
         return won5050 != ResultType.LOST;
     }

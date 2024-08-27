@@ -259,7 +259,7 @@ public class DatabaseManager {
             try {
                 if (rs.next()) {
                     String profileString = rs.getString(crateName);
-                    return deserializeProfile(profileString);
+                    return deserializeProfile(profileString).cutHistory(5000);
                 }
             } catch (SQLException e) {
                 LOGGER.warning(e.getMessage());

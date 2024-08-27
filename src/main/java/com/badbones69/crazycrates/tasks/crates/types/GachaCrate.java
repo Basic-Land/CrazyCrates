@@ -1,6 +1,5 @@
 package com.badbones69.crazycrates.tasks.crates.types;
 
-import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.builders.CrateBuilder;
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.objects.Crate;
@@ -94,8 +93,6 @@ public class GachaCrate extends CrateBuilder {
                 case FATE_POINT -> gachaSystem.rollWithFatePoint(playerProfile, crateSettings, prize);
                 case OVERRIDE -> gachaSystem.rollOverrideSet(playerProfile, crateSettings, prize);
             };
-
-            plugin.getLogger().info("Result: " + result);
 
             Rarity rarity = result.getRarity();
             stellarShards += rarityMap.get(rarity).stellarShards();

@@ -150,7 +150,8 @@ public class CrateTierMenu extends InventoryBuilder {
         getInventory().setItem(getCrate().getAbsolutePreviewItemPosition(8), item.getStack());
 
         ItemBuilder paper = new ItemBuilder(Material.PAPER).setCustomModelData(11).setDisplayName("Info");
-        paper.addDisplayLore("<gray>Click to open the main menu");
+        paper.addDisplayLore("<gray>Zde najdeš informace o");
+        paper.addDisplayLore("<gray>itemech a jejich šancích");
         getInventory().setItem(getCrate().getAbsolutePreviewItemPosition(4), paper.getStack());
 
         ItemBuilder mainMenu = new ItemBuilder(Material.CHEST).setDisplayName("<green><b>Hlavní Menu");

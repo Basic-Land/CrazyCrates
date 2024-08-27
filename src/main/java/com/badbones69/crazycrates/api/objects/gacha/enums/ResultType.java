@@ -24,4 +24,20 @@ public enum ResultType {
             default -> "";
         };
     }
+
+    public boolean isWon() {
+        return this == WON;
+    }
+
+    public boolean isLost() {
+        return this == LOST;
+    }
+
+    public boolean isGuaranteed() {
+        return this == GUARANTEED;
+    }
+
+    public boolean isWonOfRateUp() {
+        return this == WON_OF_RATE_UP;
+    }
 }

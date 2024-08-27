@@ -167,16 +167,19 @@ public class UltimateMenu extends InventoryBuilder {
                 close(player);
                 manager.getHistory().sendHistory(player, player.getName(), 1, crate.getCrateSettings());
             }
+
             case 82 -> {
                 player.playSound(UltimateMenuStuff.CLICK);
                 close(player);
                 plugin.getInventoryManager().openNewCratePreview(player, crate);
             }
+
             case 83 -> {
                 player.playSound(UltimateMenuStuff.CLICK);
                 close(player);
                 manager.getShopManager().openFirst(crate, player);
             }
+
             case 84 -> {
                 if (totalPageAmount == 1 || currentPage == 0) return;
                 if (currentPage > 0) {
@@ -184,6 +187,7 @@ public class UltimateMenu extends InventoryBuilder {
                     player.openInventory(new UltimateMenu(first, player).build().getInventory());
                 }
             }
+
             case 85 -> {
                 if (totalPageAmount == 1 || currentPage == totalPageAmount - 1) return;
                 if (currentPage < totalPageAmount - 1) {

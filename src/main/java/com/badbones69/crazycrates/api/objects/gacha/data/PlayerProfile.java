@@ -63,14 +63,15 @@ public class PlayerProfile implements Serializable {
         fatePoint++;
     }
 
-    public void addHistory(Result history) {
-        this.history.add(history);
+    public void addHistory(Result result) {
+        history.add(result);
     }
 
-    public void cutHistory(int size) {
+    public PlayerProfile cutHistory(int size) {
         if (history.size() > size) {
             history.subList(0, history.size() - size).clear();
         }
+        return this;
     }
 
     public void incrementTotalPity() {
