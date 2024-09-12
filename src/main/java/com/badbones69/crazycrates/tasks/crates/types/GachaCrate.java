@@ -67,9 +67,7 @@ public class GachaCrate extends CrateBuilder {
         boolean keyCheck = this.userManager.takeKeys(getPlayer().getUniqueId(), getCrate().getFileName(), type, amount, checkHand);
 
         if (!keyCheck) {
-            // Send the message about failing to take the key.
             MiscUtils.failedToTakeKey(getPlayer(), getCrate().getFileName());
-            // Remove from opening list.
             this.crateManager.removePlayerFromOpeningList(getPlayer());
             return;
         }
@@ -103,7 +101,6 @@ public class GachaCrate extends CrateBuilder {
 
         baseProfile.addMysticTokens(mysticTokens);
         baseProfile.addStellarShards(stellarShards);
-
 
         setItem(37, UltimateMenuStuff.BORDER.getStack());
         setItem(8, new ItemBuilder(Material.PLAYER_HEAD).setDisplayName("<green>Skip").setCustomModelData(1000002).getStack());
