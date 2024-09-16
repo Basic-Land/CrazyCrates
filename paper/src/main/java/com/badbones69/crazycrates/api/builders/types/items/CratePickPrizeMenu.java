@@ -17,8 +17,8 @@ import org.bukkit.inventory.ItemStack;
 public class CratePickPrizeMenu extends InventoryBuilder {
     private final ItemStack item;
     private final DatabaseManager databaseManager = plugin.getCrateManager().getDatabaseManager();
-    private final static ItemStack back = new ItemBuilder(Material.RED_STAINED_GLASS_PANE).setDisplayName("Back").getStack();
-    private final static ItemStack save = new ItemBuilder(Material.GREEN_STAINED_GLASS_PANE).setDisplayName("Save").getStack();
+    private final static ItemStack back = new ItemBuilder(Material.RED_STAINED_GLASS_PANE).setDisplayName("Back").asItemStack();
+    private final static ItemStack save = new ItemBuilder(Material.GREEN_STAINED_GLASS_PANE).setDisplayName("Save").asItemStack();
 
     public CratePickPrizeMenu(Player player, ItemStack item, Crate crate) {
         super(player, "Item menu", 9, crate);
@@ -61,7 +61,7 @@ public class CratePickPrizeMenu extends InventoryBuilder {
         if (event.getSlot() < 4) {
             player.playSound(UltimateMenuStuff.BACK);
             // Open the previous menu
-            player.openInventory(crate.getTierPreview(player));
+            player.openInventory(crate.getTierPreview(player).getGui().getInventory());
         } else if (event.getSlot() > 4) {
             player.playSound(UltimateMenuStuff.CLICK);
             // Retrieve the player's profile and save the chosen reward
@@ -73,7 +73,7 @@ public class CratePickPrizeMenu extends InventoryBuilder {
 
             playerProfile.setChosenReward(rewardName);
             holder.databaseManager.savePlayerProfile(player.getName(), crateSettings, playerProfile);
-            player.openInventory(crate.getTierPreview(player));
+            player.openInventory(crate.getTierPreview(player).getGui().getInventory());
         }
     }
 }

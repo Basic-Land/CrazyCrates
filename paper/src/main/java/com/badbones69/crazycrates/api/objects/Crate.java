@@ -2,19 +2,22 @@ package com.badbones69.crazycrates.api.objects;
 
 import ch.jalu.configme.SettingsManager;
 import com.badbones69.crazycrates.api.PrizeManager;
+import com.badbones69.crazycrates.api.builders.types.CratePreviewMenu;
 import com.badbones69.crazycrates.api.builders.types.CrateTierMenu;
 import com.badbones69.crazycrates.api.crates.CrateHologram;
-import com.badbones69.crazycrates.api.enums.misc.Files;
 import com.badbones69.crazycrates.api.enums.misc.Keys;
+import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.config.ConfigManager;
 import com.badbones69.crazycrates.config.impl.ConfigKeys;
 import com.badbones69.crazycrates.tasks.BukkitUserManager;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
 import com.badbones69.crazycrates.tasks.crates.effects.SoundEffect;
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
+import com.badbones69.crazycrates.tasks.crates.other.GachaCrateManager;
 import com.ryderbelserion.vital.paper.api.files.CustomFile;
 import com.ryderbelserion.vital.paper.util.DyeUtil;
 import com.ryderbelserion.vital.paper.util.ItemUtil;
+import lombok.Getter;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Color;
@@ -32,15 +35,11 @@ import com.badbones69.crazycrates.tasks.crates.other.AbstractCrateManager;
 import org.jetbrains.annotations.NotNull;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import com.badbones69.crazycrates.tasks.InventoryManager;
-import com.badbones69.crazycrates.api.builders.types.CratePreviewMenu;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Crate {
@@ -875,7 +874,7 @@ public class Crate {
      * @return the finalized slot.
      */
     public final int getAbsoluteItemPosition(final int baseSlot) {
-        return baseSlot + (this.previewChestLines > 1 ? this.previewChestLines - (getCrateType().isGacha() ? 0 : 1) : 1) * 9;
+        return baseSlot + (this.previewChestLines > 1 ? this.previewChestLines - 1 : 1) * 9;
     }
 
     /**

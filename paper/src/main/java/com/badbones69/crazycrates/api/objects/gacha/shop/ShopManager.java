@@ -122,8 +122,8 @@ public class ShopManager {
         ShopMenu shopMenu = new ShopMenu(crate, player, shop, this, shopData);
 
         Inventory inventory = shopMenu.getInventory();
-        inventory.setItem(45, UltimateMenuStuff.SHOP_BANNER.getStack());
-        inventory.setItem(49, UltimateMenuStuff.MAIN_MENU_SHOP.getStack());
+        inventory.setItem(45, UltimateMenuStuff.SHOP_BANNER.asItemStack());
+        inventory.setItem(49, UltimateMenuStuff.MAIN_MENU_SHOP.asItemStack());
 
         buildGUI(shopMenu, shopData.shopID());
         buildItems(player, inventory, shopData);
@@ -153,7 +153,7 @@ public class ShopManager {
             case UNLIMITED -> itemBuilder.addDisplayLore("<green><b>Limit: <white>Unlimited");
         }
 
-        return itemBuilder.getStack();
+        return itemBuilder.asItemStack();
     }
 
     public void buildGUI(InventoryBuilder builder, ShopID selected) {
@@ -174,18 +174,18 @@ public class ShopManager {
 
             if (selected == shopID) {
                 selectedMain.setCustomModelData(1000007 - ordinal);
-                inv.setItem(slot, selectedMain.getStack());
+                inv.setItem(slot, selectedMain.asItemStack());
 
                 selectedMain.setCustomModelData(1000003);
-                inv.setItem(slot + 1, selectedMain.getStack());
-                inv.setItem(slot + 2, selectedMain.getStack());
+                inv.setItem(slot + 1, selectedMain.asItemStack());
+                inv.setItem(slot + 2, selectedMain.asItemStack());
             } else {
                 unselectedMain.setCustomModelData(1000007 - ordinal);
-                inv.setItem(slot, unselectedMain.getStack());
+                inv.setItem(slot, unselectedMain.asItemStack());
 
                 unselectedMain.setCustomModelData(1000001);
-                inv.setItem(slot + 1, unselectedMain.getStack());
-                inv.setItem(slot + 2, unselectedMain.getStack());
+                inv.setItem(slot + 1, unselectedMain.asItemStack());
+                inv.setItem(slot + 2, unselectedMain.asItemStack());
             }
 
             slot += 3;

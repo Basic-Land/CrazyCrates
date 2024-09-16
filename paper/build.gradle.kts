@@ -8,6 +8,14 @@ plugins {
 
 repositories {
     maven("https://repo.fancyplugins.de/releases")
+    maven {
+        url = uri("http://nexus.basicland.cz:8081/repository/dev-private/")
+        isAllowInsecureProtocol = true
+        credentials {
+            username = ("dev")
+            password = ("rtVXgxFyWkiVfU3")
+        }
+    }
 }
 
 dependencies {
@@ -35,6 +43,10 @@ dependencies {
     compileOnly(libs.placeholderapi)
 
     compileOnly(libs.oraxen)
+
+    compileOnly("org.projectlombok:lombok:1.18.32")
+    annotationProcessor("org.projectlombok:lombok:1.18.32")
+    compileOnly("cz.basicland:bLibs:2.0.0-WIP-b38")
 }
 
 paperweight {

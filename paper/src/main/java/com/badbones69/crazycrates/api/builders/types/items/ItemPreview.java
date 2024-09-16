@@ -82,13 +82,13 @@ public class ItemPreview extends InventoryBuilder {
         if (page > 0) {
             ItemBuilder previousPage = new ItemBuilder(Material.ARROW).setDisplayName("<green>Previous Page");
             // Add previous page item
-            getInventory().setItem(getSize() - 9, previousPage.getStack());
+            getInventory().setItem(getSize() - 9, previousPage.asItemStack());
         }
 
         if (page < totalPages - 1) {
             ItemBuilder nextPage = new ItemBuilder(Material.ARROW).setDisplayName("<green>Next Page");
             // Add next page item
-            getInventory().setItem(getSize() - 1, nextPage.getStack());
+            getInventory().setItem(getSize() - 1, nextPage.asItemStack());
         }
 
         add();
@@ -156,7 +156,7 @@ public class ItemPreview extends InventoryBuilder {
     private void add() {
         if (editing) {
             ItemBuilder back = new ItemBuilder(Material.CHEST).setDisplayName("<green>Go back");
-            getInventory().setItem(getSize() - 5, back.getStack());
+            getInventory().setItem(getSize() - 5, back.asItemStack());
         }
     }
 }

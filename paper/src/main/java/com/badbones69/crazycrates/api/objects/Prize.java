@@ -1,27 +1,34 @@
 package com.badbones69.crazycrates.api.objects;
 
 import com.badbones69.crazycrates.CrazyCrates;
-import com.badbones69.crazycrates.api.enums.PersistentKeys;
+import com.badbones69.crazycrates.api.PrizeManager;
+import com.badbones69.crazycrates.api.builders.ItemBuilder;
+import com.badbones69.crazycrates.api.enums.Messages;
+import com.badbones69.crazycrates.api.enums.misc.Keys;
+import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
+import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.api.utils.ItemUtils;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
 import com.badbones69.crazycrates.config.ConfigManager;
-import com.badbones69.crazycrates.config.impl.ConfigKeys;
-import com.badbones69.crazycrates.api.builders.ItemBuilder;
+import com.badbones69.crazycrates.config.impl.messages.CrateKeys;
 import com.ryderbelserion.vital.common.utils.StringUtil;
 import com.ryderbelserion.vital.paper.api.enums.Support;
 import com.ryderbelserion.vital.paper.util.AdvUtil;
 import com.ryderbelserion.vital.paper.util.ItemUtil;
+import cz.basicland.blibs.spigot.utils.item.NBT;
+import lombok.Getter;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.bukkit.configuration.ConfigurationSection;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -42,7 +49,6 @@ public class Prize {
     private String crateName = "";
     private int maxRange = 100;
     private double chance = 0;
-    private boolean custom = false;
 
     private int maxPulls;
 
@@ -131,10 +137,7 @@ public class Prize {
 
         this.permissions = Collections.emptyList();
 
-        ItemBuilder display = new ItemBuilder(stack.clone());
-        this.displayItem = display;
-        this.prizeItem = display;
-        this.custom = true;
+        this.displayItem = new ItemBuilder(stack.clone());
     }
 
     /**
@@ -174,6 +177,10 @@ public class Prize {
         return this.sectionName;
     }
 
+    public @NotNull final ItemStack getDisplayItem() {
+        return getDisplayItem(null, null);
+    }
+
     /**
      * @return the display item that is shown for the preview and the winning prize.
      */
@@ -185,6 +192,8 @@ public class Prize {
      * @return the display item that is shown for the preview and the winning prize.
      */
     public @NotNull final ItemStack getDisplayItem(@Nullable final Player player, final Crate crate) {
+        if (crate == null) return this.displayItem.asItemStack();
+
         final int pulls = PrizeManager.getCurrentPulls(this, crate);
         final String maxPulls = String.valueOf(getMaxPulls());
         final String amount = String.valueOf(pulls);

@@ -36,7 +36,7 @@ public class RaritiesMenu extends InventoryBuilder {
                         .addDisplayLore("<white>STANDARD")
                         .addDisplayLore("- <white>Kliknuti <red><b>LEVYM</red> tlacitkem pro <red><b>PRIDANI</red> itemu do crate</white>")
                         .addDisplayLore("- <white>Kliknuti <red><b>PRAVYM</red> tlacitkem pro <red><b>ODEBRANI</red> itemu z crate</white>")
-                        .getStack();
+                        .asItemStack();
 
                 getInventory().addItem(item);
             }
@@ -45,7 +45,7 @@ public class RaritiesMenu extends InventoryBuilder {
                     .addDisplayLore("<white>LIMITED")
                     .addDisplayLore("- <white>Kliknuti <red><b>LEVYM</red> tlacitkem pro <red><b>PRIDANI</red> itemu do crate</white>")
                     .addDisplayLore("- <white>Kliknuti <red><b>PRAVYM</red> tlacitkem pro <red><b>ODEBRANI</red> itemu z crate</white>")
-                    .getStack();
+                    .asItemStack();
             getInventory().addItem(item);
         }
         return this;

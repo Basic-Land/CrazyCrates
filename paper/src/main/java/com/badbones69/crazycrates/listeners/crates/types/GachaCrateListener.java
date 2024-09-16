@@ -1,4 +1,4 @@
-package com.badbones69.crazycrates.listeners.crates;
+package com.badbones69.crazycrates.listeners.crates.types;
 
 import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.builders.types.CratePrizeMenu;

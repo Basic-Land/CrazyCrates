@@ -115,10 +115,10 @@ public class RouletteStandard extends FoliaRunnable {
     }
 
     private void setupInventory() {
-        builder.setItem(36, glass.setCustomModelData(modelData).getStack());
+        builder.setItem(36, glass.setCustomModelData(modelData).asItemStack());
         for (int i = 0; i < 45; i++) {
             if (i == 36 || i == 37 || i == 8) continue;
-            builder.setItem(i, MiscUtils.getRandomPaneColor().setCustomModelData(2000000).getStack());
+            builder.setItem(i, MiscUtils.getRandomPaneColor().setCustomModelData(2000000).asItemStack());
         }
     }
 
@@ -126,7 +126,7 @@ public class RouletteStandard extends FoliaRunnable {
         if (!first) {
             first = true;
             lock = true;
-            builder.setItem(36, glass.setCustomModelData(600).getStack());
+            builder.setItem(36, glass.setCustomModelData(600).asItemStack());
             if (!sneak || !skip) builder.setItem(22, prize.getFirst().getPrize().getDisplayItem());
             skip = true;
             return;
@@ -154,7 +154,7 @@ public class RouletteStandard extends FoliaRunnable {
     }
 
     private void endTask() {
-        builder.setItem(36, glass.setCustomModelData(600).getStack());
+        builder.setItem(36, glass.setCustomModelData(600).asItemStack());
         if (!sneak) {
             builder.setItem(22, prize.getFirst().getPrize().getDisplayItem());
         }

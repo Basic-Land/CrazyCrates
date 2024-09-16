@@ -35,7 +35,7 @@ public class ItemAddMenu extends InventoryBuilder {
         builder.addDisplayLore("<gray><b>Right click to close.");
         builder.addDisplayLore("<gray><b>Left click to save.");
 
-        inventory.setItem(53, builder.getStack());
+        inventory.setItem(53, builder.asItemStack());
         return this;
     }
 

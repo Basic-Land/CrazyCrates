@@ -15,7 +15,6 @@ import com.badbones69.crazycrates.api.objects.gacha.enums.Table;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ComponentBuilder;
 import com.badbones69.crazycrates.api.objects.gacha.util.TierInfo;
 import com.ryderbelserion.vital.paper.api.files.CustomFile;
-import com.ryderbelserion.vital.paper.api.files.FileManager;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import lombok.Getter;
 import lombok.ToString;

@@ -84,13 +84,13 @@ public class BonusPityMenu extends InventoryBuilder {
         getInventory().setItem(35, pageForwardItem); // Page forward
 
         ItemBuilder backItem = new ItemBuilder(Material.ARROW).setCustomModelData(1000002);
-        getInventory().setItem(29, backItem.getStack());
+        getInventory().setItem(29, backItem.asItemStack());
 
         // Set the paper at the specified position
         ItemStack paper = new ItemBuilder(Material.PAPER)
                 .setCustomModelData(10)
                 .setDisplayName("#f0af37Progress " + totalPity + "/" + extraRewardPity)
-                .getStack();
+                .asItemStack();
         getInventory().setItem(31, paper);
 
         // Set the barrier or player head at the specified position based on a condition
@@ -106,7 +106,7 @@ public class BonusPityMenu extends InventoryBuilder {
             confirm.setDisplayName("#f0af37You have not reached the required pity");
         }
 
-        getInventory().setItem(33, confirm.getStack());
+        getInventory().setItem(33, confirm.asItemStack());
 
         return this;
     }
@@ -151,7 +151,7 @@ public class BonusPityMenu extends InventoryBuilder {
 
         if (clickedSlot == 29) {
             player.playSound(UltimateMenuStuff.BACK);
-            player.openInventory(holder.crateTierMenu.getInventory());
+            player.openInventory(holder.crateTierMenu.getGui().getInventory());
         }
 
         if (clickedSlot == 33) {
@@ -169,7 +169,7 @@ public class BonusPityMenu extends InventoryBuilder {
                     playerProfile.setClaimedExtraReward(true);
                     holder.databaseManager.savePlayerProfile(player.getName(), holder.getCrate().getCrateSettings(), playerProfile);
                     player.sendMessage("You have claimed the extra reward.");
-                    player.openInventory(holder.crateTierMenu.getInventory());
+                    player.openInventory(holder.crateTierMenu.getGui().getInventory());
                 } else {
                     player.playSound(UltimateMenuStuff.ERROR);
                     player.sendMessage("You have not reached the required pity.");
@@ -192,6 +192,6 @@ public class BonusPityMenu extends InventoryBuilder {
     }
 
     private static ItemStack glass(Material item) {
-        return new ItemBuilder(item).setCustomModelData(1000001).setDisplayName("<gray>").getStack();
+        return new ItemBuilder(item).setCustomModelData(1000001).setDisplayName("<gray>").asItemStack();
     }
 }

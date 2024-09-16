@@ -255,9 +255,9 @@ public class UltimateMenu extends InventoryBuilder {
 
     private void setVoteMenu(Player player, int keysNeeded, int voteTokensNeeded) {
         PlayerInventory playerInventory = player.getInventory();
-        playerInventory.setItem(28, UltimateMenuStuff.TOKEN_SHOP.getStack());
+        playerInventory.setItem(28, UltimateMenuStuff.TOKEN_SHOP.asItemStack());
 
-        ItemStack no = UltimateMenuStuff.SHOP_BACK_MENU.getStack();
+        ItemStack no = UltimateMenuStuff.SHOP_BACK_MENU.asItemStack();
         playerInventory.setItem(20, no);
         playerInventory.setItem(21, no);
 
@@ -266,17 +266,17 @@ public class UltimateMenu extends InventoryBuilder {
         shopVoteTokensYes.addLorePlaceholder("{keys}", keysNeeded + "");
         shopVoteTokensYes.addLorePlaceholder("{vote}", voteTokensNeeded + "");
 
-        playerInventory.setItem(23, shopVoteTokensYes.getStack());
-        playerInventory.setItem(24, shopVoteTokensYes.getStack());
+        playerInventory.setItem(23, shopVoteTokensYes.asItemStack());
+        playerInventory.setItem(24, shopVoteTokensYes.asItemStack());
         voteShop = true;
         premiumShop = false;
     }
 
     private void setPremiumMenu(Player player, int premiumNeeded) {
         PlayerInventory playerInventory = player.getInventory();
-        playerInventory.setItem(28, UltimateMenuStuff.PREMIUM_SHOP.getStack());
+        playerInventory.setItem(28, UltimateMenuStuff.PREMIUM_SHOP.asItemStack());
 
-        ItemStack no = UltimateMenuStuff.SHOP_BACK_MENU.getStack();
+        ItemStack no = UltimateMenuStuff.SHOP_BACK_MENU.asItemStack();
         playerInventory.setItem(20, no);
         playerInventory.setItem(21, no);
 
@@ -284,24 +284,24 @@ public class UltimateMenu extends InventoryBuilder {
 
         shopVoteTokensYes.addLorePlaceholder("{premium}", premiumNeeded + "");
 
-        playerInventory.setItem(23, shopVoteTokensYes.getStack());
-        playerInventory.setItem(24, shopVoteTokensYes.getStack());
+        playerInventory.setItem(23, shopVoteTokensYes.asItemStack());
+        playerInventory.setItem(24, shopVoteTokensYes.asItemStack());
         premiumShop = true;
         voteShop = false;
     }
 
     private void openStoreMenu(Player player) {
         PlayerInventory playerInventory = player.getInventory();
-        playerInventory.setItem(28, UltimateMenuStuff.STORE_MENU.getStack());
+        playerInventory.setItem(28, UltimateMenuStuff.STORE_MENU.asItemStack());
 
-        ItemStack no = UltimateMenuStuff.SHOP_BACK_MENU.getStack();
+        ItemStack no = UltimateMenuStuff.SHOP_BACK_MENU.asItemStack();
         playerInventory.setItem(20, no);
         playerInventory.setItem(21, no);
 
         ItemBuilder shopVoteTokensYes = UltimateMenuStuff.OPEN_STORE;
 
-        playerInventory.setItem(23, shopVoteTokensYes.getStack());
-        playerInventory.setItem(24, shopVoteTokensYes.getStack());
+        playerInventory.setItem(23, shopVoteTokensYes.asItemStack());
+        playerInventory.setItem(24, shopVoteTokensYes.asItemStack());
         store = true;
     }
 
@@ -321,23 +321,23 @@ public class UltimateMenu extends InventoryBuilder {
 
             if (crate == selectedCrate) {
                 selectedMain.setCustomModelData(1000002);
-                getInventory().setItem(slot, selectedMain.getStack());
+                getInventory().setItem(slot, selectedMain.asItemStack());
 
                 selectedMain.setCustomModelData(1000003);
-                getInventory().setItem(slot + 1, selectedMain.getStack());
-                getInventory().setItem(slot + 2, selectedMain.getStack());
+                getInventory().setItem(slot + 1, selectedMain.asItemStack());
+                getInventory().setItem(slot + 2, selectedMain.asItemStack());
 
                 int model = setting.getModelDataMainMenu();
                 mainCrate.setCustomModelData(model);
-                ItemStack item = mainCrate.getStack();
+                ItemStack item = mainCrate.asItemStack();
                 getPlayer().getInventory().setItem(29, item);
             } else {
                 unselectedMain.setCustomModelData(1000002);
-                getInventory().setItem(slot, unselectedMain.getStack());
+                getInventory().setItem(slot, unselectedMain.asItemStack());
 
                 unselectedMain.setCustomModelData(1000001);
-                getInventory().setItem(slot + 1, unselectedMain.getStack());
-                getInventory().setItem(slot + 2, unselectedMain.getStack());
+                getInventory().setItem(slot + 1, unselectedMain.asItemStack());
+                getInventory().setItem(slot + 2, unselectedMain.asItemStack());
             }
 
             crate++;
@@ -347,33 +347,33 @@ public class UltimateMenu extends InventoryBuilder {
 
     private void setTextureGlass() {
         PlayerInventory playerInventory = getPlayer().getInventory();
-        playerInventory.setItem(27, UltimateMenuStuff.MAIN_MENU.getStack());
-        playerInventory.setItem(28, UltimateMenuStuff.BANNER.getStack());
+        playerInventory.setItem(27, UltimateMenuStuff.MAIN_MENU.asItemStack());
+        playerInventory.setItem(28, UltimateMenuStuff.BANNER.asItemStack());
     }
 
     private void setItemsPlayerInv() {
         PlayerInventory playerInventory = getPlayer().getInventory();
 
-        playerInventory.setItem(0, UltimateMenuStuff.BOOK.getStack());
-        playerInventory.setItem(1, UltimateMenuStuff.PAPER.getStack());
-        playerInventory.setItem(2, UltimateMenuStuff.SHOP.getStack());
+        playerInventory.setItem(0, UltimateMenuStuff.BOOK.asItemStack());
+        playerInventory.setItem(1, UltimateMenuStuff.PAPER.asItemStack());
+        playerInventory.setItem(2, UltimateMenuStuff.SHOP.asItemStack());
 
         if (totalPageAmount > 1) {
             if (currentPage == 0) {
-                playerInventory.setItem(4, UltimateMenuStuff.FORWARD.getStack());
+                playerInventory.setItem(4, UltimateMenuStuff.FORWARD.asItemStack());
             } else if (currentPage < totalPageAmount - 1) {
-                playerInventory.setItem(3, UltimateMenuStuff.BACK_ITEM.getStack());
-                playerInventory.setItem(4, UltimateMenuStuff.FORWARD.getStack());
+                playerInventory.setItem(3, UltimateMenuStuff.BACK_ITEM.asItemStack());
+                playerInventory.setItem(4, UltimateMenuStuff.FORWARD.asItemStack());
             } else if (currentPage == totalPageAmount - 1) {
-                playerInventory.setItem(3, UltimateMenuStuff.BACK_ITEM.getStack());
+                playerInventory.setItem(3, UltimateMenuStuff.BACK_ITEM.asItemStack());
             }
         }
 
-        ItemStack x1 = UltimateMenuStuff.BUILDER_X1.getStack();
+        ItemStack x1 = UltimateMenuStuff.BUILDER_X1.asItemStack();
         playerInventory.setItem(5, x1);
         playerInventory.setItem(6, x1);
 
-        ItemStack x10 = UltimateMenuStuff.BUILDER_X10.getStack();
+        ItemStack x10 = UltimateMenuStuff.BUILDER_X10.asItemStack();
         playerInventory.setItem(7, x10);
         playerInventory.setItem(8, x10);
     }
