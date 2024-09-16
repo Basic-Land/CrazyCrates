@@ -22,6 +22,10 @@ public class CratePreviewMenu extends DynamicInventoryBuilder {
     private final PaginatedGui gui = getGui();
     private final Crate crate = getCrate();
 
+    //TODO: FIX THIS
+
+    private final boolean gacha = crate.getCrateType().isGacha();
+
     @Override
     public void open() {
         if (this.crate == null) return;
@@ -29,7 +33,7 @@ public class CratePreviewMenu extends DynamicInventoryBuilder {
         if (this.crate.isBorderToggle()) {
             final GuiFiller guiFiller = this.gui.getFiller();
 
-            final GuiItem guiItem = new GuiItem(this.crate.getBorderItem().asItemStack());
+            final GuiItem guiItem = new GuiItem(this.crate.getBorderItem().setCustomModelData(gacha ? 1000001 : -1).asItemStack());
 
             guiFiller.fillTop(guiItem);
             guiFiller.fillBottom(guiItem);

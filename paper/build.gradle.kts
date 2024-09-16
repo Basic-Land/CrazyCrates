@@ -8,14 +8,6 @@ plugins {
 
 repositories {
     maven("https://repo.fancyplugins.de/releases")
-    maven {
-        url = uri("http://nexus.basicland.cz:8081/repository/dev-private/")
-        isAllowInsecureProtocol = true
-        credentials {
-            username = ("dev")
-            password = ("rtVXgxFyWkiVfU3")
-        }
-    }
 }
 
 dependencies {
@@ -46,7 +38,6 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok:1.18.32")
     annotationProcessor("org.projectlombok:lombok:1.18.32")
-    compileOnly("cz.basicland:bLibs:2.0.0-WIP-b38")
 }
 
 paperweight {
@@ -55,7 +46,7 @@ paperweight {
 
 tasks {
     runServer {
-        jvmArgs("-Dnet.kyori.ansi.colorLevel=truecolor")
+        jvmArgs("-Dnet.kyori.ansi.colorLevel=truecolor", "-Xmx2G", "-Xms2G", "-XX:+AllowEnhancedClassRedefinition")
 
         defaultCharacterEncoding = Charsets.UTF_8.name()
 
@@ -96,5 +87,12 @@ tasks {
         filesMatching("paper-plugin.yml") {
             expand(inputs.properties)
         }
+    }
+}
+
+tasks.withType(xyz.jpenilla.runtask.task.AbstractRun::class.java).configureEach {
+    javaLauncher = javaToolchains.launcherFor {
+        vendor = JvmVendorSpec.JETBRAINS
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }

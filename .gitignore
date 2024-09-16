@@ -7,8 +7,7 @@ buildSrc/build
 
 api/.gradle
 api/build
-libs/compile/bLibs-2.0.0-WIP.jar
-libs/compile/bSpecializedCrates-1.2.1.jar
+paper/libs/compile/bLibs-2.0.0-WIP.jar
 
 run/
 

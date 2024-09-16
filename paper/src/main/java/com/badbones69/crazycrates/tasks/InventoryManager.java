@@ -90,7 +90,7 @@ public class InventoryManager {
     }
 
     public void openNewCratePreview(@NotNull final Player player, @NotNull final Crate crate) {
-        if (crate.getCrateType() == CrateType.casino || crate.getCrateType() == CrateType.cosmic && crate.isPreviewTierToggle()) {
+        if (crate.isPreviewTierToggle()) {
             crate.getTierPreview(player).open();
 
             return;

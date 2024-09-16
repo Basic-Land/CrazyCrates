@@ -948,6 +948,10 @@ public class Crate {
                 prizes.add(player == null ? prize.getDisplayItem(this) : prize.getDisplayItem(player, this));
             } else {
                 if (prize.getTiers().contains(tier)) {
+                    if (crateType.isGacha()) {
+                        prizes.add(prize.getDisplayItem());
+                        continue;
+                    }
                     prizes.add(player == null ? prize.getDisplayItem(this) : prize.getDisplayItem(player, this));
                 }
             }
