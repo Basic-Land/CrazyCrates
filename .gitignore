@@ -10,13 +10,13 @@ api/build
 libs/compile/bLibs-2.0.0-WIP.jar
 libs/compile/bSpecializedCrates-1.2.1.jar
 
-run
+paper/run
 
-!run/config/paper-global.yml
-!run/config/paper-world-defaults.yml
-!run/bukkit.yml
-!run/eula.txt
-!run/server.properties
-!run/spigot.yml
+!paper/run/config/paper-global.yml
+!paper/run/config/paper-world-defaults.yml
+!paper/run/bukkit.yml
+!paper/run/eula.txt
+!paper/run/server.properties
+!paper/run/spigot.yml
 
 jars
