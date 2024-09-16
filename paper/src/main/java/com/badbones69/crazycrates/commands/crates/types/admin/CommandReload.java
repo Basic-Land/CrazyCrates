@@ -3,11 +3,11 @@ package com.badbones69.crazycrates.commands.crates.types.admin;
 import com.badbones69.crazycrates.api.enums.Messages;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
 import com.badbones69.crazycrates.commands.crates.types.BaseCommand;
+import com.badbones69.crazycrates.config.impl.ConfigKeys;
 import dev.triumphteam.cmd.bukkit.annotation.Permission;
 import dev.triumphteam.cmd.core.annotations.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.PermissionDefault;
-import com.badbones69.crazycrates.config.impl.ConfigKeys;
 
 public class CommandReload extends BaseCommand {
 
@@ -21,15 +21,7 @@ public class CommandReload extends BaseCommand {
         MiscUtils.save();
 
         if (this.config.getProperty(ConfigKeys.take_out_of_preview)) {
-            this.plugin.getServer().getOnlinePlayers().forEach(player -> {
-                if (this.inventoryManager.inCratePreview(player)) {
-                    this.inventoryManager.closeCratePreview(player);
-
-                    if (this.config.getProperty(ConfigKeys.send_preview_taken_out_message)) {
-                        Messages.reloaded_forced_out_of_preview.sendMessage(player);
-                    }
-                }
-            });
+            this.inventoryManager.closePreview();
         }
 
         this.crateManager.loadHolograms();

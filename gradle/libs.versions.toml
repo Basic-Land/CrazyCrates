@@ -31,9 +31,7 @@ vault = "1.7.1"
 triumph-cmd = "2.0.0-ALPHA-10"
 jetbrains = "24.1.0"
 adventure = "4.17.0"
-vital-paper = "0.0.2"
-
-# Modrinth
+vital-paper = "0.0.1"
 
 [libraries]
 velocity = { module = "com.velocitypowered:velocity-api", version.ref = "velocity" }
@@ -46,11 +44,11 @@ kyori-api = { module = "net.kyori:adventure-api", version.ref = "adventure" }
 
 # Bukkit Plugins
 decent-holograms = { module = "com.github.decentsoftware-eu:decentholograms", version.ref = "decentholograms" }
-fancy-holograms = { module = "de.oliver:FancyHolograms", version.ref = "fancyholograms" }
+placeholderapi = { module = "com.github.PlaceholderAPI:PlaceholderAPI", version.ref = "placeholderapi" }
 headdatabaseapi = { module = "com.arcaniax:HeadDatabase-API", version.ref = "headdatabaseapi" }
-placeholderapi = { module = "me.clip:placeholderapi", version.ref = "placeholderapi" }
-vault = { module = "com.github.MilkBowl:VaultAPI", version.ref = "vault" }
 itemsadder = { module = "com.github.LoneDev6:api-itemsadder", version.ref = "itemsadder" }
+fancy-holograms = { module = "de.oliver:FancyHolograms", version.ref = "fancyholograms" }
+vault = { module = "com.github.MilkBowl:VaultAPI", version.ref = "vault" }
 oraxen = { module = "io.th0rgal:oraxen", version.ref = "oraxen" }
 
 # Crate Plugins

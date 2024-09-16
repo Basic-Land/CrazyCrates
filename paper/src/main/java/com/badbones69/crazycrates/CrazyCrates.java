@@ -1,22 +1,16 @@
 package com.badbones69.crazycrates;
 
-import com.badbones69.crazycrates.api.builders.types.CrateAdminMenu;
-import com.badbones69.crazycrates.api.builders.types.CrateMainMenu;
-import com.badbones69.crazycrates.api.builders.types.CratePreviewMenu;
-import com.badbones69.crazycrates.api.builders.types.CrateTierMenu;
 import com.badbones69.crazycrates.api.objects.other.Server;
 import com.badbones69.crazycrates.api.utils.MiscUtils;
 import com.badbones69.crazycrates.commands.CommandManager;
-import com.badbones69.crazycrates.config.ConfigManager;
-import com.badbones69.crazycrates.config.impl.ConfigKeys;
 import com.badbones69.crazycrates.listeners.BrokeLocationsListener;
 import com.badbones69.crazycrates.listeners.CrateControlListener;
 import com.badbones69.crazycrates.listeners.MiscListener;
-import com.badbones69.crazycrates.listeners.crates.CosmicCrateListener;
+import com.badbones69.crazycrates.listeners.crates.types.CosmicCrateListener;
 import com.badbones69.crazycrates.listeners.crates.CrateOpenListener;
-import com.badbones69.crazycrates.listeners.crates.MobileCrateListener;
-import com.badbones69.crazycrates.listeners.crates.QuadCrateListener;
-import com.badbones69.crazycrates.listeners.crates.WarCrateListener;
+import com.badbones69.crazycrates.listeners.crates.types.MobileCrateListener;
+import com.badbones69.crazycrates.listeners.crates.types.QuadCrateListener;
+import com.badbones69.crazycrates.listeners.crates.types.WarCrateListener;
 import com.badbones69.crazycrates.listeners.other.EntityDamageListener;
 import com.badbones69.crazycrates.support.MetricsWrapper;
 import com.badbones69.crazycrates.support.holograms.HologramManager;
