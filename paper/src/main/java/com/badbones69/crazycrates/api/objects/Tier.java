@@ -2,7 +2,7 @@ package com.badbones69.crazycrates.api.objects;
 
 import com.badbones69.crazycrates.api.enums.misc.Keys;
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
-import com.ryderbelserion.vital.common.utils.StringUtil;
+import com.badbones69.crazycrates.api.objects.gacha.util.TierInfo;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -38,8 +38,7 @@ public class Tier {
         this.coloredName = stack.name();
         this.lore = stack.lore();
         this.item = new ItemBuilder(stack.material()).setCustomModelData(stack.modelData());
-        this.chance = chance;
-        this.maxRange = 100;
+        this.weight = chance;
         this.slot = slot;
     }
 

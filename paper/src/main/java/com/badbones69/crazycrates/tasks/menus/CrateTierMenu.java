@@ -1,14 +1,18 @@
-package com.badbones69.crazycrates.api.builders.types;
+package com.badbones69.crazycrates.tasks.menus;
 
+import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.builders.gui.StaticInventoryBuilder;
+import com.badbones69.crazycrates.api.builders.types.items.BonusPityMenu;
 import com.badbones69.crazycrates.api.enums.misc.Keys;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.Tier;
+import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuStuff;
 import com.ryderbelserion.vital.paper.api.builders.gui.interfaces.Gui;
 import com.ryderbelserion.vital.paper.api.builders.gui.interfaces.GuiFiller;
 import com.ryderbelserion.vital.paper.api.builders.gui.interfaces.GuiItem;
 import io.papermc.paper.persistence.PersistentDataContainerView;
 import net.kyori.adventure.sound.Sound;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import us.crazycrew.crazycrates.api.enums.types.CrateType;
@@ -79,7 +83,7 @@ public class CrateTierMenu extends StaticInventoryBuilder {
                 .addDisplayLore("<gray>po dostatku otevření");
         item.setCustomModelData(1000001);
 
-        gui.setItem(crate.getAbsolutePreviewItemPosition(8), item.asGuiItem(action -> {
+        gui.setItem(crate.getMaxSlots() - 1, item.asGuiItem(action -> {
             player.playSound(UltimateMenuStuff.CLICK);
             player.openInventory(new BonusPityMenu(crate, player, 36, "<green><b>Bonus pity prize", this).build().getInventory());
         }));
@@ -87,11 +91,11 @@ public class CrateTierMenu extends StaticInventoryBuilder {
         ItemBuilder paper = new ItemBuilder(Material.PAPER).setCustomModelData(11).setDisplayName("Info");
         paper.addDisplayLore("<gray>Zde najdeš informace o");
         paper.addDisplayLore("<gray>itemech a jejich šancích");
-        gui.setItem(getCrate().getAbsolutePreviewItemPosition(4), paper.asGuiItem());
+        gui.setItem(crate.getMaxSlots() - 5, paper.asGuiItem());
 
         ItemBuilder mainMenu = new ItemBuilder(Material.CHEST).setDisplayName("<green><b>Hlavní Menu");
         mainMenu.setCustomModelData(1000001);
-        gui.setItem(getCrate().getAbsolutePreviewItemPosition(0), mainMenu.asGuiItem(action -> {
+        gui.setItem(crate.getMaxSlots() - 8, mainMenu.asGuiItem(action -> {
             player.playSound(UltimateMenuStuff.BACK);
             plugin.getCrateManager().getDatabaseManager().getUltimateMenuManager().open(player, crate);
         }));

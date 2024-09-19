@@ -9,7 +9,7 @@ api/.gradle
 api/build
 paper/libs/compile/bLibs-2.0.0-WIP.jar
 
-run/
+paper/run
 
 !paper/run/config/paper-global.yml
 !paper/run/config/paper-world-defaults.yml
