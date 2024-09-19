@@ -28,7 +28,7 @@ import static java.util.regex.Matcher.quoteReplacement;
 
 public class PrizeManager {
     
-    private static @NotNull final CrazyCrates plugin = CrazyCrates.getPlugin();
+    private static final CrazyCrates plugin = CrazyCrates.getPlugin();
 
     /**
      * Gets the prize for the player.
@@ -229,22 +229,26 @@ public class PrizeManager {
     }
 
     public static @Nullable Tier getTier(@NotNull final Crate crate) {
-        if (!crate.getTiers().isEmpty()) {
-            Random random = MiscUtils.useOtherRandom() ? ThreadLocalRandom.current() : new Random();
+        if (crate.getTiers().isEmpty()) return null;
 
-            for (int stopLoop = 0; stopLoop <= 100; stopLoop++) {
-                for (final Tier tier : crate.getTiers()) {
-                    final double chance = tier.getChance();
+        final Random random = MiscUtils.useOtherRandom() ? ThreadLocalRandom.current() : new Random();
 
-                    final double num = random.nextDouble(tier.getMaxRange());
+        double weight = 0.0;
 
-                    if (num >= 1 && num <= chance) {
-                        return tier;
-                    }
-                }
-            }
+        final List<Tier> tiers = crate.getTiers();
+
+        for (final Tier tier : tiers) {
+            weight += tier.getWeight();
         }
 
-        return null;
+        int index = 0;
+
+        for (double value = random.nextDouble() * weight; index < tiers.size() - 1; index++) {
+            value -= tiers.get(index).getWeight();
+
+            if (value < 0.0) break;
+        }
+
+        return tiers.get(index);
     }
 }
