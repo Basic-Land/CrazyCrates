@@ -133,7 +133,6 @@ public class CrateSettings {
         }
 
         crate.saveFile();
-
     }
 
     private BannerData getBanner(YamlConfiguration file, String banner) {

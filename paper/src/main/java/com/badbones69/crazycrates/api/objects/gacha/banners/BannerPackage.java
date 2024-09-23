@@ -28,4 +28,12 @@ public record BannerPackage(BannerData currentBanner, BannerData nextBanner, boo
                 duration.toHoursPart(),
                 duration.toMinutesPart());
     }
+
+    public boolean isCurrentBanner() {
+        return currentBanner.isBannerActive();
+    }
+
+    public boolean isNextBanner() {
+        return nextBanner.isBannerActive();
+    }
 }

@@ -83,7 +83,7 @@ public class CrateTierMenu extends StaticInventoryBuilder {
                 .addDisplayLore("<gray>po dostatku otevření");
         item.setCustomModelData(1000001);
 
-        gui.setItem(crate.getMaxSlots() - 1, item.asGuiItem(action -> {
+        gui.setItem(gui.getSize() - 1, item.asGuiItem(action -> {
             player.playSound(UltimateMenuStuff.CLICK);
             player.openInventory(new BonusPityMenu(crate, player, 36, "<green><b>Bonus pity prize", this).build().getInventory());
         }));
@@ -91,11 +91,11 @@ public class CrateTierMenu extends StaticInventoryBuilder {
         ItemBuilder paper = new ItemBuilder(Material.PAPER).setCustomModelData(11).setDisplayName("Info");
         paper.addDisplayLore("<gray>Zde najdeš informace o");
         paper.addDisplayLore("<gray>itemech a jejich šancích");
-        gui.setItem(crate.getMaxSlots() - 5, paper.asGuiItem());
+        gui.setItem(gui.getSize() - 5, paper.asGuiItem());
 
         ItemBuilder mainMenu = new ItemBuilder(Material.CHEST).setDisplayName("<green><b>Hlavní Menu");
         mainMenu.setCustomModelData(1000001);
-        gui.setItem(crate.getMaxSlots() - 8, mainMenu.asGuiItem(action -> {
+        gui.setItem(gui.getSize() - 8, mainMenu.asGuiItem(action -> {
             player.playSound(UltimateMenuStuff.BACK);
             plugin.getCrateManager().getDatabaseManager().getUltimateMenuManager().open(player, crate);
         }));
