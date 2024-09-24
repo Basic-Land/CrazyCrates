@@ -30,6 +30,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import static com.badbones69.crazycrates.CrazyCrates.LOGGER;
@@ -50,7 +51,7 @@ public class DatabaseManager {
     private final ShopManager shopManager;
 
     public DatabaseManager(List<Crate> crateList) {
-        connection = BLibs.getApi().getDatabaseHandler().loadSQLite(JavaPlugin.getPlugin(CrazyCrates.class), "gamba", "crates.db");
+        connection = BLibs.getApi().getDatabaseHandler().loadSQLite(CrazyCrates.getPlugin(), "gamba", "crates.db");
         crateSettings = crateList.stream().map(Crate::getCrateSettings).filter(Objects::nonNull).collect(Collectors.toList());
         crateSettingsSplit = Lists.partition(crateSettings, 3);
         createCrateTable();
@@ -153,7 +154,6 @@ public class DatabaseManager {
                 LOGGER.warning(e.getMessage());
             }
         }).join();
-
     }
 
     public void restoreInv(UUID target) {
@@ -171,7 +171,7 @@ public class DatabaseManager {
 
                     OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
 
-                    Bukkit.getScheduler().runTaskLater(CrazyCrates.getPlugin(CrazyCrates.class), () -> {
+                    Bukkit.getScheduler().runTaskLater(CrazyCrates.getPlugin(), () -> {
                         CMIUser user = CMI.getInstance().getPlayerManager().getUser(offlinePlayer);
                         Player player = user.getPlayer();
 
@@ -273,7 +273,7 @@ public class DatabaseManager {
         }).join();
     }
 
-    public PlayerBaseProfile getPlayerBaseProfile(String playerName) {
+    public CompletableFuture<PlayerBaseProfile> getPlayerBaseProfile(String playerName) {
         if (!hasPlayerData(playerName)) {
             addBlankPlayerData(playerName, null);
         }
@@ -288,7 +288,7 @@ public class DatabaseManager {
                 LOGGER.warning(e.getMessage());
             }
             return null;
-        }).join();
+        });
     }
 
     public void savePlayerBaseProfile(String playerName, PlayerBaseProfile profile) {
@@ -353,21 +353,14 @@ public class DatabaseManager {
     }
 
     private byte[] compress(final byte[] data) {
-        LZ4Factory lz4Factory = LZ4Factory.nativeInstance();
-        LZ4Compressor fastCompressor = lz4Factory.highCompressor();
-        int maxCompressedLength = fastCompressor.maxCompressedLength(data.length);
-        byte[] comp = new byte[maxCompressedLength];
-        int compressedLength = fastCompressor.compress(data, 0, data.length, comp, 0, maxCompressedLength);
-
+        LZ4Compressor fastCompressor = LZ4Factory.fastestInstance().highCompressor();
+        byte[] comp = new byte[fastCompressor.maxCompressedLength(data.length)];
+        int compressedLength = fastCompressor.compress(data, 0, data.length, comp, 0, comp.length);
         return Arrays.copyOf(comp, compressedLength);
     }
 
     private byte[] decompress(final byte[] compressed) {
-        LZ4Factory lz4Factory = LZ4Factory.nativeInstance();
-        LZ4SafeDecompressor decompressor = lz4Factory.safeDecompressor();
-        byte[] decomp = new byte[compressed.length * 100];
-        decomp = decompressor.decompress(Arrays.copyOf(compressed, compressed.length), decomp.length);
-
-        return decomp;
+        LZ4SafeDecompressor decompressor = LZ4Factory.fastestInstance().safeDecompressor();
+        return decompressor.decompress(compressed, compressed.length * 100);
     }
 }
