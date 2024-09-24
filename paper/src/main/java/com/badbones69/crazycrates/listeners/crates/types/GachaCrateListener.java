@@ -65,9 +65,6 @@ public class GachaCrateListener implements Listener {
 
         if (diff < 400) return;
 
-        plugin.getLogger().info("Count: " + count);
-        plugin.getLogger().info("Diff: " + diff);
-
         rouletteStandard.updateTimer();
 
         if (count == 11) {

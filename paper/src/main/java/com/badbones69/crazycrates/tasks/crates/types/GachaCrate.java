@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.badbones69.crazycrates.CrazyCrates.LOGGER;
-
 public class GachaCrate extends CrateBuilder {
     @NotNull
     private final CrateManager crateManager = this.plugin.getCrateManager();
@@ -58,8 +56,6 @@ public class GachaCrate extends CrateBuilder {
             crateManager.removePlayerFromOpeningList(getPlayer());
             return;
         }
-
-        LOGGER.info("Chosen reward: " + chosenReward);
 
         boolean sneak = getPlayer().isSneaking();
         int amount = sneak ? 10 : 1;

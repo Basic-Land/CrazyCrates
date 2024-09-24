@@ -1,7 +1,7 @@
 package com.badbones69.crazycrates.commands.crates.types.custom;
 
-import com.badbones69.crazycrates.api.builders.types.items.ItemPreview;
-import com.badbones69.crazycrates.api.builders.types.items.RaritiesMenu;
+import com.badbones69.crazycrates.api.builders.items.ItemPreview;
+import com.badbones69.crazycrates.api.builders.items.RaritiesMenu;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.commands.crates.types.BaseCommand;

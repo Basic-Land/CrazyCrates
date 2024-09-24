@@ -1,6 +1,6 @@
 package com.badbones69.crazycrates.commands.crates.types.custom;
 
-import com.badbones69.crazycrates.api.builders.types.items.ItemAddMenu;
+import com.badbones69.crazycrates.api.builders.items.ItemAddMenu;
 import com.badbones69.crazycrates.api.enums.Messages;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;

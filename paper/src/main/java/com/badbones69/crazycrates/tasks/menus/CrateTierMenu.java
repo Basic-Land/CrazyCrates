@@ -2,7 +2,7 @@ package com.badbones69.crazycrates.tasks.menus;
 
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.builders.gui.StaticInventoryBuilder;
-import com.badbones69.crazycrates.api.builders.types.items.BonusPityMenu;
+import com.badbones69.crazycrates.api.builders.items.BonusPityMenu;
 import com.badbones69.crazycrates.api.enums.misc.Keys;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.Tier;
@@ -15,7 +15,7 @@ import net.kyori.adventure.sound.Sound;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import us.crazycrew.crazycrates.api.enums.types.CrateType;
+
 import java.util.List;
 
 public class CrateTierMenu extends StaticInventoryBuilder {

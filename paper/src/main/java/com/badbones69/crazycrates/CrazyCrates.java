@@ -2,15 +2,15 @@ package com.badbones69.crazycrates;
 
 import com.badbones69.crazycrates.api.builders.InventoryBuilder;
 import com.badbones69.crazycrates.api.builders.InventoryListener;
-import com.badbones69.crazycrates.api.builders.types.items.UltimateMenu;
+import com.badbones69.crazycrates.api.builders.items.UltimateMenu;
 import com.badbones69.crazycrates.api.objects.gacha.BaseProfileManager;
 import com.badbones69.crazycrates.api.objects.other.Server;
 import com.badbones69.crazycrates.commands.CommandManager;
 import com.badbones69.crazycrates.listeners.BrokeLocationsListener;
 import com.badbones69.crazycrates.listeners.CrateControlListener;
 import com.badbones69.crazycrates.listeners.MiscListener;
-import com.badbones69.crazycrates.listeners.crates.types.*;
 import com.badbones69.crazycrates.listeners.crates.CrateOpenListener;
+import com.badbones69.crazycrates.listeners.crates.types.*;
 import com.badbones69.crazycrates.listeners.other.EntityDamageListener;
 import com.badbones69.crazycrates.managers.BukkitUserManager;
 import com.badbones69.crazycrates.managers.InventoryManager;
@@ -26,8 +26,8 @@ import com.ryderbelserion.vital.paper.util.AdvUtil;
 import lombok.Getter;
 import me.arcaniax.hdb.api.HeadDatabaseAPI;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import java.io.File;
 import java.util.List;
 import java.util.Locale;
@@ -108,7 +108,7 @@ public class CrazyCrates extends Vital {
         InventoryListener inventoryListener = new InventoryListener();
         try {
             ClassPath.from(getClassLoader()).getAllClasses().stream()
-                    .filter(info -> info.getName().startsWith("com.badbones69.crazycrates.api.builders.types"))
+                    .filter(info -> info.getName().startsWith("com.badbones69.crazycrates.api.builders.items"))
                     .map(ClassPath.ClassInfo::load)
                     .filter(InventoryBuilder.class::isAssignableFrom)
                     .map(clazz -> (Class<? extends InventoryBuilder>) clazz)

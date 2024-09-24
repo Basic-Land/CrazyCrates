@@ -1,7 +1,7 @@
 package com.badbones69.crazycrates.api.objects.gacha.ultimatemenu;
 
 import com.badbones69.crazycrates.CrazyCrates;
-import com.badbones69.crazycrates.api.builders.types.items.UltimateMenu;
+import com.badbones69.crazycrates.api.builders.items.UltimateMenu;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
 import lombok.Getter;

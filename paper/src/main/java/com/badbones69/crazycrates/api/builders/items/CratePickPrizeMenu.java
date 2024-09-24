@@ -1,4 +1,4 @@
-package com.badbones69.crazycrates.api.builders.types.items;
+package com.badbones69.crazycrates.api.builders.items;
 
 import com.badbones69.crazycrates.api.builders.InventoryBuilder;
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
@@ -71,8 +71,6 @@ public class CratePickPrizeMenu extends InventoryBuilder {
             PlayerProfile playerProfile = holder.databaseManager.getPlayerProfile(player.getName(), crateSettings, false);
 
             String rewardName = nbt.getString("rewardName");
-
-            plugin.getLogger().info("Chosen reward: " + rewardName);
 
             playerProfile.setChosenReward(rewardName);
             holder.databaseManager.savePlayerProfile(player.getName(), crateSettings, playerProfile);

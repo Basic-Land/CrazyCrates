@@ -16,6 +16,9 @@ import cz.basicland.blibs.shared.databases.hikari.DatabaseConnection;
 import cz.basicland.blibs.spigot.BLibs;
 import cz.basicland.blibs.spigot.utils.item.DBItemStack;
 import lombok.Getter;
+import net.jpountz.lz4.LZ4Compressor;
+import net.jpountz.lz4.LZ4Factory;
+import net.jpountz.lz4.LZ4SafeDecompressor;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -68,7 +71,7 @@ public class DatabaseManager {
     }
 
     private void createCrateTable() {
-        connection.updateSQLite("CREATE TABLE IF NOT EXISTS PlayerData(playerName VARCHAR(16) PRIMARY KEY, baseData VARCHAR NULL)").join();
+        connection.updateSQLite("CREATE TABLE IF NOT EXISTS PlayerData(playerName VARCHAR(16) PRIMARY KEY, baseData BLOB NULL)").join();
         connection.updateSQLite("CREATE TABLE IF NOT EXISTS AllItems(id INTEGER PRIMARY KEY AUTOINCREMENT, itemStack VARCHAR NULL)").join();
         connection.updateSQLite("CREATE TABLE IF NOT EXISTS ShopItems(id INTEGER PRIMARY KEY AUTOINCREMENT, itemStack VARCHAR NULL)").join();
         connection.updateSQLite("CREATE TABLE IF NOT EXISTS Backup(uuid VARCHAR(36) PRIMARY KEY, inventory VARCHAR NULL)").join();
@@ -101,7 +104,7 @@ public class DatabaseManager {
                     int bonusPity = crate.getBonusPity();
 
                     if (!columnNames.contains(name)) {
-                        connection.updateSQLite("ALTER TABLE PlayerData ADD COLUMN " + name + " VARCHAR NULL").join();
+                        connection.updateSQLite("ALTER TABLE PlayerData ADD COLUMN " + name + " BLOB NULL").join();
                         playernames.forEach(playerName -> connection.updateSQLite("UPDATE PlayerData SET " + name + " = ? WHERE playerName = ?", serializeProfile(new PlayerProfile(playerName, rarities, bonusPity)), playerName));
                     }
                 });
@@ -122,11 +125,8 @@ public class DatabaseManager {
                 if (rs.next()) {
                     LocalDate nextReset = LocalDate.parse(rs.getString("nextReset"));
 
-                    LOGGER.info("Date: " + date + " Next reset: " + nextReset);
-
                     if (date.equals(nextReset)) {
                         connection.updateSQLite("UPDATE ShopInfo SET nextReset = ?", firstDayOfNextMonth.toString()).join();
-                        LOGGER.info("Reset date: " + firstDayOfNextMonth);
                         resetLimits();
                     }
                 } else {
@@ -143,7 +143,7 @@ public class DatabaseManager {
         connection.querySQLite("SELECT baseData from PlayerData").thenAccept(rs -> {
             try {
                 while (rs.next()) {
-                    String baseData = rs.getString("baseData");
+                    byte[] baseData = (byte[]) rs.getObject("baseData");
                     PlayerBaseProfile baseProfile = deserializeBaseProfile(baseData);
 
                     baseProfile.resetShopLimits();
@@ -206,8 +206,12 @@ public class DatabaseManager {
             query.append(", ").append(crateSettings.getCrateName());
         }
 
+        List<byte[]> profiles = new ArrayList<>();
+
         query.append(") VALUES('").append(playerName).append("'");
-        query.append(", '").append(serializeProfile(new PlayerBaseProfile(playerName))).append("'");
+        query.append(", ?");
+
+        profiles.add(serializeProfile(new PlayerBaseProfile(playerName)));
 
         PlayerProfile newProfile = null;
 
@@ -218,12 +222,13 @@ public class DatabaseManager {
                 newProfile = profile;
             }
 
-            query.append(", '").append(serializeProfile(profile)).append("'");
+            query.append(", ?");
+            profiles.add(serializeProfile(profile));
         }
 
         query.append(")");
 
-        connection.updateSQLite(query.toString()).join();
+        connection.updateSQLite(query.toString(), profiles.toArray()).join();
 
         return newProfile;
     }
@@ -235,8 +240,8 @@ public class DatabaseManager {
             return;
         }
 
-        String profileString = serializeProfile(profile);
-        connection.updateSQLite("UPDATE PlayerData SET " + name + " = ? WHERE playerName = ?", profileString, playerName);
+        byte[] profileString = serializeProfile(profile);
+        connection.updateSQLite("UPDATE PlayerData SET " + name + " = ? WHERE playerName = ?", profileString, playerName).join();
     }
 
     public PlayerProfile getPlayerProfile(String playerName, CrateSettings crateSettings, boolean override) {
@@ -258,8 +263,8 @@ public class DatabaseManager {
         return connection.querySQLite("SELECT " + crateName + " FROM PlayerData WHERE playerName = ?", playerName).thenApply(rs -> {
             try {
                 if (rs.next()) {
-                    String profileString = rs.getString(crateName);
-                    return deserializeProfile(profileString).cutHistory(5000);
+                    byte[] profileString = (byte[]) rs.getObject(crateName);
+                    return deserializeProfile(profileString);
                 }
             } catch (SQLException e) {
                 LOGGER.warning(e.getMessage());
@@ -276,7 +281,7 @@ public class DatabaseManager {
         return connection.querySQLite("SELECT baseData FROM PlayerData WHERE playerName = ?", playerName).thenApply(rs -> {
             try {
                 if (rs.next()) {
-                    String profileString = rs.getString("baseData");
+                    byte[] profileString = (byte[]) rs.getObject("baseData");
                     return deserializeBaseProfile(profileString);
                 }
             } catch (SQLException e) {
@@ -287,7 +292,7 @@ public class DatabaseManager {
     }
 
     public void savePlayerBaseProfile(String playerName, PlayerBaseProfile profile) {
-        String profileString = serializeProfile(profile);
+        byte[] profileString = serializeProfile(profile);
         connection.updateSQLite("UPDATE PlayerData SET baseData = ? WHERE playerName = ?", profileString, playerName);
     }
 
@@ -313,31 +318,31 @@ public class DatabaseManager {
         connection.updateSQLite("DELETE FROM Backup WHERE uuid = ?", player.getUniqueId());
     }
 
-    private String serializeProfile(Object profile) {
+    private byte[] serializeProfile(Object profile) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(baos);
             oos.writeObject(profile);
             oos.close();
-            return Base64.getEncoder().encodeToString(baos.toByteArray());
+            return compress(baos.toByteArray());
         } catch (IOException e) {
             LOGGER.warning(e.getMessage());
             return null;
         }
     }
 
-    private PlayerProfile deserializeProfile(String profileString) {
+    private PlayerProfile deserializeProfile(byte[] profileString) {
         return deserialize(profileString);
     }
 
-    private PlayerBaseProfile deserializeBaseProfile(String profileString) {
+    private PlayerBaseProfile deserializeBaseProfile(byte[] profileString) {
         return deserialize(profileString);
     }
 
     @SuppressWarnings("unchecked")
-    private <OUT> OUT deserialize(String profileString) {
+    private <OUT> OUT deserialize(byte[] profileString) {
         try {
-            byte[] bytes = Base64.getDecoder().decode(profileString);
+            byte[] bytes = decompress(profileString);
             ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
             ObjectInputStream ois = new ObjectInputStream(bais);
             return (OUT) ois.readObject();
@@ -345,5 +350,24 @@ public class DatabaseManager {
             LOGGER.warning(e.getMessage());
             return null;
         }
+    }
+
+    private byte[] compress(final byte[] data) {
+        LZ4Factory lz4Factory = LZ4Factory.nativeInstance();
+        LZ4Compressor fastCompressor = lz4Factory.highCompressor();
+        int maxCompressedLength = fastCompressor.maxCompressedLength(data.length);
+        byte[] comp = new byte[maxCompressedLength];
+        int compressedLength = fastCompressor.compress(data, 0, data.length, comp, 0, maxCompressedLength);
+
+        return Arrays.copyOf(comp, compressedLength);
+    }
+
+    private byte[] decompress(final byte[] compressed) {
+        LZ4Factory lz4Factory = LZ4Factory.nativeInstance();
+        LZ4SafeDecompressor decompressor = lz4Factory.safeDecompressor();
+        byte[] decomp = new byte[compressed.length * 100];
+        decomp = decompressor.decompress(Arrays.copyOf(compressed, compressed.length), decomp.length);
+
+        return decomp;
     }
 }

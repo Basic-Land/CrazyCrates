@@ -1,4 +1,4 @@
-package com.badbones69.crazycrates.api.builders.types.items;
+package com.badbones69.crazycrates.api.builders.items;
 
 import com.badbones69.crazycrates.api.builders.InventoryBuilder;
 import com.badbones69.crazycrates.api.builders.ItemBuilder;

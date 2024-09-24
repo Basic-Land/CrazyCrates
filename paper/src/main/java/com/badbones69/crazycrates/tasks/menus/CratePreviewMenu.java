@@ -1,7 +1,7 @@
 package com.badbones69.crazycrates.tasks.menus;
 
 import com.badbones69.crazycrates.api.builders.gui.DynamicInventoryBuilder;
-import com.badbones69.crazycrates.api.builders.types.items.CratePickPrizeMenu;
+import com.badbones69.crazycrates.api.builders.items.CratePickPrizeMenu;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.Prize;
 import com.badbones69.crazycrates.api.objects.Tier;
@@ -14,7 +14,6 @@ import com.ryderbelserion.vital.paper.api.builders.gui.types.PaginatedGui;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 

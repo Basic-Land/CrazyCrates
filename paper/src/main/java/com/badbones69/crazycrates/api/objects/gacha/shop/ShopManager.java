@@ -3,7 +3,7 @@ package com.badbones69.crazycrates.api.objects.gacha.shop;
 import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.builders.InventoryBuilder;
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
-import com.badbones69.crazycrates.api.builders.types.items.ShopMenu;
+import com.badbones69.crazycrates.api.builders.items.ShopMenu;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
 import com.badbones69.crazycrates.api.objects.gacha.enums.CurrencyType;
