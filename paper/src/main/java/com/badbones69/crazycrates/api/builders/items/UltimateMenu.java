@@ -10,6 +10,7 @@ import com.badbones69.crazycrates.api.objects.gacha.data.OpenData;
 import com.badbones69.crazycrates.api.objects.gacha.data.PlayerBaseProfile;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ComponentBuilder;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuStuff;
+import com.badbones69.crazycrates.managers.events.enums.EventType;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -233,7 +234,7 @@ public class UltimateMenu extends InventoryBuilder {
         if (keys >= size) {
             runnable.run();
             player.playSound(UltimateMenuStuff.CRATE);
-            crateManager.openCrate(player, crate, KeyType.virtual_key, player.getLocation(), false, false);
+            crateManager.openCrate(player, crate, KeyType.virtual_key, player.getLocation(), false, false, EventType.event_crate_opened);
         } else {
             PlayerBaseProfile playerBaseProfile = plugin.getBaseProfileManager().getPlayerBaseProfile(player.getName());
             int cost = size * 160;

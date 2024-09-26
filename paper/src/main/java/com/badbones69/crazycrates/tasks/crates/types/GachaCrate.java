@@ -11,6 +11,7 @@ import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.gacha.GachaSystem;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuStuff;
 import com.badbones69.crazycrates.managers.BukkitUserManager;
+import com.badbones69.crazycrates.managers.events.enums.EventType;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
 import com.badbones69.crazycrates.tasks.crates.types.roulette.RouletteStandard;
 import com.badbones69.crazycrates.utils.MiscUtils;
@@ -36,9 +37,9 @@ public class GachaCrate extends CrateBuilder {
     }
 
     @Override
-    public void open(@NotNull KeyType type, boolean checkHand) {
+    public void open(@NotNull KeyType type, boolean checkHand, EventType eventType) {
         // Crate event failed so we return.
-        if (isCrateEventValid(type, checkHand)) {
+        if (isCrateEventValid(type, checkHand, eventType)) {
             return;
         }
 
