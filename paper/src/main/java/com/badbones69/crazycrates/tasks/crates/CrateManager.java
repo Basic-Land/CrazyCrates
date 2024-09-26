@@ -3,24 +3,28 @@ package com.badbones69.crazycrates.tasks.crates;
 import ch.jalu.configme.SettingsManager;
 import com.Zrips.CMI.Modules.ModuleHandling.CMIModule;
 import com.badbones69.crazycrates.api.builders.CrateBuilder;
-import com.badbones69.crazycrates.api.enums.misc.Files;
-import com.badbones69.crazycrates.api.ChestManager;
-import com.badbones69.crazycrates.api.objects.crates.BrokeLocation;
+import com.badbones69.crazycrates.tasks.menus.CrateMainMenu;
 import com.badbones69.crazycrates.api.objects.crates.CrateHologram;
-import com.badbones69.crazycrates.api.objects.crates.CrateLocation;
 import com.badbones69.crazycrates.api.objects.crates.quadcrates.CrateSchematic;
-import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
-import com.badbones69.crazycrates.api.objects.gacha.gacha.GachaSystem;
-import com.badbones69.crazycrates.managers.InventoryManager;
-import com.badbones69.crazycrates.managers.config.ConfigManager;
-import com.badbones69.crazycrates.managers.config.impl.ConfigKeys;
+import com.badbones69.crazycrates.api.enums.misc.Files;
+import com.badbones69.crazycrates.api.objects.crates.BrokeLocation;
+import com.badbones69.crazycrates.api.ChestManager;
+import com.badbones69.crazycrates.utils.MiscUtils;
 import com.badbones69.crazycrates.support.holograms.types.CMIHologramsSupport;
 import com.badbones69.crazycrates.support.holograms.types.DecentHologramsSupport;
 import com.badbones69.crazycrates.support.holograms.types.FancyHologramsSupport;
-import com.badbones69.crazycrates.tasks.crates.types.*;
-import com.badbones69.crazycrates.tasks.menus.CrateMainMenu;
-import com.badbones69.crazycrates.utils.ItemUtils;
-import com.badbones69.crazycrates.utils.MiscUtils;
+import com.badbones69.crazycrates.managers.InventoryManager;
+import com.badbones69.crazycrates.tasks.crates.types.CasinoCrate;
+import com.badbones69.crazycrates.tasks.crates.types.CosmicCrate;
+import com.badbones69.crazycrates.tasks.crates.types.CrateOnTheGo;
+import com.badbones69.crazycrates.tasks.crates.types.CsgoCrate;
+import com.badbones69.crazycrates.tasks.crates.types.FireCrackerCrate;
+import com.badbones69.crazycrates.tasks.crates.types.QuadCrate;
+import com.badbones69.crazycrates.tasks.crates.types.QuickCrate;
+import com.badbones69.crazycrates.tasks.crates.types.RouletteCrate;
+import com.badbones69.crazycrates.tasks.crates.types.WarCrate;
+import com.badbones69.crazycrates.tasks.crates.types.WheelCrate;
+import com.badbones69.crazycrates.tasks.crates.types.WonderCrate;
 import com.ryderbelserion.vital.paper.api.files.CustomFile;
 import com.ryderbelserion.vital.paper.api.files.FileManager;
 import com.ryderbelserion.vital.common.utils.FileUtil;
@@ -28,10 +32,8 @@ import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.ryderbelserion.vital.paper.api.enums.Support;
 import io.papermc.paper.persistence.PersistentDataContainerView;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
-import lombok.Getter;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import org.bukkit.NamespacedKey;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.persistence.PersistentDataType;
@@ -43,9 +45,12 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import us.crazycrew.crazycrates.api.enums.types.CrateType;
 import us.crazycrew.crazycrates.api.enums.types.KeyType;
 import com.badbones69.crazycrates.api.enums.misc.Keys;
+import com.badbones69.crazycrates.managers.config.ConfigManager;
+import com.badbones69.crazycrates.managers.config.impl.ConfigKeys;
 import com.badbones69.crazycrates.api.enums.Messages;
 import com.badbones69.crazycrates.support.holograms.HologramManager;
 import com.badbones69.crazycrates.api.objects.Crate;
+import com.badbones69.crazycrates.api.objects.crates.CrateLocation;
 import com.badbones69.crazycrates.api.objects.Prize;
 import com.badbones69.crazycrates.api.objects.Tier;
 import org.bukkit.Location;
@@ -57,12 +62,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import com.badbones69.crazycrates.CrazyCrates;
+import com.badbones69.crazycrates.utils.ItemUtils;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -560,8 +565,9 @@ public class CrateManager {
      * @param crate the crate that is being used.
      * @param location the location that may be needed for some crate types.
      * @param checkHand if it just checks the players hand or if it checks their inventory.
+     * @param eventType {@link EventType}
      */
-    public void openCrate(@NotNull final Player player, @NotNull final Crate crate, @NotNull final KeyType keyType, @NotNull final Location location, final boolean virtualCrate, final boolean checkHand) {
+    public void openCrate(@NotNull final Player player, @NotNull final Crate crate, @NotNull final KeyType keyType, @NotNull final Location location, final boolean virtualCrate, final boolean checkHand, final EventType eventType) {
         final SettingsManager config = ConfigManager.getConfig();
 
         if (crate.getCrateType() == CrateType.menu) {
@@ -691,7 +697,7 @@ public class CrateManager {
         }
 
         // Open the crate.
-        crateBuilder.open(keyType, checkHand);
+        crateBuilder.open(keyType, checkHand, eventType);
     }
 
     /**
