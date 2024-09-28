@@ -1,12 +1,15 @@
 package com.badbones69.crazycrates.tasks.crates.types;
 
+import com.badbones69.crazycrates.api.builders.types.features.CrateSpinMenu;
 import com.badbones69.crazycrates.api.enums.Messages;
+import com.badbones69.crazycrates.api.enums.misc.Files;
 import com.badbones69.crazycrates.api.events.PlayerPrizeEvent;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.Prize;
 import com.badbones69.crazycrates.api.ChestManager;
 import com.badbones69.crazycrates.api.PrizeManager;
 import com.badbones69.crazycrates.api.objects.crates.CrateLocation;
+import com.badbones69.crazycrates.api.objects.gui.GuiSettings;
 import com.badbones69.crazycrates.managers.events.enums.EventType;
 import com.badbones69.crazycrates.support.holograms.HologramManager;
 import com.ryderbelserion.vital.paper.util.AdvUtil;
@@ -35,13 +38,10 @@ public class QuickCrate extends CrateBuilder {
     }
 
     @Override
-    public void open(@NotNull final KeyType type, final boolean checkHand, final EventType eventType) {
-        // If the crate type is not fire cracker.
-        if (!isFireCracker()) {
-            // If the crate event failed.
-            if (isCrateEventValid(type, checkHand, eventType)) {
-                return;
-            }
+    public void open(@NotNull final KeyType type, final boolean checkHand, final boolean isSilent, final EventType eventType) {
+        // Crate event failed so we return.
+        if (isCrateEventValid(type, checkHand, isSilent, eventType)) {
+            return;
         }
 
         final Player player = getPlayer();
@@ -127,7 +127,17 @@ public class QuickCrate extends CrateBuilder {
         }
 
         Prize prize = crate.pickPrize(player, getLocation().clone().add(.5, 1.3, .5));
-        PrizeManager.givePrize(player, prize, crate);
+
+        if (crate.isCyclePrize() && !PrizeManager.isCapped(crate, player)) { // re-open this menu
+            new CrateSpinMenu(player, new GuiSettings(crate, prize, Files.respin_gui.getConfiguration())).open();
+
+            this.crateManager.removePlayerFromOpeningList(player);
+            this.crateManager.removeCrateInUse(player);
+
+            return;
+        }
+
+        PrizeManager.givePrize(player, crate, prize);
 
         this.plugin.getServer().getPluginManager().callEvent(new PlayerPrizeEvent(player, crate, prize));
 

@@ -3,10 +3,11 @@ package com.badbones69.crazycrates.api.enums;
 import ch.jalu.configme.SettingsManager;
 import ch.jalu.configme.properties.Property;
 import com.badbones69.crazycrates.api.enums.misc.State;
+import com.badbones69.crazycrates.utils.MiscUtils;
 import com.ryderbelserion.vital.common.utils.StringUtil;
 import com.ryderbelserion.vital.paper.api.enums.Support;
 import com.ryderbelserion.vital.paper.util.AdvUtil;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.command.CommandSender;
 import com.badbones69.crazycrates.managers.config.ConfigManager;
 import com.badbones69.crazycrates.managers.config.impl.messages.CommandKeys;
@@ -73,6 +74,9 @@ public enum Messages {
     crate_teleported(CrateKeys.crate_teleported),
     crate_cannot_teleport(CrateKeys.crate_cannot_teleport),
     crate_prize_max_pulls(CrateKeys.crate_prize_max_pulls),
+    crate_prize_max_respins(CrateKeys.crate_prize_max_respins),
+    crate_prize_max_respins_left(CrateKeys.crate_prize_max_respins_left),
+    crate_prize_max_respins_none(CrateKeys.crate_prize_max_respins_none),
 
     gave_a_player_keys(CommandKeys.gave_a_player_keys),
     cannot_give_player_keys(CommandKeys.cannot_give_player_keys),
@@ -247,25 +251,6 @@ public enum Messages {
             message = getString();
         }
 
-        if (sender instanceof Player player) {
-            if (Support.placeholder_api.isEnabled()) {
-                message = PlaceholderAPI.setPlaceholders(player, message);
-            }
-        }
-
-        if (!placeholders.isEmpty()) {
-            for (Map.Entry<String, String> placeholder : placeholders.entrySet()) {
-                if (placeholder != null) {
-                    final String key = placeholder.getKey();
-                    final String value = placeholder.getValue();
-
-                    if (key != null && value != null) {
-                        message = message.replace(key, value).replace(key.toLowerCase(), value);
-                    }
-                }
-            }
-        }
-
-        return message;
+        return MiscUtils.populatePlaceholders(sender, message, placeholders);
     }
 }

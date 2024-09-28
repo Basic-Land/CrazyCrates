@@ -79,6 +79,11 @@ public class Crate {
     private int maxMassOpen;
     private int requiredKeys;
 
+    private boolean cyclePrize;
+
+    private boolean cyclePermissionToggle;
+    private int cyclePermissionCap;
+
     private List<String> prizeMessage = new ArrayList<>();
 
     private List<String> prizeCommands = new ArrayList<>();
@@ -96,6 +101,7 @@ public class Crate {
     private String broadcastPermission = "";
 
     private double sum = 0;
+    private double tierSum = 0;
 
     /**
      * @param name The name of the crate.
@@ -132,6 +138,19 @@ public class Crate {
         this.broadcastToggle = this.file.getBoolean("Crate.Settings.Broadcast.Toggle", false);
         this.broadcastMessages = this.file.getStringList("Crate.Settings.Broadcast.Messages");
         this.broadcastPermission = this.file.getString("Crate.Settings.Broadcast.Permission", "");
+
+        this.cyclePrize = this.file.getBoolean("Crate.Settings.Rewards.Re-Roll-Spin", false);
+
+        this.cyclePermissionToggle = this.file.getBoolean("Crate.Settings.Rewards.Permission.Toggle", false);
+        this.cyclePermissionCap = this.file.getInt("Crate.Settings.Rewards.Permission.Max-Cap", 20);
+
+        for (int node = 1; node < this.cyclePermissionCap; node++) {
+            if (this.cyclePermissionToggle) {
+                MiscUtils.registerPermission("crazycrates.respin." + this.name + "." + node, "Allows you to open the crate " + this.name + node + " amount of times.", false);
+            } else {
+                MiscUtils.unregisterPermission("crazycrates.respin." + this.name + "." + node);
+            }
+        }
 
         if (this.broadcastToggle) {
             MiscUtils.registerPermission(this.broadcastPermission, "Hides the broadcast message if a player has this permission", false);
@@ -177,7 +196,7 @@ public class Crate {
 
         setTierPreviewRows(file.getInt("Crate.tier-preview.rows", 5));
 
-        if (crateType == CrateType.quad_crate) {
+        if (this.crateType == CrateType.quad_crate) {
             this.particle = ItemUtil.getParticleType(file.getString("Crate.particles.type", "dust"));
 
             this.color = DyeUtil.getColor(file.getString("Crate.particles.color", "235,64,52"));
@@ -189,7 +208,10 @@ public class Crate {
         if (this.file != null) {
             this.manager = switch (crateType) {
                 case gacha -> new GachaCrateManager();
-                case cosmic -> new CosmicCrateManager(this.file);
+                case cosmic -> {
+                    this.tierSum = this.tiers.stream().filter(tier -> tier.getWeight() != -1).mapToDouble(Tier::getWeight).sum();
+                    yield new CosmicCrateManager(this.file);
+                }
                 default -> null;
             };
         }
@@ -337,7 +359,7 @@ public class Crate {
 
         for (Prize prize : getPrizes()) {
             if (prize.getWeight() == -1) continue;
-
+          
             final int pulls = PrizeManager.getCurrentPulls(prize, this);
 
              if (pulls != 0) {
@@ -383,11 +405,7 @@ public class Crate {
      * @return {@link Prize}
      */
     private Prize getPrize(@NotNull final List<Prize> prizes, @NotNull final Random random) {
-        double weight = 0.0;
-
-        for (Prize itemDrop : prizes) {
-            weight += itemDrop.getWeight();
-        }
+        double weight = this.sum;
 
         int index = 0;
 
@@ -408,6 +426,16 @@ public class Crate {
      */
     public double getChance(final double weight) {
         return (weight / this.sum) * 100D;
+    }
+
+    /**
+     * Gets the chance of the tier.
+     *
+     * @param weight the weight out of the sum
+     * @return the chance
+     */
+    public double getTierChance(final double weight) {
+        return (weight / this.tierSum) * 100D;
     }
 
     /**
@@ -444,7 +472,15 @@ public class Crate {
 
         return prize;
     }
-    
+
+    public final boolean isCyclePermissionToggle() {
+        return this.cyclePermissionToggle;
+    }
+
+    public final int getCyclePermissionCap() {
+        return this.cyclePermissionCap;
+    }
+
     /**
      * @return name file name.
      */
@@ -874,6 +910,10 @@ public class Crate {
         }
 
         return prizes;
+    }
+
+    public final boolean isCyclePrize() {
+        return this.cyclePrize;
     }
 
     public final boolean useRequiredKeys() {

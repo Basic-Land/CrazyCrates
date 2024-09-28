@@ -39,10 +39,10 @@ import java.util.stream.IntStream;
 
 public class CommandManager {
 
-    private final static @NotNull CrazyCrates plugin = CrazyCrates.getPlugin();
-    private final static @NotNull CrateManager crateManager = plugin.getCrateManager();
+    private static final CrazyCrates plugin = CrazyCrates.getPlugin();
+    private static final CrateManager crateManager = plugin.getCrateManager();
 
-    private final static @NotNull BukkitCommandManager<CommandSender> commandManager = BukkitCommandManager.create(plugin);
+    private static final BukkitCommandManager<CommandSender> commandManager = BukkitCommandManager.create(plugin);
 
     /**
      * Loads commands.

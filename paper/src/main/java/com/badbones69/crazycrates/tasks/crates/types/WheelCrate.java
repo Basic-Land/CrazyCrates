@@ -1,8 +1,11 @@
 package com.badbones69.crazycrates.tasks.crates.types;
 
+import com.badbones69.crazycrates.api.builders.types.features.CrateSpinMenu;
+import com.badbones69.crazycrates.api.enums.misc.Files;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.Prize;
 import com.badbones69.crazycrates.api.PrizeManager;
+import com.badbones69.crazycrates.api.objects.gui.GuiSettings;
 import com.badbones69.crazycrates.managers.events.enums.EventType;
 import com.ryderbelserion.vital.paper.util.scheduler.FoliaRunnable;
 import net.kyori.adventure.sound.Sound;
@@ -29,9 +32,9 @@ public class WheelCrate extends CrateBuilder {
     private Map<Integer, ItemStack> rewards;
 
     @Override
-    public void open(@NotNull final KeyType type, final boolean checkHand, final EventType eventType) {
+    public void open(@NotNull final KeyType type, final boolean checkHand, final boolean isSilent, final EventType eventType) {
         // Crate event failed so we return.
-        if (isCrateEventValid(type, checkHand, eventType)) {
+        if (isCrateEventValid(type, checkHand, isSilent, eventType)) {
             return;
         }
 
@@ -114,6 +117,12 @@ public class WheelCrate extends CrateBuilder {
 
                         if (crateManager.isInOpeningList(player)) {
                             prize = crate.getPrize(rewards.get(this.slots.get(this.what)));
+                        }
+
+                        if (crate.isCyclePrize() && !PrizeManager.isCapped(crate, player)) { // re-open this menu
+                            new CrateSpinMenu(player, new GuiSettings(crate, prize, Files.respin_gui.getConfiguration())).open();
+
+                            return;
                         }
 
                         PrizeManager.givePrize(player, crate, prize);

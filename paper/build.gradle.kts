@@ -1,5 +1,4 @@
 plugins {
-    alias(libs.plugins.paperweight)
     alias(libs.plugins.runPaper)
     alias(libs.plugins.shadow)
 
@@ -11,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    paperweight.paperDevBundle(libs.versions.paper)
+    compileOnly(libs.paper)
 
     compileOnly(fileTree("$projectDir/libs/compile").include("*.jar"))
 
@@ -39,10 +38,6 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok:1.18.32")
     annotationProcessor("org.projectlombok:lombok:1.18.32")
-}
-
-paperweight {
-    reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
 }
 
 tasks {
