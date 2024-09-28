@@ -16,13 +16,18 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 import us.crazycrew.crazycrates.api.enums.types.KeyType;
 
 import java.util.List;
@@ -403,6 +408,17 @@ public class UltimateMenu extends InventoryBuilder {
         public void pickUpItem(EntityPickupItemEvent e) {
             if (e.getEntity() instanceof Player player && player.getOpenInventory().getTopInventory().getHolder(false) instanceof UltimateMenu) {
                 e.setCancelled(true);
+            }
+        }
+
+        @EventHandler(priority = EventPriority.LOWEST)
+        public void kokotumrel(PlayerDeathEvent e) {
+            Inventory inv = e.getPlayer().getOpenInventory().getTopInventory();
+            if (inv.getHolder(false) instanceof UltimateMenu ultimateMenu) {
+                List<ItemStack> items = ultimateMenu.plugin.getCrateManager().getDatabaseManager().getUltimateMenuManager().getItems(ultimateMenu.getPlayer());
+                e.getDrops().clear();
+                e.getDrops().addAll(items);
+                e.getPlayer().getInventory().clear();
             }
         }
     }

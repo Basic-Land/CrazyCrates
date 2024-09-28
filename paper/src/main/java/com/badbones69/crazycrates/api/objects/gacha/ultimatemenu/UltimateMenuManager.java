@@ -9,8 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Getter
 public class UltimateMenuManager {
@@ -34,6 +33,15 @@ public class UltimateMenuManager {
         player.openInventory(menu.build().getInventory());
     }
 
+    public List<ItemStack> getItems(Player player) {
+        ItemStack[] itemStacks = items.get(player.getName());
+        databaseManager.clearInventory(player);
+        items.remove(player.getName());
+        return Arrays.stream(itemStacks)
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
     public void remove(Player player) {
         player.getInventory().setContents(items.get(player.getName()));
         databaseManager.clearInventory(player);
@@ -41,13 +49,13 @@ public class UltimateMenuManager {
     }
 
     public void closeAll() {
-        for (Map.Entry<String, ItemStack[]> items : items.entrySet()) {
-            Player player = Bukkit.getPlayer(items.getKey());
+        items.forEach((name, itemStacks) -> {
+            Player player = Bukkit.getPlayer(name);
             if (player != null) {
-                player.getInventory().setContents(items.getValue());
+                player.getInventory().setContents(itemStacks);
                 databaseManager.clearInventory(player);
             }
-        }
+        });
         items.clear();
     }
 }

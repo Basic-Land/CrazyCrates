@@ -95,7 +95,7 @@ public class CrateTierMenu extends StaticInventoryBuilder {
 
         ItemBuilder mainMenu = new ItemBuilder(Material.CHEST).setDisplayName("<green><b>Hlavní Menu");
         mainMenu.setCustomModelData(1000001);
-        gui.setItem(gui.getSize() - 8, mainMenu.asGuiItem(action -> {
+        gui.setItem(gui.getSize() - 9, mainMenu.asGuiItem(action -> {
             player.playSound(UltimateMenuStuff.BACK);
             plugin.getCrateManager().getDatabaseManager().getUltimateMenuManager().open(player, crate);
         }));

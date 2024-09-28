@@ -37,9 +37,9 @@ public class GachaCrate extends CrateBuilder {
     }
 
     @Override
-    public void open(@NotNull KeyType type, boolean checkHand, EventType eventType) {
+    public void open(@NotNull KeyType type, boolean checkHand, boolean isSilent, EventType eventType) {
         // Crate event failed so we return.
-        if (isCrateEventValid(type, checkHand, eventType)) {
+        if (isCrateEventValid(type, checkHand, isSilent, eventType)) {
             return;
         }
 

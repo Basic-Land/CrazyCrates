@@ -10,8 +10,8 @@ import org.bukkit.permissions.PermissionDefault;
 
 public class CommandTest extends BaseCommand {
 
-    @Command(value = "test")
-    @Permission(value = "test", def = PermissionDefault.TRUE)
+    @Command(value = "gacha")
+    @Permission(value = "", def = PermissionDefault.TRUE)
     public void onTest(Player player) {
         if (crateManager.isInOpeningList(player)) {
             player.sendMessage(Component.text("You are already opening a crate.", NamedTextColor.RED));

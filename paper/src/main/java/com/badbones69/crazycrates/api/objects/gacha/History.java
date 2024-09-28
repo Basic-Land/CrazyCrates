@@ -11,7 +11,6 @@ import com.badbones69.crazycrates.api.objects.gacha.enums.ResultType;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Table;
 import com.badbones69.crazycrates.api.objects.gacha.util.HSLColor;
 import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
-import io.papermc.paper.adventure.PaperAdventure;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -21,7 +20,6 @@ import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
 import org.bukkit.NamespacedKey;
-import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -147,9 +145,7 @@ public class History {
             }
         }
 
-        NamespacedKey key = item.getType().getKey();
-        int itemCount = item.getAmount();
-        return HoverEvent.showItem(HoverEvent.ShowItem.showItem(key, itemCount, PaperAdventure.asAdventure(CraftItemStack.asNMSCopy(item).getComponentsPatch())));
+        return item.asHoverEvent();
     }
 
     private Component getHoverText(Result history, CrateSettings crateSettings) {

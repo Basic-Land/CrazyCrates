@@ -38,6 +38,7 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok:1.18.32")
     annotationProcessor("org.projectlombok:lombok:1.18.32")
+    compileOnly("net.jpountz.lz4:lz4:1.3.0")
 }
 
 tasks {
