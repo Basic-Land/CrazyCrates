@@ -10,12 +10,11 @@ import com.badbones69.crazycrates.api.objects.gacha.data.OpenData;
 import com.badbones69.crazycrates.api.objects.gacha.data.PlayerBaseProfile;
 import com.badbones69.crazycrates.api.objects.gacha.enums.CurrencyType;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ComponentBuilder;
-import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuStuff;
+import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ItemRepo;
 import com.badbones69.crazycrates.managers.events.enums.EventType;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -129,7 +128,7 @@ public class UltimateMenu extends InventoryBuilder {
 
             CrateSettings newCrate = settings.get(newCrateNum);
 
-            player.playSound(UltimateMenuStuff.CLICK);
+            player.playSound(ItemRepo.CLICK);
             Component component = ComponentBuilder.mainMenu(player, newCrate);
 
             player.openInventory(new UltimateMenu(ultimateMenu, component, newCrateNum).build().getInventory());
@@ -161,27 +160,27 @@ public class UltimateMenu extends InventoryBuilder {
                     player.openInventory(new UltimateMenu(this).build().getInventory());
                 } else if (store) {
                     player.sendMessage(empty()
-                            .append(miniMessage().deserialize("<red><b>Server <dark_gray>» </b><gray>Klikni pro otevření stránky obchodu"))
-                            .hoverEvent(text("https://store.basicland.cz/"))
-                            .clickEvent(ClickEvent.openUrl("https://store.basicland.cz/")));
+                            .append(miniMessage().deserialize("<red><b>Server <dark_gray>» </b><gray>Klikni zde (<yellow>store.basicland.cz</yellow>) pro otevření stránky obchodu."))
+                            .hoverEvent(text("https://store.basicland.cz/category/tokeny"))
+                            .clickEvent(ClickEvent.openUrl("https://store.basicland.cz/category/tokeny")));
                     close(player);
                 }
             }
 
             case 81 -> {
-                player.playSound(UltimateMenuStuff.CLICK);
+                player.playSound(ItemRepo.CLICK);
                 close(player);
                 manager.getHistory().sendHistory(player, player.getName(), 1, crate.getCrateSettings());
             }
 
             case 82 -> {
-                player.playSound(UltimateMenuStuff.CLICK);
+                player.playSound(ItemRepo.CLICK);
                 close(player);
                 plugin.getInventoryManager().openNewCratePreview(player, crate);
             }
 
             case 83 -> {
-                player.playSound(UltimateMenuStuff.CLICK);
+                player.playSound(ItemRepo.CLICK);
                 close(player);
                 manager.getShopManager().openFirst(crate, player);
             }
@@ -238,7 +237,7 @@ public class UltimateMenu extends InventoryBuilder {
         int keys = getKeys(player, crate);
         if (keys >= size) {
             runnable.run();
-            player.playSound(UltimateMenuStuff.CRATE);
+            player.playSound(ItemRepo.CRATE);
             crateManager.openCrate(player, crate, KeyType.virtual_key, player.getLocation(), false, false, EventType.event_crate_opened);
         } else {
             PlayerBaseProfile playerBaseProfile = plugin.getBaseProfileManager().getPlayerBaseProfile(player.getName());
@@ -261,13 +260,13 @@ public class UltimateMenu extends InventoryBuilder {
 
     private void setVoteMenu(Player player, int keysNeeded, int voteTokensNeeded) {
         PlayerInventory playerInventory = player.getInventory();
-        playerInventory.setItem(28, UltimateMenuStuff.TOKEN_SHOP.asItemStack());
+        playerInventory.setItem(28, ItemRepo.TOKEN_SHOP.asItemStack());
 
-        ItemStack no = UltimateMenuStuff.SHOP_BACK_MENU.asItemStack();
+        ItemStack no = ItemRepo.SHOP_BACK_MENU.asItemStack();
         playerInventory.setItem(20, no);
         playerInventory.setItem(21, no);
 
-        ItemBuilder shopVoteTokensYes = UltimateMenuStuff.SHOP_VOTE_TOKENS_YES;
+        ItemBuilder shopVoteTokensYes = ItemRepo.SHOP_VOTE_TOKENS_YES;
 
         shopVoteTokensYes.addLorePlaceholder("{keys}", keysNeeded + "");
         shopVoteTokensYes.addLorePlaceholder("{vote}", voteTokensNeeded + "");
@@ -283,13 +282,13 @@ public class UltimateMenu extends InventoryBuilder {
 
     private void setPremiumMenu(Player player, int premiumNeeded) {
         PlayerInventory playerInventory = player.getInventory();
-        playerInventory.setItem(28, UltimateMenuStuff.PREMIUM_SHOP.asItemStack());
+        playerInventory.setItem(28, ItemRepo.PREMIUM_SHOP.asItemStack());
 
-        ItemStack no = UltimateMenuStuff.SHOP_BACK_MENU.asItemStack();
+        ItemStack no = ItemRepo.SHOP_BACK_MENU.asItemStack();
         playerInventory.setItem(20, no);
         playerInventory.setItem(21, no);
 
-        ItemBuilder shopVoteTokensYes = UltimateMenuStuff.SHOP_VOTE_PREMIUM_YES;
+        ItemBuilder shopVoteTokensYes = ItemRepo.SHOP_VOTE_PREMIUM_YES;
 
         shopVoteTokensYes.addLorePlaceholder("{premium}", premiumNeeded + "");
         shopVoteTokensYes.addLorePlaceholder("{premium_currency}", CurrencyType.PREMIUM_CURRENCY.translateMM());
@@ -304,13 +303,13 @@ public class UltimateMenu extends InventoryBuilder {
 
     private void openStoreMenu(Player player) {
         PlayerInventory playerInventory = player.getInventory();
-        playerInventory.setItem(28, UltimateMenuStuff.STORE_MENU.asItemStack());
+        playerInventory.setItem(28, ItemRepo.STORE_MENU.asItemStack());
 
-        ItemStack no = UltimateMenuStuff.SHOP_BACK_MENU.asItemStack();
+        ItemStack no = ItemRepo.SHOP_BACK_MENU.asItemStack();
         playerInventory.setItem(20, no);
         playerInventory.setItem(21, no);
 
-        ItemBuilder shopVoteTokensYes = UltimateMenuStuff.OPEN_STORE;
+        ItemBuilder shopVoteTokensYes = ItemRepo.OPEN_STORE;
 
         playerInventory.setItem(23, shopVoteTokensYes.asItemStack());
         playerInventory.setItem(24, shopVoteTokensYes.asItemStack());
@@ -321,9 +320,9 @@ public class UltimateMenu extends InventoryBuilder {
         int slot = 0;
         int crate = 0;
 
-        ItemBuilder selectedMain = UltimateMenuStuff.SELECTED;
-        ItemBuilder unselectedMain = UltimateMenuStuff.UNSELECTED;
-        ItemBuilder mainCrate = UltimateMenuStuff.MAIN_MENU_NAME;
+        ItemBuilder selectedMain = ItemRepo.SELECTED;
+        ItemBuilder unselectedMain = ItemRepo.UNSELECTED;
+        ItemBuilder mainCrate = ItemRepo.MAIN_MENU_NAME;
 
         for (CrateSettings setting : manager.getCrateSettingsSplit().get(currentPage)) {
             if (setting == null) continue;
@@ -359,33 +358,33 @@ public class UltimateMenu extends InventoryBuilder {
 
     private void setTextureGlass() {
         PlayerInventory playerInventory = getPlayer().getInventory();
-        playerInventory.setItem(27, UltimateMenuStuff.MAIN_MENU.asItemStack());
-        playerInventory.setItem(28, UltimateMenuStuff.BANNER.asItemStack());
+        playerInventory.setItem(27, ItemRepo.MAIN_MENU.asItemStack());
+        playerInventory.setItem(28, ItemRepo.BANNER.asItemStack());
     }
 
     private void setItemsPlayerInv() {
         PlayerInventory playerInventory = getPlayer().getInventory();
 
-        playerInventory.setItem(0, UltimateMenuStuff.BOOK.asItemStack());
-        playerInventory.setItem(1, UltimateMenuStuff.PAPER.asItemStack());
-        playerInventory.setItem(2, UltimateMenuStuff.SHOP.asItemStack());
+        playerInventory.setItem(0, ItemRepo.BOOK.asItemStack());
+        playerInventory.setItem(1, ItemRepo.PAPER.asItemStack());
+        playerInventory.setItem(2, ItemRepo.SHOP.asItemStack());
 
         if (totalPageAmount > 1) {
             if (currentPage == 0) {
-                playerInventory.setItem(4, UltimateMenuStuff.FORWARD.asItemStack());
+                playerInventory.setItem(4, ItemRepo.FORWARD.asItemStack());
             } else if (currentPage < totalPageAmount - 1) {
-                playerInventory.setItem(3, UltimateMenuStuff.BACK_ITEM.asItemStack());
-                playerInventory.setItem(4, UltimateMenuStuff.FORWARD.asItemStack());
+                playerInventory.setItem(3, ItemRepo.BACK_ITEM.asItemStack());
+                playerInventory.setItem(4, ItemRepo.FORWARD.asItemStack());
             } else if (currentPage == totalPageAmount - 1) {
-                playerInventory.setItem(3, UltimateMenuStuff.BACK_ITEM.asItemStack());
+                playerInventory.setItem(3, ItemRepo.BACK_ITEM.asItemStack());
             }
         }
 
-        ItemStack x1 = UltimateMenuStuff.BUILDER_X1.asItemStack();
+        ItemStack x1 = ItemRepo.BUILDER_X1.asItemStack();
         playerInventory.setItem(5, x1);
         playerInventory.setItem(6, x1);
 
-        ItemStack x10 = UltimateMenuStuff.BUILDER_X10.asItemStack();
+        ItemStack x10 = ItemRepo.BUILDER_X10.asItemStack();
         playerInventory.setItem(7, x10);
         playerInventory.setItem(8, x10);
     }

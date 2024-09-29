@@ -1,18 +1,16 @@
 package com.badbones69.crazycrates.tasks.menus;
 
-import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.builders.gui.StaticInventoryBuilder;
 import com.badbones69.crazycrates.api.builders.items.BonusPityMenu;
 import com.badbones69.crazycrates.api.enums.misc.Keys;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.Tier;
-import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuStuff;
+import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ItemRepo;
 import com.ryderbelserion.vital.paper.api.builders.gui.interfaces.Gui;
 import com.ryderbelserion.vital.paper.api.builders.gui.interfaces.GuiFiller;
 import com.ryderbelserion.vital.paper.api.builders.gui.interfaces.GuiItem;
 import io.papermc.paper.persistence.PersistentDataContainerView;
 import net.kyori.adventure.sound.Sound;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -59,7 +57,7 @@ public class CrateTierMenu extends StaticInventoryBuilder {
 
                 if (tags.has(Keys.crate_tier.getNamespacedKey())) {
                     if (!gacha) crate.playSound(player, player.getLocation(), "click-sound", "ui.button.click", Sound.Source.PLAYER);
-                    else player.playSound(UltimateMenuStuff.CLICK);
+                    else player.playSound(ItemRepo.CLICK);
 
                     this.crate.getPreview(this.player, tier).open();
                 }
@@ -77,26 +75,15 @@ public class CrateTierMenu extends StaticInventoryBuilder {
     }
 
     private void setItemsGacha() {
-        ItemBuilder item = new ItemBuilder(Material.PLAYER_HEAD).setDisplayName("<green><b>Bonus pity cena")
-                .addDisplayLore("<gray>Klikni pro otevření")
-                .addDisplayLore("<gray>bonusového výběru ceny")
-                .addDisplayLore("<gray>po dostatku otevření");
-        item.setCustomModelData(1000001);
-
-        gui.setItem(gui.getSize() - 1, item.asGuiItem(action -> {
-            player.playSound(UltimateMenuStuff.CLICK);
+        gui.setItem(gui.getSize() - 1, ItemRepo.PREVIEW_HEAD.asGuiItem(action -> {
+            player.playSound(ItemRepo.CLICK);
             player.openInventory(new BonusPityMenu(crate, player, 36, "<green><b>Bonus pity prize", this).build().getInventory());
         }));
 
-        ItemBuilder paper = new ItemBuilder(Material.PAPER).setCustomModelData(11).setDisplayName("Info");
-        paper.addDisplayLore("<gray>Zde najdeš informace o");
-        paper.addDisplayLore("<gray>itemech a jejich šancích");
-        gui.setItem(gui.getSize() - 5, paper.asGuiItem());
+        gui.setItem(gui.getSize() - 5, ItemRepo.PREVIEW_INFO.asGuiItem());
 
-        ItemBuilder mainMenu = new ItemBuilder(Material.CHEST).setDisplayName("<green><b>Hlavní Menu");
-        mainMenu.setCustomModelData(1000001);
-        gui.setItem(gui.getSize() - 9, mainMenu.asGuiItem(action -> {
-            player.playSound(UltimateMenuStuff.BACK);
+        gui.setItem(gui.getSize() - 9, ItemRepo.MAIN_MENU_BACK.asGuiItem(action -> {
+            player.playSound(ItemRepo.BACK);
             plugin.getCrateManager().getDatabaseManager().getUltimateMenuManager().open(player, crate);
         }));
     }

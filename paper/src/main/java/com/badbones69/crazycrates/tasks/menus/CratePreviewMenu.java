@@ -7,7 +7,7 @@ import com.badbones69.crazycrates.api.objects.Prize;
 import com.badbones69.crazycrates.api.objects.Tier;
 import com.badbones69.crazycrates.api.objects.gacha.enums.GachaType;
 import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
-import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuStuff;
+import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ItemRepo;
 import com.ryderbelserion.vital.paper.api.builders.gui.interfaces.GuiFiller;
 import com.ryderbelserion.vital.paper.api.builders.gui.interfaces.GuiItem;
 import com.ryderbelserion.vital.paper.api.builders.gui.types.PaginatedGui;
@@ -94,7 +94,7 @@ public class CratePreviewMenu extends DynamicInventoryBuilder {
                     break;
             }
 
-            player.playSound(UltimateMenuStuff.CLICK);
+            player.playSound(ItemRepo.CLICK);
 
             player.openInventory(new CratePickPrizeMenu(player, item, getCrate(), tier).build().getInventory());
         }

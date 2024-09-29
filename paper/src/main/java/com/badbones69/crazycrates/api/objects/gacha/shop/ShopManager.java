@@ -10,7 +10,7 @@ import com.badbones69.crazycrates.api.objects.gacha.enums.CurrencyType;
 import com.badbones69.crazycrates.api.objects.gacha.enums.ShopID;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Table;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ComponentBuilder;
-import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuStuff;
+import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ItemRepo;
 import com.ryderbelserion.vital.paper.api.files.CustomFile;
 import com.ryderbelserion.vital.paper.api.files.FileManager;
 import lombok.Getter;
@@ -122,8 +122,8 @@ public class ShopManager {
         ShopMenu shopMenu = new ShopMenu(crate, player, shop, this, shopData);
 
         Inventory inventory = shopMenu.getInventory();
-        inventory.setItem(45, UltimateMenuStuff.SHOP_BANNER.asItemStack());
-        inventory.setItem(49, UltimateMenuStuff.MAIN_MENU_SHOP.asItemStack());
+        inventory.setItem(45, ItemRepo.SHOP_BANNER.asItemStack());
+        inventory.setItem(49, ItemRepo.MAIN_MENU_SHOP.asItemStack());
 
         buildGUI(shopMenu, shopData.shopID());
         buildItems(player, inventory, shopData);
@@ -161,8 +161,8 @@ public class ShopManager {
 
         int slot = 0;
 
-        ItemBuilder selectedMain = UltimateMenuStuff.SHOP_SELECTED;
-        ItemBuilder unselectedMain = UltimateMenuStuff.SHOP_UNSELECTED;
+        ItemBuilder selectedMain = ItemRepo.SHOP_SELECTED;
+        ItemBuilder unselectedMain = ItemRepo.SHOP_UNSELECTED;
         Inventory inv = builder.getInventory();
 
         for (ShopData shopData : shops) {

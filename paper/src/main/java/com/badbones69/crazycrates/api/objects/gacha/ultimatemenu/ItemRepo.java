@@ -7,7 +7,7 @@ import org.bukkit.Material;
 
 import java.util.List;
 
-public class UltimateMenuStuff {
+public class ItemRepo {
     public static final ItemBuilder SELECTED = getItem(Material.GREEN_STAINED_GLASS_PANE, 1000002)
             .addDisplayLore("<gray>Právě vybraná truhla");
     public static final ItemBuilder UNSELECTED = getItem(Material.RED_STAINED_GLASS_PANE, 1000002)
@@ -47,8 +47,8 @@ public class UltimateMenuStuff {
             .addDisplayLore("<gray>Právě vybraný obchod");
     public static final ItemBuilder SHOP_UNSELECTED = getItem(Material.RED_STAINED_GLASS_PANE, 1000007)
             .addDisplayLore("<gray>Kliknutím vyberete tento obchod");
-    public static final ItemBuilder MAIN_MENU_SHOP = getItem(Material.CHEST, 1000008);
-
+    public static final ItemBuilder MAIN_MENU_SHOP = getItem(Material.CHEST, 1000008)
+            .setDisplayName("<green><b>Hlavní Menu");
 
 
     public static final ItemBuilder SHOP_BACK_MENU = getItem(Material.RED_STAINED_GLASS_PANE, 1000001)
@@ -74,11 +74,26 @@ public class UltimateMenuStuff {
     public static final ItemBuilder OPEN_STORE = getItem(Material.GREEN_STAINED_GLASS_PANE, 1000003)
             .setDisplayName("<white><b>Potvrdit")
             .setDisplayLore(List.of(
-                    "<white>Kliknutím dostaneš link",
-                    "<white>na webový obchod"
+                    "<white>Kliknutím obdržíš link",
+                    "<white>do chatu na webový obchod"
             ));
 
     public static final ItemBuilder BORDER = getItem(Material.LIGHT_GRAY_STAINED_GLASS_PANE, 1000011);
+
+    public static final ItemBuilder PREVIEW_HEAD = getItem(Material.PLAYER_HEAD, 1000001)
+            .setDisplayName("<green><b>Bonus pity cena")
+            .addDisplayLore("<gray>Klikni pro otevření")
+            .addDisplayLore("<gray>bonusového výběru ceny")
+            .addDisplayLore("<gray>po dostatku otevření");
+
+    public static final ItemBuilder PREVIEW_INFO = getItem(Material.PAPER, 11)
+            .setDisplayName("Info")
+            .addDisplayLore("<gray>Zde najdeš informace o")
+            .addDisplayLore("<gray>itemech a jejich šancích");
+
+    public static final ItemBuilder MAIN_MENU_BACK = getItem(Material.CHEST, 1000001)
+            .setDisplayName("<green><b>Hlavní Menu");
+
 
     public static final Sound CLICK = Sound.sound(Key.key("crate", "click"), Sound.Source.MASTER, 1f, 1f);
     public static final Sound BACK = Sound.sound(Key.key("crate", "back"), Sound.Source.MASTER, 1f, 1f);

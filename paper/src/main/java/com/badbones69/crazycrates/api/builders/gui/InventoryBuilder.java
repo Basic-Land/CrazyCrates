@@ -3,7 +3,7 @@ package com.badbones69.crazycrates.api.builders.gui;
 import ch.jalu.configme.SettingsManager;
 import com.badbones69.crazycrates.CrazyCrates;
 import com.badbones69.crazycrates.api.objects.Crate;
-import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuStuff;
+import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ItemRepo;
 import com.badbones69.crazycrates.managers.BukkitUserManager;
 import com.badbones69.crazycrates.managers.InventoryManager;
 import com.badbones69.crazycrates.common.config.ConfigManager;
@@ -63,7 +63,7 @@ public abstract class InventoryBuilder {
                 }
 
                 if (crate.getCrateType().isGacha()) crate.playSound(player, player.getLocation(), "click-sound", "ui.button.click", Sound.Source.PLAYER);
-                else player.playSound(UltimateMenuStuff.BACK);
+                else player.playSound(ItemRepo.BACK);
 
                 new CrateMainMenu(player, this.config.getProperty(ConfigKeys.inventory_name), this.config.getProperty(ConfigKeys.inventory_rows)).open();
             }));

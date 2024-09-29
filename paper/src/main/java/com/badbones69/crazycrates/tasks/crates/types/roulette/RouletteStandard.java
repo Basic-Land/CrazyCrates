@@ -8,7 +8,7 @@ import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.Prize;
 import com.badbones69.crazycrates.api.objects.gacha.data.Result;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
-import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuStuff;
+import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ItemRepo;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
 import com.badbones69.crazycrates.tasks.crates.other.GachaCrateManager;
 import com.badbones69.crazycrates.utils.MiscUtils;
@@ -75,7 +75,7 @@ public class RouletteStandard extends FoliaRunnable {
         }
 
         if (modelData == 8) {
-            player.playSound(UltimateMenuStuff.OPEN);
+            player.playSound(ItemRepo.OPEN);
         }
 
         if (!first && !skip) {

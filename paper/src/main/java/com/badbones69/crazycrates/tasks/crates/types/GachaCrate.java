@@ -9,7 +9,7 @@ import com.badbones69.crazycrates.api.objects.gacha.data.*;
 import com.badbones69.crazycrates.api.objects.gacha.enums.GachaType;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.gacha.GachaSystem;
-import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuStuff;
+import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ItemRepo;
 import com.badbones69.crazycrates.managers.BukkitUserManager;
 import com.badbones69.crazycrates.managers.events.enums.EventType;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
@@ -99,7 +99,7 @@ public class GachaCrate extends CrateBuilder {
         baseProfile.addMysticTokens(mysticTokens);
         baseProfile.addStellarShards(stellarShards);
 
-        setItem(37, UltimateMenuStuff.BORDER.asItemStack());
+        setItem(37, ItemRepo.BORDER.asItemStack());
         setItem(8, new ItemBuilder(Material.PLAYER_HEAD).setDisplayName("<green>Skip").setCustomModelData(1000002).asItemStack());
 
         addCrateTask(new RouletteStandard(this, items, sneak).runAtFixedRate(this.plugin, 1, 2));
