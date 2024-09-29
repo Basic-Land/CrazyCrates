@@ -3,6 +3,7 @@ package com.badbones69.crazycrates.utils;
 import com.badbones69.crazycrates.api.enums.Permissions;
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.enums.misc.Files;
+import com.badbones69.crazycrates.common.utils.Methods;
 import com.ryderbelserion.vital.common.utils.FileUtil;
 import com.ryderbelserion.vital.paper.api.enums.Support;
 import com.ryderbelserion.vital.paper.util.scheduler.FoliaRunnable;
@@ -12,8 +13,8 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.PluginManager;
 import org.jetbrains.annotations.Nullable;
-import com.badbones69.crazycrates.managers.config.ConfigManager;
-import com.badbones69.crazycrates.managers.config.impl.ConfigKeys;
+import com.badbones69.crazycrates.common.config.ConfigManager;
+import com.badbones69.crazycrates.common.config.impl.ConfigKeys;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
@@ -294,7 +295,7 @@ public class MiscUtils {
                     "",
                     " <yellow>-> <light_purple>Not enough keys.",
                     " <yellow>-> <light_purple>Key is in off hand."
-            ).forEach(line -> player.sendRichMessage(MsgUtils.getPrefix(line)));
+            ).forEach(line -> player.sendRichMessage(Methods.getPrefix(line)));
         }
     }
 

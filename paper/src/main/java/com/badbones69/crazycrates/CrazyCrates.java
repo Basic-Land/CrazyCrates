@@ -6,6 +6,7 @@ import com.badbones69.crazycrates.api.builders.items.UltimateMenu;
 import com.badbones69.crazycrates.api.objects.gacha.BaseProfileManager;
 import com.badbones69.crazycrates.api.objects.other.Server;
 import com.badbones69.crazycrates.listeners.crates.types.*;
+import com.badbones69.crazycrates.common.Server;
 import com.badbones69.crazycrates.utils.MiscUtils;
 import com.badbones69.crazycrates.commands.CommandManager;
 import com.badbones69.crazycrates.listeners.BrokeLocationsListener;
