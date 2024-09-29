@@ -1,10 +1,24 @@
 package com.badbones69.crazycrates.api.objects.gacha.enums;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+
 public enum CurrencyType {
-    VOTE_TOKENS, // base
-    MYSTIC_TOKENS, // common
-    STELLAR_SHARDS, // rare
-    PREMIUM_CURRENCY;
+    VOTE_TOKENS("votetokeny", "vote tokenů"), // base
+    MYSTIC_TOKENS("mystictokeny", "mystic tokenů"), // common
+    STELLAR_SHARDS("stellarshardy", "stellar shardů"), // rare
+    PREMIUM_CURRENCY("premiummena", "premium měny"); // premium
+
+    private final String name, fallback;
+
+    CurrencyType(String name, String fallback) {
+        this.name = name;
+        this.fallback = fallback;
+    }
+
+    public String translateMM() {
+        return MiniMessage.miniMessage().serialize(Component.translatable(name, fallback));
+    }
 
     public static CurrencyType getCurrencyType(String name) {
         for (CurrencyType currencyType : values()) {

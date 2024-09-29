@@ -8,12 +8,14 @@ import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.api.objects.gacha.data.OpenData;
 import com.badbones69.crazycrates.api.objects.gacha.data.PlayerBaseProfile;
+import com.badbones69.crazycrates.api.objects.gacha.enums.CurrencyType;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ComponentBuilder;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuStuff;
 import com.badbones69.crazycrates.managers.events.enums.EventType;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -23,11 +25,9 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.NotNull;
 import us.crazycrew.crazycrates.api.enums.types.KeyType;
 
 import java.util.List;
@@ -271,9 +271,12 @@ public class UltimateMenu extends InventoryBuilder {
 
         shopVoteTokensYes.addLorePlaceholder("{keys}", keysNeeded + "");
         shopVoteTokensYes.addLorePlaceholder("{vote}", voteTokensNeeded + "");
+        shopVoteTokensYes.addLorePlaceholder("{currency}", CurrencyType.VOTE_TOKENS.translateMM());
 
-        playerInventory.setItem(23, shopVoteTokensYes.asItemStack());
-        playerInventory.setItem(24, shopVoteTokensYes.asItemStack());
+        ItemStack yes = shopVoteTokensYes.asItemStack();
+
+        playerInventory.setItem(23, yes);
+        playerInventory.setItem(24, yes);
         voteShop = true;
         premiumShop = false;
     }
@@ -289,6 +292,9 @@ public class UltimateMenu extends InventoryBuilder {
         ItemBuilder shopVoteTokensYes = UltimateMenuStuff.SHOP_VOTE_PREMIUM_YES;
 
         shopVoteTokensYes.addLorePlaceholder("{premium}", premiumNeeded + "");
+        shopVoteTokensYes.addLorePlaceholder("{premium_currency}", CurrencyType.PREMIUM_CURRENCY.translateMM());
+        shopVoteTokensYes.addLorePlaceholder("{vote}", premiumNeeded + "");
+        shopVoteTokensYes.addLorePlaceholder("{currency}", CurrencyType.VOTE_TOKENS.translateMM());
 
         playerInventory.setItem(23, shopVoteTokensYes.asItemStack());
         playerInventory.setItem(24, shopVoteTokensYes.asItemStack());
@@ -412,7 +418,7 @@ public class UltimateMenu extends InventoryBuilder {
         }
 
         @EventHandler(priority = EventPriority.LOWEST)
-        public void kokotumrel(PlayerDeathEvent e) {
+        public void kokotUmrel(PlayerDeathEvent e) {
             Inventory inv = e.getPlayer().getOpenInventory().getTopInventory();
             if (inv.getHolder(false) instanceof UltimateMenu ultimateMenu) {
                 List<ItemStack> items = ultimateMenu.plugin.getCrateManager().getDatabaseManager().getUltimateMenuManager().getItems(ultimateMenu.getPlayer());

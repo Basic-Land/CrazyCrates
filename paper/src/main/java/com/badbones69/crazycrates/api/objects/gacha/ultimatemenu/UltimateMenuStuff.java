@@ -60,15 +60,15 @@ public class UltimateMenuStuff {
     public static final ItemBuilder SHOP_VOTE_TOKENS_YES = getItem(Material.GREEN_STAINED_GLASS_PANE, 1000003)
             .setDisplayName("<white><b>Potvrdit")
             .setDisplayLore(List.of(
-                    "<white>Kliknutím si koupíš <yellow>{keys}</yellow>",
-                    "<white>za <yellow>{vote}</yellow> vote tokenů"
+                    "<white>Kliknutím si koupíš <yellow>{keys}</yellow> otevření",
+                    "<white>za <yellow>{vote}</yellow>{currency}"
             ));
 
     public static final ItemBuilder SHOP_VOTE_PREMIUM_YES = getItem(Material.GREEN_STAINED_GLASS_PANE, 1000003)
             .setDisplayName("<white><b>Potvrdit")
             .setDisplayLore(List.of(
-                    "<white>Kliknutím si převedeš <yellow>{premium}</yellow>",
-                    "<white>na vote tokeny"
+                    "<white>Kliknutím si převedeš <yellow>{premium}</yellow>{premium_currency}",
+                    "<white>na <yellow>{vote}</yellow>{currency}"
             ));
 
     public static final ItemBuilder OPEN_STORE = getItem(Material.GREEN_STAINED_GLASS_PANE, 1000003)

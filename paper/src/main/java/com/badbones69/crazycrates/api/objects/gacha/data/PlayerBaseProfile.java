@@ -134,8 +134,7 @@ public class PlayerBaseProfile implements Serializable {
     }
 
     public void convertPremiumToVote(int amount) {
-        if (hasPremiumCurrency(amount)) {
-            removePremiumCurrency(amount);
+        if (removePremiumCurrencyIfHas(amount)) {
             addVoteTokens(amount);
         }
     }

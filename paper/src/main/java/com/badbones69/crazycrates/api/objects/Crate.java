@@ -711,7 +711,11 @@ public class Crate {
 
         if (section == null) return null;
 
-        return section.getConfigurationSection("Prizes");
+        ConfigurationSection prizes = section.getConfigurationSection("Prizes");
+        if (prizes == null) {
+            prizes = section.createSection("Prizes");
+        }
+        return prizes;
     }
 
     /**

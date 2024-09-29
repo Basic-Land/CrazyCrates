@@ -145,12 +145,12 @@ public class ShopManager {
         ShopPurchase shopPurchase = limitManager.getData(player, shopData.shopID(), shopItem, false);
         ItemStack stack = shopItem.stack().clone();
         ItemBuilder itemBuilder = new ItemBuilder(stack);
-        itemBuilder.addDisplayLore("<green><b>Price: <white>" + shopItem.price());
+        itemBuilder.addDisplayLore("<green><b>Cena:</b> <white>" + shopItem.price() + shopData.currencyType().translateMM());
 
         switch (shopPurchase.limitType()) {
-            case SUCCESS -> itemBuilder.addDisplayLore("<green><b>Bought: <white>" + shopPurchase.bought() + "/" +  shopItem.limit());
-            case LIMIT_REACHED -> itemBuilder.addDisplayLore("<red><b>Limit Reached");
-            case UNLIMITED -> itemBuilder.addDisplayLore("<green><b>Limit: <white>Unlimited");
+            case SUCCESS -> itemBuilder.addDisplayLore("<green><b>Limit:</b> <white>" + shopPurchase.bought() + "/" +  shopItem.limit());
+            case LIMIT_REACHED -> itemBuilder.addDisplayLore("<red><b>Vykoupil jsi limit!");
+            case UNLIMITED -> itemBuilder.addDisplayLore("<green><b>Limit:</b> <white>neomezeno");
         }
 
         return itemBuilder.asItemStack();

@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.PermissionDefault;
 import us.crazycrew.crazycrates.api.enums.types.CrateType;
+
 import java.util.HashMap;
 
 public class CommandAddItem extends BaseCommand {
@@ -42,6 +43,15 @@ public class CommandAddItem extends BaseCommand {
         }
 
         final String fancyName = crate.getCrateName();
+
+        if (tier != null && tier.equals("inv")) {
+            for (ItemStack stack : player.getInventory().getContents()) {
+                if (stack != null && !stack.getType().isAir()) {
+                    crate.addEditorItem(stack, String.valueOf(crate.getPrizeSection().getKeys(false).size()), weight);
+                }
+            }
+            return;
+        }
 
         if (tier != null) {
             crate.addEditorItem(item, prizeName, tier, weight);
