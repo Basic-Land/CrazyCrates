@@ -18,6 +18,8 @@ import com.ryderbelserion.vital.paper.util.ItemUtil;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import lombok.Getter;
 import me.clip.placeholderapi.PlaceholderAPI;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -27,10 +29,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.bukkit.configuration.ConfigurationSection;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class Prize {
 
@@ -125,7 +124,9 @@ public class Prize {
 
         this.alternativePrize = null;
 
-        this.prizeName = "";
+        Component displayName = itemStack.getItemMeta().displayName();
+        this.prizeName = displayName != null ? MiniMessage.miniMessage().serialize(displayName) : "";
+
         this.weight = 100;
         this.firework = false;
 
@@ -135,6 +136,10 @@ public class Prize {
         this.permissions = Collections.emptyList();
 
         this.displayItem = new ItemBuilder(stack.clone());
+
+        displayItem.addDisplayLore("<white>");
+        displayItem.addDisplayLore("<gray>Typ: " + type.getName());
+        displayItem.addDisplayLore("<gray>Rarita: " + rarity.getName());
     }
 
     /**

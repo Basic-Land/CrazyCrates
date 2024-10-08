@@ -16,7 +16,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,7 +36,7 @@ public class ItemPreview extends InventoryBuilder {
         this.rarity = null;
         this.raritiesMenu = null;
         this.leftClick = true;
-        ItemManager itemManager = JavaPlugin.getPlugin(CrazyCrates.class).getCrateManager().getDatabaseManager().getItemManager();
+        ItemManager itemManager = CrazyCrates.getPlugin().getCrateManager().getDatabaseManager().getItemManager();
         items = itemManager.getAllItemsFromCache(Table.ALL_ITEMS).entrySet().stream()
                 .map(entry -> new Pair<>(entry.getKey(), entry.getValue().clone()))
                 .collect(Collectors.toList());
@@ -50,7 +49,7 @@ public class ItemPreview extends InventoryBuilder {
         this.leftClick = leftClick;
         this.editing = true;
         this.rarity = rarity;
-        ItemManager itemManager = JavaPlugin.getPlugin(CrazyCrates.class).getCrateManager().getDatabaseManager().getItemManager();
+        ItemManager itemManager = CrazyCrates.getPlugin().getCrateManager().getDatabaseManager().getItemManager();
         items = itemManager.getAllItemsFromCache(Table.ALL_ITEMS).entrySet().stream()
                 .filter(entry -> leftClick != ids.contains(entry.getKey()))
                 .map(entry -> new Pair<>(entry.getKey(), entry.getValue().clone()))
@@ -64,7 +63,7 @@ public class ItemPreview extends InventoryBuilder {
             return this;
         }
 
-        int totalPages = (int) Math.ceil((double) items.size() / getSize());
+        int totalPages = Math.ceilDiv(items.size(), getSize());
 
         // Clear the inventory
         getInventory().clear();
@@ -112,7 +111,7 @@ public class ItemPreview extends InventoryBuilder {
             // Previous page
             holder.page--;
             holder.build();
-        } else if (slot == holder.getSize() - 1 && holder.page < (int) Math.ceil((double) holder.items.size() / holder.getSize()) - 1) {
+        } else if (slot == holder.getSize() - 1 && holder.page < Math.ceilDiv(holder.items.size(), holder.getSize()) - 1) {
             // Next page
             holder.page++;
             holder.build();

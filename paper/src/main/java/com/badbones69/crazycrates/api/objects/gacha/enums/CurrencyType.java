@@ -5,8 +5,8 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 
 public enum CurrencyType {
     VOTE_TOKENS("votetokeny", "vote tokenů"), // base
-    MYSTIC_TOKENS("mystictokeny", "mystic tokenů"), // common
-    STELLAR_SHARDS("stellarshardy", "stellar shardů"), // rare
+    MYSTIC_TOKENS("mystictokeny", "mystic tokenů"), // common - rarity
+    STELLAR_SHARDS("stellarshardy", "stellar shardů"), // rare - epic and above
     PREMIUM_CURRENCY("premiummena", "premium měny"); // premium
 
     private final String name, fallback;

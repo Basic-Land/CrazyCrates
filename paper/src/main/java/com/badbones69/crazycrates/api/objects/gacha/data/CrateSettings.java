@@ -83,7 +83,7 @@ public class CrateSettings {
             rarityMap.put(rarity, raritySettings);
         }
 
-        CustomFile customFile = plugin.getFileManager().getFile(bannerFile, true);
+        CustomFile customFile = plugin.getVital().getFileManager().getFile(bannerFile, true);
 
         if (customFile == null) {
             bannerPackage = new BannerPackage(null, null, false);

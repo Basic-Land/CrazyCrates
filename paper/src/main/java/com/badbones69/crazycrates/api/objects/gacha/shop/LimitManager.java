@@ -5,12 +5,11 @@ import com.badbones69.crazycrates.api.objects.gacha.data.PlayerBaseProfile;
 import com.badbones69.crazycrates.api.objects.gacha.enums.LimitType;
 import com.badbones69.crazycrates.api.objects.gacha.enums.ShopID;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
 
 public class LimitManager {
-    private final CrazyCrates plugin = JavaPlugin.getPlugin(CrazyCrates.class);
+    private final CrazyCrates plugin = CrazyCrates.getPlugin();
 
     public ShopPurchase getData(Player player, ShopID shopID, ShopItem item, boolean increment) {
         PlayerBaseProfile playerBaseProfile = plugin.getBaseProfileManager().getPlayerBaseProfile(player.getName());

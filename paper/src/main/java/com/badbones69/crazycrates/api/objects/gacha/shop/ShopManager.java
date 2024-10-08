@@ -19,7 +19,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +31,8 @@ public class ShopManager {
     private final LimitManager limitManager;
 
     public ShopManager(DatabaseManager databaseManager) {
-        CrazyCrates plugin = JavaPlugin.getPlugin(CrazyCrates.class);
-        FileManager yamlManager = plugin.getFileManager();
+        CrazyCrates plugin = CrazyCrates.getPlugin();
+        FileManager yamlManager = plugin.getVital().getFileManager();
         limitManager = new LimitManager();
 
         yamlManager.getCustomFiles()

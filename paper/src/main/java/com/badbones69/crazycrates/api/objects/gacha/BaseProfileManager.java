@@ -8,13 +8,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 public class BaseProfileManager implements Listener {
     private final DatabaseManager databaseManager;
-    private final CrazyCrates plugin = JavaPlugin.getPlugin(CrazyCrates.class);
+    private final CrazyCrates plugin = CrazyCrates.getPlugin();
     private final ConcurrentHashMap<String, PlayerBaseProfile> profilesCache = new ConcurrentHashMap<>();
 
     public BaseProfileManager() {

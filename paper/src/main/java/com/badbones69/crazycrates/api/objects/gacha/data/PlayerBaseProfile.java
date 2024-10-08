@@ -139,6 +139,12 @@ public class PlayerBaseProfile implements Serializable {
         }
     }
 
+    public void convert(int amount, CurrencyType from, CurrencyType to) {
+        if (removeIfHas(amount, from)) {
+            add(amount, to);
+        }
+    }
+
     public void resetShopLimits() {
         shops.forEach((shopID, shop) -> shop.clear());
     }

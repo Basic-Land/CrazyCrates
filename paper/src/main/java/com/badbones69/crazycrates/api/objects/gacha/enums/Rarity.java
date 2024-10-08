@@ -6,19 +6,21 @@ import net.kyori.adventure.text.format.TextColor;
 
 @Getter
 public enum Rarity {
-    COMMON(NamedTextColor.GRAY, 1000002),
-    UNCOMMON(NamedTextColor.DARK_AQUA, 1000003),
-    RARE(NamedTextColor.YELLOW, 1000004),
-    EPIC(NamedTextColor.DARK_PURPLE, 1000005),
-    LEGENDARY(TextColor.fromHexString("#ffc13d"), 1000006),
-    EXTRA_REWARD(NamedTextColor.BLACK, 1000007);
+    COMMON(NamedTextColor.GRAY, 1000002, "Common"),
+    UNCOMMON(NamedTextColor.DARK_AQUA, 1000003, "Uncommon"),
+    RARE(NamedTextColor.YELLOW, 1000004, "Rare"),
+    EPIC(NamedTextColor.DARK_PURPLE, 1000005, "Epic"),
+    LEGENDARY(TextColor.fromHexString("#ffc13d"), 1000006, "Legendary"),
+    EXTRA_REWARD(NamedTextColor.BLACK, 1000007, "Extra Reward");
 
     private final TextColor color;
     private final int modelData;
+    private final String name;
 
-    Rarity(TextColor color, int modelData) {
+    Rarity(TextColor color, int modelData, String name) {
         this.color = color;
         this.modelData = modelData;
+        this.name = name;
     }
 
     public NumberType getNumberType() {
@@ -38,5 +40,9 @@ public enum Rarity {
             }
         }
         return null;
+    }
+
+    public boolean isLegendary() {
+        return this == LEGENDARY;
     }
 }

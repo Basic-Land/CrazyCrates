@@ -23,7 +23,7 @@ import static net.kyori.adventure.text.Component.translatable;
 @UtilityClass
 public final class ComponentBuilder {
     private static final CrazyCrates plugin = CrazyCrates.getPlugin(CrazyCrates.class);
-    private static final Key KEY = Key.key("minecraft", "spaces");
+    private static final Key KEY = Key.key("space", "default");
     private static final TextColor COLOR = NamedTextColor.WHITE;
     private static final Component SPACE_BACK = translatable("space.-45", "").font(KEY);
     private static final Component SPACE_NEGATIVE = translatable("space.-1", "").font(KEY);

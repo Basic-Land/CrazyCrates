@@ -154,7 +154,11 @@ public class PrizeManager {
             runCommands(player, prize, crate, command);
         }
 
-        prize.broadcast(player, crate);
+        if (crate.getCrateType().isGacha()) {
+            if (prize.getRarity().isLegendary()) prize.broadcast(player, crate);
+        } else {
+            prize.broadcast(player, crate);
+        }
 
         if (!crate.getPrizeMessage().isEmpty() && prize.getMessages().isEmpty()) {
             for (final String message : crate.getPrizeMessage()) {

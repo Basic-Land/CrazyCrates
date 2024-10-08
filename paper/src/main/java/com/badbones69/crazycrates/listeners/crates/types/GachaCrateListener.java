@@ -12,7 +12,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import us.crazycrew.crazycrates.api.enums.types.CrateType;
 
@@ -21,7 +20,7 @@ import java.util.UUID;
 
 public class GachaCrateListener implements Listener {
 
-    private @NotNull final CrazyCrates plugin = JavaPlugin.getPlugin(CrazyCrates.class);
+    private @NotNull final CrazyCrates plugin = CrazyCrates.getPlugin();
 
     private @NotNull final CrateManager crateManager = this.plugin.getCrateManager();
     private static final List<Integer> slots = List.of(10, 12, 14, 16, 20, 22, 24, 28, 31, 34);

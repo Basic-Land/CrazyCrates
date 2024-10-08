@@ -5,7 +5,6 @@ import com.badbones69.crazycrates.api.PrizeManager;
 import com.badbones69.crazycrates.api.builders.CrateBuilder;
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.objects.Crate;
-import com.badbones69.crazycrates.api.objects.Prize;
 import com.badbones69.crazycrates.api.objects.gacha.data.Result;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ItemRepo;
@@ -19,7 +18,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
@@ -33,7 +31,7 @@ public class RouletteStandard extends FoliaRunnable {
     private final Inventory inventory;
     @Getter
     private final List<Result> prize;
-    private final CrazyCrates plugin = JavaPlugin.getPlugin(CrazyCrates.class);
+    private final CrazyCrates plugin = CrazyCrates.getPlugin();
     private final CrateManager crateManager = plugin.getCrateManager();
     private final Rarity highestRarity;
     @Getter
@@ -162,16 +160,12 @@ public class RouletteStandard extends FoliaRunnable {
         builder.playSound("stop-sound", Sound.Source.PLAYER, "entity.player.levelup");
         crateManager.endCrate(player);
 
-        for (Result itemData : prize) {
-            for (Prize prize : crate.getPrizes()) {
-                if (prize.getSectionName().equals(itemData.getPrize().getSectionName())) {
-                    PrizeManager.givePrize(player, prize, crate);
-                    break;
-                }
-            }
-        }
-
-        player.sendMessage(plugin.getBaseProfileManager().getPlayerBaseProfile(player.getName()).toString());
+        prize.forEach(itemData ->
+                crate.getPrizes()
+                        .stream()
+                        .filter(prize -> prize.getSectionName().equals(itemData.getPrize().getSectionName()))
+                        .findFirst()
+                        .ifPresent(prize -> PrizeManager.givePrize(player, prize, crate)));
 
         new BukkitRunnable() {
             @Override

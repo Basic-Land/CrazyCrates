@@ -26,7 +26,6 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.plugin.java.JavaPlugin;
 import us.crazycrew.crazycrates.api.enums.types.KeyType;
 
 import java.util.List;
@@ -36,7 +35,7 @@ import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.minimessage.MiniMessage.miniMessage;
 
 public class UltimateMenu extends InventoryBuilder {
-    private static final DatabaseManager manager = JavaPlugin.getPlugin(CrazyCrates.class).getCrateManager().getDatabaseManager();
+    private final DatabaseManager manager;
     private final int selectedCrate;
     private final int totalPageAmount;
     private final int currentPage;
@@ -45,6 +44,7 @@ public class UltimateMenu extends InventoryBuilder {
 
     public UltimateMenu(Crate crate, Player player, Component trans) {
         super(crate, player, 54, trans);
+        manager = CrazyCrates.getPlugin().getCrateManager().getDatabaseManager();
         player.getInventory().clear();
 
         int page = 0;
@@ -67,7 +67,8 @@ public class UltimateMenu extends InventoryBuilder {
     }
 
     private UltimateMenu(Player player, Component trans, int page, int selectedCrate) {
-        super(manager.getCrateSettingsSplit().get(page).get(selectedCrate).getCrate(), player, 54, trans);
+        super(CrazyCrates.getPlugin().getCrateManager().getDatabaseManager().getCrateSettingsSplit().get(page).get(selectedCrate).getCrate(), player, 54, trans);
+        manager = CrazyCrates.getPlugin().getCrateManager().getDatabaseManager();
         this.currentPage = page;
         this.selectedCrate = selectedCrate;
 
@@ -405,7 +406,7 @@ public class UltimateMenu extends InventoryBuilder {
         @EventHandler
         public void Close(InventoryCloseEvent e) {
             if (e.getInventory().getHolder(false) instanceof UltimateMenu ultimateMenu && e.getReason().equals(InventoryCloseEvent.Reason.PLAYER)) {
-                ultimateMenu.plugin.getCrateManager().getDatabaseManager().getUltimateMenuManager().remove(ultimateMenu.getPlayer());
+                ultimateMenu.manager.getUltimateMenuManager().remove(ultimateMenu.getPlayer());
             }
         }
 
@@ -420,7 +421,7 @@ public class UltimateMenu extends InventoryBuilder {
         public void kokotUmrel(PlayerDeathEvent e) {
             Inventory inv = e.getPlayer().getOpenInventory().getTopInventory();
             if (inv.getHolder(false) instanceof UltimateMenu ultimateMenu) {
-                List<ItemStack> items = ultimateMenu.plugin.getCrateManager().getDatabaseManager().getUltimateMenuManager().getItems(ultimateMenu.getPlayer());
+                List<ItemStack> items = ultimateMenu.manager.getUltimateMenuManager().getItems(ultimateMenu.getPlayer());
                 e.getDrops().clear();
                 e.getDrops().addAll(items);
                 e.getPlayer().getInventory().clear();
