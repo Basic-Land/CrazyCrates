@@ -1,13 +1,17 @@
 package com.badbones69.crazycrates.api.builders.types.features;
 
 import com.badbones69.crazycrates.api.builders.gui.StaticInventoryBuilder;
+import com.badbones69.crazycrates.api.enums.Messages;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gui.GuiSettings;
 import com.ryderbelserion.vital.paper.api.builders.gui.interfaces.Gui;
 import com.ryderbelserion.vital.paper.api.builders.gui.interfaces.GuiFiller;
 import com.ryderbelserion.vital.paper.api.builders.gui.interfaces.GuiItem;
+import com.ryderbelserion.vital.paper.util.scheduler.FoliaRunnable;
 import org.bukkit.entity.Player;
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 public class CrateSpinMenu extends StaticInventoryBuilder {
 
@@ -45,11 +49,29 @@ public class CrateSpinMenu extends StaticInventoryBuilder {
             }
         }
 
+        final UUID uuid = player.getUniqueId();
+        final String fileName = this.crate.getFileName();
+
         this.settings.getButtons().forEach((slot, button) -> this.gui.setItem(slot, button.getGuiItem()));
 
-        this.gui.setOpenGuiAction(action -> this.userManager.addRespinPrize(this.player.getUniqueId(), this.crate.getFileName(), this.settings.getPrize().getSectionName()));
+        this.gui.setOpenGuiAction(action -> {
+            this.userManager.addRespinPrize(uuid, fileName, this.settings.getPrize().getSectionName());
+        });
 
         this.gui.setCloseGuiAction(action -> {
+            new FoliaRunnable(this.plugin.getServer().getGlobalRegionScheduler()) {
+                @Override
+                public void run() {
+                    if (!userManager.hasUser(uuid) && userManager.hasRespinPrize(uuid, fileName)) { // if they aren't in the cache, then we run this.
+                        Messages.crate_prize_respin_not_claimed.sendMessage(player, new HashMap<>() {{
+                            put("{crate_pretty}", crate.getCrateName());
+                            put("{crate}", fileName);
+                            put("{prize}", userManager.getRespinPrize(uuid, fileName));
+                        }});
+                    }
+                }
+            }.runDelayed(this.plugin, 20);
+
             this.crateManager.removePlayerFromOpeningList(this.player);
             this.crateManager.removeCrateInUse(this.player);
             this.crateManager.removeCrateTask(this.player);

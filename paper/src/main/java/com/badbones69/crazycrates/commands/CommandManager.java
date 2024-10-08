@@ -7,6 +7,7 @@ import com.badbones69.crazycrates.api.objects.gacha.data.RaritySettings;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.commands.crates.types.admin.crates.CommandAddItem;
+import com.badbones69.crazycrates.commands.crates.types.admin.crates.CommandClaim;
 import com.badbones69.crazycrates.commands.crates.types.admin.crates.CommandMigrate;
 import com.badbones69.crazycrates.commands.crates.types.admin.crates.migrator.enums.MigrationType;
 import com.badbones69.crazycrates.commands.crates.types.custom.*;
@@ -189,6 +190,8 @@ public class CommandManager {
 
                 new CommandTransfer(),
                 new CommandKey(),
+
+                new CommandClaim(),
 
                 new CommandHelp(),
                 new CommandHistory(),

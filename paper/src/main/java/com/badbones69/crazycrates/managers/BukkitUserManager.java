@@ -646,13 +646,27 @@ public class BukkitUserManager extends UserManager {
         this.data.save();
     }
 
-    public int getCrateRespin(@NotNull final UUID uuid, @NotNull final String crateName) {
+    private final Map<UUID, Map<String, Integer>> crates = new HashMap<>();
+
+    public boolean hasUser(final UUID uuid) {
+        return crates.containsKey(uuid);
+    }
+
+    public int getCrateRespin(@NotNull final UUID uuid, @NotNull final String crateName, final boolean write) {
         final Crate crate = isCrateInvalid(crateName);
 
         if (crate == null) {
             if (MiscUtils.isLogging()) this.plugin.getComponentLogger().warn("Crate {} doesn't exist.", crateName);
 
             return 0;
+        }
+
+        if (!write) {
+            if (!this.crates.containsKey(uuid)) {
+                return 0;
+            }
+
+            return this.crates.get(uuid).getOrDefault(crate.getFileName(), 0);
         }
 
         return this.data.getConfiguration().getInt("Players." + uuid + ".respins." + crateName + ".amount", 0);
@@ -705,6 +719,12 @@ public class BukkitUserManager extends UserManager {
 
         final String fileName = crate.getFileName();
 
+        String prize = configuration.getString("Players." + uuid + ".respins." + fileName + ".prize");
+
+        if (prize == null) {
+            return;
+        }
+
         configuration.set("Players." + uuid + ".respins." + fileName + ".prize", null);
 
         this.data.save();
@@ -726,11 +746,17 @@ public class BukkitUserManager extends UserManager {
         return configuration.getString("Players." + uuid + ".respins." + fileName + ".prize", "");
     }
 
-    public void removeRespinCrate(@NotNull final UUID uuid, @NotNull final String crateName, final int amount) {
+    public void removeRespinCrate(@NotNull final UUID uuid, @NotNull final String crateName, final int amount, final boolean write) {
         final Crate crate = isCrateInvalid(crateName);
 
         if (crate == null) {
             if (MiscUtils.isLogging()) this.plugin.getComponentLogger().warn("Crate {} doesn't exist.", crateName);
+
+            return;
+        }
+
+        if (!write) {
+            this.crates.remove(uuid);
 
             return;
         }
@@ -752,7 +778,7 @@ public class BukkitUserManager extends UserManager {
         }
     }
 
-    public void addRespinCrate(@NotNull final UUID uuid, @NotNull final String crateName, final int amount) {
+    public void addRespinCrate(@NotNull final UUID uuid, @NotNull final String crateName, final int amount, final boolean write) {
         final Crate crate = isCrateInvalid(crateName);
 
         if (crate == null) {
@@ -761,9 +787,27 @@ public class BukkitUserManager extends UserManager {
             return;
         }
 
-        final YamlConfiguration configuration = this.data.getConfiguration();
-
         final String fileName = crate.getFileName();
+
+        if (!write) {
+            if (this.crates.containsKey(uuid)) {
+                final Map<String, Integer> respins = this.crates.get(uuid);
+
+                respins.put(fileName, respins.get(fileName) + amount);
+
+                crates.put(uuid, respins);
+
+                return;
+            }
+
+            crates.put(uuid, new HashMap<>() {{
+                put(fileName, amount);
+            }});
+
+            return;
+        }
+
+        final YamlConfiguration configuration = this.data.getConfiguration();
 
         final boolean hasValue = configuration.contains("Players." + uuid + ".respins." + fileName);
 

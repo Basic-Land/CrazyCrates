@@ -26,6 +26,7 @@ import com.ryderbelserion.vital.paper.util.AdvUtil;
 import lombok.Getter;
 import me.arcaniax.hdb.api.HeadDatabaseAPI;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Locale;
@@ -34,19 +35,23 @@ import java.util.logging.Logger;
 
 import static com.badbones69.crazycrates.utils.MiscUtils.registerPermissions;
 
-public class CrazyCrates extends Vital {
+@ApiStatus.Internal
+public class CrazyCrates extends JavaPlugin {
 
+    @ApiStatus.Internal
     public static CrazyCrates getPlugin() {
         return JavaPlugin.getPlugin(CrazyCrates.class);
     }
 
+    private final Vital vital;
     private final Timer timer;
     private final long startTime;
 
     public CrazyCrates() {
         this.startTime = System.nanoTime();
 
-        // Create timer object.
+        this.vital = new Vital(this);
+
         this.timer = new Timer();
     }
 
@@ -66,7 +71,7 @@ public class CrazyCrates extends Vital {
         this.instance.apply();
         LOGGER = getLogger();
 
-        getFileManager().addFile("locations.yml").addFile("data.yml").addFile("respin-gui.yml", "guis")
+        this.vital.getFileManager().addFile("locations.yml").addFile("data.yml").addFile("respin-gui.yml", "guis")
                 .addFile("crates.log", "logs")
                 .addFile("keys.log", "logs")
                 .addFolder("crates")
@@ -191,18 +196,22 @@ public class CrazyCrates extends Vital {
         MiscUtils.janitor();
     }
 
+    @ApiStatus.Internal
     public final InventoryManager getInventoryManager() {
         return this.inventoryManager;
     }
 
+    @ApiStatus.Internal
     public final BukkitUserManager getUserManager() {
         return this.userManager;
     }
 
+    @ApiStatus.Internal
     public final CrateManager getCrateManager() {
         return this.crateManager;
     }
 
+    @ApiStatus.Internal
     public @Nullable final HeadDatabaseAPI getApi() {
         if (this.api == null) {
             return null;
@@ -211,10 +220,17 @@ public class CrazyCrates extends Vital {
         return this.api;
     }
 
+    @ApiStatus.Internal
     public final Server getInstance() {
         return this.instance;
     }
 
+    @ApiStatus.Internal
+    public final Vital getVital() {
+        return this.vital;
+    }
+
+    @ApiStatus.Internal
     public final Timer getTimer() {
         return this.timer;
     }

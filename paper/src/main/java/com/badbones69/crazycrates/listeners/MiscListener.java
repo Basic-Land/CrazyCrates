@@ -28,8 +28,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
 import us.crazycrew.crazycrates.api.enums.types.CrateType;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 public class MiscListener implements Listener {
@@ -75,10 +73,13 @@ public class MiscListener implements Listener {
             final String fileName = crate.getFileName();
 
             if (crate.isCyclePrize() && this.userManager.hasRespinPrize(uuid, fileName)) {
-                if (PrizeManager.isCapped(crate, player)) {
-                    PrizeManager.givePrize(player, crate.getPrize(this.userManager.getRespinPrize(player.getUniqueId(), crate.getFileName())), crate);
+                if (PrizeManager.isCapped(crate, player)) { // if the option is false, we want to run this. || !crate.isCyclePersistRestart()
+                    PrizeManager.givePrize(player, crate.getPrize(this.userManager.getRespinPrize(uuid, fileName)), crate);
 
-                    this.userManager.removeRespinPrize(player.getUniqueId(), crate.getFileName());
+                    this.userManager.removeRespinPrize(uuid, fileName);
+
+                    // remove from the cache
+                    this.userManager.removeRespinCrate(uuid, fileName, 0, false);
 
                     count++;
 
@@ -92,7 +93,7 @@ public class MiscListener implements Listener {
         }
 
         if (count > 0) {
-            Messages.crate_prizes_respins_claimed.sendMessage(player, "{amount}", String.valueOf(count));
+            Messages.crate_prize_respins_claimed.sendMessage(player, "{amount}", String.valueOf(count));
         }
     }
 
@@ -133,6 +134,12 @@ public class MiscListener implements Listener {
         this.crateManager.removePlayerKeyType(player);
 
         this.crateManager.removeSlot(player);
+
+        for (final Crate crate : this.crateManager.getUsableCrates()) {
+            if (!crate.isCyclePersistRestart()) {
+                this.userManager.removeRespinCrate(player.getUniqueId(), crate.getFileName(), 0, false);
+            }
+        }
     }
 
     @EventHandler
