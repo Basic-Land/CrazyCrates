@@ -58,7 +58,11 @@ public class GachaSystem {
         Pair<Integer, ResultType> pair = playerProfile.getPity(finalRarity);
         playerProfile.setPity(finalRarity, 0, final5050);
 
-        return new Result(finalRarity, final5050, pair.first());
+        Result result = new Result(finalRarity, final5050, pair.first());
+        result.setMystic(rarityMap.get(finalRarity).mysticTokens());
+        result.setStellar(rarityMap.get(finalRarity).stellarShards());
+
+        return result;
     }
 
     public Result roll(PlayerProfile playerProfile, CrateSettings itemSet) {

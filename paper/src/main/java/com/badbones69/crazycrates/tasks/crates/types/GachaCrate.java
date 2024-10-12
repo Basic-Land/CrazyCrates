@@ -77,8 +77,6 @@ public class GachaCrate extends CrateBuilder {
             throw new IllegalStateException("Chosen reward not found");
         }
 
-        Map<Rarity, RaritySettings> rarityMap = crateSettings.getRarityMap();
-
         int stellarShards = 0;
         int mysticTokens = 0;
 
@@ -89,9 +87,8 @@ public class GachaCrate extends CrateBuilder {
                 case OVERRIDE -> gachaSystem.rollOverrideSet(playerProfile, crateSettings, prize);
             };
 
-            Rarity rarity = result.getRarity();
-            stellarShards += rarityMap.get(rarity).stellarShards();
-            mysticTokens += rarityMap.get(rarity).mysticTokens();
+            stellarShards += result.getStellar();
+            mysticTokens += result.getMystic();
 
             items.add(result);
         }

@@ -3,6 +3,8 @@ package com.badbones69.crazycrates.api.objects.gacha.enums;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
+import java.util.Arrays;
+
 public enum CurrencyType {
     VOTE_TOKENS("votetokeny", "vote tokenů"), // base
     MYSTIC_TOKENS("mystictokeny", "mystic tokenů"), // common - rarity
@@ -21,11 +23,6 @@ public enum CurrencyType {
     }
 
     public static CurrencyType getCurrencyType(String name) {
-        for (CurrencyType currencyType : values()) {
-            if (currencyType.name().equalsIgnoreCase(name) && !currencyType.equals(PREMIUM_CURRENCY)) {
-                return currencyType;
-            }
-        }
-        return null;
+        return Arrays.stream(values()).filter(currencyType -> currencyType.name().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 }

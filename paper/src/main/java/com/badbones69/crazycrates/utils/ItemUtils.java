@@ -58,91 +58,29 @@ public class ItemUtils {
     public static String getEnchant(String enchant) {
         if (enchant.isEmpty()) return "";
 
-        switch (enchant) {
-            case "PROTECTION_ENVIRONMENTAL" -> {
-                return "protection";
-            }
-
-            case "PROTECTION_FIRE" -> {
-                return "fire_protection";
-            }
-
-            case "PROTECTION_FALL" -> {
-                return "feather_falling";
-            }
-
-            case "PROTECTION_EXPLOSIONS" -> {
-                return "blast_protection";
-            }
-
-            case "PROTECTION_PROJECTILE" -> {
-                return "projectile_protection";
-            }
-
-            case "OXYGEN" -> {
-                return "respiration";
-            }
-
-            case "WATER_WORKER" -> {
-                return "aqua_affinity";
-            }
-
-            case "DAMAGE_ALL" -> {
-                return "sharpness";
-            }
-
-            case "DAMAGE_UNDEAD" -> {
-                return "smite";
-            }
-
-            case "DAMAGE_ARTHROPODS" -> {
-                return "bane_of_arthropods";
-            }
-
-            case "LOOT_BONUS_MOBS" -> {
-                return "looting";
-            }
-
-            case "SWEEPING_EDGE" -> {
-                return "sweeping";
-            }
-
-            case "DIG_SPEED" -> {
-                return "efficiency";
-            }
-
-            case "DURABILITY" -> {
-                return "unbreaking";
-            }
-
-            case "LOOT_BONUS_BLOCKS" -> {
-                return "fortune";
-            }
-
-            case "ARROW_DAMAGE" -> {
-                return "power";
-            }
-
-            case "ARROW_KNOCKBACK" -> {
-                return "punch";
-            }
-
-            case "ARROW_FIRE" -> {
-                return "flame";
-            }
-
-            case "ARROW_INFINITE" -> {
-                return "infinity";
-            }
-
-            case "LUCK" -> {
-                return "luck_of_the_sea";
-            }
-
-            default -> {
-                return enchant.toLowerCase();
-            }
-        }
+        return switch (enchant) {
+            case "PROTECTION_ENVIRONMENTAL" -> "protection";
+            case "PROTECTION_FIRE" -> "fire_protection";
+            case "PROTECTION_FALL" -> "feather_falling";
+            case "PROTECTION_EXPLOSIONS" -> "blast_protection";
+            case "PROTECTION_PROJECTILE" -> "projectile_protection";
+            case "OXYGEN" -> "respiration";
+            case "WATER_WORKER" -> "aqua_affinity";
+            case "DAMAGE_ALL" -> "sharpness";
+            case "DAMAGE_UNDEAD" -> "smite";
+            case "DAMAGE_ARTHROPODS" -> "bane_of_arthropods";
+            case "LOOT_BONUS_MOBS" -> "looting";
+            case "SWEEPING_EDGE" -> "sweeping";
+            case "DIG_SPEED" -> "efficiency";
+            case "DURABILITY" -> "unbreaking";
+            case "LOOT_BONUS_BLOCKS" -> "fortune";
+            case "ARROW_DAMAGE" -> "power";
+            case "ARROW_KNOCKBACK" -> "punch";
+            case "ARROW_FIRE" -> "flame";
+            case "ARROW_INFINITE" -> "infinity";
+            case "LUCK" -> "luck_of_the_sea";
+            default -> enchant.toLowerCase();
+        };
     }
 
     /**

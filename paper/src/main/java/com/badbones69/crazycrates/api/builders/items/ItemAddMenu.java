@@ -3,6 +3,7 @@ package com.badbones69.crazycrates.api.builders.items;
 import com.badbones69.crazycrates.api.builders.InventoryBuilder;
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.objects.Crate;
+import com.badbones69.crazycrates.api.objects.gacha.ItemManager;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
@@ -14,6 +15,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class ItemAddMenu extends InventoryBuilder {
@@ -66,6 +68,11 @@ public class ItemAddMenu extends InventoryBuilder {
         Rarity rarity = holder.rarity;
         RewardType type = holder.type;
         CrateSettings crateSettings = crate.getCrateSettings();
+        ItemManager itemManager = holder.plugin.getCrateManager().getDatabaseManager().getItemManager();
+        if (type.equals(RewardType.SHOP)) {
+            Arrays.stream(items).forEach(item -> itemManager.addItem(item, Table.SHOP_ITEMS));
+            return;
+        }
 
         String path;
         if (type.equals(RewardType.EXTRA_REWARD)) {
@@ -79,7 +86,7 @@ public class ItemAddMenu extends InventoryBuilder {
         for (ItemStack item : items) {
             if (item == null || item.getType() == Material.AIR) continue;
 
-            int id = holder.plugin.getCrateManager().getDatabaseManager().getItemManager().addItem(item, Table.ALL_ITEMS);
+            int id = itemManager.addItem(item, Table.ALL_ITEMS);
             if (id == -1) continue;
 
             crateSettings.addItem(type, id, rarity, item, crate);

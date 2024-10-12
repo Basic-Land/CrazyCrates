@@ -71,7 +71,10 @@ public class CrazyCrates extends JavaPlugin {
         this.instance.apply();
         LOGGER = getLogger();
 
-        this.vital.getFileManager().addFile("locations.yml").addFile("data.yml").addFile("respin-gui.yml", "guis")
+        this.vital.getFileManager()
+                .addFile("locations.yml")
+                .addFile("data.yml")
+                .addFile("respin-gui.yml", "guis")
                 .addFile("crates.log", "logs")
                 .addFile("keys.log", "logs")
                 .addFolder("crates")

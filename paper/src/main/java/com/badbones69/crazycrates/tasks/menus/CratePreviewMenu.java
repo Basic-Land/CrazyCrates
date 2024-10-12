@@ -1,5 +1,6 @@
 package com.badbones69.crazycrates.tasks.menus;
 
+import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.builders.gui.DynamicInventoryBuilder;
 import com.badbones69.crazycrates.api.builders.items.CratePickPrizeMenu;
 import com.badbones69.crazycrates.api.objects.Crate;
@@ -66,7 +67,7 @@ public class CratePreviewMenu extends DynamicInventoryBuilder {
             setNextButton(rows, 6, true);
 
             if (gacha) {
-                gui.setItem(gui.getSize() - 5, new GuiItem(Material.COMPASS, action -> crate.getTierPreview(player).open()));
+                gui.setItem(gui.getSize() - 5, new ItemBuilder(Material.COMPASS).setCustomModelData(1000001).asGuiItem(action -> crate.getTierPreview(player).open()));
             } else {
                 addMenuButton(this.player, crate, this.gui, rows, 5);
             }
@@ -87,15 +88,21 @@ public class CratePreviewMenu extends DynamicInventoryBuilder {
             boolean standard = rewardName.split("_")[1].equals(RewardType.STANDARD.name());
 
             switch (gachaType) {
-                case NORMAL:
+                case NORMAL -> {
                     return;
-                case FATE_POINT:
-                    if (getCrate().getCrateSettings().getLegendaryStandard().stream().map(Prize::getSectionName).anyMatch(rewardName::equals) && standard) {
+                }
+
+                case FATE_POINT -> {
+                    if (getCrate().getCrateSettings().getLegendaryStandard()
+                            .stream()
+                            .map(Prize::getSectionName)
+                            .anyMatch(rewardName::equals) && standard) {
                         return;
                     }
-                    break;
-                case OVERRIDE:
-                    break;
+                }
+
+                case OVERRIDE -> {
+                }
             }
 
             player.playSound(ItemRepo.CLICK);

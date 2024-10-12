@@ -29,15 +29,15 @@ public class ItemPreview extends InventoryBuilder {
     private final Rarity rarity;
     private int page = 0;
 
-    public ItemPreview(Player player, int size, String title, RewardType type) {
+    public ItemPreview(Player player, int size, String title, Table type) {
         super(player, title, size);
-        this.type = type;
+        this.type = null;
         this.editing = false;
         this.rarity = null;
         this.raritiesMenu = null;
         this.leftClick = true;
         ItemManager itemManager = CrazyCrates.getPlugin().getCrateManager().getDatabaseManager().getItemManager();
-        items = itemManager.getAllItemsFromCache(Table.ALL_ITEMS).entrySet().stream()
+        items = itemManager.getAllItemsFromCache(type).entrySet().stream()
                 .map(entry -> new Pair<>(entry.getKey(), entry.getValue().clone()))
                 .collect(Collectors.toList());
     }

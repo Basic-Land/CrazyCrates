@@ -3,7 +3,7 @@ package com.badbones69.crazycrates.commands.crates.types.custom;
 import com.badbones69.crazycrates.api.builders.items.ItemPreview;
 import com.badbones69.crazycrates.api.builders.items.RaritiesMenu;
 import com.badbones69.crazycrates.api.objects.Crate;
-import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
+import com.badbones69.crazycrates.api.objects.gacha.enums.Table;
 import com.badbones69.crazycrates.commands.crates.types.BaseCommand;
 import dev.triumphteam.cmd.bukkit.annotation.Permission;
 import dev.triumphteam.cmd.core.annotations.Command;
@@ -15,10 +15,15 @@ public class EditItems extends BaseCommand {
     @Command("edititems")
     @Permission(value = "crazycrates.command.admin.edititems", def = PermissionDefault.OP)
     public void editItems(Player player, @Suggestion("both") String type) {
-        RewardType rewardType = RewardType.fromString(type);
+        Table table = switch (type.toLowerCase()) {
+            case "crateitems" -> Table.ALL_ITEMS;
+            case "shopitems" -> Table.SHOP_ITEMS;
+            default -> null;
+        };
+
         Crate crate = this.crateManager.getCrateFromName(type);
         if (crate == null) {
-            player.openInventory(new ItemPreview(player, 54, "<red><b>Edit Items", rewardType).build().getInventory());
+            player.openInventory(new ItemPreview(player, 54, "<red><b>Edit Items", table).build().getInventory());
             return;
         }
 

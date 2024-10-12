@@ -39,7 +39,7 @@ public class UltimateMenu extends InventoryBuilder {
     private final int selectedCrate;
     private final int totalPageAmount;
     private final int currentPage;
-    private boolean voteShop, premiumShop, store = false;
+    private boolean premiumShop, store = false;
     private OpenData openData = null;
 
     public UltimateMenu(Crate crate, Player player, Component trans) {
@@ -81,20 +81,9 @@ public class UltimateMenu extends InventoryBuilder {
         this(ultimateMenu.getPlayer(), title, ultimateMenu.currentPage, selectedCrate);
     }
 
-    private UltimateMenu(UltimateMenu ultimateMenu) {
-        this(ultimateMenu.getPlayer(),
-                ComponentBuilder.mainMenu(
-                        ultimateMenu.getPlayer(),
-                        ultimateMenu.getCrate().getCrateSettings()),
-                ultimateMenu.currentPage,
-                ultimateMenu.selectedCrate
-        );
-    }
-
     private UltimateMenu(CrateSettings settings, Player player) {
         this(settings.getCrate(), player, ComponentBuilder.mainMenu(player, settings));
     }
-
 
     @Override
     public InventoryBuilder build() {
@@ -138,9 +127,8 @@ public class UltimateMenu extends InventoryBuilder {
 
         switch (slot) {
             case 65, 66 -> {
-                if (voteShop || premiumShop || store) {
+                if (premiumShop || store) {
                     setTextureGlass();
-                    voteShop = false;
                     premiumShop = false;
                 }
 
@@ -151,14 +139,9 @@ public class UltimateMenu extends InventoryBuilder {
             }
 
             case 68, 69 -> {
-                if (voteShop && !premiumShop) {
+                if (premiumShop) {
                     if (openFrom(player, crate)) return;
-                    plugin.getBaseProfileManager().getPlayerBaseProfile(player.getName()).removeVoteTokens(openData.currencyTake());
-                } else if (premiumShop && !voteShop) {
-                    plugin.getBaseProfileManager().getPlayerBaseProfile(player.getName()).convertPremiumToVote(openData.currencyTake());
-                    voteShop = false;
-                    premiumShop = false;
-                    player.openInventory(new UltimateMenu(this).build().getInventory());
+                    plugin.getBaseProfileManager().getPlayerBaseProfile(player.getName()).removePremiumCurrency(openData.currencyTake());
                 } else if (store) {
                     player.sendMessage(empty()
                             .append(miniMessage().deserialize("<red><b>Server <dark_gray>» </b><gray>Klikni zde (<yellow>store.basicland.cz</yellow>) pro otevření stránky obchodu."))
@@ -242,16 +225,11 @@ public class UltimateMenu extends InventoryBuilder {
             crateManager.openCrate(player, crate, KeyType.virtual_key, player.getLocation(), false, false, EventType.event_crate_opened);
         } else {
             PlayerBaseProfile playerBaseProfile = plugin.getBaseProfileManager().getPlayerBaseProfile(player.getName());
-            int cost = size * 160;
             int keysNeeded = size - keys;
-            int vote = keysNeeded * 160;
-            int premium = cost - (cost - vote) - playerBaseProfile.getVoteTokens();
+            int premium = keysNeeded * 160;
 
-            if (playerBaseProfile.hasVoteTokens(vote)) {
-                setVoteMenu(player, keysNeeded, vote);
-                openData = new OpenData(size, keysNeeded, vote);
-            } else if (playerBaseProfile.hasPremiumCurrency(premium)) {
-                setPremiumMenu(player, premium);
+            if (playerBaseProfile.hasPremiumCurrency(premium)) {
+                setPremiumMenu(player, keysNeeded, premium);
                 openData = new OpenData(size, keysNeeded, premium);
             } else {
                 openStoreMenu(player);
@@ -259,29 +237,7 @@ public class UltimateMenu extends InventoryBuilder {
         }
     }
 
-    private void setVoteMenu(Player player, int keysNeeded, int voteTokensNeeded) {
-        PlayerInventory playerInventory = player.getInventory();
-        playerInventory.setItem(28, ItemRepo.TOKEN_SHOP.asItemStack());
-
-        ItemStack no = ItemRepo.SHOP_BACK_MENU.asItemStack();
-        playerInventory.setItem(20, no);
-        playerInventory.setItem(21, no);
-
-        ItemBuilder shopVoteTokensYes = ItemRepo.SHOP_VOTE_TOKENS_YES;
-
-        shopVoteTokensYes.addLorePlaceholder("{keys}", keysNeeded + "");
-        shopVoteTokensYes.addLorePlaceholder("{vote}", voteTokensNeeded + "");
-        shopVoteTokensYes.addLorePlaceholder("{currency}", CurrencyType.VOTE_TOKENS.translateMM());
-
-        ItemStack yes = shopVoteTokensYes.asItemStack();
-
-        playerInventory.setItem(23, yes);
-        playerInventory.setItem(24, yes);
-        voteShop = true;
-        premiumShop = false;
-    }
-
-    private void setPremiumMenu(Player player, int premiumNeeded) {
+    private void setPremiumMenu(Player player, int keysNeeded, int premiumNeeded) {
         PlayerInventory playerInventory = player.getInventory();
         playerInventory.setItem(28, ItemRepo.PREMIUM_SHOP.asItemStack());
 
@@ -289,17 +245,17 @@ public class UltimateMenu extends InventoryBuilder {
         playerInventory.setItem(20, no);
         playerInventory.setItem(21, no);
 
-        ItemBuilder shopVoteTokensYes = ItemRepo.SHOP_VOTE_PREMIUM_YES;
+        ItemBuilder shopVotePremiumYes = ItemRepo.SHOP_VOTE_PREMIUM_YES;
 
-        shopVoteTokensYes.addLorePlaceholder("{premium}", premiumNeeded + "");
-        shopVoteTokensYes.addLorePlaceholder("{premium_currency}", CurrencyType.PREMIUM_CURRENCY.translateMM());
-        shopVoteTokensYes.addLorePlaceholder("{vote}", premiumNeeded + "");
-        shopVoteTokensYes.addLorePlaceholder("{currency}", CurrencyType.VOTE_TOKENS.translateMM());
+        shopVotePremiumYes.addLorePlaceholder("{keys}", keysNeeded + "");
+        shopVotePremiumYes.addLorePlaceholder("{premium}", premiumNeeded + "");
+        shopVotePremiumYes.addLorePlaceholder("{currency}", CurrencyType.PREMIUM_CURRENCY.translateMM());
 
-        playerInventory.setItem(23, shopVoteTokensYes.asItemStack());
-        playerInventory.setItem(24, shopVoteTokensYes.asItemStack());
+        ItemStack yes = shopVotePremiumYes.asItemStack();
+
+        playerInventory.setItem(23, yes);
+        playerInventory.setItem(24, yes);
         premiumShop = true;
-        voteShop = false;
     }
 
     private void openStoreMenu(Player player) {

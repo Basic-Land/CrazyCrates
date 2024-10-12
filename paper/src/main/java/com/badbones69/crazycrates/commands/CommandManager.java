@@ -128,9 +128,8 @@ public class CommandManager {
                     .map(Crate::getFileName)
                     .collect(Collectors.toList());
 
-            Arrays.stream(RewardType.values())
-                    .map(Enum::name)
-                    .forEach(collect::add);
+            collect.add("crateitems");
+            collect.add("shopitems");
 
             return collect;
         });

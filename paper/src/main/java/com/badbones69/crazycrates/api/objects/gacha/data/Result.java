@@ -32,6 +32,8 @@ public class Result implements Serializable {
     private String itemName;
     private String rewardName;
     private transient Prize prize;
+    @Setter
+    private transient int mystic, stellar;
 
     public Result(Rarity rarity, ResultType won5050, int pity) {
         this.rarity = rarity;

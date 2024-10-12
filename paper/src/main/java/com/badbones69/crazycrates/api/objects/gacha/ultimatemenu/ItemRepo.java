@@ -37,8 +37,7 @@ public class ItemRepo {
     public static final ItemBuilder BUILDER_X10 = getItem(Material.BLUE_STAINED_GLASS_PANE, 1000001)
             .setDisplayName("<white><b>10x")
             .addDisplayLore("<gray>Kliknutím otevřeš truhlu 10x");
-    public static final ItemBuilder TOKEN_SHOP = getItem(Material.LIGHT_GRAY_STAINED_GLASS_PANE, 1000008);
-    public static final ItemBuilder PREMIUM_SHOP = getItem(Material.LIGHT_GRAY_STAINED_GLASS_PANE, 1000009);
+    public static final ItemBuilder PREMIUM_SHOP = getItem(Material.LIGHT_GRAY_STAINED_GLASS_PANE, 1000008);
     public static final ItemBuilder STORE_MENU = getItem(Material.LIGHT_GRAY_STAINED_GLASS_PANE, 1000010);
 
 
@@ -57,18 +56,11 @@ public class ItemRepo {
                     "<white>Kliknutím se vrátíš zpět",
                     "<white>na hlavní menu"
             ));
-    public static final ItemBuilder SHOP_VOTE_TOKENS_YES = getItem(Material.GREEN_STAINED_GLASS_PANE, 1000003)
-            .setDisplayName("<white><b>Potvrdit")
-            .setDisplayLore(List.of(
-                    "<white>Kliknutím si koupíš <yellow>{keys}</yellow> otevření",
-                    "<white>za <yellow>{vote}</yellow>{currency}"
-            ));
-
     public static final ItemBuilder SHOP_VOTE_PREMIUM_YES = getItem(Material.GREEN_STAINED_GLASS_PANE, 1000003)
             .setDisplayName("<white><b>Potvrdit")
             .setDisplayLore(List.of(
-                    "<white>Kliknutím si převedeš <yellow>{premium}</yellow>{premium_currency}",
-                    "<white>na <yellow>{vote}</yellow>{currency}"
+                    "<white>Kliknutím si koupíš <yellow>{keys}</yellow> otevření",
+                    "<white>za <yellow>{premium}</yellow>{currency}"
             ));
 
     public static final ItemBuilder OPEN_STORE = getItem(Material.GREEN_STAINED_GLASS_PANE, 1000003)
