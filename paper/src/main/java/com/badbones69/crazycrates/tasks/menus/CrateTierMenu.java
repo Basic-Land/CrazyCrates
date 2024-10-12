@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
+import java.util.UUID;
 
 public class CrateTierMenu extends StaticInventoryBuilder {
 
@@ -42,6 +43,8 @@ public class CrateTierMenu extends StaticInventoryBuilder {
             guiFiller.fillBottom(guiItem);
         }
 
+        final UUID uuid = this.player.getUniqueId();
+
         final List<Tier> tiers = this.crate.getTiers();
 
         tiers.forEach(tier -> {
@@ -67,9 +70,9 @@ public class CrateTierMenu extends StaticInventoryBuilder {
         if (gacha) setItemsGacha();
         else addMenuButton(this.player, this.crate, this.gui, this.gui.getRows(), 5);
 
-        this.gui.setOpenGuiAction(event -> this.inventoryManager.addPreviewViewer(event.getPlayer().getUniqueId()));
+        this.gui.setOpenGuiAction(event -> this.inventoryManager.addPreviewViewer(uuid));
 
-        this.gui.setCloseGuiAction(event -> this.inventoryManager.removePreviewViewer(event.getPlayer().getUniqueId()));
+        this.gui.setCloseGuiAction(event -> this.inventoryManager.removePreviewViewer(uuid));
 
         this.gui.open(this.player);
     }
