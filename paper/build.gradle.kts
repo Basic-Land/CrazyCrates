@@ -39,7 +39,7 @@ dependencies {
 
 tasks {
     runServer {
-        jvmArgs("-Dnet.kyori.ansi.colorLevel=truecolor", "-Xmx2G", "-Xms2G", "-XX:+AllowEnhancedClassRedefinition")
+        jvmArgs("-Dnet.kyori.ansi.colorLevel=truecolor", "-Xmx4G", "-Xms4G", "-XX:+AllowEnhancedClassRedefinition", "-XX:NonProfiledCodeHeapSize=512M", "-XX:ReservedCodeCacheSize=640M", )
 
         defaultCharacterEncoding = Charsets.UTF_8.name()
 
@@ -61,12 +61,12 @@ tasks {
         archiveBaseName.set(rootProject.name)
         archiveClassifier.set("")
 
-        listOf(
-            "com.ryderbelserion.vital",
-            "dev.triumphteam.cmd"
-        ).forEach {
-            relocate(it, "libs.$it")
-        }
+//        listOf(
+//            "com.ryderbelserion.vital",
+//            "dev.triumphteam.cmd"
+//        ).forEach {
+//            relocate(it, "libs.$it")
+//        }
     }
 
     processResources {

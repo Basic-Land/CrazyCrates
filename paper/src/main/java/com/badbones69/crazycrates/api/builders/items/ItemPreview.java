@@ -11,11 +11,14 @@ import com.badbones69.crazycrates.api.objects.gacha.enums.Table;
 import com.badbones69.crazycrates.api.objects.gacha.util.Pair;
 import com.google.common.collect.Lists;
 import cz.basicland.blibs.spigot.utils.item.NBT;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -74,6 +77,20 @@ public class ItemPreview extends InventoryBuilder {
             ItemStack itemStack = item.second();
             NBT nbt = new NBT(itemStack);
             nbt.setInteger("itemID", item.first());
+            ItemMeta meta = itemStack.getItemMeta();
+            List<Component> lore = meta.lore();
+            if (lore == null) {
+                lore = Lists.newArrayList();
+            }
+
+            boolean b = lore.stream().map(PlainTextComponentSerializer.plainText()::serialize).noneMatch(component -> component.contains("id: " + item.first()));
+            if (b) {
+                lore.add(Component.text("id: " + item.first()));
+            }
+
+            meta.lore(lore);
+            itemStack.setItemMeta(meta);
+
             getInventory().setItem(i++, itemStack);
         }
 

@@ -13,6 +13,8 @@ import java.util.*;
 
 @Getter
 public class UltimateMenuManager {
+    private final static Map<UUID, Long> cooldowns = new HashMap<>();
+    private static final long COOLDOWN_TIME = 250;
     private final Map<String, ItemStack[]> items = new HashMap<>();
     private final CrazyCrates plugin = CrazyCrates.getPlugin(CrazyCrates.class);
     private final DatabaseManager databaseManager;
@@ -26,6 +28,22 @@ public class UltimateMenuManager {
     }
 
     public void open(Player player, Crate crate) {
+        if (player.getOpenInventory().getTopInventory().getHolder(false) instanceof UltimateMenu) {
+            return;
+        }
+
+        UUID playerId = player.getUniqueId();
+        long currentTime = System.currentTimeMillis();
+
+        if (cooldowns.containsKey(playerId)) {
+            long lastOpenTime = cooldowns.get(playerId);
+            if (currentTime - lastOpenTime < COOLDOWN_TIME) {
+                return; // Cooldown period has not passed, do not open the menu
+            }
+        }
+
+        cooldowns.put(playerId, currentTime);
+
         items.put(player.getName(), player.getInventory().getContents());
         databaseManager.saveInventory(player);
 

@@ -272,7 +272,7 @@ public class CrateSettings {
         List<String> messages = config.getStringList(path + "." + key + ".messages");
         boolean give = config.getBoolean(path + "." + key + ".give", true);
 
-        prizes.add(new Prize(rewardName, crateName, tier, item, give, commands, messages, rarity, type));
+        prizes.add(new Prize(rewardName, crateName, tier, item, give, messages, commands, rarity, type));
     }
 
     public void addItem(RewardType type, int id, Rarity rarity, ItemStack stack, Crate crate) {

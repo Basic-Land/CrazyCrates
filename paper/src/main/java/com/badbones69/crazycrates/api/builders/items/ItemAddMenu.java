@@ -70,7 +70,7 @@ public class ItemAddMenu extends InventoryBuilder {
         CrateSettings crateSettings = crate.getCrateSettings();
         ItemManager itemManager = holder.plugin.getCrateManager().getDatabaseManager().getItemManager();
         if (type.equals(RewardType.SHOP)) {
-            Arrays.stream(items).forEach(item -> itemManager.addItem(item, Table.SHOP_ITEMS));
+            Arrays.stream(items).filter(item -> item != null && item.getType() != Material.AIR).forEach(item -> itemManager.addItem(item, Table.SHOP_ITEMS));
             return;
         }
 

@@ -1,6 +1,7 @@
 package com.badbones69.crazycrates.api.builders;
 
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.InventoryHolder;
@@ -18,14 +19,9 @@ public class InventoryListener implements Listener {
         menus.add(menu);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onInventoryClick(InventoryClickEvent event) {
-        for (Class<? extends InventoryBuilder> menu : menus) {
-            InventoryHolder holder = event.getInventory().getHolder(false);
-            if (menu.isInstance(holder)) {
-                InventoryBuilder inventoryBuilder = (InventoryBuilder) holder;
-                inventoryBuilder.run(event);
-            }
-        }
+        InventoryHolder holder = event.getInventory().getHolder(false);
+        menus.stream().filter(menu -> menu.isInstance(holder)).map(menu -> (InventoryBuilder) holder).findFirst().ifPresent(inventoryBuilder -> inventoryBuilder.run(event));
     }
 }

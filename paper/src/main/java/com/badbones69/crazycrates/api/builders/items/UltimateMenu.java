@@ -95,7 +95,7 @@ public class UltimateMenu extends InventoryBuilder {
 
     @Override
     public void run(InventoryClickEvent e) {
-        if (!(e.getInventory().getHolder() instanceof UltimateMenu ultimateMenu)) return;
+        if (!(e.getInventory().getHolder(false) instanceof UltimateMenu ultimateMenu)) return;
 
         e.setCancelled(true);
         int slot = e.getRawSlot();
@@ -361,7 +361,8 @@ public class UltimateMenu extends InventoryBuilder {
     public static class TestMenuListener implements Listener {
         @EventHandler
         public void Close(InventoryCloseEvent e) {
-            if (e.getInventory().getHolder(false) instanceof UltimateMenu ultimateMenu && e.getReason().equals(InventoryCloseEvent.Reason.PLAYER)) {
+            InventoryCloseEvent.Reason reason = e.getReason();
+            if (e.getInventory().getHolder(false) instanceof UltimateMenu ultimateMenu && reason.equals(InventoryCloseEvent.Reason.PLAYER)) {
                 ultimateMenu.manager.getUltimateMenuManager().remove(ultimateMenu.getPlayer());
             }
         }

@@ -73,10 +73,10 @@ public class ShopMenu extends InventoryBuilder {
 
                     shopManager.openShop(getCrate(), getPlayer(), shopData.shopID());
                 } else if (data.isLimitReached()) {
-                    player.sendMessage("You have reached the limit for this item.");
+                    player.sendRichMessage("<bold><red>Server </red></bold><bold><dark_gray>»</bold> <gray>Dosáhl jsi limitu pro tento předmět.");
                 }
             } else {
-                player.sendMessage("You don't have enough money to buy this item.");
+                player.sendRichMessage("<bold><red>Server </red></bold><bold><dark_gray>»</bold> <gray>Nemáš dostatek měny na nákup tohoto předmětu.");
             }
 
             return;
