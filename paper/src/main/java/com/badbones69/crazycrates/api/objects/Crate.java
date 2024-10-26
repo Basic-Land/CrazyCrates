@@ -213,11 +213,11 @@ public class Crate {
             this.manager = switch (crateType) {
                 case gacha -> new GachaCrateManager();
                 case cosmic -> {
-                    this.tierSum = this.tiers.stream().filter(tier -> tier.getWeight() != -1).mapToDouble(Tier::getWeight).sum();
+                    this.tierSum = calculateTierSum();
                     yield new CosmicCrateManager(this.file);
                 }
                 case casino -> {
-                    this.tierSum = this.tiers.stream().filter(tier -> tier.getWeight() != -1).mapToDouble(Tier::getWeight).sum();
+                    this.tierSum = calculateTierSum();
                     yield null;
                 }
                 default -> null;
@@ -230,6 +230,13 @@ public class Crate {
             crateSettings = new CrateSettings(file, name, this);
         }
         this.crateSettings = crateSettings;
+    }
+
+    private double calculateTierSum() {
+        return this.tiers.stream()
+                .filter(tier -> tier.getWeight() != -1)
+                .mapToDouble(Tier::getWeight)
+                .sum();
     }
 
     public Crate(@NotNull final String name) {

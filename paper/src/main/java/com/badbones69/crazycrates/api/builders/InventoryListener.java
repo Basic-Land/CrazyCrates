@@ -22,6 +22,10 @@ public class InventoryListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onInventoryClick(InventoryClickEvent event) {
         InventoryHolder holder = event.getInventory().getHolder(false);
-        menus.stream().filter(menu -> menu.isInstance(holder)).map(menu -> (InventoryBuilder) holder).findFirst().ifPresent(inventoryBuilder -> inventoryBuilder.run(event));
+        menus.stream()
+                .filter(menu -> menu.isInstance(holder))
+                .map(menu -> (InventoryBuilder) holder)
+                .findFirst()
+                .ifPresent(inventoryBuilder -> inventoryBuilder.run(event));
     }
 }
