@@ -20,6 +20,7 @@ import us.crazycrew.crazycrates.api.enums.types.KeyType;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.logging.Logger;
 
 public class CasinoCrate extends CrateBuilder {
 
@@ -126,6 +127,31 @@ public class CasinoCrate extends CrateBuilder {
 
                     return;
                 }
+
+                final Tier tier_uno = this.crate.getTier(row_uno);
+                final Tier tier_dos = this.crate.getTier(row_dos);
+                final Tier tier_tres = this.crate.getTier(row_tres);
+
+                if (tier_uno == null || tier_dos == null || tier_tres == null) {
+                    final Logger logger = this.plugin.getLogger();
+
+                    if (MiscUtils.isLogging()) {
+                        List.of(
+                                "One of your rows has a tier that doesn't exist supplied in " + fileName,
+                                "You can find this in your crate config, search for row-1, row-2, and row-3"
+                        ).forEach(logger::warning);
+                    }
+
+                    this.crateManager.endCrate(this.player);
+
+                    this.crateManager.removeCrateTask(this.player);
+
+                    this.crateManager.removePlayerFromOpeningList(this.player);
+
+                    this.player.closeInventory();
+
+                    return;
+                }
             }
         }
 
@@ -179,9 +205,9 @@ public class CasinoCrate extends CrateBuilder {
                 return;
             }
 
-            final String row_uno = section.getString("types.row-1", "");
-            final String row_dos = section.getString("types.row-2", "");
-            final String row_tres = section.getString("types.row-3", "");
+            final String row_uno = section.getString("types.row-1", null);
+            final String row_dos = section.getString("types.row-2", null);
+            final String row_tres = section.getString("types.row-3", null);
 
             final Tier tierUno = this.crate.getTier(row_uno);
 
