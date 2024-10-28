@@ -10,12 +10,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 public class UltimateMenuManager {
     private final static Map<UUID, Long> cooldowns = new HashMap<>();
     private static final long COOLDOWN_TIME = 250;
-    private final Map<String, ItemStack[]> items = new HashMap<>();
+    private final Map<String, ItemStack[]> items = new ConcurrentHashMap<>();
     private final CrazyCrates plugin = CrazyCrates.getPlugin(CrazyCrates.class);
     private final DatabaseManager databaseManager;
 
@@ -51,11 +52,15 @@ public class UltimateMenuManager {
         player.openInventory(menu.build().getInventory());
     }
 
-    public List<ItemStack> getItems(Player player) {
+    public ItemStack[] getItems(Player player) {
         ItemStack[] itemStacks = items.get(player.getName());
         databaseManager.clearInventory(player);
         items.remove(player.getName());
-        return Arrays.stream(itemStacks)
+        return itemStacks;
+    }
+
+    public List<ItemStack> getItemsClean(Player player) {
+        return Arrays.stream(getItems(player))
                 .filter(Objects::nonNull)
                 .toList();
     }

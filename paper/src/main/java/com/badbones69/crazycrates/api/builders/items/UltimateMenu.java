@@ -15,6 +15,7 @@ import com.badbones69.crazycrates.managers.events.enums.EventType;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -362,8 +363,21 @@ public class UltimateMenu extends InventoryBuilder {
         @EventHandler
         public void Close(InventoryCloseEvent e) {
             InventoryCloseEvent.Reason reason = e.getReason();
-            if (e.getInventory().getHolder(false) instanceof UltimateMenu ultimateMenu && reason.equals(InventoryCloseEvent.Reason.PLAYER)) {
-                ultimateMenu.manager.getUltimateMenuManager().remove(ultimateMenu.getPlayer());
+            if (e.getInventory().getHolder(false) instanceof UltimateMenu ultimateMenu) {
+                Player player = ultimateMenu.getPlayer();
+                if (reason.equals(InventoryCloseEvent.Reason.PLAYER)) {
+                    ultimateMenu.manager.getUltimateMenuManager().remove(player);
+                    return;
+                } else if (reason.equals(InventoryCloseEvent.Reason.PLUGIN)) {
+                    Bukkit.getScheduler().runTaskLater(CrazyCrates.getPlugin(), () -> {
+                        PlayerInventory inventory = player.getInventory();
+                        inventory.clear();
+                        ItemStack[] items = ultimateMenu.manager.getUltimateMenuManager().getItems(player);
+                        inventory.setContents(items);
+                        player.updateInventory();
+                    }, 1L);
+                }
+                CrazyCrates.LOGGER.info("UltimateMenu closed for reason: " + reason);
             }
         }
 
@@ -378,7 +392,7 @@ public class UltimateMenu extends InventoryBuilder {
         public void kokotUmrel(PlayerDeathEvent e) {
             Inventory inv = e.getPlayer().getOpenInventory().getTopInventory();
             if (inv.getHolder(false) instanceof UltimateMenu ultimateMenu) {
-                List<ItemStack> items = ultimateMenu.manager.getUltimateMenuManager().getItems(ultimateMenu.getPlayer());
+                List<ItemStack> items = ultimateMenu.manager.getUltimateMenuManager().getItemsClean(ultimateMenu.getPlayer());
                 e.getDrops().clear();
                 e.getDrops().addAll(items);
                 e.getPlayer().getInventory().clear();
