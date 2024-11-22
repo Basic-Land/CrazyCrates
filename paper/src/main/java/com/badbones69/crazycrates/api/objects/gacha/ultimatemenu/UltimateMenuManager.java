@@ -66,7 +66,10 @@ public class UltimateMenuManager {
     }
 
     public void remove(Player player) {
-        player.getInventory().setContents(items.get(player.getName()));
+        ItemStack[] itemStacks = items.get(player.getName());
+        if (itemStacks != null) {
+            player.getInventory().setContents(itemStacks);
+        }
         databaseManager.clearInventory(player);
         items.remove(player.getName());
     }

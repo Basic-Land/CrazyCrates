@@ -71,6 +71,8 @@ public class ShopMenu extends InventoryBuilder {
                         plugin.getUserManager().addVirtualKeys(player.getUniqueId(), crate, 1);
                     }
 
+                    player.playSound(ItemRepo.CLICK);
+
                     shopManager.openShop(getCrate(), getPlayer(), shopData.shopID());
                 } else if (data.isLimitReached()) {
                     player.sendRichMessage("<bold><red>Server </red></bold><bold><dark_gray>»</bold> <gray>Dosáhl jsi limitu pro tento předmět.");
