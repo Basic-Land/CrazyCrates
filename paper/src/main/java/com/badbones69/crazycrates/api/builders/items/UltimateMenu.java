@@ -116,6 +116,7 @@ public class UltimateMenu extends InventoryBuilder {
         if (newCrateNum != -1) {
             List<CrateSettings> settings = manager.getCrateSettingsSplit().get(ultimateMenu.currentPage);
             if (settings.size() <= newCrateNum) return;
+            if (selectedCrate == newCrateNum) return;
 
             CrateSettings newCrate = settings.get(newCrateNum);
 
@@ -373,6 +374,7 @@ public class UltimateMenu extends InventoryBuilder {
                         PlayerInventory inventory = player.getInventory();
                         inventory.clear();
                         ItemStack[] items = ultimateMenu.manager.getUltimateMenuManager().getItems(player);
+                        if (items == null) return;
                         inventory.setContents(items);
                         player.updateInventory();
                     }, 1L);
