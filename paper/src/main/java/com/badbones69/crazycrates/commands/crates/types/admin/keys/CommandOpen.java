@@ -277,7 +277,7 @@ public class CommandOpen extends BaseCommand {
         final String keyName = crate.getKeyName();
 
         // Prevent it from working with these crate types.
-        if (crateType == CrateType.crate_on_the_go || crateType == CrateType.quick_crate || crateType == CrateType.fire_cracker || crateType == CrateType.quad_crate) {
+        if (crateType == CrateType.crate_on_the_go || crateType == CrateType.quick_crate || crateType == CrateType.fire_cracker || crateType == CrateType.quad_crate || crateType == CrateType.gacha) {
             final Map<String, String> placeholders = new HashMap<>();
 
             placeholders.put("{cratetype}", crateType.getName());

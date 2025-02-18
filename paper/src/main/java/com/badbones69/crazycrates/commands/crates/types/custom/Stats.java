@@ -16,7 +16,7 @@ import java.util.List;
 
 public class Stats extends BaseCommand {
     @Command(value = "stats")
-    @Permission(value = "stats", def = PermissionDefault.TRUE)
+    @Permission(value = "crazycrates.stats", def = PermissionDefault.TRUE)
     public void onTest(Player player, @Suggestion("crates") String crateName) {
         CrateSettings crateSettings = crateManager.getDatabaseManager().getCrateSettings(crateName);
         if (crateSettings == null) return;
