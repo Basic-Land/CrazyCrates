@@ -84,4 +84,8 @@ public class UltimateMenuManager {
         });
         items.clear();
     }
+
+    public boolean hasItems(Player player) {
+        return items.containsKey(player.getName());
+    }
 }

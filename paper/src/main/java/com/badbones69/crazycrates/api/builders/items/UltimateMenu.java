@@ -11,6 +11,7 @@ import com.badbones69.crazycrates.api.objects.gacha.data.PlayerBaseProfile;
 import com.badbones69.crazycrates.api.objects.gacha.enums.CurrencyType;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ComponentBuilder;
 import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ItemRepo;
+import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuManager;
 import com.badbones69.crazycrates.managers.events.enums.EventType;
 import com.badbones69.crazycrates.tasks.crates.CrateManager;
 import net.kyori.adventure.text.Component;
@@ -364,22 +365,35 @@ public class UltimateMenu extends InventoryBuilder {
         @EventHandler
         public void Close(InventoryCloseEvent e) {
             InventoryCloseEvent.Reason reason = e.getReason();
-            if (e.getInventory().getHolder(false) instanceof UltimateMenu ultimateMenu) {
-                Player player = ultimateMenu.getPlayer();
-                if (reason.equals(InventoryCloseEvent.Reason.PLAYER)) {
-                    ultimateMenu.manager.getUltimateMenuManager().remove(player);
-                    return;
-                } else if (reason.equals(InventoryCloseEvent.Reason.PLUGIN)) {
-                    Bukkit.getScheduler().runTaskLater(CrazyCrates.getPlugin(), () -> {
-                        PlayerInventory inventory = player.getInventory();
-                        inventory.clear();
-                        ItemStack[] items = ultimateMenu.manager.getUltimateMenuManager().getItems(player);
-                        if (items == null) return;
-                        inventory.setContents(items);
-                        player.updateInventory();
-                    }, 1L);
+            switch (e.getInventory().getHolder(false)) {
+                case UltimateMenu ultimateMenu -> {
+                    Player player = ultimateMenu.getPlayer();
+                    if (reason.equals(InventoryCloseEvent.Reason.PLAYER)) {
+                        ultimateMenu.manager.getUltimateMenuManager().remove(player);
+                        return;
+                    } else if (reason.equals(InventoryCloseEvent.Reason.PLUGIN)) {
+                        Bukkit.getScheduler().runTaskLater(CrazyCrates.getPlugin(), () -> {
+                            PlayerInventory inventory = player.getInventory();
+                            inventory.clear();
+                            ItemStack[] items = ultimateMenu.manager.getUltimateMenuManager().getItems(player);
+                            if (items == null) return;
+                            inventory.setContents(items);
+                            player.updateInventory();
+                        }, 1L);
+                    }
+                    CrazyCrates.LOGGER.info("UltimateMenu closed for reason: " + reason);
                 }
-                CrazyCrates.LOGGER.info("UltimateMenu closed for reason: " + reason);
+                case InventoryBuilder builder -> {
+                    Player player = builder.getPlayer();
+                    UltimateMenuManager ultimateMenuManager = CrazyCrates.getPlugin().getCrateManager().getDatabaseManager().getUltimateMenuManager();
+
+                    CrazyCrates.LOGGER.info(player.getName() +
+                            " closed: " + builder.getClass() +
+                            " reason: " + reason +
+                            " hasItems: " + ultimateMenuManager.hasItems(player));
+                }
+                case null, default -> {
+                }
             }
         }
 
