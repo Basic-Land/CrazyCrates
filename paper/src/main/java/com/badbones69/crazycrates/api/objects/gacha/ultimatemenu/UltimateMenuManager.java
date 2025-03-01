@@ -69,6 +69,7 @@ public class UltimateMenuManager {
         ItemStack[] itemStacks = items.get(player.getName());
         if (itemStacks != null) {
             player.getInventory().setContents(itemStacks);
+            player.updateInventory();
         }
         databaseManager.clearInventory(player);
         items.remove(player.getName());

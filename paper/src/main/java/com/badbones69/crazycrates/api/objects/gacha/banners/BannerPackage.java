@@ -2,11 +2,16 @@ package com.badbones69.crazycrates.api.objects.gacha.banners;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
 
-public record BannerPackage(BannerData currentBanner, BannerData nextBanner, boolean enabled) {
+public record BannerPackage(List<BannerData> bannerDataList, boolean enabled) {
 
     public BannerData getBanner() {
-        return enabled ? currentBanner.isBannerActive() ? currentBanner : nextBanner.isBannerActive() ? nextBanner : null : null;
+        return bannerDataList.stream()
+                .filter(BannerData::isBannerActive)
+                .min(Comparator.comparing(BannerData::end))
+                .orElse(null);
     }
 
     public boolean isBannerActive() {
@@ -27,13 +32,5 @@ public record BannerPackage(BannerData currentBanner, BannerData nextBanner, boo
                 duration.toDaysPart(),
                 duration.toHoursPart(),
                 duration.toMinutesPart());
-    }
-
-    public boolean isCurrentBanner() {
-        return currentBanner.isBannerActive();
-    }
-
-    public boolean isNextBanner() {
-        return nextBanner.isBannerActive();
     }
 }

@@ -66,7 +66,7 @@ public class ItemPreview extends InventoryBuilder {
             return this;
         }
 
-        int totalPages = Math.ceilDiv(items.size(), getSize());
+        int totalPages = Math.ceilDiv(items.size(), 45);
 
         // Clear the inventory
         getInventory().clear();
@@ -128,7 +128,7 @@ public class ItemPreview extends InventoryBuilder {
             // Previous page
             holder.page--;
             holder.build();
-        } else if (slot == holder.getSize() - 1 && holder.page < Math.ceilDiv(holder.items.size(), holder.getSize()) - 1) {
+        } else if (slot == holder.getSize() - 1 && holder.page < Math.ceilDiv(holder.items.size(), 45) - 1) {
             // Next page
             holder.page++;
             holder.build();

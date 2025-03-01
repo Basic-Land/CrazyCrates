@@ -86,16 +86,15 @@ public class CrateSettings {
         CustomFile customFile = plugin.getVital().getFileManager().getFile(bannerFile, true);
 
         if (customFile == null) {
-            bannerPackage = new BannerPackage(null, null, false);
+            bannerPackage = new BannerPackage(null, false);
             return;
         }
 
+        List<BannerData> banners = new ArrayList<>();
         YamlConfiguration yaml = customFile.getConfiguration();
+        yaml.getKeys(false).forEach(key -> banners.add(getBanner(yaml, key)));
 
-        BannerData currentBanner = getBanner(yaml, "currentBanner");
-        BannerData nextBanner = getBanner(yaml, "nextBanner");
-
-        bannerPackage = new BannerPackage(currentBanner, nextBanner, true);
+        bannerPackage = new BannerPackage(banners, true);
         updateItems();
     }
 
@@ -136,15 +135,14 @@ public class CrateSettings {
     }
 
     private BannerData getBanner(YamlConfiguration file, String banner) {
-        String bannerName = file.getString("Banner.Name");
-
         String path = banner + ".duration.start";
         LocalDateTime start = getTime(file, path);
 
         path = banner + ".duration.end";
         LocalDateTime end = getTime(file, path);
+        int modelData = file.getInt(banner + ".model-data", 1000002);
 
-        return new BannerData(bannerName, start, end, getItems(file, banner));
+        return new BannerData(start, end, getItems(file, banner), modelData);
     }
 
     private List<BannerItem> getItems(YamlConfiguration file, String banner) {
@@ -294,48 +292,53 @@ public class CrateSettings {
         List<String> lore = new ArrayList<>();
 
         lore.add("");
-        lore.add("<dark_gray>│ <white>Pity: <yellow>" + raritySettings.pity());
-        lore.add("<dark_gray>│ <white>Základní šance: <yellow>" + raritySettings.baseChance() + "<white>%");
+        lore.add("<white>Pity: <yellow>" + raritySettings.pity());
+        lore.add("<white>Základní šance: <yellow>" + raritySettings.baseChance() + "<white>%");
 
-        lore.add("<dark_gray>│ <white>50/50 je: <yellow>" + (raritySettings.is5050Enabled() ? "Zapnutá" : "Vypnutá"));
+        lore.add("<white>50/50 je: <yellow>" + (raritySettings.is5050Enabled() ? "Zapnutá" : "Vypnutá"));
         if (raritySettings.is5050Enabled()) {
-            lore.add("<dark_gray>│ <white>50/50 Šance: <yellow>" + raritySettings.get5050Chance() + "<white>% na výhru");
+            lore.add("<white>50/50 Šance: <yellow>" + raritySettings.get5050Chance() + "<white>% na výhru");
         }
 
         if (raritySettings.softPityFrom() != 1) {
-            lore.add("<dark_gray>│ <white>Soft pity začíná od: <yellow>" + raritySettings.softPityFrom() + " <white>otevření");
+            lore.add("<white>Soft pity začíná od: <yellow>" + raritySettings.softPityFrom() + " <white>otevření");
             if (raritySettings.staticFormula()) {
-                lore.add("<dark_gray>│ <white>a od <yellow>" + raritySettings.softPityFrom() + "<white> a výše je <yellow>" + raritySettings.softPityFormula() + "<white>%");
+                lore.add("<white>a od <yellow>" + raritySettings.softPityFrom() + "<white> a výše je <yellow>" + raritySettings.softPityFormula() + "<white>%");
             } else {
-                lore.add("<dark_gray>│ <white>Soft pity od <yellow>" + raritySettings.softPityFrom() + "<white> se zvyšuje o <yellow>" + raritySettings.softPityFormula() + "<white>% pokaždém otevření");
+                lore.add("<white>Soft pity od <yellow>" + raritySettings.softPityFrom() + "<white> se zvyšuje o <yellow>" + raritySettings.softPityFormula() + "<white>% pokaždém otevření");
             }
             if (raritySettings.softPityLimit() != -1) {
-                lore.add("<dark_gray>│ <white>Maximální šance pro soft pity je <yellow>" + raritySettings.softPityLimit() + "<white>%");
+                lore.add("<white>Maximální šance pro soft pity je <yellow>" + raritySettings.softPityLimit() + "<white>%");
             }
         }
 
-        int maxSize = 0;
-        int size;
-        for (String s : lore) {
-            size = ComponentBuilder.getSize(s);
-            if (size > maxSize) {
-                maxSize = size;
-            }
-        }
+        int maxSize = lore.stream().map(ComponentBuilder::getSize).max(Integer::compareTo).orElse(0);
 
         StringBuilder sb = new StringBuilder();
 
         sb.append("<dark_gray>┌");
 
-        int i = 6;
-        while (i < maxSize) {
+        int pixelLenght = -1;
+        while (pixelLenght < maxSize) {
             sb.append("─");
-            i += 9;
+            pixelLenght += 9;
+        }
+
+        sb.append("┐");
+
+        for (int lineNumber = 1; lineNumber < lore.size(); lineNumber++) {
+            String line = lore.get(lineNumber);
+            int size = ComponentBuilder.getSize(line);
+            int totalSpaceSize = pixelLenght - size;
+            int leftSpaceSize = totalSpaceSize / 2;
+            int rightSpaceSize = totalSpaceSize - leftSpaceSize;
+            lore.set(lineNumber, "<dark_gray>│ <font:space:default><lang:space." + leftSpaceSize + "></font>" + line + "<font:space:default><lang:space." + rightSpaceSize + "></font>" + "<reset><dark_gray>│");
         }
 
         lore.add(1, sb.toString());
 
         sb.setCharAt(11, '└');
+        sb.setCharAt(sb.length() - 1, '┘');
 
         lore.add(sb.toString());
 

@@ -4,8 +4,6 @@ import com.badbones69.crazycrates.api.builders.InventoryBuilder;
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.ItemManager;
-import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
-import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Table;
 import org.bukkit.Material;
@@ -16,15 +14,12 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
-import java.util.List;
 
 public class ItemAddMenu extends InventoryBuilder {
-    private final Rarity rarity;
     private final RewardType type;
 
-    public ItemAddMenu(Player player, int size, String title, Crate crate, Rarity rarity, RewardType type) {
+    public ItemAddMenu(Player player, int size, String title, Crate crate, RewardType type) {
         super(player, title, size, crate);
-        this.rarity = rarity;
         this.type = type;
     }
 
@@ -64,37 +59,12 @@ public class ItemAddMenu extends InventoryBuilder {
     }
 
     private void saveItems(ItemStack[] items, ItemAddMenu holder) {
-        Crate crate = holder.getCrate();
-        Rarity rarity = holder.rarity;
         RewardType type = holder.type;
-        CrateSettings crateSettings = crate.getCrateSettings();
         ItemManager itemManager = holder.plugin.getCrateManager().getDatabaseManager().getItemManager();
         if (type.equals(RewardType.SHOP)) {
             Arrays.stream(items).filter(item -> item != null && item.getType() != Material.AIR).forEach(item -> itemManager.addItem(item, Table.SHOP_ITEMS));
             return;
         }
-
-        String path;
-        if (type.equals(RewardType.EXTRA_REWARD)) {
-            path = "Crate.Gacha.extra-reward.items";
-        } else {
-            path = "Crate.Gacha." + type.name().toLowerCase() + "." + rarity.name().toLowerCase() + ".list";
-        }
-
-        List<Integer> ids = crate.getFile().getIntegerList(path);
-
-        for (ItemStack item : items) {
-            if (item == null || item.getType() == Material.AIR) continue;
-
-            int id = itemManager.addItem(item, Table.ALL_ITEMS);
-            if (id == -1) continue;
-
-            crateSettings.addItem(type, id, rarity, item, crate);
-
-            ids.add(id);
-        }
-
-        crate.getFile().set(path, ids);
-        crate.saveFile();
+        Arrays.stream(items).filter(item -> item != null && item.getType() != Material.AIR).forEach(item -> itemManager.addItem(item, Table.ALL_ITEMS));
     }
 }

@@ -5,6 +5,7 @@ import com.badbones69.crazycrates.api.builders.InventoryBuilder;
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
+import com.badbones69.crazycrates.api.objects.gacha.banners.BannerData;
 import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.api.objects.gacha.data.OpenData;
 import com.badbones69.crazycrates.api.objects.gacha.data.PlayerBaseProfile;
@@ -38,9 +39,7 @@ import static net.kyori.adventure.text.minimessage.MiniMessage.miniMessage;
 
 public class UltimateMenu extends InventoryBuilder {
     private final DatabaseManager manager;
-    private final int selectedCrate;
-    private final int totalPageAmount;
-    private final int currentPage;
+    private final int selectedCrate, totalPageAmount, currentPage;
     private boolean premiumShop, store = false;
     private OpenData openData = null;
 
@@ -319,7 +318,8 @@ public class UltimateMenu extends InventoryBuilder {
     private void setTextureGlass() {
         PlayerInventory playerInventory = getPlayer().getInventory();
         playerInventory.setItem(27, ItemRepo.MAIN_MENU.asItemStack());
-        playerInventory.setItem(28, ItemRepo.BANNER.asItemStack());
+        BannerData banner = getCrate().getCrateSettings().getBannerPackage().getBanner();
+        playerInventory.setItem(28, ItemRepo.BANNER.setCustomModelData(banner == null ? -1 : banner.modelData()).asItemStack());
     }
 
     private void setItemsPlayerInv() {
