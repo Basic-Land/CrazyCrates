@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Arrays;
 
 import static net.kyori.adventure.text.Component.text;
 
@@ -71,9 +72,11 @@ public class Result implements Serializable {
         TextComponent.Builder out = text();
         out.color(NamedTextColor.GRAY);
 
-        for (String s : type.toLowerCase().split("_")) {
-            out.append(text(s.substring(0, 1).toUpperCase())).append(text(s.substring(1))).appendSpace();
-        }
+        Arrays.stream(type.toLowerCase().split("_"))
+                .forEach(s -> out.append(text(s.substring(0, 1).toUpperCase()))
+                        .append(text(s.substring(1)))
+                        .appendSpace()
+                );
 
         return JSONComponentSerializer.json().serialize(out.build());
     }

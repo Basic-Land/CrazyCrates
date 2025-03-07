@@ -201,9 +201,7 @@ public class DatabaseManager {
     private PlayerProfile addBlankPlayerData(String playerName, String crateName) {
         StringBuilder query = new StringBuilder("INSERT INTO PlayerData(playerName, baseData");
 
-        for (CrateSettings crateSettings : crateSettings) {
-            query.append(", ").append(crateSettings.getCrateName());
-        }
+        crateSettings.forEach(crateSettings -> query.append(", ").append(crateSettings.getCrateName()));
 
         List<byte[]> profiles = new ArrayList<>();
 

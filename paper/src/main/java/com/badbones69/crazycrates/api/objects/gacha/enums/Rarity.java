@@ -4,6 +4,8 @@ import lombok.Getter;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 
+import java.util.Arrays;
+
 @Getter
 public enum Rarity {
     COMMON(NamedTextColor.GRAY, 1000002, "Common"),
@@ -34,12 +36,10 @@ public enum Rarity {
     }
 
     public static Rarity getRarity(String name) {
-        for (Rarity rarity : values()) {
-            if (rarity.name().equalsIgnoreCase(name)) {
-                return rarity;
-            }
-        }
-        return null;
+        return Arrays.stream(values())
+                .filter(rarity -> rarity.name().equalsIgnoreCase(name))
+                .findFirst()
+                .orElse(null);
     }
 
     public boolean isLegendary() {

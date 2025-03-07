@@ -34,9 +34,7 @@ public class PlayerProfile implements Serializable {
     public PlayerProfile(String playerName, Collection<Rarity> rarities, int extraRewardPity) {
         this.playerName = playerName;
         this.extraRewardPity = extraRewardPity;
-        for (Rarity rarity : rarities) {
-            map.put(rarity, new Pair<>(0, ResultType.WON));
-        }
+        rarities.forEach(rarity -> map.put(rarity, new Pair<>(0, ResultType.WON)));
     }
 
     public Pair<Integer, ResultType> getPity(Rarity rarity) {

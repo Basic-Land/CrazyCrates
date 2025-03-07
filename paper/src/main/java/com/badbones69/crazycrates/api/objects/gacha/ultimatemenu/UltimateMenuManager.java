@@ -36,11 +36,8 @@ public class UltimateMenuManager {
         UUID playerId = player.getUniqueId();
         long currentTime = System.currentTimeMillis();
 
-        if (cooldowns.containsKey(playerId)) {
-            long lastOpenTime = cooldowns.get(playerId);
-            if (currentTime - lastOpenTime < COOLDOWN_TIME) {
-                return; // Cooldown period has not passed, do not open the menu
-            }
+        if (cooldowns.getOrDefault(playerId, 0L) + COOLDOWN_TIME > currentTime) {
+            return;
         }
 
         cooldowns.put(playerId, currentTime);

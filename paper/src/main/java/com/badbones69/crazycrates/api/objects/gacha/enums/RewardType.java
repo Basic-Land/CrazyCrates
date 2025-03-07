@@ -2,6 +2,8 @@ package com.badbones69.crazycrates.api.objects.gacha.enums;
 
 import lombok.Getter;
 
+import java.util.Arrays;
+
 @Getter
 public enum RewardType {
     STANDARD("Standard"),
@@ -16,11 +18,9 @@ public enum RewardType {
     }
 
     public static RewardType fromString(String string) {
-        for (RewardType rewardType : values()) {
-            if (rewardType.name().equalsIgnoreCase(string)) {
-                return rewardType;
-            }
-        }
-        return null;
+        return Arrays.stream(values())
+                .filter(rewardType -> rewardType.name().equalsIgnoreCase(string))
+                .findFirst()
+                .orElse(null);
     }
 }

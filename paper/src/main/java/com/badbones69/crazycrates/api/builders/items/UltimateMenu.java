@@ -370,7 +370,6 @@ public class UltimateMenu extends InventoryBuilder {
                     Player player = ultimateMenu.getPlayer();
                     if (reason.equals(InventoryCloseEvent.Reason.PLAYER)) {
                         ultimateMenu.manager.getUltimateMenuManager().remove(player);
-                        return;
                     } else if (reason.equals(InventoryCloseEvent.Reason.PLUGIN)) {
                         Bukkit.getScheduler().runTaskLater(CrazyCrates.getPlugin(), () -> {
                             PlayerInventory inventory = player.getInventory();
@@ -379,22 +378,24 @@ public class UltimateMenu extends InventoryBuilder {
                             if (items == null) return;
                             inventory.setContents(items);
                             player.updateInventory();
+                            print(player, reason, ultimateMenu);
                         }, 1L);
+                        return;
                     }
-                    CrazyCrates.LOGGER.info("UltimateMenu closed for reason: " + reason);
+                    print(player, reason, ultimateMenu);
                 }
-                case InventoryBuilder builder -> {
-                    Player player = builder.getPlayer();
-                    UltimateMenuManager ultimateMenuManager = CrazyCrates.getPlugin().getCrateManager().getDatabaseManager().getUltimateMenuManager();
-
-                    CrazyCrates.LOGGER.info(player.getName() +
-                            " closed: " + builder.getClass() +
-                            " reason: " + reason +
-                            " hasItems: " + ultimateMenuManager.hasItems(player));
-                }
+                case InventoryBuilder builder -> print(builder.getPlayer(), reason, builder);
                 case null, default -> {
                 }
             }
+        }
+
+        private void print(Player player, InventoryCloseEvent.Reason reason, InventoryBuilder builder) {
+            UltimateMenuManager ultimateMenuManager = CrazyCrates.getPlugin().getCrateManager().getDatabaseManager().getUltimateMenuManager();
+            CrazyCrates.LOGGER.info(player.getName() +
+                    " closed " + (builder instanceof UltimateMenu ? "Ultimatemenu" : builder.getClass().getName()) +
+                    " reason: " + reason +
+                    " hasItems: " + ultimateMenuManager.hasItems(player));
         }
 
         @EventHandler
