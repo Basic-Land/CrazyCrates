@@ -14,16 +14,19 @@ import org.bukkit.inventory.PlayerInventory;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.IntStream;
 
 public class ItemEdit extends InventoryBuilder {
     private final ItemPreview preview;
     private final ItemStack itemStack;
+    private final Table table;
     private final List<Integer> slots = List.of(10, 11, 15, 18, 26);
 
-    public ItemEdit(ItemPreview preview, Player player, int size, String title, ItemStack itemStack) {
+    public ItemEdit(ItemPreview preview, Player player, int size, String title, ItemStack itemStack, Table table) {
         super(player, title, size, preview.getCrate());
         this.preview = preview;
         this.itemStack = itemStack;
+        this.table = table;
     }
 
     @Override
@@ -37,10 +40,7 @@ public class ItemEdit extends InventoryBuilder {
         getInventory().setItem(11, itemStack);
         getInventory().setItem(18, back);
         getInventory().setItem(26, save);
-        for (int i = 0; i < getSize(); i++) {
-            if (slots.contains(i)) continue;
-            getInventory().setItem(i, glass);
-        }
+        IntStream.range(0, getSize()).filter(i -> !slots.contains(i)).forEach(i -> getInventory().setItem(i, glass));
 
         return this;
     }
@@ -74,7 +74,7 @@ public class ItemEdit extends InventoryBuilder {
                     Integer id = nbt.getInteger("itemID");
                     if (id == null || id == 0) return;
                     try {
-                        holder.plugin.getCrateManager().getDatabaseManager().getItemManager().updateItem(id, DBItemStack.encodeItem(stack), Table.ALL_ITEMS);
+                        holder.plugin.getCrateManager().getDatabaseManager().getItemManager().updateItem(id, DBItemStack.encodeItem(stack), holder.table);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }

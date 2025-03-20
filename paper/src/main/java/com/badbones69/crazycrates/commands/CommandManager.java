@@ -100,16 +100,7 @@ public class CommandManager {
             if (crate == null) return Collections.emptyList();
             CrateSettings crateSettings = crate.getCrateSettings();
             if (crateSettings == null) return Collections.emptyList();
-            if (context.get(1).equalsIgnoreCase("EXTRA_REWARD")) {
-                return Collections.singletonList("EXTRA_REWARD");
-            } else {
-                RaritySettings raritySettings = crateSettings.getRarityMap().get(Rarity.valueOf(context.get(1)));
-                if (raritySettings.is5050Enabled()) {
-                    return List.of("LIMITED", "STANDARD");
-                } else {
-                    return Collections.singletonList("LIMITED");
-                }
-            }
+            return Arrays.stream(RewardType.values()).map(RewardType::getName).toList();
         });
 
         commandManager.registerSuggestion(SuggestionKey.of("rarities"), (sender, context) -> {

@@ -30,6 +30,7 @@ public class ItemPreview extends InventoryBuilder {
     private final boolean leftClick;
     private final boolean editing;
     private final Rarity rarity;
+    private final Table table;
     private int page = 0;
 
     public ItemPreview(Player player, int size, String title, Table type) {
@@ -39,6 +40,7 @@ public class ItemPreview extends InventoryBuilder {
         this.rarity = null;
         this.raritiesMenu = null;
         this.leftClick = true;
+        this.table = type;
         ItemManager itemManager = CrazyCrates.getPlugin().getCrateManager().getDatabaseManager().getItemManager();
         items = itemManager.getAllItemsFromCache(type).entrySet().stream()
                 .map(entry -> new Pair<>(entry.getKey(), entry.getValue().clone()))
@@ -52,6 +54,7 @@ public class ItemPreview extends InventoryBuilder {
         this.leftClick = leftClick;
         this.editing = true;
         this.rarity = rarity;
+        this.table = Table.ALL_ITEMS;
         ItemManager itemManager = CrazyCrates.getPlugin().getCrateManager().getDatabaseManager().getItemManager();
         items = itemManager.getAllItemsFromCache(Table.ALL_ITEMS).entrySet().stream()
                 .filter(entry -> leftClick != ids.contains(entry.getKey()))
@@ -162,7 +165,7 @@ public class ItemPreview extends InventoryBuilder {
                 crate.saveFile();
                 player.openInventory(holder.raritiesMenu.getInventory());
             } else {
-                player.openInventory(new ItemEdit(holder, player, 27, "Edit Item", item).build().getInventory());
+                player.openInventory(new ItemEdit(holder, player, 27, "Edit Item", item, holder.table).build().getInventory());
             }
         } else if (slot == holder.getSize() - 5 && holder.editing && holder.raritiesMenu != null && holder.rarity != null) {
             player.openInventory(holder.raritiesMenu.getInventory());
