@@ -1,30 +1,36 @@
 plugins {
+    id("paper-plugin")
+
     alias(libs.plugins.runPaper)
     alias(libs.plugins.shadow)
 }
 
+project.group = "${rootProject.group}.paper"
+project.version = rootProject.version
+project.description = "Add crates to your Paper server with 11 different crate types to choose from!"
+
 repositories {
-    maven("https://repo.papermc.io/repository/maven-public")
+    maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
 
-    maven("https://repo.extendedclip.com/content/repositories/placeholderapi")
+    maven("https://repo.triumphteam.dev/snapshots/")
 
-    maven("https://repo.triumphteam.dev/snapshots")
+    maven("https://repo.fancyplugins.de/releases/")
 
-    maven("https://repo.fancyplugins.de/releases")
+    maven("https://repo.nexomc.com/snapshots/")
 
-    maven("https://repo.oraxen.com/releases")
+    maven("https://repo.oraxen.com/releases/")
 }
 
 dependencies {
-    implementation(project(":common"))
+    implementation(project(":crazycrates-core"))
 
     compileOnly(fileTree("$projectDir/libs/compile").include("*.jar"))
 
     implementation(libs.triumph.cmds)
 
-    implementation(libs.vital.paper) {
-        exclude("org.yaml")
-    }
+    implementation(libs.fusion.paper)
+
+    implementation(libs.metrics)
 
     compileOnly(libs.bundles.dependencies)
     compileOnly(libs.bundles.shared)
@@ -38,12 +44,16 @@ dependencies {
 }
 
 tasks {
-    runServer {
-        jvmArgs("-Dnet.kyori.ansi.colorLevel=truecolor", "-Xmx4G", "-Xms4G", "-XX:+AllowEnhancedClassRedefinition", "-XX:NonProfiledCodeHeapSize=512M", "-XX:ReservedCodeCacheSize=640M", )
+    shadowJar {
+        archiveBaseName.set(rootProject.name)
+        archiveClassifier.set("")
 
-        defaultCharacterEncoding = Charsets.UTF_8.name()
-
-        minecraftVersion(libs.versions.minecraft.get())
+//        listOf(
+//            "com.ryderbelserion.fusion",
+//            "org.bstats"
+//        ).forEach {
+//            relocate(it, "libs.$it")
+//        }
     }
 
     assemble {
@@ -57,29 +67,25 @@ tasks {
         }
     }
 
-    shadowJar {
-        archiveBaseName.set(rootProject.name)
-        archiveClassifier.set("")
-
-//        listOf(
-//            "com.ryderbelserion.vital",
-//            "dev.triumphteam.cmd"
-//        ).forEach {
-//            relocate(it, "libs.$it")
-//        }
-    }
-
     processResources {
         inputs.properties("name" to rootProject.name)
         inputs.properties("version" to project.version)
         inputs.properties("group" to project.group)
         inputs.properties("apiVersion" to libs.versions.minecraft.get())
         inputs.properties("description" to project.description)
-        inputs.properties("website" to "https://modrinth.com/plugin/crazycrates")
+        inputs.properties("website" to rootProject.properties["website"].toString())
 
         filesMatching("paper-plugin.yml") {
             expand(inputs.properties)
         }
+    }
+
+    runServer {
+        jvmArgs("-Dnet.kyori.ansi.colorLevel=truecolor")
+
+        defaultCharacterEncoding = Charsets.UTF_8.name()
+
+        minecraftVersion(libs.versions.minecraft.get())
     }
 }
 

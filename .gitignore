@@ -1,21 +1,10 @@
-.gradle
+### Intellij
+.kotlin
 .idea
-build
 
-buildSrc/.gradle
-buildSrc/build
+### Gradle
+.gradle
+build/
+run/
 
-api/.gradle
-api/build
-paper/libs/compile/bLibs-2.0.0-WIP.jar
-
-paper/run
-
-!paper/run/config/paper-global.yml
-!paper/run/config/paper-world-defaults.yml
-!paper/run/bukkit.yml
-!paper/run/eula.txt
-!paper/run/server.properties
-!paper/run/spigot.yml
-
-jars
+jars/

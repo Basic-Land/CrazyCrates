@@ -1,52 +1,25 @@
 plugins {
-    alias(libs.plugins.shadow)
+    id("root-plugin")
+
+    `maven-publish`
 }
 
 project.group = "us.crazycrew.crazycrates"
+project.description = "The official API for CrazyCrates!"
 project.version = "0.8"
 
-repositories {
-    maven("https://repo.papermc.io/repository/maven-public")
-}
-
 dependencies {
-    compileOnly(libs.paper)
+    compileOnly(libs.bundles.adventure)
 }
 
-val javaComponent: SoftwareComponent = components["java"]
+publishing {
+    repositories {
+        maven {
+            url = uri("https://repo.crazycrew.us/releases/")
 
-tasks {
-    val sourcesJar by creating(Jar::class) {
-        archiveClassifier.set("sources")
-        from(sourceSets.main.get().allSource)
-    }
-
-    val javadocJar by creating(Jar::class) {
-        dependsOn.add(javadoc)
-        archiveClassifier.set("javadoc")
-        from(javadoc)
-    }
-
-    publishing {
-        repositories {
-            maven {
-                url = uri("https://repo.crazycrew.us/releases")
-
-                credentials {
-                    this.username = System.getenv("gradle_username")
-                    this.password = System.getenv("gradle_password")
-                }
-            }
-        }
-
-        publications {
-            create<MavenPublication>("maven") {
-                artifactId = "api"
-
-                from(javaComponent)
-
-                artifact(sourcesJar)
-                artifact(javadocJar)
+            credentials {
+                this.username = System.getenv("gradle_username")
+                this.password = System.getenv("gradle_password")
             }
         }
     }
