@@ -1,17 +1,18 @@
-package com.badbones69.crazycrates.api.builders.items;
+package com.badbones69.crazycrates.paper.api.builders.items;
 
-import com.badbones69.crazycrates.api.builders.InventoryBuilder;
-import com.badbones69.crazycrates.api.builders.ItemBuilder;
-import com.badbones69.crazycrates.api.objects.Crate;
-import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
-import com.badbones69.crazycrates.api.objects.gacha.data.PlayerProfile;
-import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ItemRepo;
-import com.badbones69.crazycrates.tasks.menus.CrateTierMenu;
+import com.badbones69.crazycrates.paper.api.builders.InventoryBuilder;
+import com.badbones69.crazycrates.paper.api.builders.LegacyItemBuilder;
+import com.badbones69.crazycrates.paper.api.objects.Crate;
+import com.badbones69.crazycrates.paper.api.objects.gacha.DatabaseManager;
+import com.badbones69.crazycrates.paper.api.objects.gacha.data.PlayerProfile;
+import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.ItemRepo;
+import com.badbones69.crazycrates.paper.tasks.menus.CrateTierMenu;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.ItemType;
 
 import java.util.List;
 
@@ -22,9 +23,9 @@ public class BonusPityMenu extends InventoryBuilder {
     private int lastItemSlot = 10;
     private final List<ItemStack> extraRewards;
     private final CrateTierMenu crateTierMenu;
-    private final static ItemStack orangeGlassPane = glass(Material.ORANGE_STAINED_GLASS_PANE);
-    private final static ItemStack redGlassPane = glass(Material.RED_STAINED_GLASS_PANE);
-    private final static ItemStack greenGlassPane = glass(Material.GREEN_STAINED_GLASS_PANE);
+    private final static ItemStack orangeGlassPane = glass(ItemType.ORANGE_STAINED_GLASS_PANE);
+    private final static ItemStack redGlassPane = glass(ItemType.RED_STAINED_GLASS_PANE);
+    private final static ItemStack greenGlassPane = glass(ItemType.GREEN_STAINED_GLASS_PANE);
 
     public BonusPityMenu(Crate crate, Player player, int size, String title, CrateTierMenu crateTierMenu) {
         super(player, title, size, crate);
@@ -83,11 +84,11 @@ public class BonusPityMenu extends InventoryBuilder {
         getInventory().setItem(27, pageBackItem); // Page back
         getInventory().setItem(35, pageForwardItem); // Page forward
 
-        ItemBuilder backItem = new ItemBuilder(Material.ARROW).setCustomModelData(1000002);
+        LegacyItemBuilder backItem = new LegacyItemBuilder(ItemType.ARROW).setCustomModelData(1000002);
         getInventory().setItem(29, backItem.asItemStack());
 
         // Set the paper at the specified position
-        ItemStack paper = new ItemBuilder(Material.PAPER)
+        ItemStack paper = new LegacyItemBuilder(ItemType.PAPER)
                 .setCustomModelData(10)
                 .setDisplayName("#f0af37Progress " + totalPity + "/" + extraRewardPity)
                 .asItemStack();
@@ -96,7 +97,7 @@ public class BonusPityMenu extends InventoryBuilder {
         // Set the barrier or player head at the specified position based on a condition
         boolean extraPity = playerProfile.reachedExtraRewardPity();
 
-        ItemBuilder confirm = new ItemBuilder(extraPity ? Material.ARROW : Material.BARRIER)
+        LegacyItemBuilder confirm = new LegacyItemBuilder(extraPity ? ItemType.ARROW : ItemType.BARRIER)
                 .setCustomModelData(1000001);
 
         if (extraPity) {
@@ -191,7 +192,7 @@ public class BonusPityMenu extends InventoryBuilder {
         build();
     }
 
-    private static ItemStack glass(Material item) {
-        return new ItemBuilder(item).setCustomModelData(1000001).setDisplayName("<gray>").asItemStack();
+    private static ItemStack glass(ItemType item) {
+        return new LegacyItemBuilder(item).setCustomModelData(1000001).setDisplayName("<gray>").asItemStack();
     }
 }

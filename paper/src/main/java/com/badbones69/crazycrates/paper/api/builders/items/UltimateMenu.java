@@ -1,20 +1,20 @@
-package com.badbones69.crazycrates.api.builders.items;
+package com.badbones69.crazycrates.paper.api.builders.items;
 
-import com.badbones69.crazycrates.CrazyCrates;
-import com.badbones69.crazycrates.api.builders.InventoryBuilder;
-import com.badbones69.crazycrates.api.builders.ItemBuilder;
-import com.badbones69.crazycrates.api.objects.Crate;
-import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
-import com.badbones69.crazycrates.api.objects.gacha.banners.BannerData;
-import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
-import com.badbones69.crazycrates.api.objects.gacha.data.OpenData;
-import com.badbones69.crazycrates.api.objects.gacha.data.PlayerBaseProfile;
-import com.badbones69.crazycrates.api.objects.gacha.enums.CurrencyType;
-import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ComponentBuilder;
-import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ItemRepo;
-import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.UltimateMenuManager;
-import com.badbones69.crazycrates.managers.events.enums.EventType;
-import com.badbones69.crazycrates.tasks.crates.CrateManager;
+import com.badbones69.crazycrates.paper.CrazyCrates;
+import com.badbones69.crazycrates.paper.api.builders.InventoryBuilder;
+import com.badbones69.crazycrates.paper.api.builders.LegacyItemBuilder;
+import com.badbones69.crazycrates.paper.api.objects.Crate;
+import com.badbones69.crazycrates.paper.api.objects.gacha.DatabaseManager;
+import com.badbones69.crazycrates.paper.api.objects.gacha.banners.BannerData;
+import com.badbones69.crazycrates.paper.api.objects.gacha.data.CrateSettings;
+import com.badbones69.crazycrates.paper.api.objects.gacha.data.OpenData;
+import com.badbones69.crazycrates.paper.api.objects.gacha.data.PlayerBaseProfile;
+import com.badbones69.crazycrates.paper.api.objects.gacha.enums.CurrencyType;
+import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.ComponentBuilder;
+import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.ItemRepo;
+import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.UltimateMenuManager;
+import com.badbones69.crazycrates.paper.managers.events.enums.EventType;
+import com.badbones69.crazycrates.paper.tasks.crates.CrateManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import org.bukkit.Bukkit;
@@ -247,7 +247,7 @@ public class UltimateMenu extends InventoryBuilder {
         playerInventory.setItem(20, no);
         playerInventory.setItem(21, no);
 
-        ItemBuilder shopVotePremiumYes = ItemRepo.SHOP_VOTE_PREMIUM_YES;
+        LegacyItemBuilder shopVotePremiumYes = ItemRepo.SHOP_VOTE_PREMIUM_YES;
 
         shopVotePremiumYes.addLorePlaceholder("{keys}", keysNeeded + "");
         shopVotePremiumYes.addLorePlaceholder("{premium}", premiumNeeded + "");
@@ -268,7 +268,7 @@ public class UltimateMenu extends InventoryBuilder {
         playerInventory.setItem(20, no);
         playerInventory.setItem(21, no);
 
-        ItemBuilder shopVoteTokensYes = ItemRepo.OPEN_STORE;
+        LegacyItemBuilder shopVoteTokensYes = ItemRepo.OPEN_STORE;
 
         playerInventory.setItem(23, shopVoteTokensYes.asItemStack());
         playerInventory.setItem(24, shopVoteTokensYes.asItemStack());
@@ -279,9 +279,9 @@ public class UltimateMenu extends InventoryBuilder {
         int slot = 0;
         int crate = 0;
 
-        ItemBuilder selectedMain = ItemRepo.SELECTED;
-        ItemBuilder unselectedMain = ItemRepo.UNSELECTED;
-        ItemBuilder mainCrate = ItemRepo.MAIN_MENU_NAME;
+        LegacyItemBuilder selectedMain = ItemRepo.SELECTED;
+        LegacyItemBuilder unselectedMain = ItemRepo.UNSELECTED;
+        LegacyItemBuilder mainCrate = ItemRepo.MAIN_MENU_NAME;
 
         for (CrateSettings setting : manager.getCrateSettingsSplit().get(currentPage)) {
             if (setting == null) continue;

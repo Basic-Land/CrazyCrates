@@ -1,29 +1,29 @@
-package com.badbones69.crazycrates.tasks.crates.types.roulette;
+package com.badbones69.crazycrates.paper.tasks.crates.types.roulette;
 
-import com.badbones69.crazycrates.CrazyCrates;
-import com.badbones69.crazycrates.api.PrizeManager;
-import com.badbones69.crazycrates.api.builders.CrateBuilder;
-import com.badbones69.crazycrates.api.builders.ItemBuilder;
-import com.badbones69.crazycrates.api.objects.Crate;
-import com.badbones69.crazycrates.api.objects.gacha.data.Result;
-import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
-import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ItemRepo;
-import com.badbones69.crazycrates.tasks.crates.CrateManager;
-import com.badbones69.crazycrates.tasks.crates.other.GachaCrateManager;
-import com.badbones69.crazycrates.utils.MiscUtils;
-import com.ryderbelserion.vital.paper.util.scheduler.FoliaRunnable;
+import com.badbones69.crazycrates.paper.CrazyCrates;
+import com.badbones69.crazycrates.paper.api.PrizeManager;
+import com.badbones69.crazycrates.paper.api.builders.CrateBuilder;
+import com.badbones69.crazycrates.paper.api.builders.LegacyItemBuilder;
+import com.badbones69.crazycrates.paper.api.objects.Crate;
+import com.badbones69.crazycrates.paper.api.objects.gacha.data.Result;
+import com.badbones69.crazycrates.paper.api.objects.gacha.enums.Rarity;
+import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.ItemRepo;
+import com.badbones69.crazycrates.paper.tasks.crates.CrateManager;
+import com.badbones69.crazycrates.paper.tasks.crates.other.GachaCrateManager;
+import com.badbones69.crazycrates.paper.utils.MiscUtils;
+import com.ryderbelserion.fusion.paper.util.scheduler.FoliaScheduler;
 import lombok.Getter;
 import net.kyori.adventure.sound.Sound;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
 import java.util.UUID;
 
-public class RouletteStandard extends FoliaRunnable {
+public class RouletteStandard extends FoliaScheduler {
     private final CrateBuilder builder;
     private final Crate crate;
     private final Player player;
@@ -36,14 +36,14 @@ public class RouletteStandard extends FoliaRunnable {
     private final Rarity highestRarity;
     @Getter
     private final boolean sneak;
-    private final ItemBuilder glass = new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE);
+    private final LegacyItemBuilder glass = new LegacyItemBuilder(ItemType.GRAY_STAINED_GLASS_PANE);
     @Getter
     private int count = 1;
     @Getter
     private long time = System.currentTimeMillis();
 
     public RouletteStandard(CrateBuilder builder, List<Result> prize, boolean sneak) {
-        super(builder.getPlayer().getScheduler(), null);
+        super(null, builder.getPlayer());
         this.builder = builder;
         this.crate = builder.getCrate();
         this.player = builder.getPlayer();
@@ -165,7 +165,7 @@ public class RouletteStandard extends FoliaRunnable {
                         .stream()
                         .filter(prize -> prize.getSectionName().equals(itemData.getPrize().getSectionName()))
                         .findFirst()
-                        .ifPresent(prize -> PrizeManager.givePrize(player, prize, crate)));
+                        .ifPresent(prize -> PrizeManager.givePrize(player, crate, prize)));
 
         new BukkitRunnable() {
             @Override

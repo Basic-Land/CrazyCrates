@@ -7,8 +7,8 @@ import com.badbones69.crazycrates.paper.api.PrizeManager;
 import com.badbones69.crazycrates.paper.api.builders.LegacyItemBuilder;
 import com.badbones69.crazycrates.paper.api.enums.Messages;
 import com.badbones69.crazycrates.paper.api.enums.other.Plugins;
-import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
-import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
+import com.badbones69.crazycrates.paper.api.objects.gacha.enums.Rarity;
+import com.badbones69.crazycrates.paper.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.paper.api.enums.other.keys.ItemKeys;
 import com.badbones69.crazycrates.paper.utils.ItemUtils;
 import com.badbones69.crazycrates.paper.utils.MiscUtils;
@@ -22,7 +22,6 @@ import lombok.Getter;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Color;
 import org.bukkit.Server;
@@ -133,7 +132,8 @@ public class Prize {
         NBT nbt = new NBT(itemStack);
         nbt.remove("rewardName");
 
-        this.builders = give ? Collections.singletonList(new ItemBuilder(itemStack).setAmount(itemStack.getAmount())) : Collections.emptyList();
+        this.builders = give ? Collections.singletonList(new LegacyItemBuilder(itemStack).setAmount(itemStack.getAmount())) : Collections.emptyList();
+        this.items = Collections.emptyList();
 
         this.tiers = Collections.singletonList(tier);
 
@@ -150,7 +150,7 @@ public class Prize {
 
         this.permissions = Collections.emptyList();
 
-        this.displayItem = new ItemBuilder(stack.clone());
+        this.displayItem = new LegacyItemBuilder(stack.clone());
 
         displayItem.addDisplayLore("<white>");
         displayItem.addDisplayLore("<gray>Typ: " + type.getName());

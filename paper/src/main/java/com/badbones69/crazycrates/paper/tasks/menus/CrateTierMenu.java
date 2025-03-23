@@ -1,11 +1,11 @@
 package com.badbones69.crazycrates.paper.tasks.menus;
 
 import com.badbones69.crazycrates.paper.api.builders.gui.StaticInventoryBuilder;
-import com.badbones69.crazycrates.api.builders.items.BonusPityMenu;
+import com.badbones69.crazycrates.paper.api.builders.items.BonusPityMenu;
 import com.badbones69.crazycrates.paper.api.enums.other.keys.ItemKeys;
 import com.badbones69.crazycrates.paper.api.objects.Crate;
 import com.badbones69.crazycrates.paper.api.objects.Tier;
-import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ItemRepo;
+import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.ItemRepo;
 import com.ryderbelserion.fusion.paper.builder.gui.interfaces.Gui;
 import com.ryderbelserion.fusion.paper.builder.gui.interfaces.GuiFiller;
 import com.ryderbelserion.fusion.paper.builder.gui.interfaces.GuiItem;
@@ -32,6 +32,7 @@ public class CrateTierMenu extends StaticInventoryBuilder {
         if (this.crate == null) return;
 
         final boolean isPreviewBorderEnabled = this.crate.isPreviewTierBorderToggle();
+        boolean gacha = crate.getCrateType().isGacha();
 
         if (isPreviewBorderEnabled) {
             final GuiItem guiItem = this.crate.getPreviewTierBorderItem().setPlayer(this.player).setCustomModelData(gacha ? 1000001 : -1).asGuiItem();

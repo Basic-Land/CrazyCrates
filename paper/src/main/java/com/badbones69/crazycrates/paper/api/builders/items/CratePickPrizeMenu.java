@@ -1,26 +1,27 @@
-package com.badbones69.crazycrates.api.builders.items;
+package com.badbones69.crazycrates.paper.api.builders.items;
 
-import com.badbones69.crazycrates.api.builders.InventoryBuilder;
-import com.badbones69.crazycrates.api.builders.ItemBuilder;
-import com.badbones69.crazycrates.api.objects.Crate;
-import com.badbones69.crazycrates.api.objects.Tier;
-import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
-import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
-import com.badbones69.crazycrates.api.objects.gacha.data.PlayerProfile;
-import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ItemRepo;
+import com.badbones69.crazycrates.paper.api.builders.InventoryBuilder;
+import com.badbones69.crazycrates.paper.api.builders.LegacyItemBuilder;
+import com.badbones69.crazycrates.paper.api.objects.Crate;
+import com.badbones69.crazycrates.paper.api.objects.Tier;
+import com.badbones69.crazycrates.paper.api.objects.gacha.DatabaseManager;
+import com.badbones69.crazycrates.paper.api.objects.gacha.data.CrateSettings;
+import com.badbones69.crazycrates.paper.api.objects.gacha.data.PlayerProfile;
+import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.ItemRepo;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.ItemType;
 
 public class CratePickPrizeMenu extends InventoryBuilder {
     private final ItemStack item;
     private final Tier tier;
     private final DatabaseManager databaseManager = plugin.getCrateManager().getDatabaseManager();
-    private final static ItemStack back = new ItemBuilder(Material.RED_STAINED_GLASS_PANE).setDisplayName("Back").asItemStack();
-    private final static ItemStack save = new ItemBuilder(Material.GREEN_STAINED_GLASS_PANE).setDisplayName("Save").asItemStack();
+    private final static ItemStack back = new LegacyItemBuilder(ItemType.RED_STAINED_GLASS_PANE).setDisplayName("Back").asItemStack();
+    private final static ItemStack save = new LegacyItemBuilder(ItemType.GREEN_STAINED_GLASS_PANE).setDisplayName("Save").asItemStack();
 
     public CratePickPrizeMenu(Player player, ItemStack item, Crate crate, Tier tier) {
         super(player, "Item menu", 9, crate);

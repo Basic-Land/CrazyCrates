@@ -1,13 +1,13 @@
-package com.badbones69.crazycrates.api.builders.items;
+package com.badbones69.crazycrates.paper.api.builders.items;
 
-import com.badbones69.crazycrates.api.builders.InventoryBuilder;
-import com.badbones69.crazycrates.api.objects.Crate;
-import com.badbones69.crazycrates.api.objects.gacha.data.PlayerBaseProfile;
-import com.badbones69.crazycrates.api.objects.gacha.shop.ShopData;
-import com.badbones69.crazycrates.api.objects.gacha.shop.ShopItem;
-import com.badbones69.crazycrates.api.objects.gacha.shop.ShopManager;
-import com.badbones69.crazycrates.api.objects.gacha.shop.ShopPurchase;
-import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ItemRepo;
+import com.badbones69.crazycrates.paper.api.builders.InventoryBuilder;
+import com.badbones69.crazycrates.paper.api.objects.Crate;
+import com.badbones69.crazycrates.paper.api.objects.gacha.data.PlayerBaseProfile;
+import com.badbones69.crazycrates.paper.api.objects.gacha.shop.ShopData;
+import com.badbones69.crazycrates.paper.api.objects.gacha.shop.ShopItem;
+import com.badbones69.crazycrates.paper.api.objects.gacha.shop.ShopManager;
+import com.badbones69.crazycrates.paper.api.objects.gacha.shop.ShopPurchase;
+import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.ItemRepo;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;

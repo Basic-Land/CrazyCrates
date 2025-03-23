@@ -1,14 +1,14 @@
 package com.badbones69.crazycrates.paper.tasks.menus;
 
-import com.badbones69.crazycrates.api.builders.ItemBuilder;
+import com.badbones69.crazycrates.paper.api.builders.LegacyItemBuilder;
 import com.badbones69.crazycrates.paper.api.builders.gui.DynamicInventoryBuilder;
-import com.badbones69.crazycrates.api.builders.items.CratePickPrizeMenu;
+import com.badbones69.crazycrates.paper.api.builders.items.CratePickPrizeMenu;
 import com.badbones69.crazycrates.paper.api.objects.Crate;
-import com.badbones69.crazycrates.api.objects.Prize;
+import com.badbones69.crazycrates.paper.api.objects.Prize;
 import com.badbones69.crazycrates.paper.api.objects.Tier;
-import com.badbones69.crazycrates.api.objects.gacha.enums.GachaType;
-import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
-import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ItemRepo;
+import com.badbones69.crazycrates.paper.api.objects.gacha.enums.GachaType;
+import com.badbones69.crazycrates.paper.api.objects.gacha.enums.RewardType;
+import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.ItemRepo;
 import com.ryderbelserion.fusion.paper.builder.gui.interfaces.GuiFiller;
 import com.ryderbelserion.fusion.paper.builder.gui.interfaces.GuiItem;
 import com.ryderbelserion.fusion.paper.builder.gui.types.PaginatedGui;
@@ -17,6 +17,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.ItemType;
 
 import java.util.UUID;
 
@@ -67,7 +68,7 @@ public class CratePreviewMenu extends DynamicInventoryBuilder {
             setNextButton(rows, 6, true);
 
             if (gacha) {
-                gui.setItem(gui.getSize() - 5, new ItemBuilder(Material.COMPASS).setCustomModelData(1000001).asGuiItem(action -> crate.getTierPreview(player).open()));
+                gui.setItem(gui.getSize() - 5, new LegacyItemBuilder(ItemType.COMPASS).setCustomModelData(1000001).asGuiItem(action -> crate.getTierPreview(player).open()));
             } else {
                 addMenuButton(this.player, crate, this.gui, rows, 5);
             }

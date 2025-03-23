@@ -1,12 +1,12 @@
-package com.badbones69.crazycrates.listeners.crates.types;
+package com.badbones69.crazycrates.paper.listeners.crates.types;
 
-import com.badbones69.crazycrates.CrazyCrates;
-import com.badbones69.crazycrates.api.objects.Crate;
-import com.badbones69.crazycrates.api.objects.gacha.data.Result;
-import com.badbones69.crazycrates.tasks.crates.CrateManager;
-import com.badbones69.crazycrates.tasks.crates.other.GachaCrateManager;
-import com.badbones69.crazycrates.tasks.crates.types.roulette.RouletteStandard;
-import com.badbones69.crazycrates.tasks.menus.CratePrizeMenu;
+import com.badbones69.crazycrates.paper.CrazyCrates;
+import com.badbones69.crazycrates.paper.api.objects.Crate;
+import com.badbones69.crazycrates.paper.api.objects.gacha.data.Result;
+import com.badbones69.crazycrates.paper.tasks.crates.CrateManager;
+import com.badbones69.crazycrates.paper.tasks.crates.other.GachaCrateManager;
+import com.badbones69.crazycrates.paper.tasks.crates.types.roulette.RouletteStandard;
+import com.badbones69.crazycrates.paper.tasks.menus.CratePrizeMenu;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

@@ -1,28 +1,30 @@
-package com.badbones69.crazycrates.tasks.crates.types;
+package com.badbones69.crazycrates.paper.tasks.crates.types;
 
-import com.badbones69.crazycrates.api.builders.CrateBuilder;
-import com.badbones69.crazycrates.api.builders.ItemBuilder;
-import com.badbones69.crazycrates.api.objects.Crate;
-import com.badbones69.crazycrates.api.objects.Prize;
-import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
-import com.badbones69.crazycrates.api.objects.gacha.data.*;
-import com.badbones69.crazycrates.api.objects.gacha.enums.GachaType;
-import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
-import com.badbones69.crazycrates.api.objects.gacha.gacha.GachaSystem;
-import com.badbones69.crazycrates.api.objects.gacha.ultimatemenu.ItemRepo;
-import com.badbones69.crazycrates.managers.BukkitUserManager;
-import com.badbones69.crazycrates.managers.events.enums.EventType;
-import com.badbones69.crazycrates.tasks.crates.CrateManager;
-import com.badbones69.crazycrates.tasks.crates.types.roulette.RouletteStandard;
-import com.badbones69.crazycrates.utils.MiscUtils;
+import com.badbones69.crazycrates.paper.api.builders.CrateBuilder;
+import com.badbones69.crazycrates.paper.api.builders.LegacyItemBuilder;
+import com.badbones69.crazycrates.paper.api.objects.Crate;
+import com.badbones69.crazycrates.paper.api.objects.Prize;
+import com.badbones69.crazycrates.paper.api.objects.gacha.DatabaseManager;
+import com.badbones69.crazycrates.paper.api.objects.gacha.data.CrateSettings;
+import com.badbones69.crazycrates.paper.api.objects.gacha.data.PlayerBaseProfile;
+import com.badbones69.crazycrates.paper.api.objects.gacha.data.PlayerProfile;
+import com.badbones69.crazycrates.paper.api.objects.gacha.data.Result;
+import com.badbones69.crazycrates.paper.api.objects.gacha.enums.GachaType;
+import com.badbones69.crazycrates.paper.api.objects.gacha.gacha.GachaSystem;
+import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.ItemRepo;
+import com.badbones69.crazycrates.paper.managers.BukkitUserManager;
+import com.badbones69.crazycrates.paper.managers.events.enums.EventType;
+import com.badbones69.crazycrates.paper.tasks.crates.CrateManager;
+import com.badbones69.crazycrates.paper.tasks.crates.types.roulette.RouletteStandard;
+import com.badbones69.crazycrates.paper.utils.MiscUtils;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemType;
 import org.jetbrains.annotations.NotNull;
 import us.crazycrew.crazycrates.api.enums.types.KeyType;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class GachaCrate extends CrateBuilder {
     @NotNull
@@ -97,9 +99,9 @@ public class GachaCrate extends CrateBuilder {
         baseProfile.addStellarShards(stellarShards);
 
         setItem(37, ItemRepo.BORDER.asItemStack());
-        setItem(8, new ItemBuilder(Material.PLAYER_HEAD).setDisplayName("<green>Skip").setCustomModelData(1000002).asItemStack());
+        setItem(8, new LegacyItemBuilder(ItemType.PLAYER_HEAD).setDisplayName("<green>Skip").setCustomModelData(1000002).asItemStack());
 
-        addCrateTask(new RouletteStandard(this, items, sneak).runAtFixedRate(this.plugin, 1, 2));
+        addCrateTask(new RouletteStandard(this, items, sneak).runAtFixedRate(1, 2));
 
         playerDataManager.savePlayerProfile(playerName, crateSettings, playerProfile);
     }

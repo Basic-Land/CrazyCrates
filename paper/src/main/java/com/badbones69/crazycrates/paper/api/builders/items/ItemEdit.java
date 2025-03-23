@@ -1,8 +1,8 @@
-package com.badbones69.crazycrates.api.builders.items;
+package com.badbones69.crazycrates.paper.api.builders.items;
 
-import com.badbones69.crazycrates.api.builders.InventoryBuilder;
-import com.badbones69.crazycrates.api.builders.ItemBuilder;
-import com.badbones69.crazycrates.api.objects.gacha.enums.Table;
+import com.badbones69.crazycrates.paper.api.builders.InventoryBuilder;
+import com.badbones69.crazycrates.paper.api.builders.LegacyItemBuilder;
+import com.badbones69.crazycrates.paper.api.objects.gacha.enums.Table;
 import cz.basicland.blibs.spigot.utils.item.DBItemStack;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import org.bukkit.Material;
@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.ItemType;
 import org.bukkit.inventory.PlayerInventory;
 
 import java.io.IOException;
@@ -31,10 +32,10 @@ public class ItemEdit extends InventoryBuilder {
 
     @Override
     public InventoryBuilder build() {
-        ItemStack head = new ItemBuilder(Material.PLAYER_HEAD).setPlayer("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjMyY2E2NjA1NmI3Mjg2M2U5OGY3ZjMyYmQ3ZDk0YzdhMGQ3OTZhZjY5MWM5YWMzYTkxMzYzMzEzNTIyODhmOSJ9fX0=").setDisplayName("Current Item").asItemStack();
-        ItemStack back = new ItemBuilder(Material.RED_STAINED_GLASS_PANE).setDisplayName("Back").asItemStack();
-        ItemStack save = new ItemBuilder(Material.GREEN_STAINED_GLASS_PANE).setDisplayName("Save").asItemStack();
-        ItemStack glass = new ItemBuilder(Material.LIGHT_GRAY_STAINED_GLASS_PANE).setDisplayName("<gray>").asItemStack();
+        ItemStack head = new LegacyItemBuilder(ItemType.PLAYER_HEAD).setPlayer("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjMyY2E2NjA1NmI3Mjg2M2U5OGY3ZjMyYmQ3ZDk0YzdhMGQ3OTZhZjY5MWM5YWMzYTkxMzYzMzEzNTIyODhmOSJ9fX0=").setDisplayName("Current Item").asItemStack();
+        ItemStack back = new LegacyItemBuilder(ItemType.RED_STAINED_GLASS_PANE).setDisplayName("Back").asItemStack();
+        ItemStack save = new LegacyItemBuilder(ItemType.GREEN_STAINED_GLASS_PANE).setDisplayName("Save").asItemStack();
+        ItemStack glass = new LegacyItemBuilder(ItemType.LIGHT_GRAY_STAINED_GLASS_PANE).setDisplayName("<gray>").asItemStack();
 
         getInventory().setItem(10, head);
         getInventory().setItem(11, itemStack);

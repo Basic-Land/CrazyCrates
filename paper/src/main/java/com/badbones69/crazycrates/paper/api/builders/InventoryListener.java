@@ -1,4 +1,4 @@
-package com.badbones69.crazycrates.api.builders;
+package com.badbones69.crazycrates.paper.api.builders;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

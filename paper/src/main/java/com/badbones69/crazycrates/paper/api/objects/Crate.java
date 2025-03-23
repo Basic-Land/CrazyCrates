@@ -1,18 +1,18 @@
 package com.badbones69.crazycrates.paper.api.objects;
 
 import com.badbones69.crazycrates.paper.api.PrizeManager;
+import com.badbones69.crazycrates.paper.tasks.crates.other.GachaCrateManager;
 import com.badbones69.crazycrates.paper.tasks.menus.CratePreviewMenu;
 import com.badbones69.crazycrates.paper.tasks.menus.CrateTierMenu;
 import com.badbones69.crazycrates.paper.api.objects.crates.CrateHologram;
 import com.badbones69.crazycrates.paper.api.enums.other.keys.ItemKeys;
-import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
+import com.badbones69.crazycrates.paper.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.core.config.ConfigManager;
 import com.badbones69.crazycrates.core.config.impl.ConfigKeys;
 import com.badbones69.crazycrates.paper.managers.BukkitUserManager;
 import com.badbones69.crazycrates.paper.tasks.crates.CrateManager;
 import com.badbones69.crazycrates.paper.tasks.crates.effects.SoundEffect;
 import com.badbones69.crazycrates.paper.api.builders.LegacyItemBuilder;
-import com.badbones69.crazycrates.tasks.crates.other.GachaCrateManager;
 import com.ryderbelserion.fusion.core.api.enums.FileType;
 import com.ryderbelserion.fusion.core.util.StringUtils;
 import com.ryderbelserion.fusion.paper.files.CustomFile;

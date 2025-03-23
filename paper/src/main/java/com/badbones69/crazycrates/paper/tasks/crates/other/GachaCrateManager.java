@@ -1,6 +1,6 @@
-package com.badbones69.crazycrates.tasks.crates.other;
+package com.badbones69.crazycrates.paper.tasks.crates.other;
 
-import com.badbones69.crazycrates.tasks.crates.types.roulette.RouletteStandard;
+import com.badbones69.crazycrates.paper.tasks.crates.types.roulette.RouletteStandard;
 import lombok.Getter;
 
 import java.util.HashMap;

@@ -1,17 +1,18 @@
-package com.badbones69.crazycrates.api.builders.items;
+package com.badbones69.crazycrates.paper.api.builders.items;
 
-import com.badbones69.crazycrates.api.builders.InventoryBuilder;
-import com.badbones69.crazycrates.api.builders.ItemBuilder;
-import com.badbones69.crazycrates.api.objects.Crate;
-import com.badbones69.crazycrates.api.objects.gacha.data.CrateSettings;
-import com.badbones69.crazycrates.api.objects.gacha.data.RaritySettings;
-import com.badbones69.crazycrates.api.objects.gacha.enums.Rarity;
-import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
+import com.badbones69.crazycrates.paper.api.builders.InventoryBuilder;
+import com.badbones69.crazycrates.paper.api.builders.LegacyItemBuilder;
+import com.badbones69.crazycrates.paper.api.objects.Crate;
+import com.badbones69.crazycrates.paper.api.objects.gacha.data.CrateSettings;
+import com.badbones69.crazycrates.paper.api.objects.gacha.data.RaritySettings;
+import com.badbones69.crazycrates.paper.api.objects.gacha.enums.Rarity;
+import com.badbones69.crazycrates.paper.api.objects.gacha.enums.RewardType;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.ItemType;
 
 import java.util.List;
 import java.util.Map;
@@ -32,7 +33,7 @@ public class RaritiesMenu extends InventoryBuilder {
 
             ItemStack item;
             if (raritySettings.is5050Enabled()) {
-                item = new ItemBuilder(Material.CHEST).setDisplayName(rarity.name())
+                item = new LegacyItemBuilder(ItemType.CHEST).setDisplayName(rarity.name())
                         .addDisplayLore("<white>STANDARD")
                         .addDisplayLore("- <white>Kliknuti <red><b>LEVYM</red> tlacitkem pro <red><b>PRIDANI</red> itemu do crate</white>")
                         .addDisplayLore("- <white>Kliknuti <red><b>PRAVYM</red> tlacitkem pro <red><b>ODEBRANI</red> itemu z crate</white>")
@@ -41,7 +42,7 @@ public class RaritiesMenu extends InventoryBuilder {
                 getInventory().addItem(item);
             }
 
-            item = new ItemBuilder(Material.CHEST).setDisplayName(rarity.name())
+            item = new LegacyItemBuilder(ItemType.CHEST).setDisplayName(rarity.name())
                     .addDisplayLore("<white>LIMITED")
                     .addDisplayLore("- <white>Kliknuti <red><b>LEVYM</red> tlacitkem pro <red><b>PRIDANI</red> itemu do crate</white>")
                     .addDisplayLore("- <white>Kliknuti <red><b>PRAVYM</red> tlacitkem pro <red><b>ODEBRANI</red> itemu z crate</white>")

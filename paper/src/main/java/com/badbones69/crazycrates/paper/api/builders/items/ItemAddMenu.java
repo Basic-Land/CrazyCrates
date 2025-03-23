@@ -1,17 +1,18 @@
-package com.badbones69.crazycrates.api.builders.items;
+package com.badbones69.crazycrates.paper.api.builders.items;
 
-import com.badbones69.crazycrates.api.builders.InventoryBuilder;
-import com.badbones69.crazycrates.api.builders.ItemBuilder;
-import com.badbones69.crazycrates.api.objects.Crate;
-import com.badbones69.crazycrates.api.objects.gacha.ItemManager;
-import com.badbones69.crazycrates.api.objects.gacha.enums.RewardType;
-import com.badbones69.crazycrates.api.objects.gacha.enums.Table;
+import com.badbones69.crazycrates.paper.api.builders.InventoryBuilder;
+import com.badbones69.crazycrates.paper.api.builders.LegacyItemBuilder;
+import com.badbones69.crazycrates.paper.api.objects.Crate;
+import com.badbones69.crazycrates.paper.api.objects.gacha.ItemManager;
+import com.badbones69.crazycrates.paper.api.objects.gacha.enums.RewardType;
+import com.badbones69.crazycrates.paper.api.objects.gacha.enums.Table;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.ItemType;
 
 import java.util.Arrays;
 
@@ -26,7 +27,7 @@ public class ItemAddMenu extends InventoryBuilder {
     @Override
     public InventoryBuilder build() {
         Inventory inventory = getInventory();
-        ItemBuilder builder = new ItemBuilder(new ItemStack(Material.CHEST));
+        LegacyItemBuilder builder = new LegacyItemBuilder(ItemType.CHEST);
         builder.setDisplayName("<green>Save Items");
         builder.addDisplayLore("");
         builder.addDisplayLore("<gray><b>Right click to close.");

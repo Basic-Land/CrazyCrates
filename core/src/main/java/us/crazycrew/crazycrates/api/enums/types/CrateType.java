@@ -36,4 +36,8 @@ public enum CrateType {
     public String getName() {
         return this.name;
     }
+
+    public boolean isGacha() {
+        return this == gacha;
+    }
 }

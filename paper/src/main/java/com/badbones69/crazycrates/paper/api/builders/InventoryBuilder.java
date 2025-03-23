@@ -10,7 +10,6 @@ import com.badbones69.crazycrates.paper.managers.BukkitUserManager;
 import com.badbones69.crazycrates.paper.managers.InventoryManager;
 import com.badbones69.crazycrates.paper.tasks.crates.CrateManager;
 import com.ryderbelserion.fusion.core.util.StringUtils;
-import com.ryderbelserion.vital.paper.util.ItemUtil;
 import net.kyori.adventure.text.Component;
 import com.ryderbelserion.fusion.paper.util.PaperMethods;
 import org.bukkit.Server;
