@@ -32,6 +32,7 @@ import org.bukkit.inventory.PlayerInventory;
 import us.crazycrew.crazycrates.api.enums.types.KeyType;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static net.kyori.adventure.text.Component.empty;
 import static net.kyori.adventure.text.Component.text;
@@ -135,9 +136,7 @@ public class UltimateMenu extends InventoryBuilder {
                 }
 
                 PlayerInventory playerInventory = player.getInventory();
-                for (int i = 20; i < 25; i++) {
-                    playerInventory.setItem(i, null);
-                }
+                IntStream.range(20, 25).forEach(i -> playerInventory.setItem(i, null));
             }
 
             case 68, 69 -> {
@@ -368,19 +367,8 @@ public class UltimateMenu extends InventoryBuilder {
             switch (e.getInventory().getHolder(false)) {
                 case UltimateMenu ultimateMenu -> {
                     Player player = ultimateMenu.getPlayer();
-                    if (reason.equals(InventoryCloseEvent.Reason.PLAYER)) {
+                    if (reason.equals(InventoryCloseEvent.Reason.PLAYER) || reason.equals(InventoryCloseEvent.Reason.PLUGIN)) {
                         ultimateMenu.manager.getUltimateMenuManager().remove(player);
-                    } else if (reason.equals(InventoryCloseEvent.Reason.PLUGIN)) {
-                        Bukkit.getScheduler().runTaskLater(CrazyCrates.getPlugin(), () -> {
-                            PlayerInventory inventory = player.getInventory();
-                            inventory.clear();
-                            ItemStack[] items = ultimateMenu.manager.getUltimateMenuManager().getItems(player);
-                            if (items == null) return;
-                            inventory.setContents(items);
-                            player.updateInventory();
-                            print(player, reason, ultimateMenu);
-                        }, 1L);
-                        return;
                     }
                     print(player, reason, ultimateMenu);
                 }

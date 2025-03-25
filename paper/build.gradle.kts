@@ -48,12 +48,12 @@ tasks {
         archiveBaseName.set(rootProject.name)
         archiveClassifier.set("")
 
-//        listOf(
-//            "com.ryderbelserion.fusion",
-//            "org.bstats"
-//        ).forEach {
-//            relocate(it, "libs.$it")
-//        }
+        listOf(
+            "com.ryderbelserion.fusion",
+            "org.bstats"
+        ).forEach {
+            relocate(it, "libs.$it")
+        }
     }
 
     assemble {

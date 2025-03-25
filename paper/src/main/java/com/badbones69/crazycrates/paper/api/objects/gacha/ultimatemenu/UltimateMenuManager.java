@@ -1,23 +1,19 @@
 package com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu;
 
-import com.badbones69.crazycrates.paper.CrazyCrates;
 import com.badbones69.crazycrates.paper.api.builders.items.UltimateMenu;
 import com.badbones69.crazycrates.paper.api.objects.Crate;
 import com.badbones69.crazycrates.paper.api.objects.gacha.DatabaseManager;
-import lombok.Getter;
+import lombok.Synchronized;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
-@Getter
 public class UltimateMenuManager {
     private final static Map<UUID, Long> cooldowns = new HashMap<>();
     private static final long COOLDOWN_TIME = 250;
-    private final Map<String, ItemStack[]> items = new ConcurrentHashMap<>();
-    private final CrazyCrates plugin = CrazyCrates.getPlugin();
+    private final Map<String, ItemStack[]> items = new HashMap<>();
     private final DatabaseManager databaseManager;
 
     public UltimateMenuManager(DatabaseManager databaseManager) {
@@ -28,6 +24,7 @@ public class UltimateMenuManager {
         open(player, databaseManager.getCrateSettingsSplit().getFirst().getFirst().getCrate());
     }
 
+    @Synchronized
     public void open(Player player, Crate crate) {
         if (player.getOpenInventory().getTopInventory().getHolder(false) instanceof UltimateMenu) {
             return;
@@ -49,19 +46,18 @@ public class UltimateMenuManager {
         player.openInventory(menu.build().getInventory());
     }
 
-    public ItemStack[] getItems(Player player) {
+    @Synchronized
+    public List<ItemStack> getItemsClean(Player player) {
         ItemStack[] itemStacks = items.get(player.getName());
         databaseManager.clearInventory(player);
         items.remove(player.getName());
-        return itemStacks;
-    }
 
-    public List<ItemStack> getItemsClean(Player player) {
-        return Arrays.stream(getItems(player))
+        return Arrays.stream(itemStacks)
                 .filter(Objects::nonNull)
                 .toList();
     }
 
+    @Synchronized
     public void remove(Player player) {
         ItemStack[] itemStacks = items.get(player.getName());
         if (itemStacks != null) {
