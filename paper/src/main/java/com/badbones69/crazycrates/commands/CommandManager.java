@@ -169,6 +169,7 @@ public class CommandManager {
                 new AddCurrency(),
                 new Clear(),
                 new Stats(),
+                new Convert(),
 
                 new CommandGive(),
                 new CommandOpen(),

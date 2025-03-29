@@ -3,13 +3,13 @@ package com.badbones69.crazycrates.api.objects.gacha;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Table;
 import cz.basicland.blibs.shared.databases.hikari.DatabaseConnection;
 import cz.basicland.blibs.spigot.utils.item.DBItemStack;
-import cz.basicland.blibs.spigot.utils.item.NBT;
+import cz.basicland.blibs.spigot.utils.item.DBItemStackNew;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static com.badbones69.crazycrates.CrazyCrates.LOGGER;
@@ -25,9 +25,7 @@ public class ItemManager {
      */
     public ItemManager(DatabaseConnection connection) {
         this.connection = connection;
-        for (Table table : Table.values()) {
-            items.put(table, getAllItems(table));
-        }
+        Arrays.stream(Table.values()).forEach(table -> items.put(table, getAllItems(table)));
     }
 
     /**
@@ -41,7 +39,15 @@ public class ItemManager {
             try {
                 while (rs.next()) {
                     int id = rs.getInt("id");
-                    ItemStack item = DBItemStack.decodeItem(rs.getString("itemStack"));
+                    int version = DatabaseManager.getVersion();
+                    ItemStack item;
+                    if (version == 1) {
+                        item = DBItemStack.decodeItem(rs.getString("itemStack"));
+                    } else if (version == 2) {
+                        item = DBItemStackNew.decodeItem(rs.getString("itemStack"));
+                    } else {
+                        throw new SQLException("Unknown version " + version);
+                    }
                     items.put(id, item);
                 }
             } catch (SQLException | IOException | ClassNotFoundException e) {
@@ -49,10 +55,6 @@ public class ItemManager {
             }
             return items;
         }).join();
-    }
-
-    private Map<Integer, ItemStack> get(Map<Integer, ItemStack> map, List<Integer> ids) {
-        return map.entrySet().stream().filter(e -> (ids.isEmpty() || ids.contains(e.getKey()))).collect(HashMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), HashMap::putAll);
     }
 
     /**
@@ -78,7 +80,16 @@ public class ItemManager {
      */
     public int addItem(ItemStack item, Table table) {
         try {
-            connection.updateSQLite("INSERT INTO " + table.getTable() + "(itemStack) VALUES(?)", DBItemStack.encodeItem(item)).join();
+            int version = DatabaseManager.getVersion();
+            String stack;
+            if (version == 1) {
+                stack = DBItemStack.encodeItem(item);
+            } else if (version == 2) {
+                stack = DBItemStackNew.encodeItem(item);
+            } else {
+                throw new RuntimeException("Unknown version " + version);
+            }
+            connection.updateSQLite("INSERT INTO " + table.getTable() + "(itemStack) VALUES(?)", stack).join();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

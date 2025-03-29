@@ -15,6 +15,7 @@ import com.google.common.collect.Lists;
 import cz.basicland.blibs.shared.databases.hikari.DatabaseConnection;
 import cz.basicland.blibs.spigot.BLibs;
 import cz.basicland.blibs.spigot.utils.item.DBItemStack;
+import cz.basicland.blibs.spigot.utils.item.DBItemStackNew;
 import lombok.Getter;
 import net.jpountz.lz4.LZ4Compressor;
 import net.jpountz.lz4.LZ4Factory;
@@ -48,6 +49,8 @@ public class DatabaseManager {
     private final UltimateMenuManager ultimateMenuManager;
     @Getter
     private final ShopManager shopManager;
+    @Getter
+    private static int version = 1;
 
     public DatabaseManager(List<Crate> crateList) {
         connection = BLibs.getApi().getDatabaseHandler().loadSQLite(CrazyCrates.getPlugin(), "gamba", "crates.db");
@@ -76,6 +79,19 @@ public class DatabaseManager {
         connection.updateSQLite("CREATE TABLE IF NOT EXISTS ShopItems(id INTEGER PRIMARY KEY AUTOINCREMENT, itemStack VARCHAR NULL)").join();
         connection.updateSQLite("CREATE TABLE IF NOT EXISTS Backup(uuid VARCHAR(36) PRIMARY KEY, inventory VARCHAR NULL)").join();
         connection.updateSQLite("CREATE TABLE IF NOT EXISTS ShopInfo(nextReset VARCHAR)").join();
+        connection.updateSQLite("CREATE TABLE IF NOT EXISTS Version(version INTEGER)").join();
+
+        connection.querySQLite("SELECT version FROM Version").thenAccept(rs -> {
+            try {
+                if (!rs.next()) {
+                    version = 1;
+                } else {
+                    version = rs.getInt("version");
+                }
+            } catch (SQLException e) {
+                LOGGER.warning(e.getMessage());
+            }
+        }).join();
 
         Set<String> playernames = new HashSet<>();
         connection.querySQLite("SELECT playerName FROM PlayerData").thenAccept(rs -> {
@@ -165,8 +181,14 @@ public class DatabaseManager {
                     String inventory = rs.getString("inventory");
 
                     List<String> items = Arrays.asList(inventory.split("\n"));
-
-                    ItemStack[] contents = DBItemStack.getItemStackList(items).toArray(new ItemStack[0]);
+                    ItemStack[] contents;
+                    if (version == 1) {
+                        contents = DBItemStack.getItemStackList(items).toArray(new ItemStack[0]);
+                    } else if (version == 2) {
+                        contents = DBItemStackNew.getItemStackList(inventory).toArray(new ItemStack[0]);
+                    } else {
+                        throw new RuntimeException("Unsupported version: " + version);
+                    }
 
                     OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
 
@@ -300,19 +322,32 @@ public class DatabaseManager {
     public void saveInventory(Player player) {
         UUID uuid = player.getUniqueId();
         ItemStack[] contents = player.getInventory().getContents();
-        List<String> items;
-        try {
-            items = DBItemStack.encodeItemList(Arrays.asList(contents));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+
+        String inventory;
+
+        if (version == 1) {
+            List<String> items;
+            try {
+                items = DBItemStack.encodeItemList(Arrays.asList(contents));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            inventory = String.join("\n", items);
+        } else if (version == 2) {
+            inventory = DBItemStackNew.encodeItemList(Arrays.asList(contents));
+        } else {
+            throw new RuntimeException("Unsupported version: " + version);
         }
-        String inventory = String.join("\n", items);
 
         connection.updateSQLite("INSERT OR REPLACE INTO Backup(uuid, inventory) VALUES(?, ?)", uuid, inventory);
     }
 
     public void clearInventory(Player player) {
         connection.updateSQLite("DELETE FROM Backup WHERE uuid = ?", player.getUniqueId());
+    }
+
+    public void update() {
+        connection.updateSQLite("INSERT INTO Version (version) VALUES(?)", 2);
     }
 
     private byte[] serializeProfile(Object profile) {

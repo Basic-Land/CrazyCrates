@@ -2,8 +2,10 @@ package com.badbones69.crazycrates.api.builders.items;
 
 import com.badbones69.crazycrates.api.builders.InventoryBuilder;
 import com.badbones69.crazycrates.api.builders.ItemBuilder;
+import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
 import com.badbones69.crazycrates.api.objects.gacha.enums.Table;
 import cz.basicland.blibs.spigot.utils.item.DBItemStack;
+import cz.basicland.blibs.spigot.utils.item.DBItemStackNew;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -74,7 +76,17 @@ public class ItemEdit extends InventoryBuilder {
                     Integer id = nbt.getInteger("itemID");
                     if (id == null || id == 0) return;
                     try {
-                        holder.plugin.getCrateManager().getDatabaseManager().getItemManager().updateItem(id, DBItemStack.encodeItem(stack), holder.table);
+                        int version = DatabaseManager.getVersion();
+                        String stackString;
+                        if (version == 1) {
+                            stackString = DBItemStack.encodeItem(stack);
+                        } else if (version == 2) {
+                            stackString = DBItemStackNew.encodeItem(stack);
+                        } else {
+                            throw new RuntimeException("Unsupported database version: " + version);
+                        }
+
+                        holder.plugin.getCrateManager().getDatabaseManager().getItemManager().updateItem(id, stackString, holder.table);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
