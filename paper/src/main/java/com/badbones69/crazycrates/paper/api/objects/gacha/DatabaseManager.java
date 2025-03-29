@@ -376,7 +376,7 @@ public class DatabaseManager {
         try {
             byte[] bytes = decompress(profileString);
             ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-            ObjectInputStream ois = new ObjectInputStream(bais);
+            CustomObjectInputStream ois = new CustomObjectInputStream(bais);
             return (OUT) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             LOGGER.warning(e.getMessage());
@@ -394,5 +394,23 @@ public class DatabaseManager {
     private byte[] decompress(final byte[] compressed) {
         LZ4SafeDecompressor decompressor = LZ4Factory.fastestInstance().safeDecompressor();
         return decompressor.decompress(compressed, compressed.length * 100);
+    }
+
+    public static class CustomObjectInputStream extends ObjectInputStream {
+
+        public CustomObjectInputStream(InputStream in) throws IOException {
+            super(in);
+        }
+
+        @Override
+        protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
+            try {
+                return super.resolveClass(desc);
+            } catch (ClassNotFoundException e) {
+                String originalClassName = desc.getName();
+                String replace = originalClassName.replace("com.badbones69.crazycrates.api", "com.badbones69.crazycrates.paper.api");
+                return Class.forName(replace);
+            }
+        }
     }
 }

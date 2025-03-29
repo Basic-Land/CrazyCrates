@@ -88,7 +88,7 @@ public class CrateSettings {
         LegacyCustomFile customFile = plugin.getFileManager().getFile(bannerFile, FileType.YAML);
 
         if (customFile == null) {
-            bannerPackage = new BannerPackage(null, false);
+            bannerPackage = new BannerPackage(Collections.emptyList(), false);
             return;
         }
 

@@ -81,7 +81,9 @@ public class CrazyCrates extends JavaPlugin {
         this.instance = new Server(getDataFolder());
         this.instance.apply();
 
-        this.fileManager.addFile("locations.yml", FileType.YAML).addFile("data.yml", FileType.YAML).addFile("respin-gui.yml", "guis", false, FileType.YAML)
+        this.fileManager.addFile("locations.yml", FileType.YAML)
+                .addFile("data.yml", FileType.YAML)
+                .addFile("respin-gui.yml", "guis", false, FileType.YAML)
                 .addFile("crates.log", "logs", false, FileType.NONE)
                 .addFile("keys.log", "logs", false, FileType.NONE)
                 .addFolder("crates", FileType.YAML)
@@ -121,7 +123,7 @@ public class CrazyCrates extends JavaPlugin {
         InventoryListener inventoryListener = new InventoryListener();
         try {
             ClassPath.from(getClassLoader()).getAllClasses().stream()
-                    .filter(info -> info.getName().startsWith("com.badbones69.crazycrates.api.builders.items"))
+                    .filter(info -> info.getName().startsWith("com.badbones69.crazycrates.paper.api.builders.items"))
                     .map(ClassPath.ClassInfo::load)
                     .filter(InventoryBuilder.class::isAssignableFrom)
                     .map(clazz -> (Class<? extends InventoryBuilder>) clazz)
