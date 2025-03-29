@@ -11,8 +11,8 @@ import com.badbones69.crazycrates.paper.api.objects.gacha.enums.ShopID;
 import com.badbones69.crazycrates.paper.api.objects.gacha.enums.Table;
 import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.ComponentBuilder;
 import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.ItemRepo;
-import com.ryderbelserion.fusion.paper.files.CustomFile;
-import com.ryderbelserion.fusion.paper.files.FileManager;
+import com.ryderbelserion.fusion.paper.files.LegacyCustomFile;
+import com.ryderbelserion.fusion.paper.files.LegacyFileManager;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.configuration.ConfigurationSection;
@@ -32,14 +32,14 @@ public class ShopManager {
 
     public ShopManager(DatabaseManager databaseManager) {
         CrazyCrates plugin = CrazyCrates.getPlugin();
-        FileManager yamlManager = plugin.getFileManager();
+        LegacyFileManager yamlManager = plugin.getFileManager();
         limitManager = new LimitManager();
 
         yamlManager.getFiles()
                 .values()
                 .stream()
                 .filter(customFile -> customFile.getFile().getParent().contains("shops"))
-                .map(CustomFile::getConfiguration)
+                .map(LegacyCustomFile::getConfiguration)
                 .filter(Objects::nonNull)
                 .map(cfg -> {
                     ShopID shopID = ShopID.getShopID(cfg.getString("id"));

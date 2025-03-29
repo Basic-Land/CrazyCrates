@@ -14,8 +14,9 @@ import com.badbones69.crazycrates.paper.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.paper.api.objects.gacha.enums.Table;
 import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.ComponentBuilder;
 import com.badbones69.crazycrates.paper.api.objects.gacha.util.TierInfo;
-import com.ryderbelserion.fusion.core.api.enums.FileType;
-import com.ryderbelserion.fusion.paper.files.CustomFile;
+import com.ryderbelserion.fusion.api.enums.FileType;
+import com.ryderbelserion.fusion.api.files.CustomFile;
+import com.ryderbelserion.fusion.paper.files.LegacyCustomFile;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import lombok.Getter;
 import lombok.ToString;
@@ -84,7 +85,7 @@ public class CrateSettings {
             rarityMap.put(rarity, raritySettings);
         }
 
-        CustomFile customFile = plugin.getFileManager().getFile(bannerFile, FileType.YAML);
+        LegacyCustomFile customFile = plugin.getFileManager().getFile(bannerFile, FileType.YAML);
 
         if (customFile == null) {
             bannerPackage = new BannerPackage(null, false);
