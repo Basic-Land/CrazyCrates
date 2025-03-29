@@ -2,8 +2,10 @@ package com.badbones69.crazycrates.paper.api.builders.items;
 
 import com.badbones69.crazycrates.paper.api.builders.InventoryBuilder;
 import com.badbones69.crazycrates.paper.api.builders.LegacyItemBuilder;
+import com.badbones69.crazycrates.paper.api.objects.gacha.DatabaseManager;
 import com.badbones69.crazycrates.paper.api.objects.gacha.enums.Table;
 import cz.basicland.blibs.spigot.utils.item.DBItemStack;
+import cz.basicland.blibs.spigot.utils.item.DBItemStackNew;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

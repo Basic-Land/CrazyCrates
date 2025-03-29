@@ -1,9 +1,9 @@
-package com.badbones69.crazycrates.commands.crates.types.custom;
+package com.badbones69.crazycrates.paper.commands.crates.types.custom;
 
-import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
-import com.badbones69.crazycrates.api.objects.gacha.ItemManager;
-import com.badbones69.crazycrates.api.objects.gacha.enums.Table;
-import com.badbones69.crazycrates.commands.crates.types.BaseCommand;
+import com.badbones69.crazycrates.paper.api.objects.gacha.DatabaseManager;
+import com.badbones69.crazycrates.paper.api.objects.gacha.ItemManager;
+import com.badbones69.crazycrates.paper.api.objects.gacha.enums.Table;
+import com.badbones69.crazycrates.paper.commands.crates.types.BaseCommand;
 import cz.basicland.blibs.spigot.utils.item.DBItemStackNew;
 import dev.triumphteam.cmd.bukkit.annotation.Permission;
 import dev.triumphteam.cmd.core.annotations.Command;
@@ -18,6 +18,12 @@ public class Convert extends BaseCommand {
     @Permission(value = "crates.convert", def = PermissionDefault.OP)
     public void onConvert(Player player) {
         DatabaseManager databaseManager = plugin.getCrateManager().getDatabaseManager();
+
+        if (DatabaseManager.getVersion() == 2) {
+            System.out.println("Already converted to new format.");
+            return;
+        }
+
         ItemManager itemManager = databaseManager.getItemManager();
         Arrays.stream(Table.values()).forEach(table ->
                 itemManager.getAllItemsFromCache(table).forEach((id, stack) ->
