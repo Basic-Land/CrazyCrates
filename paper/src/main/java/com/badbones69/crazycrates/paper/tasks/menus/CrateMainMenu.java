@@ -1,5 +1,6 @@
 package com.badbones69.crazycrates.paper.tasks.menus;
 
+import com.badbones69.crazycrates.core.config.beans.ModelData;
 import com.badbones69.crazycrates.paper.api.builders.LegacyItemBuilder;
 import com.badbones69.crazycrates.paper.api.builders.gui.StaticInventoryBuilder;
 import com.badbones69.crazycrates.paper.api.enums.Messages;
@@ -9,10 +10,9 @@ import com.badbones69.crazycrates.paper.managers.events.enums.EventType;
 import com.badbones69.crazycrates.paper.utils.ItemUtils;
 import com.badbones69.crazycrates.paper.utils.MiscUtils;
 import com.badbones69.crazycrates.core.config.impl.ConfigKeys;
-import com.ryderbelserion.fusion.core.util.StringUtils;
-import com.ryderbelserion.fusion.paper.builder.gui.interfaces.Gui;
-import com.ryderbelserion.fusion.paper.builder.gui.interfaces.GuiFiller;
-import com.ryderbelserion.fusion.paper.util.PaperMethods;
+import com.ryderbelserion.fusion.api.utils.StringUtils;
+import com.ryderbelserion.fusion.paper.api.builder.gui.interfaces.Gui;
+import com.ryderbelserion.fusion.paper.api.builder.gui.interfaces.GuiFiller;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.Server;
@@ -41,11 +41,14 @@ public class CrateMainMenu extends StaticInventoryBuilder {
         if (this.config.getProperty(ConfigKeys.filler_toggle)) {
             final GuiFiller guiFiller = gui.getFiller();
 
+            final ModelData fillerModel = this.config.getProperty(ConfigKeys.filler_item_model);
+
             guiFiller.fill(new LegacyItemBuilder()
                     .withType(this.config.getProperty(ConfigKeys.filler_item))
                     .setDisplayName(this.config.getProperty(ConfigKeys.filler_name))
                     .setDisplayLore(this.config.getProperty(ConfigKeys.filler_lore))
                     .setCustomModelData(this.config.getProperty(ConfigKeys.filler_model_data))
+                    .setItemModel(fillerModel.getNamespace(), fillerModel.getId())
                     .asGuiItem());
         }
 
@@ -71,7 +74,7 @@ public class CrateMainMenu extends StaticInventoryBuilder {
                             }
                         }
 
-                        case "custom-model-data" -> item.setCustomModelData(StringUtils.tryParseInt(value).orElse(-1).intValue());
+                        case "custom-model-data" -> item.setCustomModelData(value);
 
                         case "glowing" -> item.setGlowing(StringUtils.tryParseBoolean(value).orElse(false));
 
@@ -116,7 +119,8 @@ public class CrateMainMenu extends StaticInventoryBuilder {
                     final LegacyItemBuilder builder = new LegacyItemBuilder()
                             .withType(section.getString("Item", "chest").toLowerCase())
                             .setDisplayName(crate.getCrateName())
-                            .setCustomModelData(section.getInt("Custom-Model-Data", -1))
+                            .setCustomModelData(section.getString("Custom-Model-Data", ""))
+                            .setItemModel(section.getString("Model.Namespace", ""), section.getString("Model.Id", ""))
                             .addLorePlaceholder("%keys%", instance.format(virtualKeys))
                             .addLorePlaceholder("%keys_physical%", instance.format(physicalKeys))
                             .addLorePlaceholder("%keys_total%", instance.format(totalKeys))

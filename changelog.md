@@ -1,22 +1,27 @@
-# New Item Format
-I've been working on a new format for the `Items` section as the current one is very restrictive, You can experiment with this by enabling it in your `config.yml`
-
-- The command /crazycrates migrate -mt NewItemFormat will update all `Items` section to the best it can.
-  - The migration is one way, Please be wary of this and take backups.
-  - Editor-Items should be migrated as soon as possible when you feel like it as this is much more readable, I plan to do much more to expand on the in-game editor since the structure makes such a thing easier.
-
-You can find an example of the `Items` format linked below
-https://github.com/Crazy-Crew/CrazyCrates/blob/main/core/src/main/resources/crates/beta/NewCrate.yml
-
-## Fixes
-- ItemsAdder blocks were not working with left/right click
-- A double message sent to admins when using /crazycrates giveall
-- Holograms were not refreshing when using DecentHolograms
-- Set the default item plugin option to "None" because it was causing issues
-- Fixed a few other issues like ItemStacks not stacking properly
-
-## Changes
-- Removed an unused config option from the config.yml
-  - The option this was replaced with has already been moved to fusion.yml previously
-- Marked `use-new-permission-system` for removal
-  - This option is being removed as crazycrates.open.<crate-name> will be the permission going forward.
+- Added the ability to use `Item Models` which was introduced in 1.21.4
+  - This acts as replacement to `Custom-Model-Data` wherever you see it, It's up to the plugin/resource pack you use to find the new id.
+    - oraxen:emerald_helmet
+    - nexo:emerald_helmet
+    - itemsadder:emerald_helmet
+  - Above are examples of namespace:id.
+```yml
+  PhysicalKey:
+    # Name of the Key.
+    Name: "<bold><gradient:#084CFB:#ADF3FD>Wonder Crate Key</gradient></bold>"
+    # Lore of the Key.
+    Lore:
+      - "<gradient:#084CFB:#ADF3FD>A fancy key to open a wonderful crate!</gradient>"
+    # The item the key is.
+    Item: "blue_dye"
+    # The item model, Mojang introduced this in 1.21.4... this replaces custom model data!
+    # Set this to blank for it to do nothing.
+    # The format is namespace:id
+    Model:
+      # The namespace i.e. nexo
+      Namespace: ""
+      # The id i.e. emerald_helmet
+      Id: ""
+    # Makes the key look enchanted.
+    Glowing: true 
+```
+- Custom-Model-Data, or custom-model-data can accept numbers or strings due to recent changes in 1.21.4.

@@ -13,10 +13,11 @@ import com.badbones69.crazycrates.paper.managers.BukkitUserManager;
 import com.badbones69.crazycrates.paper.tasks.crates.CrateManager;
 import com.badbones69.crazycrates.paper.tasks.crates.effects.SoundEffect;
 import com.badbones69.crazycrates.paper.api.builders.LegacyItemBuilder;
-import com.ryderbelserion.fusion.core.api.enums.FileType;
-import com.ryderbelserion.fusion.core.util.StringUtils;
-import com.ryderbelserion.fusion.paper.files.CustomFile;
-import com.ryderbelserion.fusion.paper.util.PaperMethods;
+import com.ryderbelserion.fusion.api.enums.FileType;
+import com.ryderbelserion.fusion.core.utils.AdvUtils;
+import com.ryderbelserion.fusion.paper.files.LegacyCustomFile;
+import com.ryderbelserion.fusion.paper.utils.ColorUtils;
+import com.ryderbelserion.fusion.paper.utils.ItemUtils;
 import lombok.Getter;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
@@ -191,7 +192,8 @@ public class Crate {
 
         this.borderItem = new LegacyItemBuilder()
                 .withType(file.getString("Crate.Preview.Glass.Item", "gray_stained_glass_pane").toLowerCase())
-                .setCustomModelData(file.getInt("Crate.Preview.Glass.Custom-Model-Data", -1))
+                .setCustomModelData(file.getString("Crate.Preview.Glass.Custom-Model-Data", ""))
+                .setItemModel(file.getString("Crate.Preview.Glass.Model.Namespace", ""), file.getString("Crate.Preview.Glass.Model.Id", ""))
                 .setHidingItemFlags(file.getBoolean("Crate.Preview.Glass.HideItemFlags", false))
                 .setDisplayName(borderName);
 
@@ -199,16 +201,17 @@ public class Crate {
 
         this.previewTierBorderItem = new LegacyItemBuilder()
                 .withType(file.getString("Crate.tier-preview.glass.item", "gray_stained_glass_pane").toLowerCase())
-                .setCustomModelData(file.getInt("Crate.tier-preview.glass.custom-model-data", -1))
+                .setCustomModelData(file.getString("Crate.tier-preview.glass.custom-model-data", ""))
+                .setItemModel(file.getString("Crate.tier-preview.glass.model.namespace", ""), file.getString("Crate.tier-preview.glass.model.id", ""))
                 .setHidingItemFlags(file.getBoolean("Crate.tier-preview.glass.hideitemflags", false))
                 .setDisplayName(previewTierBorderName);
 
         setTierPreviewRows(file.getInt("Crate.tier-preview.rows", 5));
 
         if (this.crateType == CrateType.quad_crate) {
-            this.particle = PaperMethods.getParticleType(file.getString("Crate.particles.type", "dust"));
+            this.particle = ItemUtils.getParticleType(file.getString("Crate.particles.type", "dust"));
 
-            this.color = PaperMethods.getColor(file.getString("Crate.particles.color", "235,64,52"));
+            this.color = ColorUtils.getColor(file.getString("Crate.particles.color", "235,64,52"));
         }
 
         this.hologram = hologram;
@@ -761,7 +764,7 @@ public class Crate {
                 final Component displayName = itemMeta.displayName();
 
                 if (displayName != null) {
-                    section.set(getPath(prizeName, "DisplayName"), StringUtils.fromComponent(displayName));
+                    section.set(getPath(prizeName, "DisplayName"), AdvUtils.fromComponent(displayName));
                 }
             }
 
@@ -769,7 +772,7 @@ public class Crate {
                 final List<Component> lore = itemMeta.lore();
 
                 if (lore != null) {
-                    section.set(getPath(prizeName, "DisplayLore"), StringUtils.fromComponent(lore));
+                    section.set(getPath(prizeName, "DisplayLore"), AdvUtils.fromComponent(lore));
                 }
             }
         }
@@ -778,7 +781,7 @@ public class Crate {
 
         final String items = getPath(prizeName, "Items");
 
-        final String toBase64 = PaperMethods.toBase64(itemStack);
+        final String toBase64 = ItemUtils.toBase64(itemStack);
 
         if (isList) {
             section.set(getPath(prizeName, "DisplayData"), toBase64);
@@ -846,7 +849,7 @@ public class Crate {
     public void saveFile() {
         if (this.name.isEmpty()) return;
 
-        final CustomFile customFile = this.plugin.getFileManager().getFile(this.name, FileType.YAML);
+        final LegacyCustomFile customFile = this.plugin.getFileManager().getFile(this.name, FileType.YAML);
 
         if (customFile != null) customFile.save();
 

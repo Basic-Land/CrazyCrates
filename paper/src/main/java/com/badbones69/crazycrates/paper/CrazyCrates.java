@@ -25,11 +25,10 @@ import com.badbones69.crazycrates.paper.managers.BukkitUserManager;
 import com.badbones69.crazycrates.paper.managers.InventoryManager;
 import com.badbones69.crazycrates.paper.tasks.crates.CrateManager;
 import com.google.common.reflect.ClassPath;
-import com.ryderbelserion.fusion.core.util.StringUtils;
-import com.ryderbelserion.fusion.paper.FusionApi;
-import com.ryderbelserion.fusion.core.api.enums.FileType;
-import com.ryderbelserion.fusion.paper.Fusion;
-import com.ryderbelserion.fusion.paper.files.FileManager;
+import com.ryderbelserion.fusion.api.enums.FileType;
+import com.ryderbelserion.fusion.core.utils.AdvUtils;
+import com.ryderbelserion.fusion.paper.FusionPaper;
+import com.ryderbelserion.fusion.paper.files.LegacyFileManager;
 import lombok.Getter;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -46,7 +45,6 @@ public class CrazyCrates extends JavaPlugin {
         return JavaPlugin.getPlugin(CrazyCrates.class);
     }
 
-    private final FusionApi api = FusionApi.get();
     private final Timer timer;
     private final long startTime;
 
@@ -60,6 +58,8 @@ public class CrazyCrates extends JavaPlugin {
     private BukkitUserManager userManager;
     private CrateManager crateManager;
 
+    private FusionPaper api;
+
     private Server instance;
 
     private MetricsWrapper metrics;
@@ -68,15 +68,20 @@ public class CrazyCrates extends JavaPlugin {
     @Getter
     private BaseProfileManager baseProfileManager;
 
+    private LegacyFileManager fileManager;
+
     @Override
     public void onEnable() {
+        this.api = new FusionPaper(getComponentLogger(), getDataFolder());
         this.api.enable(this);
         LOGGER = getLogger();
+
+        this.fileManager = this.api.getLegacyFileManager();
 
         this.instance = new Server(getDataFolder());
         this.instance.apply();
 
-        getFileManager().addFile("locations.yml", FileType.YAML).addFile("data.yml", FileType.YAML).addFile("respin-gui.yml", "guis", false, FileType.YAML)
+        this.fileManager.addFile("locations.yml", FileType.YAML).addFile("data.yml", FileType.YAML).addFile("respin-gui.yml", "guis", false, FileType.YAML)
                 .addFile("crates.log", "logs", false, FileType.NONE)
                 .addFile("keys.log", "logs", false, FileType.NONE)
                 .addFolder("crates", FileType.YAML)
@@ -164,9 +169,9 @@ public class CrazyCrates extends JavaPlugin {
             // Print dependency garbage
             for (final Plugins value : Plugins.values()) {
                 if (value.isEnabled()) {
-                    getComponentLogger().info(StringUtils.parse("<bold><gold>" + value.getName() + " <green>FOUND"));
+                    getComponentLogger().info(AdvUtils.parse("<bold><gold>" + value.getName() + " <green>FOUND"));
                 } else {
-                    getComponentLogger().info(StringUtils.parse("<bold><gold>" + value.getName() + " <red>NOT FOUND"));
+                    getComponentLogger().info(AdvUtils.parse("<bold><gold>" + value.getName() + " <red>NOT FOUND"));
                 }
             }
 
@@ -200,7 +205,7 @@ public class CrazyCrates extends JavaPlugin {
 
         MiscUtils.janitor();
 
-        this.api.disable();
+        this.api.save();
     }
 
     public final InventoryManager getInventoryManager() {
@@ -223,15 +228,15 @@ public class CrazyCrates extends JavaPlugin {
         return this.metrics;
     }
 
-    public final FileManager getFileManager() {
-        return this.api.getFileManager();
-    }
-
-    public final Fusion getFusion() {
-        return this.api.getFusion();
+    public final LegacyFileManager getFileManager() {
+        return this.fileManager;
     }
 
     public final Timer getTimer() {
         return this.timer;
+    }
+
+    public final FusionPaper getFusion() {
+        return this.api;
     }
 }

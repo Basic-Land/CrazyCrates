@@ -1,13 +1,14 @@
 package com.badbones69.crazycrates.paper.managers;
 
 import ch.jalu.configme.SettingsManager;
+import com.badbones69.crazycrates.core.config.beans.ModelData;
 import com.badbones69.crazycrates.paper.CrazyCrates;
 import com.badbones69.crazycrates.paper.api.enums.Messages;
 import com.badbones69.crazycrates.paper.api.enums.other.keys.ItemKeys;
 import com.badbones69.crazycrates.paper.api.objects.Crate;
 import com.badbones69.crazycrates.paper.api.objects.Tier;
 import com.badbones69.crazycrates.paper.api.builders.LegacyItemBuilder;
-import com.ryderbelserion.fusion.paper.builder.gui.types.PaginatedGui;
+import com.ryderbelserion.fusion.paper.api.builder.gui.types.PaginatedGui;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
@@ -33,20 +34,29 @@ public class InventoryManager {
     private LegacyItemBuilder backButton;
 
     public void loadButtons() {
+        final ModelData menuModelData = this.config.getProperty(ConfigKeys.menu_button_item_model);
+
         this.menuButton = new LegacyItemBuilder().withType(this.config.getProperty(ConfigKeys.menu_button_item).toLowerCase())
                 .setDisplayName(this.config.getProperty(ConfigKeys.menu_button_name))
                 .setDisplayLore(this.config.getProperty(ConfigKeys.menu_button_lore))
-                .setCustomModelData(this.config.getProperty(ConfigKeys.menu_button_model_data));
+                .setCustomModelData(this.config.getProperty(ConfigKeys.menu_button_model_data))
+                .setItemModel(menuModelData.getNamespace(), menuModelData.getId());
+
+        final ModelData nextModelData = this.config.getProperty(ConfigKeys.next_button_item_model);
 
         this.nextButton = new LegacyItemBuilder().withType(this.config.getProperty(ConfigKeys.next_button_item).toLowerCase())
                 .setDisplayName(this.config.getProperty(ConfigKeys.next_button_name))
                 .setDisplayLore(this.config.getProperty(ConfigKeys.next_button_lore))
-                .setCustomModelData(this.config.getProperty(ConfigKeys.next_button_model_data));
+                .setCustomModelData(this.config.getProperty(ConfigKeys.next_button_model_data))
+                .setItemModel(nextModelData.getNamespace(), nextModelData.getId());
+
+        final ModelData backModelData = this.config.getProperty(ConfigKeys.back_button_item_model);
 
         this.backButton = new LegacyItemBuilder().withType(this.config.getProperty(ConfigKeys.back_button_item).toLowerCase())
                 .setDisplayName(this.config.getProperty(ConfigKeys.back_button_name))
                 .setDisplayLore(this.config.getProperty(ConfigKeys.back_button_lore))
-                .setCustomModelData(this.config.getProperty(ConfigKeys.back_button_model_data));
+                .setCustomModelData(this.config.getProperty(ConfigKeys.back_button_model_data))
+                .setItemModel(backModelData.getNamespace(), backModelData.getId());
     }
 
     public final ItemStack getMenuButton(@NotNull final Player player) {

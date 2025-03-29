@@ -23,11 +23,12 @@ import com.badbones69.crazycrates.paper.support.holograms.types.DecentHologramsS
 import com.badbones69.crazycrates.paper.support.holograms.types.FancyHologramsSupport;
 import com.badbones69.crazycrates.paper.managers.InventoryManager;
 import com.badbones69.crazycrates.paper.api.builders.LegacyItemBuilder;
-import com.ryderbelserion.fusion.core.api.enums.FileType;
-import com.ryderbelserion.fusion.core.util.FileUtils;
-import com.ryderbelserion.fusion.paper.files.CustomFile;
-import com.ryderbelserion.fusion.paper.files.FileManager;
-import com.ryderbelserion.fusion.paper.util.scheduler.FoliaScheduler;
+import com.ryderbelserion.fusion.api.enums.FileType;
+import com.ryderbelserion.fusion.api.utils.FileUtils;
+import com.ryderbelserion.fusion.paper.api.enums.Scheduler;
+import com.ryderbelserion.fusion.paper.api.scheduler.FoliaScheduler;
+import com.ryderbelserion.fusion.paper.files.LegacyCustomFile;
+import com.ryderbelserion.fusion.paper.files.LegacyFileManager;
 import io.papermc.paper.persistence.PersistentDataContainerView;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import lombok.Getter;
@@ -84,7 +85,7 @@ public class CrateManager {
 
     private final CrazyCrates plugin = CrazyCrates.getPlugin();
     private final InventoryManager inventoryManager = this.plugin.getInventoryManager();
-    private final FileManager fileManager = this.plugin.getFileManager();
+    private final LegacyFileManager fileManager = this.plugin.getFileManager();
 
     private final ComponentLogger logger = this.plugin.getComponentLogger();
     private final Server server = this.plugin.getServer();
@@ -235,14 +236,14 @@ public class CrateManager {
 
             this.brokeCrates.add(fileName);
 
-            if (MiscUtils.isLogging()) this.logger.warn("There was an error while loading the {}.yml file.", fileName, exception);
+            if (MiscUtils.isLogging()) this.logger.warn("There was an error while loading the {} file.", fileName, exception);
         }
     }
 
     public void loadCustomItems() {
         final PluginManager manager = this.server.getPluginManager();
 
-        final String pluginName = this.plugin.getFusion().getItemPlugin().toLowerCase();
+        final String pluginName = this.plugin.getFusion().getItemsPlugin().toLowerCase();
 
         switch (pluginName) {
             case "nexo" -> manager.registerEvents(new NexoInteractListener(), this.plugin);
@@ -371,7 +372,7 @@ public class CrateManager {
 
         for (final String crateName : getCrateNames(true)) {
             try {
-                final CustomFile customFile = this.fileManager.getFile(crateName, FileType.YAML);
+                final LegacyCustomFile customFile = this.fileManager.getFile(crateName, FileType.YAML);
 
                 if (customFile == null) continue;
 
@@ -495,7 +496,7 @@ public class CrateManager {
             } catch (Exception exception) {
                 this.brokeCrates.add(crateName);
 
-                if (MiscUtils.isLogging()) this.logger.warn("There was an error while loading the {}.yml file.", crateName, exception);
+                if (MiscUtils.isLogging()) this.logger.warn("There was an error while loading the {} file.", crateName, exception);
             }
         }
 
@@ -1449,14 +1450,16 @@ public class CrateManager {
     // Internal methods.
     private LegacyItemBuilder getKey(@NotNull final FileConfiguration file) {
         final String name = file.getString("Crate.PhysicalKey.Name", "");
-        final int customModelData = file.getInt("Crate.PhysicalKey.Custom-Model-Data", -1);
+        final String customModelData = file.getString("Crate.PhysicalKey.Custom-Model-Data", "");
+        final String namespace = file.getString("Crate.PhysicalKey.Model.Namespace", "");
+        final String id = file.getString("Crate.PhysicalKey.Model.Id", "");
         final List<String> lore = file.getStringList("Crate.PhysicalKey.Lore");
         final boolean glowing = file.getBoolean("Crate.PhysicalKey.Glowing", true);
         final boolean hideFlags = file.getBoolean("Crate.PhysicalKey.HideItemFlags", false);
 
         final LegacyItemBuilder itemBuilder = file.contains("Crate.PhysicalKey.Data") ? new LegacyItemBuilder().fromBase64(file.getString("Crate.PhysicalKey.Data", "")) : new LegacyItemBuilder().withType(file.getString("Crate.PhysicalKey.Item", "tripwire_hook").toLowerCase());
 
-        return itemBuilder.setDisplayName(name).setDisplayLore(lore).setGlowing(glowing).setHidingItemFlags(hideFlags).setCustomModelData(customModelData);
+        return itemBuilder.setDisplayName(name).setDisplayLore(lore).setGlowing(glowing).setItemModel(namespace, id).setHidingItemFlags(hideFlags).setCustomModelData(customModelData);
     }
 
     // Cleans the data file.
@@ -1580,7 +1583,12 @@ public class CrateManager {
             this.rewards.remove(uuid);
         }
 
-        ChestManager.closeChest(location.getBlock(), false);
+        new FoliaScheduler(location) {
+            @Override
+            public void run() {
+                ChestManager.closeChest(location.getBlock(), false);
+            }
+        }.run();
 
         removeCrateInUse(player);
         removePlayerFromOpeningList(player);

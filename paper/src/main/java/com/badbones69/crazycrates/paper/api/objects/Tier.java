@@ -3,7 +3,7 @@ package com.badbones69.crazycrates.paper.api.objects;
 import com.badbones69.crazycrates.paper.api.enums.other.keys.ItemKeys;
 import com.badbones69.crazycrates.paper.api.builders.LegacyItemBuilder;
 import com.badbones69.crazycrates.paper.api.objects.gacha.util.TierInfo;
-import com.ryderbelserion.fusion.core.util.StringUtils;
+import com.ryderbelserion.fusion.api.utils.StringUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +27,9 @@ public class Tier {
 
         this.lore = section.getStringList("Lore"); // this returns an empty list if not found anyway.
 
-        this.item = new LegacyItemBuilder().withType(section.getString("Item", "chest").toLowerCase()).setHidingItemFlags(section.getBoolean("HideItemFlags", false)).setCustomModelData(section.getInt("Custom-Model-Data", -1));
+        this.item = new LegacyItemBuilder().withType(section.getString("Item", "chest").toLowerCase()).setHidingItemFlags(section.getBoolean("HideItemFlags", false))
+                .setCustomModelData(section.getString("Custom-Model-Data", ""))
+                .setItemModel(section.getString("Model.Namespace", ""), section.getString("Model.Id", ""));
 
         this.weight = section.getDouble("Weight", -1);
 

@@ -14,9 +14,10 @@ import com.badbones69.crazycrates.paper.utils.ItemUtils;
 import com.badbones69.crazycrates.paper.utils.MiscUtils;
 import com.badbones69.crazycrates.core.config.ConfigManager;
 import com.badbones69.crazycrates.core.config.impl.messages.CrateKeys;
-import com.ryderbelserion.fusion.core.util.StringUtils;
-import com.ryderbelserion.fusion.paper.builder.items.modern.ItemBuilder;
-import com.ryderbelserion.fusion.paper.util.PaperMethods;
+import com.ryderbelserion.fusion.api.utils.StringUtils;
+import com.ryderbelserion.fusion.core.utils.AdvUtils;
+import com.ryderbelserion.fusion.paper.api.builder.items.modern.ItemBuilder;
+import com.ryderbelserion.fusion.paper.utils.ColorUtils;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import lombok.Getter;
 import me.clip.placeholderapi.PlaceholderAPI;
@@ -190,7 +191,7 @@ public class Prize {
     }
 
     public @NotNull final String getStrippedName() {
-        return PlainTextComponentSerializer.plainText().serialize(StringUtils.parse(getPrizeName()));
+        return PlainTextComponentSerializer.plainText().serialize(AdvUtils.parse(getPrizeName()));
     }
 
     /**
@@ -315,8 +316,20 @@ public class Prize {
         return this.builders;
     }
 
+    /**
+     * @return the ItemBuilders for all custom items made by the Items configuration section.
+     */
     public @NotNull final List<ItemBuilder> getItems() {
         return this.items;
+    }
+
+    /**
+     * Checks if there is any valid items.
+     *
+     * @return true or false
+     */
+    public final boolean isItemsNotEmpty() {
+        return this.config.getProperty(ConfigKeys.use_different_items_layout) && !getItems().isEmpty() || !getItemBuilders().isEmpty();
     }
 
     /**
@@ -397,7 +410,7 @@ public class Prize {
             put("%reward_stripped%", getStrippedName());
         }};
 
-        final Component component = StringUtils.parse(MiscUtils.populatePlaceholders(target, message, placeholders));
+        final Component component = AdvUtils.parse(MiscUtils.populatePlaceholders(target, message, placeholders));
 
         if (permission.isEmpty()) {
             server.broadcast(component);
@@ -476,10 +489,12 @@ public class Prize {
 
             builder.setUnbreakable(this.section.getBoolean("Unbreakable", false));
 
-            builder.setCustomModelData(this.section.getInt("Settings.Custom-Model-Data", -1));
+            builder.setCustomModelData(this.section.getString("Settings.Custom-Model-Data", ""));
+
+            builder.setItemModel(this.section.getString("Settings.Model.Namespace", ""), this.section.getString("Settings.Model.Id", ""));
 
             if (this.section.contains("Settings.Mob-Type")) {
-                final EntityType type = PaperMethods.getEntity(this.section.getString("Settings.Mob-Type", "cow"));
+                final EntityType type = com.ryderbelserion.fusion.paper.utils.ItemUtils.getEntity(this.section.getString("Settings.Mob-Type", "cow"));
 
                 if (type != null) {
                     builder.setEntityType(type);
@@ -487,13 +502,13 @@ public class Prize {
             }
 
             if (this.section.contains("Settings.RGB")) {
-                final @Nullable Color color = PaperMethods.getRGB(this.section.getString("Settings.RGB", ""));
+                final @Nullable Color color = ColorUtils.getRGB(this.section.getString("Settings.RGB", ""));
 
                 if (color != null) {
                     builder.setColor(color);
                 }
             } else if (this.section.contains("Settings.Color")) {
-                builder.setColor(PaperMethods.getColor(this.section.getString("Settings.Color", "RED")));
+                builder.setColor(ColorUtils.getColor(this.section.getString("Settings.Color", "RED")));
             }
 
             if (this.section.contains("Skull")) {
