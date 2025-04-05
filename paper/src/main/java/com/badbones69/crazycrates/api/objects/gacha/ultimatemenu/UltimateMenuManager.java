@@ -5,6 +5,7 @@ import com.badbones69.crazycrates.api.builders.items.UltimateMenu;
 import com.badbones69.crazycrates.api.objects.Crate;
 import com.badbones69.crazycrates.api.objects.gacha.DatabaseManager;
 import lombok.Getter;
+import lombok.Synchronized;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -28,6 +29,7 @@ public class UltimateMenuManager {
         open(player, databaseManager.getCrateSettingsSplit().getFirst().getFirst().getCrate());
     }
 
+    @Synchronized
     public void open(Player player, Crate crate) {
         if (player.getOpenInventory().getTopInventory().getHolder(false) instanceof UltimateMenu) {
             return;
@@ -49,6 +51,7 @@ public class UltimateMenuManager {
         player.openInventory(menu.build().getInventory());
     }
 
+    @Synchronized
     public ItemStack[] getItems(Player player) {
         ItemStack[] itemStacks = items.get(player.getName());
         databaseManager.clearInventory(player);
@@ -62,6 +65,7 @@ public class UltimateMenuManager {
                 .toList();
     }
 
+    @Synchronized
     public void remove(Player player) {
         ItemStack[] itemStacks = items.get(player.getName());
         if (itemStacks != null) {
