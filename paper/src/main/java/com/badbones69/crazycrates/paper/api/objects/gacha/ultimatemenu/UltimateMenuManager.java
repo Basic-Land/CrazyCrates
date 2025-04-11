@@ -20,6 +20,7 @@ public class UltimateMenuManager {
         this.databaseManager = databaseManager;
     }
 
+    @Synchronized
     public void open(Player player) {
         open(player, databaseManager.getCrateSettingsSplit().getFirst().getFirst().getCrate());
     }
