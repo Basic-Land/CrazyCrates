@@ -446,7 +446,7 @@ public class Crate {
      * @return {@link Prize}
      */
     private Prize getPrize(@NotNull final List<Prize> prizes) {
-        double totalWeight = this.crateType == CrateType.casino || this.crateType == CrateType.cosmic ? prizes.stream().mapToDouble(Prize::getWeight).sum() : this.sum;
+        double totalWeight = this.crateType == CrateType.casino || this.crateType == CrateType.cosmic ? prizes.stream().filter(prize -> prize.getWeight() == -1).mapToDouble(Prize::getWeight).sum() : this.sum;
 
         int index = 0;
 
@@ -777,32 +777,38 @@ public class Crate {
             }
         }
 
-        final boolean isList = section.isList(getPath(prizeName, "Items"));
-
-        final String items = getPath(prizeName, "Items");
+        final String path = getPath(prizeName, "Items");
 
         final String toBase64 = ItemUtils.toBase64(itemStack);
 
-        if (isList) {
-            section.set(getPath(prizeName, "DisplayData"), toBase64);
+        if (!section.contains(path)) {
+            final boolean isNewLayout = ConfigManager.getConfig().getProperty(ConfigKeys.use_different_items_layout);
 
-            if (section.contains(items)) {
-                final List<String> list = section.getStringList(items);
-
-                list.add("Data:" + toBase64);
-
-                section.set(items, list);
+            if (isNewLayout) {
+                section.createSection(path);
             } else {
-                section.set(items, new ArrayList<>() {{
-                    add("Data:" + toBase64);
-                }});
+                section.set(path, new ArrayList<>());
             }
-        } else {
-            final ConfigurationSection itemsSection = section.getConfigurationSection(items);
+        }
 
-            if (itemsSection != null) {
-                itemsSection.set(MiscUtils.randomUUID() + ".data", toBase64);
+        section.set(getPath(prizeName, "DisplayData"), toBase64);
+
+        final boolean isList = section.isList(path);
+
+        if (isList) {
+            final List<String> list = section.getStringList(path);
+
+            list.add("Data:" + toBase64);
+
+            section.set(path, list);
+        } else {
+            ConfigurationSection items = section.getConfigurationSection(path);
+
+            if (items == null) {
+                items = section.createSection(path);
             }
+
+            items.set(MiscUtils.randomUUID() + ".data", toBase64);
         }
 
         section.set(getPath(prizeName, "DisplayItem"), itemStack.getType().getKey().getKey());
@@ -823,6 +829,7 @@ public class Crate {
         if (!tier.isEmpty()) {
             if (section.contains(tiers)) {
                 final List<String> list = section.getStringList(tiers);
+
                 list.add(tier);
 
                 section.set(tiers, list);
@@ -851,7 +858,9 @@ public class Crate {
 
         final LegacyCustomFile customFile = this.plugin.getFileManager().getFile(this.name, FileType.YAML);
 
-        if (customFile != null) customFile.save();
+        if (customFile != null) {
+            customFile.save(); // save to file
+        }
 
         this.crateManager.reloadCrate(this.crateManager.getCrateFromName(this.name));
     }

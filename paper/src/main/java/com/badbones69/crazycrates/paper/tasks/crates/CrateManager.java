@@ -350,13 +350,14 @@ public class CrateManager {
                     "config.yml",
                     "data.yml",
                     "locations.yml",
-                    "messages.yml"
-            ).forEach(file -> FileUtils.extract(file, "examples", true));
+                    "messages.yml",
+                    "editor.yml"
+            ).forEach(file -> FileUtils.extract(file, path.resolve("examples"), true));
 
-            FileUtils.extracts("/guis/", path.resolve("examples").resolve("guis"), true);
-            FileUtils.extracts("/logs/", path.resolve("examples").resolve("logs"), true);
-            FileUtils.extracts("/crates/", path.resolve("examples").resolve("crates"), true);
-            FileUtils.extracts("/schematics/", path.resolve("examples").resolve("schematics"), true);
+            FileUtils.extract("guis", path.resolve("examples"), true);
+            FileUtils.extract("logs", path.resolve("examples"), true);
+            FileUtils.extract("crates", path.resolve("examples"), true);
+            FileUtils.extract("schematics", path.resolve("examples"), true);
         }
 
         this.giveNewPlayersKeys = false;
@@ -368,7 +369,7 @@ public class CrateManager {
             this.holograms.purge(false);
         }
 
-        if (MiscUtils.isLogging()) this.plugin.getComponentLogger().info("Loading all crate information...");
+        if (MiscUtils.isLogging()) this.logger.info("Loading all crate information...");
 
         for (final String crateName : getCrateNames(true)) {
             try {
@@ -1468,7 +1469,9 @@ public class CrateManager {
 
         if (!data.contains("Players")) return;
 
-        if (MiscUtils.isLogging()) this.plugin.getComponentLogger().info("Cleaning up the data.yml file.");
+        final boolean isLogging = MiscUtils.isLogging();
+
+        if (isLogging) this.logger.info("Cleaning up the data.yml file.");
 
         final List<String> removePlayers = new ArrayList<>();
 
@@ -1500,14 +1503,14 @@ public class CrateManager {
         }
 
         if (!removePlayers.isEmpty()) {
-            if (MiscUtils.isLogging()) this.logger.info("{} player's data has been marked to be removed.", removePlayers.size());
+            if (isLogging) this.logger.info("{} player's data has been marked to be removed.", removePlayers.size());
 
             removePlayers.forEach(uuid -> data.set("Players." + uuid, null));
 
-            if (MiscUtils.isLogging()) this.logger.info("All empty player data has been removed.");
+            if (isLogging) this.logger.info("All empty player data has been removed.");
         }
 
-        if (MiscUtils.isLogging()) this.logger.info("The data.yml file has been cleaned.");
+        if (isLogging) this.logger.info("The data.yml file has been cleaned.");
 
         FileKeys.data.save();
     }

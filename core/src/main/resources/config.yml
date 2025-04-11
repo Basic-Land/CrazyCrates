@@ -10,6 +10,11 @@ root:
   #
   # If the option is set to false, items should be more random in theory.
   use-different-random: false
+  # This will allow you to use a new items layout for Prizes which should be much more straight forward, less prone to errors.
+  # You can run /crazycrates migrate -mt NewItemFormat which should migrate all existing prizes after you set this to true
+  #
+  # Take a backup before you run the migration as there may be bugs.
+  use-different-items-layout: false
   # This option defines what in-game editor format is used in CrazyCrates.
   #
   # true -> uses the new editor
@@ -46,7 +51,7 @@ root:
   # This will wipe the example folder on /crazycrates reload or plugin startup. so you always have fresh examples to look at.
   update-examples-folder: true
   # The prefix used in commands
-  command_prefix: "<dark_gray>[<blue>CrazyCrates<dark_gray>]: "
+  command_prefix: " <gradient:#e91e63:blue>CrazyCrates</gradient> | "
 # Settings related to guis.
 gui:
   # If /crates should open the main menu. Warning: This will remove the menu button from crate previews.
@@ -54,9 +59,9 @@ gui:
   # Inventory settings like size.
   inventory:
     # The name of the gui.
-    name: "<bold><blue>Crazy <dark_red>Crates</bold>"
+    name: "<bold><gradient:#e91e63:blue>Crazy Crates</gradient></bold>"
     # The amount of rows for a gui.
-    rows: 5
+    rows: 3
     # The buttons in the gui.
     buttons:
       # The main menu button.

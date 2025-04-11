@@ -78,6 +78,8 @@ tasks {
         }
     }
 
+    runPaper.folia.registerTask()
+
     runServer {
         jvmArgs("-Dnet.kyori.ansi.colorLevel=truecolor")
 

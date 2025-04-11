@@ -23,6 +23,7 @@ import lombok.Getter;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Color;
 import org.bukkit.Server;
@@ -30,6 +31,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ItemType;
+import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.bukkit.configuration.ConfigurationSection;
@@ -40,6 +42,8 @@ import java.util.Map;
 public class Prize {
 
     private final CrazyCrates plugin = CrazyCrates.getPlugin();
+
+    private final ComponentLogger logger = this.plugin.getComponentLogger();
 
     private final SettingsManager config = ConfigManager.getConfig();
 
@@ -345,6 +349,10 @@ public class Prize {
      * @return the weight
      */
     public final double getWeight() {
+        if (this.weight == -1 && MiscUtils.isLogging()) {
+            this.logger.warn("Cannot fetch the weight as the option is not present for this prize: {} in the crate: {}", this.prizeName, this.crateName);
+        }
+
         return this.weight;
     }
     
@@ -532,6 +540,27 @@ public class Prize {
                     String[] value = ench.split(":");
 
                     builder.addEnchantment(value[0], Integer.parseInt(value[1]), true);
+                }
+            }
+
+            if (this.section.contains("DisplayPotions")) {
+                final ConfigurationSection potions = this.section.getConfigurationSection("DisplayPotions");
+
+                if (potions != null) {
+                    for (final String potion : potions.getKeys(false)) {
+                        final PotionEffectType type = com.ryderbelserion.fusion.paper.utils.ItemUtils.getPotionEffect(potion);
+
+                        if (type != null) {
+                            final ConfigurationSection data = potions.getConfigurationSection(potion);
+
+                            if (data != null) {
+                                final int duration = data.getInt("duration", 10) * 20;
+                                final int level = data.getInt("level", 1);
+
+                                builder.addPotionEffect(type, duration, level);
+                            }
+                        }
+                    }
                 }
             }
 
