@@ -17,7 +17,6 @@ import com.badbones69.crazycrates.paper.managers.events.enums.EventType;
 import com.badbones69.crazycrates.paper.tasks.crates.CrateManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -289,22 +288,20 @@ public class UltimateMenu extends InventoryBuilder {
             unselectedMain.setDisplayName("<red><b>" + setting.getCrateName());
 
             if (crate == selectedCrate) {
-                selectedMain.setCustomModelData(1000002);
-                getInventory().setItem(slot, selectedMain.asItemStack());
+                getInventory().setItem(slot, new LegacyItemBuilder(selectedMain, true).setCustomModelData(1000002).asItemStack());
 
-                selectedMain.setCustomModelData(1000003);
+                selectedMain = new LegacyItemBuilder(selectedMain, true).setCustomModelData(1000003);
                 getInventory().setItem(slot + 1, selectedMain.asItemStack());
                 getInventory().setItem(slot + 2, selectedMain.asItemStack());
 
                 int model = setting.getModelDataMainMenu();
                 mainCrate.setCustomModelData(model);
-                ItemStack item = mainCrate.asItemStack();
-                getPlayer().getInventory().setItem(29, item);
+                getPlayer().getInventory().setItem(29, mainCrate.asItemStack());
             } else {
-                unselectedMain.setCustomModelData(1000002);
-                getInventory().setItem(slot, unselectedMain.asItemStack());
+                getInventory().setItem(slot, new LegacyItemBuilder(unselectedMain, true).setCustomModelData(1000002).asItemStack());
 
-                unselectedMain.setCustomModelData(1000001);
+                unselectedMain = new LegacyItemBuilder(unselectedMain, true).setCustomModelData(1000001);
+
                 getInventory().setItem(slot + 1, unselectedMain.asItemStack());
                 getInventory().setItem(slot + 2, unselectedMain.asItemStack());
             }

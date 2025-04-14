@@ -8,13 +8,13 @@ import org.bukkit.inventory.ItemType;
 import java.util.List;
 
 public class ItemRepo {
-    public static final LegacyItemBuilder SELECTED = getItem(ItemType.GREEN_STAINED_GLASS_PANE, 1000002)
+    public static final LegacyItemBuilder SELECTED = getItem(ItemType.GREEN_STAINED_GLASS_PANE, -1)
             .addDisplayLore("<gray>Právě vybraná truhla");
-    public static final LegacyItemBuilder UNSELECTED = getItem(ItemType.RED_STAINED_GLASS_PANE, 1000002)
+    public static final LegacyItemBuilder UNSELECTED = getItem(ItemType.RED_STAINED_GLASS_PANE, -1)
             .addDisplayLore("<gray>Kliknutím vyberete tuto truhlu");
     public static final LegacyItemBuilder MAIN_MENU = getItem(ItemType.LIGHT_GRAY_STAINED_GLASS_PANE, 1000001);
     public static final LegacyItemBuilder BANNER = getItem(ItemType.LIGHT_GRAY_STAINED_GLASS_PANE, 1000002);
-    public static final LegacyItemBuilder MAIN_MENU_NAME = getItem(ItemType.LIGHT_GRAY_STAINED_GLASS_PANE, 0);
+    public static final LegacyItemBuilder MAIN_MENU_NAME = getItem(ItemType.LIGHT_GRAY_STAINED_GLASS_PANE, -1);
     public static final LegacyItemBuilder BOOK = getItem(ItemType.BOOK, 10)
             .setDisplayName("<white><b>Historie truhly")
             .addDisplayLore("<gray>Kliknutím zobrazíš historii truhly");
@@ -42,9 +42,9 @@ public class ItemRepo {
 
 
     public static final LegacyItemBuilder SHOP_BANNER = getItem(ItemType.LIGHT_GRAY_STAINED_GLASS_PANE, 1000007);
-    public static final LegacyItemBuilder SHOP_SELECTED = getItem(ItemType.GREEN_STAINED_GLASS_PANE, 1000007)
+    public static final LegacyItemBuilder SHOP_SELECTED = getItem(ItemType.GREEN_STAINED_GLASS_PANE, -1)
             .addDisplayLore("<gray>Právě vybraný obchod");
-    public static final LegacyItemBuilder SHOP_UNSELECTED = getItem(ItemType.RED_STAINED_GLASS_PANE, 1000007)
+    public static final LegacyItemBuilder SHOP_UNSELECTED = getItem(ItemType.RED_STAINED_GLASS_PANE, -1)
             .addDisplayLore("<gray>Kliknutím vyberete tento obchod");
     public static final LegacyItemBuilder MAIN_MENU_SHOP = getItem(ItemType.CHEST, 1000008)
             .setDisplayName("<green><b>Hlavní Menu");

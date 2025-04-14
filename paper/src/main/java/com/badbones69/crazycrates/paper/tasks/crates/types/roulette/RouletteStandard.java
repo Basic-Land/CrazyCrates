@@ -10,7 +10,6 @@ import com.badbones69.crazycrates.paper.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.ItemRepo;
 import com.badbones69.crazycrates.paper.tasks.crates.CrateManager;
 import com.badbones69.crazycrates.paper.tasks.crates.other.GachaCrateManager;
-import com.badbones69.crazycrates.paper.utils.MiscUtils;
 import com.ryderbelserion.fusion.paper.api.scheduler.FoliaScheduler;
 import lombok.Getter;
 import net.kyori.adventure.sound.Sound;
@@ -36,7 +35,6 @@ public class RouletteStandard extends FoliaScheduler {
     private final Rarity highestRarity;
     @Getter
     private final boolean sneak;
-    private final LegacyItemBuilder glass = new LegacyItemBuilder(ItemType.GRAY_STAINED_GLASS_PANE);
     @Getter
     private int count = 1;
     @Getter
@@ -77,7 +75,7 @@ public class RouletteStandard extends FoliaScheduler {
         }
 
         if (!first && !skip) {
-            setupInventory();
+            builder.setItem(36, new LegacyItemBuilder(ItemType.GRAY_STAINED_GLASS_PANE).setCustomModelData(modelData).asItemStack());
         }
 
         if (!player.getOpenInventory().getTopInventory().equals(inventory)) {
@@ -112,19 +110,11 @@ public class RouletteStandard extends FoliaScheduler {
         put = true;
     }
 
-    private void setupInventory() {
-        builder.setItem(36, glass.setCustomModelData(modelData).asItemStack());
-        for (int i = 0; i < 45; i++) {
-            if (i == 36 || i == 37 || i == 8) continue;
-            builder.setItem(i, MiscUtils.getRandomPaneColor().setCustomModelData(2000000).asItemStack());
-        }
-    }
-
     private void handleModelData64() {
         if (!first) {
             first = true;
             lock = true;
-            builder.setItem(36, glass.setCustomModelData(600).asItemStack());
+            builder.setItem(36, new LegacyItemBuilder(ItemType.GRAY_STAINED_GLASS_PANE).setCustomModelData(600).asItemStack());
             if (!sneak || !skip) builder.setItem(22, prize.getFirst().getPrize().getDisplayItem());
             skip = true;
             return;
@@ -152,7 +142,7 @@ public class RouletteStandard extends FoliaScheduler {
     }
 
     private void endTask() {
-        builder.setItem(36, glass.setCustomModelData(600).asItemStack());
+        builder.setItem(36, new LegacyItemBuilder(ItemType.GRAY_STAINED_GLASS_PANE).setCustomModelData(600).asItemStack());
         if (!sneak) {
             builder.setItem(22, prize.getFirst().getPrize().getDisplayItem());
         }

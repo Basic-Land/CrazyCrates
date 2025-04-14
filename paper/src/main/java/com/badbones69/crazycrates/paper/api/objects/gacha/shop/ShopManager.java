@@ -172,19 +172,17 @@ public class ShopManager {
             int ordinal = shopID.ordinal();
 
             if (selected == shopID) {
-                selectedMain.setCustomModelData(1000007 - ordinal);
-                inv.setItem(slot, selectedMain.asItemStack());
+                inv.setItem(slot, new LegacyItemBuilder(selectedMain, true).setCustomModelData(1000007 - ordinal).asItemStack());
 
-                selectedMain.setCustomModelData(1000003);
-                inv.setItem(slot + 1, selectedMain.asItemStack());
-                inv.setItem(slot + 2, selectedMain.asItemStack());
+                ItemStack selectedStack = new LegacyItemBuilder(selectedMain, true).setCustomModelData(1000003).asItemStack();
+                inv.setItem(slot + 1, selectedStack);
+                inv.setItem(slot + 2, selectedStack);
             } else {
-                unselectedMain.setCustomModelData(1000007 - ordinal);
-                inv.setItem(slot, unselectedMain.asItemStack());
+                inv.setItem(slot, new LegacyItemBuilder(unselectedMain, true).setCustomModelData(1000007 - ordinal).asItemStack());
 
-                unselectedMain.setCustomModelData(1000001);
-                inv.setItem(slot + 1, unselectedMain.asItemStack());
-                inv.setItem(slot + 2, unselectedMain.asItemStack());
+                ItemStack unselected = new LegacyItemBuilder(unselectedMain, true).setCustomModelData(1000001).asItemStack();
+                inv.setItem(slot + 1, unselected);
+                inv.setItem(slot + 2, unselected);
             }
 
             slot += 3;
