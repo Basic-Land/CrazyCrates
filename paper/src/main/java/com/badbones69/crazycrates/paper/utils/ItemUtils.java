@@ -249,7 +249,13 @@ public class ItemUtils {
                 itemBuilder.withDisplayLore(item.getStringList("lore"));
             }
 
-            itemBuilder.setAmount(item.getInt("amount", 1));
+            if (item.isString("amount")) {
+                final Optional<Number> integer = StringUtils.tryParseInt(item.getString("amount"));
+
+                integer.ifPresent(number -> itemBuilder.setAmount(number.intValue()));
+            } else {
+                itemBuilder.setAmount(item.getInt("amount", 1));
+            }
 
             final ConfigurationSection enchantments = item.getConfigurationSection("enchantments");
 
@@ -385,7 +391,7 @@ public class ItemUtils {
                     }
                     case "damage" -> {
                         final Optional<Number> amount = StringUtils.tryParseInt(value);
-                        itemBuilder.setDamage(amount.map(Number::intValue).orElse(1));
+                        itemBuilder.setDamage(amount.map(Number::intValue).orElse(0));
                     }
                     case "lore" -> itemBuilder.setDisplayLore(List.of(value.split(",")));
                     case "player" -> itemBuilder.setPlayer(value);

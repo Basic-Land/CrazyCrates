@@ -446,7 +446,7 @@ public class Crate {
      * @return {@link Prize}
      */
     private Prize getPrize(@NotNull final List<Prize> prizes) {
-        double totalWeight = this.crateType == CrateType.casino || this.crateType == CrateType.cosmic ? prizes.stream().filter(prize -> prize.getWeight() == -1).mapToDouble(Prize::getWeight).sum() : this.sum;
+        double totalWeight = this.crateType == CrateType.casino || this.crateType == CrateType.cosmic ? prizes.stream().filter(prize -> prize.getWeight() != -1).mapToDouble(Prize::getWeight).sum() : this.sum;
 
         int index = 0;
 
@@ -705,9 +705,6 @@ public class Crate {
         if (itemStack == null || prizeName.isEmpty() || weight <= 0) return;
 
         ConfigurationSection section = getPrizeSection();
-
-        if (section == null) return;
-
         setItem(itemStack, prizeName, section, weight, "", Collections.emptyList());
     }
 
@@ -723,25 +720,26 @@ public class Crate {
         if (tier.isEmpty() || prizeName.isEmpty() || weight <= 0 || itemStack == null) return;
 
         final ConfigurationSection section = getPrizeSection();
-
-        if (section == null) return;
-
         setItem(itemStack, prizeName, section, weight, tier, Collections.emptyList());
     }
 
     /**
      * @return the configuration section.
      */
-    public @Nullable final ConfigurationSection getPrizeSection() {
-        final ConfigurationSection section = this.file.getConfigurationSection("Crate");
+    public @NotNull final ConfigurationSection getPrizeSection() {
+        ConfigurationSection section = this.file.getConfigurationSection("Crate");
 
-        if (section == null) return null;
-
-        ConfigurationSection prizes = section.getConfigurationSection("Prizes");
-        if (prizes == null) {
-            prizes = section.createSection("Prizes");
+        if (section == null) {
+            section = this.file.createSection("Crate");
         }
-        return prizes;
+
+        ConfigurationSection prizeSection = section.getConfigurationSection("Prizes");
+
+        if (prizeSection == null) {
+            prizeSection = section.createSection("Prizes");
+        }
+
+        return prizeSection;
     }
 
     /**
