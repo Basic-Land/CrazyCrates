@@ -13,7 +13,7 @@ public class ItemRepo {
     public static final LegacyItemBuilder UNSELECTED = getItem(ItemType.RED_STAINED_GLASS_PANE, -1)
             .addDisplayLore("<gray>Kliknutím vyberete tuto truhlu");
     public static final LegacyItemBuilder MAIN_MENU = getItem(ItemType.LIGHT_GRAY_STAINED_GLASS_PANE, 1000001);
-    public static final LegacyItemBuilder BANNER = getItem(ItemType.LIGHT_GRAY_STAINED_GLASS_PANE, 1000002);
+    public static final LegacyItemBuilder BANNER = getItem(ItemType.LIGHT_GRAY_STAINED_GLASS_PANE, -1);
     public static final LegacyItemBuilder MAIN_MENU_NAME = getItem(ItemType.LIGHT_GRAY_STAINED_GLASS_PANE, -1);
     public static final LegacyItemBuilder BOOK = getItem(ItemType.BOOK, 10)
             .setDisplayName("<white><b>Historie truhly")

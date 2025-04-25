@@ -78,10 +78,12 @@ public class CrateTierMenu extends StaticInventoryBuilder {
     }
 
     private void setItemsGacha() {
-        gui.setItem(gui.getSize() - 1, ItemRepo.PREVIEW_HEAD.asGuiItem(action -> {
-            player.playSound(ItemRepo.CLICK);
-            player.openInventory(new BonusPityMenu(crate, player, 36, "<green><b>Bonus pity prize", this).build().getInventory());
-        }));
+        if (player.hasPermission("cc.bonuspity")) {
+            gui.setItem(gui.getSize() - 1, ItemRepo.PREVIEW_HEAD.asGuiItem(action -> {
+                player.playSound(ItemRepo.CLICK);
+                player.openInventory(new BonusPityMenu(crate, player, 36, "<green><b>Bonus pity prize", this).build().getInventory());
+            }));
+        }
 
         gui.setItem(gui.getSize() - 5, ItemRepo.PREVIEW_INFO.asGuiItem());
 
