@@ -25,7 +25,6 @@ import com.badbones69.crazycrates.paper.managers.InventoryManager;
 import com.badbones69.crazycrates.paper.api.builders.LegacyItemBuilder;
 import com.ryderbelserion.fusion.api.enums.FileType;
 import com.ryderbelserion.fusion.api.utils.FileUtils;
-import com.ryderbelserion.fusion.paper.api.enums.Scheduler;
 import com.ryderbelserion.fusion.paper.api.scheduler.FoliaScheduler;
 import com.ryderbelserion.fusion.paper.files.LegacyCustomFile;
 import com.ryderbelserion.fusion.paper.files.LegacyFileManager;
@@ -785,6 +784,7 @@ public class CrateManager {
 
         if (this.currentTasks.containsKey(uuid)) {
             this.currentTasks.get(uuid).cancel();
+            this.currentTasks.remove(uuid);
         }
     }
 
