@@ -41,11 +41,19 @@ public class AddCurrency extends BaseCommand {
     private void addTokens(Player player, String type, int i) {
         PlayerBaseProfile playerBaseProfile = plugin.getBaseProfileManager().getPlayerBaseProfile(player.getName());
         CurrencyType currency = CurrencyType.getFromName(type);
+
+        if (type.equals("vote")) {
+            currency = CurrencyType.VOTE_TOKENS;
+        } else if (type.equals("premium")) {
+            currency = CurrencyType.PREMIUM_CURRENCY;
+        }
+
         if (currency == null) {
             player.sendRichMessage("<bold><red>Server </red></bold><bold><dark_gray>»</bold> <gray>Neplatný typ tokenu použij " +
                     Arrays.stream(CurrencyType.values()).map(CurrencyType::name).reduce("", (a, b) -> a + ", " + b));
             return;
         }
+
         playerBaseProfile.add(i, currency);
         player.sendRichMessage("<bold><red>Server </red></bold><bold><dark_gray>»</bold> <gray>Obdržel jsi <yellow>" + i + "</yellow> " + currency.translateMM() + " " +  type + " tokenů");
     }
