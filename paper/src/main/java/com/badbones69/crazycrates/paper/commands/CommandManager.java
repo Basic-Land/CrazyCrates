@@ -3,6 +3,7 @@ package com.badbones69.crazycrates.paper.commands;
 import com.badbones69.crazycrates.paper.api.objects.Crate;
 import com.badbones69.crazycrates.paper.api.objects.crates.CrateLocation;
 import com.badbones69.crazycrates.paper.api.objects.gacha.data.CrateSettings;
+import com.badbones69.crazycrates.paper.api.objects.gacha.enums.CurrencyType;
 import com.badbones69.crazycrates.paper.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.paper.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.paper.commands.crates.types.admin.crates.CommandAddItem;
@@ -125,7 +126,7 @@ public class CommandManager {
             return collect;
         });
 
-        commandManager.registerSuggestion(SuggestionKey.of("cmdd"), (sender, context) -> List.of("vote", "premium"));
+        commandManager.registerSuggestion(SuggestionKey.of("cmdd"), (sender, context) -> Arrays.stream(CurrencyType.values()).map(CurrencyType::name).toList());
 
         commandManager.registerSuggestion(SuggestionKey.of("doubles"), (sender, context) -> {
             final List<String> numbers = new ArrayList<>();

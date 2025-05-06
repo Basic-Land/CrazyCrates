@@ -25,4 +25,8 @@ public enum CurrencyType {
     public static CurrencyType getCurrencyType(String name) {
         return Arrays.stream(values()).filter(currencyType -> currencyType.name().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
+
+    public static CurrencyType getFromName(String name) {
+        return Arrays.stream(values()).filter(currencyType -> currencyType.name.equalsIgnoreCase(name)).findFirst().orElse(null);
+    }
 }
