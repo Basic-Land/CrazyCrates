@@ -18,7 +18,7 @@ public class AddCurrency extends BaseCommand {
 
     @Command(value = "add")
     @Permission(value = "crazycrates.command.admin.add", def = PermissionDefault.OP)
-    public void add(CommandSender sender, @Suggestion("cmdd") String type, @Suggestion("numbers") int i, @Optional @Suggestion("players") PlayerBuilder target) {
+    public void add(CommandSender sender, @Suggestion("currencies") String type, @Suggestion("numbers") int i, @Optional @Suggestion("players") PlayerBuilder target) {
         switch (sender) {
             case Player player -> {
                 if (target == null || target.getPlayer() == null) {

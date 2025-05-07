@@ -126,7 +126,7 @@ public class CommandManager {
             return collect;
         });
 
-        commandManager.registerSuggestion(SuggestionKey.of("cmdd"), (sender, context) -> Arrays.stream(CurrencyType.values()).map(CurrencyType::name).toList());
+        commandManager.registerSuggestion(SuggestionKey.of("currencies"), (sender, context) -> Arrays.stream(CurrencyType.values()).map(CurrencyType::getName).toList());
 
         commandManager.registerSuggestion(SuggestionKey.of("doubles"), (sender, context) -> {
             final List<String> numbers = new ArrayList<>();

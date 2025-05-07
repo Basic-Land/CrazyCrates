@@ -1,10 +1,12 @@
 package com.badbones69.crazycrates.paper.api.objects.gacha.enums;
 
+import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
 import java.util.Arrays;
 
+@Getter
 public enum CurrencyType {
     VOTE_TOKENS("votetokeny", "vote tokenů"), // base
     MYSTIC_TOKENS("mystictokeny", "mystic tokenů"), // common - rarity
