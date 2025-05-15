@@ -705,6 +705,7 @@ public class Crate {
         if (itemStack == null || prizeName.isEmpty() || weight <= 0) return;
 
         ConfigurationSection section = getPrizeSection();
+
         setItem(itemStack, prizeName, section, weight, "", Collections.emptyList());
     }
 
@@ -720,6 +721,7 @@ public class Crate {
         if (tier.isEmpty() || prizeName.isEmpty() || weight <= 0 || itemStack == null) return;
 
         final ConfigurationSection section = getPrizeSection();
+
         setItem(itemStack, prizeName, section, weight, tier, Collections.emptyList());
     }
 

@@ -13,7 +13,7 @@ import io.papermc.paper.persistence.PersistentDataContainerView;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
+import us.crazycrew.crazycrates.api.enums.types.CrateType;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,6 +30,10 @@ public class CrateTierMenu extends StaticInventoryBuilder {
     @Override
     public void open() {
         if (this.crate == null) return;
+
+        final CrateType crateType = this.crate.getCrateType();
+
+        if (crateType != CrateType.casino && crateType != CrateType.cosmic) return;
 
         final boolean isPreviewBorderEnabled = this.crate.isPreviewTierBorderToggle();
         boolean gacha = crate.getCrateType().isGacha();

@@ -12,7 +12,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.PermissionDefault;
 import us.crazycrew.crazycrates.api.enums.types.CrateType;
-
 import java.util.HashMap;
 
 public class CommandAddItem extends BaseCommand {
