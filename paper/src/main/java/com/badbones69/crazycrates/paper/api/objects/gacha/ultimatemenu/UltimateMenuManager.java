@@ -69,17 +69,6 @@ public class UltimateMenuManager {
         items.remove(player.getName());
     }
 
-    public void closeAll() {
-        items.forEach((name, itemStacks) -> {
-            Player player = Bukkit.getPlayer(name);
-            if (player != null) {
-                player.getInventory().setContents(itemStacks);
-                databaseManager.clearInventory(player);
-            }
-        });
-        items.clear();
-    }
-
     public boolean hasItems(Player player) {
         return items.containsKey(player.getName());
     }

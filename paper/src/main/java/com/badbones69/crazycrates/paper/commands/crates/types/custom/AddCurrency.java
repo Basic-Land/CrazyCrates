@@ -50,7 +50,7 @@ public class AddCurrency extends BaseCommand {
 
         if (currency == null) {
             player.sendRichMessage("<bold><red>Server </red></bold><bold><dark_gray>»</bold> <gray>Neplatný typ tokenu použij " +
-                    Arrays.stream(CurrencyType.values()).map(CurrencyType::name).reduce("", (a, b) -> a + ", " + b));
+                    Arrays.stream(CurrencyType.values()).map(CurrencyType::getName).reduce("", (a, b) -> a + ", " + b));
             return;
         }
 

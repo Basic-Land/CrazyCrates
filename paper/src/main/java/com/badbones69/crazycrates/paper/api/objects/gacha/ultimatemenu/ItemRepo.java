@@ -7,6 +7,7 @@ import org.bukkit.inventory.ItemType;
 
 import java.util.List;
 
+@SuppressWarnings("UnstableApiUsage")
 public class ItemRepo {
     public static final LegacyItemBuilder SELECTED = getItem(ItemType.GREEN_STAINED_GLASS_PANE, -1)
             .addDisplayLore("<gray>Právě vybraná truhla");
