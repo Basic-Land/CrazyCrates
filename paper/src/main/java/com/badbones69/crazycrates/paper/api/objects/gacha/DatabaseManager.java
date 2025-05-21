@@ -195,7 +195,7 @@ public class DatabaseManager {
                     Bukkit.getScheduler().runTaskLater(CrazyCrates.getPlugin(), () -> {
                         CMIUser user = CMI.getInstance().getPlayerManager().getUser(offlinePlayer);
                         Player player = user.getPlayer();
-
+                        System.out.println("Inventory for " + player.getName() + " has been restored.");
                         player.getInventory().setContents(contents);
                         player.saveData();
                         user.unloadData();

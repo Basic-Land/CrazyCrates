@@ -434,7 +434,7 @@ public class Prize {
 
         try {
             if (this.section.contains("DisplayData")) {
-                builder = builder.fromBase64(this.section.getString("DisplayData", ""));
+                return builder.fromBase64(this.section.getString("DisplayData", ""));
             }
 
             if (this.section.contains("DisplayName")) {
