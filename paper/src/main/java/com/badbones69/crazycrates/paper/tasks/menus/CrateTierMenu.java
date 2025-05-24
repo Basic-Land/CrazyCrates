@@ -32,11 +32,11 @@ public class CrateTierMenu extends StaticInventoryBuilder {
         if (this.crate == null) return;
 
         final CrateType crateType = this.crate.getCrateType();
+        boolean gacha = crate.getCrateType().isGacha();
 
-        if (crateType != CrateType.casino && crateType != CrateType.cosmic) return;
+        if (crateType != CrateType.casino && crateType != CrateType.cosmic && !gacha) return;
 
         final boolean isPreviewBorderEnabled = this.crate.isPreviewTierBorderToggle();
-        boolean gacha = crate.getCrateType().isGacha();
 
         if (isPreviewBorderEnabled) {
             final GuiItem guiItem = this.crate.getPreviewTierBorderItem().setPlayer(this.player).setCustomModelData(gacha ? 1000001 : -1).asGuiItem();
