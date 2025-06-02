@@ -24,6 +24,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -37,7 +38,11 @@ public class History {
         this.playerDataManager = playerDataManager;
     }
 
-    public void sendHistory(Audience player, String target, int pageNumber, CrateSettings crateSettings) {
+    public void sendHistory(Audience player, String name, int page, CrateSettings crateSettings) {
+        sendHistory(player, name, page, crateSettings, null);
+    }
+
+    public void sendHistory(Audience player, String target, int pageNumber, CrateSettings crateSettings, String type) {
         PlayerProfile profile = playerDataManager.getPlayerProfile(target, crateSettings, true);
 
         if (profile == null) {
@@ -46,6 +51,11 @@ public class History {
         }
 
         List<Result> historyList = profile.getHistory();
+        if (type != null) {
+            historyList = new ArrayList<>(historyList);
+            historyList.removeIf(result -> !result.getRarity().name().equalsIgnoreCase(type));
+        }
+
         TextColor color = TextColor.fromHexString("#de7a00");
 
         if (historyList.isEmpty()) {
@@ -88,11 +98,11 @@ public class History {
 
         Component pages = Component.newline()
                 .append(Component.text("<<<<", NamedTextColor.DARK_GRAY, TextDecoration.BOLD)
-                        .clickEvent(ClickEvent.callback(clickEvent -> sendHistory(clickEvent, target, pageMinus <= 0 ? maxPage : pageMinus, crateSettings)))
+                        .clickEvent(ClickEvent.callback(clickEvent -> sendHistory(clickEvent, target, pageMinus <= 0 ? maxPage : pageMinus, crateSettings, type)))
                         .hoverEvent(Component.text("Předchozí stránka", NamedTextColor.GRAY)))
                 .append(Component.text(" Strana " + pageNumber + "/" + maxPage + " ", color))
                 .append(Component.text(">>>>", NamedTextColor.DARK_GRAY, TextDecoration.BOLD)
-                        .clickEvent(ClickEvent.callback(clickEvent -> sendHistory(clickEvent, target, pagePlus > maxPage ? 1 : pagePlus, crateSettings)))
+                        .clickEvent(ClickEvent.callback(clickEvent -> sendHistory(clickEvent, target, pagePlus > maxPage ? 1 : pagePlus, crateSettings, type)))
                         .hoverEvent(Component.text("Další stránka", NamedTextColor.GRAY)));
         player.sendMessage(pages);
     }

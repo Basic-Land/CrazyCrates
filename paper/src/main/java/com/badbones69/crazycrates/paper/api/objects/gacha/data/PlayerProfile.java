@@ -30,6 +30,9 @@ public class PlayerProfile implements Serializable {
     @Setter
     @Getter
     private String chosenReward = null;
+    @Getter
+    @Setter
+    private int legendary5050LossStreak = 0;
 
     public PlayerProfile(String playerName, Collection<Rarity> rarities, int extraRewardPity) {
         this.playerName = playerName;

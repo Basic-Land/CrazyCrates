@@ -17,7 +17,6 @@ import com.badbones69.crazycrates.paper.managers.events.enums.EventType;
 import com.badbones69.crazycrates.paper.tasks.crates.CrateManager;
 import com.badbones69.crazycrates.paper.tasks.crates.types.roulette.RouletteStandard;
 import com.badbones69.crazycrates.paper.utils.MiscUtils;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemType;
 import org.jetbrains.annotations.NotNull;

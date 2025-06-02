@@ -1,5 +1,6 @@
 package com.badbones69.crazycrates.paper.api.objects.gacha.gacha;
 
+import com.badbones69.crazycrates.paper.CrazyCrates;
 import com.badbones69.crazycrates.paper.api.objects.Prize;
 import com.badbones69.crazycrates.paper.api.objects.gacha.data.CrateSettings;
 import com.badbones69.crazycrates.paper.api.objects.gacha.data.PlayerProfile;
@@ -13,6 +14,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 public class GachaSystem {
@@ -67,9 +69,43 @@ public class GachaSystem {
 
     public Result roll(PlayerProfile playerProfile, CrateSettings itemSet) {
         Result result = getResult(playerProfile, itemSet);
+
+        // Only apply radiance mechanic for legendary rolls
+        if (result.isLegendary()) {
+            int consecutiveLosses = playerProfile.getLegendary5050LossStreak();
+
+            if (result.getWon5050() == ResultType.LOST) {
+                consecutiveLosses++;
+                if (consecutiveLosses == 3) {
+                    boolean winRadiance = random.nextBoolean();
+                    if (winRadiance) {
+                        log(playerProfile.getPlayerName(), consecutiveLosses);
+                        result.setWon5050(ResultType.RADIANCE);
+                        playerProfile.setPity(Rarity.LEGENDARY, 0, ResultType.RADIANCE);
+                        consecutiveLosses = 0;
+                    }
+                    // else, keep as LOST, streak continues
+                } else if (consecutiveLosses >= 4) {
+                    log(playerProfile.getPlayerName(), consecutiveLosses);
+                    result.setWon5050(ResultType.RADIANCE);
+                    playerProfile.setPity(Rarity.LEGENDARY, 0, ResultType.RADIANCE);
+                    consecutiveLosses = 0;
+                }
+            } else if (result.getWon5050() != ResultType.GUARANTEED) {
+                consecutiveLosses = 0;
+            }
+
+            playerProfile.setLegendary5050LossStreak(consecutiveLosses);
+        }
+
         result.setItemData(pickRandomPrice(result, itemSet, null));
         playerProfile.addHistory(result);
         return result;
+    }
+
+    private void log(String name, int amount) {
+        CrazyCrates.LOGGER.setLevel(Level.INFO);
+        CrazyCrates.LOGGER.info("Radiance mechanic triggered for " + name + " after " + amount + " consecutive losses.");
     }
 
     public Result rollOverrideSet(PlayerProfile playerProfile, CrateSettings itemSet, Prize wantedItem) {

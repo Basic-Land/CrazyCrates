@@ -154,7 +154,7 @@ public class UltimateMenu extends InventoryBuilder {
             case 81 -> {
                 player.playSound(ItemRepo.CLICK);
                 close(player);
-                manager.getHistory().sendHistory(player, player.getName(), 1, crate.getCrateSettings());
+                manager.getHistory().sendHistory(player, player.getName(), 1, crate.getCrateSettings(), null);
             }
 
             case 82 -> {
@@ -279,7 +279,7 @@ public class UltimateMenu extends InventoryBuilder {
 
         LegacyItemBuilder selectedMain = ItemRepo.SELECTED;
         LegacyItemBuilder unselectedMain = ItemRepo.UNSELECTED;
-        LegacyItemBuilder mainCrate = ItemRepo.MAIN_MENU_NAME;
+        LegacyItemBuilder mainCrate = new LegacyItemBuilder(ItemRepo.MAIN_MENU_NAME, true);
 
         for (CrateSettings setting : manager.getCrateSettingsSplit().get(currentPage)) {
             if (setting == null) continue;
@@ -315,7 +315,7 @@ public class UltimateMenu extends InventoryBuilder {
         PlayerInventory playerInventory = getPlayer().getInventory();
         playerInventory.setItem(27, ItemRepo.MAIN_MENU.asItemStack());
         BannerData banner = getCrate().getCrateSettings().getBannerPackage().getBanner();
-        playerInventory.setItem(28, ItemRepo.BANNER.setCustomModelData(banner == null ? -1 : banner.modelData()).asItemStack());
+        playerInventory.setItem(28, new LegacyItemBuilder(ItemRepo.BANNER, true).setCustomModelData(banner == null ? -1 : banner.modelData()).asItemStack());
     }
 
     private void setItemsPlayerInv() {

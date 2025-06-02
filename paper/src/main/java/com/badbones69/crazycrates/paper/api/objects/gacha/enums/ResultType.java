@@ -9,7 +9,8 @@ public enum ResultType {
     LOST(NamedTextColor.RED),
     WON(NamedTextColor.GOLD),
     WON_OF_RATE_UP(TextColor.fromHexString("#8c26ad")),
-    GUARANTEED(NamedTextColor.BLUE);
+    GUARANTEED(NamedTextColor.BLUE),
+    RADIANCE(NamedTextColor.DARK_GREEN);
 
     private final TextColor color;
 
@@ -29,6 +30,10 @@ public enum ResultType {
         return this == WON;
     }
 
+    public boolean isWonOrRadiance() {
+        return this == WON || this == RADIANCE;
+    }
+
     public boolean isLost() {
         return this == LOST;
     }
@@ -40,4 +45,10 @@ public enum ResultType {
     public boolean isWonOfRateUp() {
         return this == WON_OF_RATE_UP;
     }
+
+    public boolean isRadiance() {
+        return this == RADIANCE;
+    }
+
+
 }

@@ -76,6 +76,7 @@ public class RouletteStandard extends FoliaScheduler {
 
         if (!first && !skip) {
             builder.setItem(36, new LegacyItemBuilder(ItemType.GRAY_STAINED_GLASS_PANE).setCustomModelData(modelData).asItemStack());
+            player.updateInventory();
         }
 
         if (!player.getOpenInventory().getTopInventory().equals(inventory)) {
@@ -160,7 +161,8 @@ public class RouletteStandard extends FoliaScheduler {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (player.getOpenInventory().getTopInventory().equals(inventory)) player.closeInventory(InventoryCloseEvent.Reason.PLAYER);
+                if (player.getOpenInventory().getTopInventory().equals(inventory))
+                    player.closeInventory(InventoryCloseEvent.Reason.PLAYER);
                 crateManager.removePlayerFromOpeningList(player);
                 plugin.getCrateManager().getDatabaseManager().getUltimateMenuManager().open(player, crate);
             }

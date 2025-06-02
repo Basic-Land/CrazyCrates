@@ -47,12 +47,26 @@ public class Stats extends BaseCommand {
         String color = list.getFirst().getRarity().getColor().asHexString();
         String rarity = list.getFirst().getRarity().name();
         double raritySize = list.size();
-        double guaranteed = list.stream().map(Result::getWon5050).filter(ResultType::isGuaranteed).count();
-        long won = list.stream().map(Result::getWon5050).filter(ResultType::isWon).count();
+        long guaranteed = 0;
+        long won = 0;
+        long radiance = 0;
+        long lost = 0;
+        double sum = 0;
 
-        double win5050 = (100 / (raritySize - guaranteed)) * won;
+        for (Result result : list) {
+            ResultType won5050 = result.getWon5050();
+            switch (won5050) {
+                case GUARANTEED -> guaranteed++;
+                case WON -> won++;
+                case RADIANCE -> radiance++;
+                case LOST -> lost++;
+            }
+            sum += result.getPity();
+        }
+
+        double win5050 = (100 / (raritySize - guaranteed)) * (won + radiance);
         double chance = totalSize > 0 ? raritySize / totalSize * 100 : raritySize;
-        double avgPity = list.stream().mapToInt(Result::getPity).average().orElse(0);
+        double avgPity = raritySize > 0 ? sum / raritySize : 0;
 
         sb.append("""
                 <%s>%s staty:
@@ -62,6 +76,9 @@ public class Stats extends BaseCommand {
                 
                 %s 50/50 staty:
                 - Výhry: %d
+                - Radiance: %d
+                - Garantované: %d
+                - Prohry: %d
                 - Průměrná šance: %.3f%%
                 
                 """
@@ -73,6 +90,9 @@ public class Stats extends BaseCommand {
                         avgPity,
                         rarity,
                         won,
+                        radiance,
+                        guaranteed,
+                        lost,
                         win5050
                 )
         );
