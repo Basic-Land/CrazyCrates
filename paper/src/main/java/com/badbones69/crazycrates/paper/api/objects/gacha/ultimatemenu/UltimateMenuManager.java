@@ -4,7 +4,6 @@ import com.badbones69.crazycrates.paper.api.builders.items.UltimateMenu;
 import com.badbones69.crazycrates.paper.api.objects.Crate;
 import com.badbones69.crazycrates.paper.api.objects.gacha.DatabaseManager;
 import lombok.Synchronized;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -13,7 +12,8 @@ import java.util.*;
 public class UltimateMenuManager {
     private final static Map<UUID, Long> cooldowns = new HashMap<>();
     private static final long COOLDOWN_TIME = 250;
-    private final Map<String, ItemStack[]> items = new HashMap<>();
+    private final Map<String, ItemStack[]> items = Collections.synchronizedMap(new HashMap<>());
+    private final Set<UUID> activeMenuUsers = Collections.synchronizedSet(new HashSet<>());
     private final DatabaseManager databaseManager;
 
     public UltimateMenuManager(DatabaseManager databaseManager) {
@@ -40,8 +40,12 @@ public class UltimateMenuManager {
 
         cooldowns.put(playerId, currentTime);
 
-        items.put(player.getName(), player.getInventory().getContents());
-        databaseManager.saveInventory(player);
+        // Only store inventory if not already in an active menu
+        if (!activeMenuUsers.contains(playerId)) {
+            items.put(player.getName(), player.getInventory().getContents());
+            databaseManager.saveInventory(player);
+            activeMenuUsers.add(playerId);
+        }
 
         UltimateMenu menu = new UltimateMenu(crate, player, ComponentBuilder.mainMenu(player, crate.getCrateSettings()));
         player.openInventory(menu.build().getInventory());
@@ -52,6 +56,7 @@ public class UltimateMenuManager {
         ItemStack[] itemStacks = items.get(player.getName());
         databaseManager.clearInventory(player);
         items.remove(player.getName());
+        activeMenuUsers.remove(player.getUniqueId());
 
         return Arrays.stream(itemStacks)
                 .filter(Objects::nonNull)
@@ -60,6 +65,7 @@ public class UltimateMenuManager {
 
     @Synchronized
     public void remove(Player player) {
+        UUID playerId = player.getUniqueId();
         ItemStack[] itemStacks = items.get(player.getName());
         if (itemStacks != null) {
             player.getInventory().setContents(itemStacks);
@@ -67,9 +73,14 @@ public class UltimateMenuManager {
         }
         databaseManager.clearInventory(player);
         items.remove(player.getName());
+        activeMenuUsers.remove(playerId);
     }
 
     public boolean hasItems(Player player) {
         return items.containsKey(player.getName());
+    }
+
+    public boolean isActiveMenuUser(Player player) {
+        return activeMenuUsers.contains(player.getUniqueId());
     }
 }

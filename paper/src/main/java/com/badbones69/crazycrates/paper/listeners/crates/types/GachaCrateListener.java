@@ -62,7 +62,7 @@ public class GachaCrateListener implements Listener {
         long time = rouletteStandard.getTime();
         long diff = System.currentTimeMillis() - time;
 
-        if (diff < 400) return;
+        if (diff < 300) return;
 
         rouletteStandard.updateTimer();
 

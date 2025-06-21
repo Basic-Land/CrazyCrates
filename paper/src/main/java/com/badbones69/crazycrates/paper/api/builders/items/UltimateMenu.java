@@ -17,6 +17,7 @@ import com.badbones69.crazycrates.paper.managers.events.enums.EventType;
 import com.badbones69.crazycrates.paper.tasks.crates.CrateManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -25,12 +26,12 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import us.crazycrew.crazycrates.api.enums.types.KeyType;
 
 import java.util.List;
+import java.util.logging.Level;
 import java.util.stream.IntStream;
 
 import static net.kyori.adventure.text.Component.empty;
@@ -358,14 +359,28 @@ public class UltimateMenu extends InventoryBuilder {
     }
 
     public static class TestMenuListener implements Listener {
-        @EventHandler
-        public void Close(InventoryCloseEvent e) {
+        private final CrazyCrates plugin = CrazyCrates.getPlugin();
+
+        @EventHandler(priority = EventPriority.MONITOR)
+        public void onClose(InventoryCloseEvent e) {
+            if (!(e.getPlayer() instanceof Player player)) return;
+
             InventoryCloseEvent.Reason reason = e.getReason();
+            UltimateMenuManager menuManager = plugin.getCrateManager().getDatabaseManager().getUltimateMenuManager();
+
             switch (e.getInventory().getHolder(false)) {
                 case UltimateMenu ultimateMenu -> {
-                    Player player = ultimateMenu.getPlayer();
                     if (reason.equals(InventoryCloseEvent.Reason.PLAYER) || reason.equals(InventoryCloseEvent.Reason.PLUGIN)) {
-                        ultimateMenu.manager.getUltimateMenuManager().remove(player);
+
+                        // Schedule inventory restoration for next tick to avoid race conditions
+                        Bukkit.getScheduler().runTask(plugin, () -> {
+                            if (!player.isOnline()) return;
+
+                            // Check if player is not in another menu instance before restoring
+                            if (!(player.getOpenInventory().getTopInventory().getHolder(false) instanceof UltimateMenu)) {
+                                menuManager.remove(player);
+                            }
+                        });
                     }
                     print(player, reason, ultimateMenu);
                 }
@@ -376,9 +391,10 @@ public class UltimateMenu extends InventoryBuilder {
         }
 
         private void print(Player player, InventoryCloseEvent.Reason reason, InventoryBuilder builder) {
-            UltimateMenuManager ultimateMenuManager = CrazyCrates.getPlugin().getCrateManager().getDatabaseManager().getUltimateMenuManager();
+            UltimateMenuManager ultimateMenuManager = plugin.getCrateManager().getDatabaseManager().getUltimateMenuManager();
+            CrazyCrates.LOGGER.setLevel(Level.INFO);
             CrazyCrates.LOGGER.info(player.getName() +
-                    " closed " + (builder instanceof UltimateMenu ? "Ultimatemenu" : builder.getClass().getName()) +
+                    " closed " + builder.getClass().getSimpleName() +
                     " reason: " + reason +
                     " hasItems: " + ultimateMenuManager.hasItems(player));
         }
@@ -392,12 +408,18 @@ public class UltimateMenu extends InventoryBuilder {
 
         @EventHandler(priority = EventPriority.LOWEST)
         public void kokotUmrel(PlayerDeathEvent e) {
-            Inventory inv = e.getPlayer().getOpenInventory().getTopInventory();
-            if (inv.getHolder(false) instanceof UltimateMenu ultimateMenu) {
-                List<ItemStack> items = ultimateMenu.manager.getUltimateMenuManager().getItemsClean(ultimateMenu.getPlayer());
+            Player player = e.getEntity();
+            UltimateMenuManager menuManager = plugin.getCrateManager().getDatabaseManager().getUltimateMenuManager();
+
+            if (player.getOpenInventory().getTopInventory().getHolder(false) instanceof UltimateMenu ||
+                    menuManager.isActiveMenuUser(player)) {
+
+                List<ItemStack> items = menuManager.getItemsClean(player);
                 e.getDrops().clear();
-                e.getDrops().addAll(items);
-                e.getPlayer().getInventory().clear();
+                if (items != null) {
+                    e.getDrops().addAll(items);
+                }
+                player.getInventory().clear();
             }
         }
     }
