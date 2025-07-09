@@ -10,9 +10,9 @@ import com.badbones69.crazycrates.paper.managers.events.enums.EventType;
 import com.badbones69.crazycrates.paper.utils.ItemUtils;
 import com.badbones69.crazycrates.paper.utils.MiscUtils;
 import com.badbones69.crazycrates.core.config.impl.ConfigKeys;
-import com.ryderbelserion.fusion.api.utils.StringUtils;
-import com.ryderbelserion.fusion.paper.api.builder.gui.interfaces.Gui;
-import com.ryderbelserion.fusion.paper.api.builder.gui.interfaces.GuiFiller;
+import com.ryderbelserion.fusion.kyori.utils.StringUtils;
+import com.ryderbelserion.fusion.paper.api.builders.gui.interfaces.Gui;
+import com.ryderbelserion.fusion.paper.api.builders.gui.interfaces.GuiFiller;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.Server;
@@ -21,13 +21,14 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.jetbrains.annotations.NotNull;
 import us.crazycrew.crazycrates.api.enums.types.KeyType;
 import java.text.NumberFormat;
 import java.util.UUID;
 
 public class CrateMainMenu extends StaticInventoryBuilder {
 
-    public CrateMainMenu(final Player player, final String title, final int rows) {
+    public CrateMainMenu(@NotNull final Player player, @NotNull final String title, final int rows) {
         super(player, title, rows);
     }
 
@@ -43,7 +44,7 @@ public class CrateMainMenu extends StaticInventoryBuilder {
 
             final ModelData fillerModel = this.config.getProperty(ConfigKeys.filler_item_model);
 
-            guiFiller.fill(new LegacyItemBuilder()
+            guiFiller.fill(new LegacyItemBuilder(this.plugin)
                     .withType(this.config.getProperty(ConfigKeys.filler_item))
                     .setDisplayName(this.config.getProperty(ConfigKeys.filler_name))
                     .setDisplayLore(this.config.getProperty(ConfigKeys.filler_lore))
@@ -54,7 +55,7 @@ public class CrateMainMenu extends StaticInventoryBuilder {
 
         if (this.config.getProperty(ConfigKeys.gui_customizer_toggle)) {
             for (String custom : this.config.getProperty(ConfigKeys.gui_customizer)) {
-                final LegacyItemBuilder item = new LegacyItemBuilder();
+                final LegacyItemBuilder item = new LegacyItemBuilder(this.plugin);
 
                 int slot = 0;
 
@@ -116,7 +117,7 @@ public class CrateMainMenu extends StaticInventoryBuilder {
 
                     final NumberFormat instance = NumberFormat.getNumberInstance();
 
-                    final LegacyItemBuilder builder = new LegacyItemBuilder()
+                    final LegacyItemBuilder builder = new LegacyItemBuilder(this.plugin)
                             .withType(section.getString("Item", "chest").toLowerCase())
                             .setDisplayName(crate.getCrateName())
                             .setCustomModelData(section.getString("Custom-Model-Data", ""))
@@ -164,7 +165,7 @@ public class CrateMainMenu extends StaticInventoryBuilder {
         this.gui.open(this.player);
     }
 
-    private void openCrate(UUID uuid, Crate crate, String fileName, String fancyName) {
+    private void openCrate(@NotNull final UUID uuid, @NotNull final Crate crate, @NotNull final String fileName, @NotNull final String fancyName) {
         if (this.crateManager.isInOpeningList(this.player)) {
             Messages.already_opening_crate.sendMessage(this.player, "{crate}", fancyName);
 
@@ -213,7 +214,7 @@ public class CrateMainMenu extends StaticInventoryBuilder {
         this.crateManager.openCrate(this.player, crate, keyType, this.player.getLocation(), true, false, EventType.event_crate_opened);
     }
 
-    private void openPreview(Crate crate, String fancyName) {
+    private void openPreview(@NotNull final Crate crate, @NotNull final String fancyName) {
         if (crate.isPreviewEnabled()) {
             crate.playSound(this.player, this.player.getLocation(), "click-sound", "ui.button.click", Sound.Source.MASTER);
 

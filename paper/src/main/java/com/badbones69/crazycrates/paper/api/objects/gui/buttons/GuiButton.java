@@ -5,7 +5,7 @@ import com.badbones69.crazycrates.paper.api.builders.LegacyItemBuilder;
 import com.badbones69.crazycrates.paper.tasks.crates.effects.SoundEffect;
 import com.badbones69.crazycrates.paper.utils.MiscUtils;
 import com.badbones69.crazycrates.paper.utils.MsgUtils;
-import com.ryderbelserion.fusion.paper.api.builder.gui.interfaces.GuiItem;
+import com.ryderbelserion.fusion.paper.api.builders.gui.interfaces.GuiItem;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -25,8 +25,8 @@ public class GuiButton {
     private final List<String> commands;
     private final List<String> messages;
 
-    public GuiButton(final ConfigurationSection section, final Map<String, String> placeholders) {
-        this.guiItem = new LegacyItemBuilder()
+    public GuiButton(@NotNull final ConfigurationSection section, @NotNull final Map<String, String> placeholders) {
+        this.guiItem = new LegacyItemBuilder(this.plugin)
                 .withType(section.getString("material", "emerald_block"))
                 .setDisplayName(section.getString("name", "No display name found."))
                 .setDisplayLore(section.getStringList("lore"));
@@ -61,7 +61,7 @@ public class GuiButton {
         });
     }
 
-    public final ConfigurationSection getSection() {
+    public @NotNull final ConfigurationSection getSection() {
         return this.section;
     }
 }

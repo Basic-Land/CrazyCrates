@@ -206,7 +206,7 @@ public class QuadCrateManager {
         // Shove other players away from the player opening the crate.
         shovePlayers.forEach(entity -> entity.getLocation().toVector().subtract(this.spawnLocation.clone().toVector()).normalize().setY(1));
 
-        // Store the spawned Crates ( Chest Block ) in the ArrayList.
+        // Store the spawned Crates (Chest Block) in the ArrayList.
         addCrateLocations(2, 1, 0);
         addCrateLocations(0, 1, 2);
 
@@ -226,7 +226,7 @@ public class QuadCrateManager {
 
         this.player.teleportAsync(this.spawnLocation.clone().toCenterLocation().add(0, 1, 0));
 
-        this.crateManager.addQuadCrateTask(this.player, new FoliaScheduler(null, this.player) {
+        this.crateManager.addQuadCrateTask(this.player, new FoliaScheduler(this.plugin, null, this.player) {
             double radius = 0.0; // Radius of the particle spiral.
             int crateNumber = 0; // The crate number that spawns next.
             int tickTillSpawn = 0; // At tick 60 the crate will spawn and then reset the tick.
@@ -263,7 +263,7 @@ public class QuadCrateManager {
             }
         }.runAtFixedRate(0,1));
 
-        this.crateManager.addCrateTask(this.player, new FoliaScheduler(null, this.player) {
+        this.crateManager.addCrateTask(this.player, new FoliaScheduler(this.plugin, null, this.player) {
             @Override
             public void run() {
                 endCrate(true);
@@ -281,10 +281,10 @@ public class QuadCrateManager {
     public void endCrate(final boolean immediately) {
         final Server server = this.plugin.getServer();
 
-        new FoliaScheduler(Scheduler.global_scheduler) {
+        new FoliaScheduler(this.plugin, Scheduler.global_scheduler) {
             @Override
             public void run() {
-                // Update spawned crate block states which removes them.
+                // Update spawned crate block states that remove them.
                 crateLocations.forEach(location -> server.getRegionScheduler().run(plugin, location, schedulerTask -> quadCrateChests.get(location).update(true, false)));
 
                 // Remove displayed rewards.
@@ -296,7 +296,7 @@ public class QuadCrateManager {
                 player.teleportAsync(lastLocation);
 
                 // Remove the structure blocks.
-                new FoliaScheduler(player.getLocation()) {
+                new FoliaScheduler(plugin, player.getLocation()) {
                     @Override
                     public void run() {
                         handler.removeStructure();

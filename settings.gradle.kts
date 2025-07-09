@@ -13,10 +13,6 @@ pluginManagement {
 rootProject.name = "CrazyCrates"
 
 listOf(
-    "examples/paper" to "example-paper",
-
-    "publish" to "publish",
-
     "paper" to "paper",
     "core" to "core",
     "api" to "api"

@@ -6,20 +6,21 @@ import com.badbones69.crazycrates.paper.api.enums.other.keys.ItemKeys;
 import com.badbones69.crazycrates.paper.api.objects.Crate;
 import com.badbones69.crazycrates.paper.api.objects.Tier;
 import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.ItemRepo;
-import com.ryderbelserion.fusion.paper.api.builder.gui.interfaces.Gui;
-import com.ryderbelserion.fusion.paper.api.builder.gui.interfaces.GuiFiller;
-import com.ryderbelserion.fusion.paper.api.builder.gui.interfaces.GuiItem;
+import com.ryderbelserion.fusion.paper.api.builders.gui.interfaces.Gui;
+import com.ryderbelserion.fusion.paper.api.builders.gui.interfaces.GuiFiller;
+import com.ryderbelserion.fusion.paper.api.builders.gui.interfaces.GuiItem;
 import io.papermc.paper.persistence.PersistentDataContainerView;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 import us.crazycrew.crazycrates.api.enums.types.CrateType;
 import java.util.List;
 import java.util.UUID;
 
 public class CrateTierMenu extends StaticInventoryBuilder {
 
-    public CrateTierMenu(final Player player, final Crate crate) {
+    public CrateTierMenu(@NotNull final Player player, @NotNull final Crate crate) {
         super(player, crate);
     }
 

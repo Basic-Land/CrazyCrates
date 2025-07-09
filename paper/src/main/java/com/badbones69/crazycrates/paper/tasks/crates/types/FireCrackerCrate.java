@@ -1,5 +1,7 @@
 package com.badbones69.crazycrates.paper.tasks.crates.types;
 
+import com.badbones69.crazycrates.core.config.ConfigManager;
+import com.badbones69.crazycrates.core.config.impl.ConfigKeys;
 import com.badbones69.crazycrates.paper.api.PrizeManager;
 import com.badbones69.crazycrates.paper.api.builders.types.features.CrateSpinMenu;
 import com.badbones69.crazycrates.paper.api.enums.other.keys.FileKeys;
@@ -34,8 +36,8 @@ public class FireCrackerCrate extends CrateBuilder {
     private final Crate crate = getCrate();
 
     @Override
-    public void open(@NotNull final KeyType type, final boolean checkHand, final boolean isSilent, final EventType eventType) {
-        // Crate event failed so we return.
+    public void open(@NotNull final KeyType type, final boolean checkHand, final boolean isSilent, @NotNull final EventType eventType) {
+        // Crate event failed, so we return.
         if (isCrateEventValid(type, checkHand, isSilent, eventType)) {
             return;
         }
@@ -47,7 +49,7 @@ public class FireCrackerCrate extends CrateBuilder {
         final boolean keyCheck = this.userManager.takeKeys(this.uuid, fileName, type, this.crate.useRequiredKeys() ? this.crate.getRequiredKeys() : 1, checkHand);
 
         if (!keyCheck) {
-            // Remove from opening list.
+            // Remove from an opening list.
             this.crateManager.removePlayerFromOpeningList(this.player);
 
             return;
@@ -65,7 +67,7 @@ public class FireCrackerCrate extends CrateBuilder {
 
         final List<Color> colors = Arrays.asList(Color.RED, Color.YELLOW, Color.GREEN, Color.BLUE, Color.BLACK, Color.AQUA, Color.MAROON, Color.PURPLE);
 
-        addCrateTask(new FoliaScheduler(null, this.player) {
+        addCrateTask(new FoliaScheduler(this.plugin, null, this.player) {
             final int random = ThreadLocalRandom.current().nextInt(colors.size());
             final Location clonedLocation = location.clone().add(0.5, 25, 0.5);
 
@@ -99,10 +101,28 @@ public class FireCrackerCrate extends CrateBuilder {
                         }
                     }
 
+                    // Only related to the item above the crate.
+                    displayItem(prize);
+
                     PrizeManager.givePrize(player, crate, prize);
 
-                    crateManager.removePlayerFromOpeningList(player);
-                    crateManager.removeCrateInUse(player);
+                    addCrateTask(new FoliaScheduler(plugin, null, player) {
+                        @Override
+                        public void run() {
+                            crateManager.removePlayerFromOpeningList(player);
+                            crateManager.removeCrateInUse(player);
+
+                            crateManager.removeReward(player);
+
+                            final HologramManager hologramManager = crateManager.getHolograms();
+
+                            if (hologramManager != null && crate.getHologram().isEnabled()) {
+                                final CrateLocation crateLocation = crateManager.getCrateLocation(location);
+
+                                if (crateLocation != null) hologramManager.createHologram(location, crate, crateLocation.getID());
+                            }
+                        }
+                    }.runDelayed(40));
                 }
             }
         }.runAtFixedRate(0, 2));

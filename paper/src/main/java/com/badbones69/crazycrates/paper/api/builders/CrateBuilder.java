@@ -2,7 +2,11 @@ package com.badbones69.crazycrates.paper.api.builders;
 
 import ch.jalu.configme.SettingsManager;
 import com.badbones69.crazycrates.paper.api.PrizeManager;
+import com.badbones69.crazycrates.paper.api.enums.other.keys.ItemKeys;
+import com.badbones69.crazycrates.paper.api.objects.Prize;
+import com.badbones69.crazycrates.paper.api.objects.crates.CrateLocation;
 import com.badbones69.crazycrates.paper.managers.events.enums.EventType;
+import com.badbones69.crazycrates.paper.support.holograms.HologramManager;
 import com.badbones69.crazycrates.paper.tasks.menus.CratePrizeMenu;
 import com.badbones69.crazycrates.paper.api.objects.Crate;
 import com.badbones69.crazycrates.paper.api.objects.Tier;
@@ -13,15 +17,19 @@ import com.badbones69.crazycrates.paper.tasks.crates.CrateManager;
 import com.badbones69.crazycrates.paper.tasks.crates.other.CosmicCrateManager;
 import com.badbones69.crazycrates.paper.tasks.crates.effects.SoundEffect;
 import com.google.common.base.Preconditions;
+import com.ryderbelserion.fusion.kyori.utils.AdvUtils;
 import com.ryderbelserion.fusion.paper.api.scheduler.FoliaScheduler;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import org.bukkit.Location;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ItemType;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -58,7 +66,7 @@ public abstract class CrateBuilder extends FoliaScheduler {
      * @param title inventory title
      */
     public CrateBuilder(@NotNull final Crate crate, @NotNull final Player player, final int size, @NotNull final String title) {
-        super(null, player);
+        super(CrazyCrates.getPlugin(), null, player);
 
         Preconditions.checkNotNull(crate, "Crate can't be null.");
         Preconditions.checkNotNull(player, "Player can't be null.");
@@ -93,7 +101,7 @@ public abstract class CrateBuilder extends FoliaScheduler {
      * @param location location of player
      */
     public CrateBuilder(@NotNull final Crate crate, @NotNull final Player player, final int size, @NotNull final Location location) {
-        super(null, player);
+        super(CrazyCrates.getPlugin(), null, player);
 
         Preconditions.checkNotNull(crate, "Crate can't be null.");
         Preconditions.checkNotNull(player, "Player can't be null.");
@@ -117,7 +125,7 @@ public abstract class CrateBuilder extends FoliaScheduler {
      * @param location location of player
      */
     public CrateBuilder(@NotNull final Crate crate, @NotNull final Player player, @NotNull final Location location) {
-        super(null, player);
+        super(CrazyCrates.getPlugin(), null, player);
 
         Preconditions.checkNotNull(crate, "Crate can't be null.");
         Preconditions.checkNotNull(player, "Player can't be null.");
@@ -152,6 +160,51 @@ public abstract class CrateBuilder extends FoliaScheduler {
      * @param isSilent true or false
      */
     public abstract void open(@NotNull final KeyType type, final boolean checkHand, final boolean isSilent, final EventType eventType);
+
+    public void displayItem(final Prize prize) {
+        final boolean showQuickCrateItem = ConfigManager.getConfig().getProperty(ConfigKeys.show_quickcrate_item);
+
+        // Only related to the item above the crate.
+        if (showQuickCrateItem) {
+            final HologramManager manager = this.crateManager.getHolograms();
+
+            if (manager != null && this.crate.getHologram().isEnabled()) {
+                CrateLocation crateLocation = this.crateManager.getCrateLocation(this.location);
+
+                if (crateLocation != null) {
+                    manager.removeHologram(crateLocation.getID());
+                }
+            }
+
+            // Get the display item.
+            ItemStack display = prize.getDisplayItem(this.player, this.crate); //todo() use display entities
+
+            display.editPersistentDataContainer(container -> container.set(ItemKeys.crate_prize.getNamespacedKey(), PersistentDataType.STRING, "1"));
+
+            Item reward;
+
+            try {
+                reward = this.player.getWorld().dropItem(this.location.clone().add(0.5, 1, 0.5), display);
+            } catch (IllegalArgumentException exception) {
+                if (MiscUtils.isLogging()) {
+                    this.logger.warn("A prize could not be given due to an invalid display item for this prize.");
+                    this.logger.warn("Crate: {} Prize: {}", prize.getCrateName(), prize.getPrizeName(), exception);
+                }
+
+                return;
+            }
+
+            reward.setVelocity(new Vector(0, 0.2, 0));
+
+            reward.customName(AdvUtils.parse(prize.getPrizeName()));
+
+            reward.setCustomNameVisible(true);
+            reward.setCanMobPickup(false);
+            reward.setCanPlayerPickup(false);
+
+            this.crateManager.addReward(this.player, reward);
+        }
+    }
 
     /**
      * Add a new crate task.
@@ -282,7 +335,7 @@ public abstract class CrateBuilder extends FoliaScheduler {
      * @param lore lore of item
      */
     public void setItem(final int slot, @NotNull final ItemType itemType, @NotNull final String name, @NotNull final List<String> lore) {
-        getInventory().setItem(slot, new LegacyItemBuilder(itemType).setPlayer(getPlayer()).setDisplayName(name).setDisplayLore(lore).asItemStack());
+        getInventory().setItem(slot, new LegacyItemBuilder(this.plugin, itemType).setPlayer(getPlayer()).setDisplayName(name).setDisplayLore(lore).asItemStack());
     }
 
     /**
@@ -293,7 +346,7 @@ public abstract class CrateBuilder extends FoliaScheduler {
      * @param name name of item
      */
     public void setItem(final int slot, @NotNull final ItemType itemType, @NotNull final String name) {
-        getInventory().setItem(slot, new LegacyItemBuilder(itemType).setPlayer(getPlayer()).setDisplayName(name).asItemStack());
+        getInventory().setItem(slot, new LegacyItemBuilder(this.plugin, itemType).setPlayer(getPlayer()).setDisplayName(name).asItemStack());
     }
 
     /**
@@ -328,14 +381,16 @@ public abstract class CrateBuilder extends FoliaScheduler {
 
         if (event.isCancelled()) {
             if (MiscUtils.isLogging()) {
-                final String fileName = crate.getFileName();
+                final String fileName = this.crate.getFileName();
 
-                final boolean hasPermission = this.config.getProperty(ConfigKeys.use_new_permission_system) && this.player.hasPermission("crazycrates.deny.open." + fileName) || this.player.hasPermission("crazycrates.open." + fileName);
+                final String playerName = this.player.getName();
 
-                if (hasPermission) {
-                    this.logger.warn("{} could not open {} due to having the permission preventing them from opening the crate.", this.player.getName(), fileName);
-                } else {
-                    this.logger.warn("{} could not open {} due to no valid prizes being found which led to the event being cancelled.", this.player.getName(), fileName);
+                if (this.config.getProperty(ConfigKeys.use_new_permission_system) && this.player.hasPermission("crazycrates.deny.open." + fileName)) {
+                    this.logger.warn("{} could not open {} due to having the permission preventing them from opening the crate.", playerName, fileName);
+                } else if (!this.player.hasPermission("crazycrates.open." + fileName)) {
+                    this.logger.warn("{} could not open {} due to not having the permission required to open the crate.", playerName, fileName);
+                } else if (!this.crate.canWinPrizes(this.player)) {
+                    this.logger.warn("{} could not open {} due to no valid prizes being found which led to the event being cancelled.", playerName, fileName);
                 }
             }
         }
@@ -372,7 +427,7 @@ public abstract class CrateBuilder extends FoliaScheduler {
     /**
      * Plays a sound at different volume levels with fallbacks.
      *
-     * @param type i.e. stop, cycle or click sound
+     * @param type stop, cycle or click sound
      * @param source sound category to respect client settings
      * @param fallback fallback sound in case no sound is found
      */
@@ -400,8 +455,7 @@ public abstract class CrateBuilder extends FoliaScheduler {
         final LegacyItemBuilder itemBuilder = manager.getMysteryCrate().setPlayer(this.player);
 
         for (int slot = 0; slot <= this.size; slot++) {
-            itemBuilder.addNamePlaceholder("%Slot%", String.valueOf(slot))
-                    .addLorePlaceholder("%Slot%", String.valueOf(slot));
+            itemBuilder.addNamePlaceholder("%Slot%", String.valueOf(slot)).addLorePlaceholder("%Slot%", String.valueOf(slot));
 
             itemBuilder.setAmount(slot);
 

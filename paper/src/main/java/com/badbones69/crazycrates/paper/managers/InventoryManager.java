@@ -8,7 +8,7 @@ import com.badbones69.crazycrates.paper.api.enums.other.keys.ItemKeys;
 import com.badbones69.crazycrates.paper.api.objects.Crate;
 import com.badbones69.crazycrates.paper.api.objects.Tier;
 import com.badbones69.crazycrates.paper.api.builders.LegacyItemBuilder;
-import com.ryderbelserion.fusion.paper.api.builder.gui.types.PaginatedGui;
+import com.ryderbelserion.fusion.paper.api.builders.gui.types.PaginatedGui;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
@@ -36,7 +36,7 @@ public class InventoryManager {
     public void loadButtons() {
         final ModelData menuModelData = this.config.getProperty(ConfigKeys.menu_button_item_model);
 
-        this.menuButton = new LegacyItemBuilder().withType(this.config.getProperty(ConfigKeys.menu_button_item).toLowerCase())
+        this.menuButton = new LegacyItemBuilder(this.plugin).withType(this.config.getProperty(ConfigKeys.menu_button_item).toLowerCase())
                 .setDisplayName(this.config.getProperty(ConfigKeys.menu_button_name))
                 .setDisplayLore(this.config.getProperty(ConfigKeys.menu_button_lore))
                 .setCustomModelData(this.config.getProperty(ConfigKeys.menu_button_model_data))
@@ -44,7 +44,7 @@ public class InventoryManager {
 
         final ModelData nextModelData = this.config.getProperty(ConfigKeys.next_button_item_model);
 
-        this.nextButton = new LegacyItemBuilder().withType(this.config.getProperty(ConfigKeys.next_button_item).toLowerCase())
+        this.nextButton = new LegacyItemBuilder(this.plugin).withType(this.config.getProperty(ConfigKeys.next_button_item).toLowerCase())
                 .setDisplayName(this.config.getProperty(ConfigKeys.next_button_name))
                 .setDisplayLore(this.config.getProperty(ConfigKeys.next_button_lore))
                 .setCustomModelData(this.config.getProperty(ConfigKeys.next_button_model_data))
@@ -52,7 +52,7 @@ public class InventoryManager {
 
         final ModelData backModelData = this.config.getProperty(ConfigKeys.back_button_item_model);
 
-        this.backButton = new LegacyItemBuilder().withType(this.config.getProperty(ConfigKeys.back_button_item).toLowerCase())
+        this.backButton = new LegacyItemBuilder(this.plugin).withType(this.config.getProperty(ConfigKeys.back_button_item).toLowerCase())
                 .setDisplayName(this.config.getProperty(ConfigKeys.back_button_name))
                 .setDisplayLore(this.config.getProperty(ConfigKeys.back_button_lore))
                 .setCustomModelData(this.config.getProperty(ConfigKeys.back_button_model_data))
@@ -64,7 +64,7 @@ public class InventoryManager {
     }
 
     public final ItemStack getNextButton(@Nullable final Player player, @Nullable final Tier tier, @NotNull final PaginatedGui gui) {
-        final LegacyItemBuilder button = new LegacyItemBuilder(this.nextButton);
+        final LegacyItemBuilder button = new LegacyItemBuilder(this.plugin, this.nextButton);
 
         if (player != null) {
             button.setPlayer(player).addLorePlaceholder("{page}", String.valueOf(gui.getNextPageNumber()));
@@ -82,7 +82,7 @@ public class InventoryManager {
     }
 
     public final ItemStack getBackButton(@Nullable final Player player, @Nullable final Tier tier, @NotNull final PaginatedGui gui) {
-        final LegacyItemBuilder button = new LegacyItemBuilder(this.backButton);
+        final LegacyItemBuilder button = new LegacyItemBuilder(this.plugin, this.backButton);
 
         if (player != null) {
             button.setPlayer(player).addLorePlaceholder("{page}", String.valueOf(gui.getPreviousPageNumber()));
@@ -111,11 +111,11 @@ public class InventoryManager {
 
     private final List<UUID> previewViewers = new ArrayList<>();
 
-    public void addPreviewViewer(final UUID uuid) {
+    public void addPreviewViewer(@NotNull final UUID uuid) {
         this.previewViewers.add(uuid);
     }
 
-    public void removePreviewViewer(final UUID uuid) {
+    public void removePreviewViewer(@NotNull final UUID uuid) {
         this.previewViewers.remove(uuid);
     }
 
@@ -123,11 +123,11 @@ public class InventoryManager {
         return Collections.unmodifiableList(this.previewViewers);
     }
 
-    public final boolean hasPreviewViewer(final UUID uuid) {
+    public final boolean hasPreviewViewer(@NotNull final UUID uuid) {
         return this.previewViewers.contains(uuid);
     }
 
-    public void openPreview(final Crate crate) {
+    public void openPreview(@NotNull final Crate crate) {
         final Iterator<UUID> viewers = getPreviewViewers().iterator();
 
         while (viewers.hasNext()) {

@@ -4,12 +4,13 @@ import com.badbones69.crazycrates.paper.api.builders.gui.StaticInventoryBuilder;
 import com.badbones69.crazycrates.paper.api.enums.Messages;
 import com.badbones69.crazycrates.paper.api.objects.Crate;
 import com.badbones69.crazycrates.paper.api.objects.gui.GuiSettings;
-import com.ryderbelserion.fusion.paper.api.builder.gui.interfaces.Gui;
-import com.ryderbelserion.fusion.paper.api.builder.gui.interfaces.GuiFiller;
-import com.ryderbelserion.fusion.paper.api.builder.gui.interfaces.GuiItem;
+import com.ryderbelserion.fusion.paper.api.builders.gui.interfaces.Gui;
+import com.ryderbelserion.fusion.paper.api.builders.gui.interfaces.GuiFiller;
+import com.ryderbelserion.fusion.paper.api.builders.gui.interfaces.GuiItem;
 import com.ryderbelserion.fusion.paper.api.enums.Scheduler;
 import com.ryderbelserion.fusion.paper.api.scheduler.FoliaScheduler;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -18,7 +19,7 @@ public class CrateSpinMenu extends StaticInventoryBuilder {
 
     private final GuiSettings settings;
 
-    public CrateSpinMenu(final Player player, final GuiSettings settings) {
+    public CrateSpinMenu(@NotNull final Player player, @NotNull final GuiSettings settings) {
         super(player, settings.getCrate(), settings.getTitle(), settings.getRows());
 
         this.settings = settings;
@@ -55,12 +56,10 @@ public class CrateSpinMenu extends StaticInventoryBuilder {
 
         this.settings.getButtons().forEach((slot, button) -> this.gui.setItem(slot, button.getGuiItem()));
 
-        this.gui.setOpenGuiAction(action -> {
-            this.userManager.addRespinPrize(uuid, fileName, this.settings.getPrize().getSectionName());
-        });
+        this.gui.setOpenGuiAction(action -> this.userManager.addRespinPrize(uuid, fileName, this.settings.getPrize().getSectionName()));
 
         this.gui.setCloseGuiAction(action -> {
-            new FoliaScheduler(Scheduler.global_scheduler) {
+            new FoliaScheduler(this.plugin, Scheduler.global_scheduler) {
                 @Override
                 public void run() {
                     if (userManager.hasRespinPrize(uuid, fileName)) { // if they have a respin prize, add it.

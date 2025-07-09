@@ -4,7 +4,8 @@ import com.badbones69.crazycrates.paper.api.enums.Permissions;
 import com.badbones69.crazycrates.paper.api.builders.LegacyItemBuilder;
 import com.badbones69.crazycrates.paper.api.enums.other.Plugins;
 import com.badbones69.crazycrates.paper.api.enums.other.keys.FileKeys;
-import com.ryderbelserion.fusion.api.utils.FileUtils;
+import com.ryderbelserion.fusion.core.files.FileAction;
+import com.ryderbelserion.fusion.core.utils.FileUtils;
 import com.ryderbelserion.fusion.paper.api.enums.Scheduler;
 import com.ryderbelserion.fusion.paper.api.scheduler.FoliaScheduler;
 import me.clip.placeholderapi.PlaceholderAPI;
@@ -49,7 +50,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class MiscUtils {
 
     private static final CrazyCrates plugin = CrazyCrates.getPlugin();
-
+    
     private static final ComponentLogger logger = plugin.getComponentLogger();
 
     public static void sendCommand(@Nullable final CommandSender sender, @NotNull final String command, @NotNull final Map<String, String> placeholders) {
@@ -59,7 +60,7 @@ public class MiscUtils {
 
         final String result = populatePlaceholders(sender, command, placeholders);
 
-        new FoliaScheduler(Scheduler.global_scheduler) {
+        new FoliaScheduler(plugin, Scheduler.global_scheduler) {
             @Override
             public void run() {
                 server.dispatchCommand(server.getConsoleSender(), result);
@@ -106,9 +107,11 @@ public class MiscUtils {
             final File crateLog = FileKeys.crate_log.getFile();
             final File keyLog = FileKeys.key_log.getFile();
 
-            FileUtils.zip(logsFolder, ".log", true);
-
             try {
+                FileUtils.compress(logsFolder.toPath(), null, "", new ArrayList<>() {{
+                    add(FileAction.DELETE);
+                }});
+
                 if (!crateLog.exists()) {
                     crateLog.createNewFile();
                 }
@@ -116,13 +119,13 @@ public class MiscUtils {
                 if (!keyLog.exists()) {
                     keyLog.createNewFile();
                 }
-            } catch (IOException exception) {
-                logger.warn("Failed to create log files.");
+            } catch (final IOException exception) {
+                if (isLogging()) logger.warn("Failed to create log files.", exception);
             }
         }
     }
 
-    public static double calculateWeight(int chance, int maxRange) {
+    public static double calculateWeight(final int chance, final int maxRange) {
         return new BigDecimal((double) chance / maxRange * 100D).setScale(1, RoundingMode.HALF_UP).doubleValue();
     }
 
@@ -150,7 +153,7 @@ public class MiscUtils {
         firework.getScheduler().runDelayed(plugin, scheduledTask -> firework.detonate(), null, 3L);
     }
 
-    public static @NotNull String location(@NotNull final Location location, boolean getName) {
+    public static @NotNull String location(@NotNull final Location location, final boolean getName) {
         String name = getName ? location.getWorld().getName() : String.valueOf(location.getWorld().getUID());
 
         return name + "," + location.getBlockX() + "," + location.getBlockY() + "," + location.getBlockZ();
@@ -305,7 +308,7 @@ public class MiscUtils {
         }
     }
 
-    public static long pickNumber(long min, long max) {
+    public static long pickNumber(final long min, long max) {
         max++;
 
         try {
@@ -345,10 +348,10 @@ public class MiscUtils {
                 ItemType.RED_STAINED_GLASS_PANE
         );
 
-        return new LegacyItemBuilder(panes.get(ThreadLocalRandom.current().nextInt(panes.size())));
+        return new LegacyItemBuilder(plugin, panes.get(ThreadLocalRandom.current().nextInt(panes.size())));
     }
 
-    public static void addItem(final Player player, final ItemStack... items) {
+    public static void addItem(@NotNull final Player player, @NotNull final ItemStack... items) {
         final Inventory inventory = player.getInventory();
 
         inventory.setMaxStackSize(64);
@@ -377,18 +380,16 @@ public class MiscUtils {
         return ConfigManager.getConfig().getProperty(ConfigKeys.use_different_random);
     }
 
-    public static void registerPermission(final String permission, final String description, final boolean isDefault) {
+    public static void registerPermission(@NotNull final String permission, @NotNull final String description, final boolean isDefault) {
         if (permission.isEmpty()) return;
 
-        PluginManager pluginManager = plugin.getServer().getPluginManager();
-
         if (pluginManager.getPermission(permission) != null) {
-            if (MiscUtils.isLogging()) logger.warn("Permission {} is already on the server. Pick a different name", permission);
+            if (isLogging()) logger.warn("Permission {} is already on the server. Pick a different name", permission);
 
             return;
         }
 
-        if (MiscUtils.isLogging()) logger.warn("Permission {} is registered", permission);
+        if (isLogging()) logger.warn("Permission {} is registered", permission);
 
         pluginManager.addPermission(new Permission(permission, description, isDefault ? PermissionDefault.TRUE : PermissionDefault.OP));
     }
@@ -396,15 +397,13 @@ public class MiscUtils {
     public static void unregisterPermission(final String permission) {
         if (permission.isEmpty()) return;
 
-        PluginManager pluginManager = plugin.getServer().getPluginManager();
-
         if (pluginManager.getPermission(permission) == null) {
-            if (MiscUtils.isLogging()) logger.warn("Permission {} is not registered", permission);
+            if (isLogging()) logger.warn("Permission {} is not registered", permission);
 
             return;
         }
 
-        if (MiscUtils.isLogging()) logger.warn("Permission {} is unregistered", permission);
+        if (isLogging()) logger.warn("Permission {} is unregistered", permission);
 
         pluginManager.removePermission(permission);
     }

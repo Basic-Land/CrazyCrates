@@ -2,14 +2,15 @@ package com.badbones69.crazycrates.paper.commands.relations;
 
 import com.badbones69.crazycrates.paper.commands.MessageManager;
 import dev.triumphteam.cmd.bukkit.message.BukkitMessageKey;
-import dev.triumphteam.cmd.core.extention.meta.MetaKey;
+import dev.triumphteam.cmd.core.extension.meta.MetaKey;
 import dev.triumphteam.cmd.core.message.MessageKey;
 import com.badbones69.crazycrates.paper.api.enums.Messages;
+import org.jetbrains.annotations.NotNull;
 import java.util.Optional;
 
 public class ArgumentRelations extends MessageManager {
 
-    private String getContext(String command, String order) {
+    private String getContext(@NotNull final String command, @NotNull final String order) {
         if (command.isEmpty() || order.isEmpty()) return "";
 
         String usage = null;

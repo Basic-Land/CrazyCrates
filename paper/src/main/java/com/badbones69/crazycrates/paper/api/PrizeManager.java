@@ -13,7 +13,7 @@ import com.badbones69.crazycrates.paper.api.objects.Crate;
 import com.badbones69.crazycrates.paper.api.objects.Prize;
 import com.badbones69.crazycrates.paper.api.builders.LegacyItemBuilder;
 import com.badbones69.crazycrates.paper.managers.BukkitUserManager;
-import com.ryderbelserion.fusion.paper.api.builder.items.modern.ItemBuilder;
+import com.ryderbelserion.fusion.paper.api.builders.items.ItemBuilder;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import org.bukkit.Location;
@@ -41,7 +41,7 @@ public class PrizeManager {
 
     private static final SettingsManager config = ConfigManager.getConfig();
 
-    public static int getCap(final Crate crate, final Player player) {
+    public static int getCap(@NotNull final Crate crate, @NotNull final Player player) {
         final String format = "crazycrates.respin." + crate.getFileName() + ".";
         int cap = 0;
 
@@ -62,7 +62,7 @@ public class PrizeManager {
         return cap;
     }
 
-    public static boolean isCapped(final Crate crate, final Player player) {
+    public static boolean isCapped(@NotNull final Crate crate, @NotNull final Player player) {
         boolean isCapped = false;
 
         if (!crate.isCyclePermissionToggle() || crate.getCyclePermissionCap() < 1 || player.isOp()) {
@@ -126,7 +126,7 @@ public class PrizeManager {
      * @param crate the player is opening
      * @param prize the player is being given
      */
-    public static void givePrize(@NotNull final Player player, @NotNull Location location, @NotNull final Crate crate, @Nullable Prize prize) {
+    public static void givePrize(@NotNull final Player player, @NotNull final Location location, @NotNull final Crate crate, @Nullable Prize prize) {
         if (prize == null) {
             if (MiscUtils.isLogging()) logger.warn("No prize was found when giving {} a prize.", player.getName());
 
@@ -154,7 +154,7 @@ public class PrizeManager {
             }
         }
 
-        for (ItemStack itemStack : prize.getEditorItems()) {
+        for (final ItemStack itemStack : prize.getEditorItems()) {
             if (!MiscUtils.isInventoryFull(player)) {
                 MiscUtils.addItem(player, itemStack);
             } else {
@@ -167,7 +167,7 @@ public class PrizeManager {
 
             if (!builders.isEmpty()) {
                 for (final ItemBuilder builder : builders) {
-                    final ItemStack itemStack = builder.asItemStack(player, false);
+                    final ItemStack itemStack = builder.asItemStack(player);
 
                     if (!MiscUtils.isInventoryFull(player)) {
                         MiscUtils.addItem(player, itemStack);
@@ -287,7 +287,7 @@ public class PrizeManager {
                 .replaceAll("%pulls%", pulls));
     }
 
-    private static void sendMessage(@NotNull final Player player, @NotNull final Prize prize, @NotNull final Crate crate, String message) {
+    private static void sendMessage(@NotNull final Player player, @NotNull final Prize prize, @NotNull final Crate crate, @NotNull final String message) {
         if (message.isEmpty()) return;
 
         final String maxPulls = String.valueOf(prize.getMaxPulls());

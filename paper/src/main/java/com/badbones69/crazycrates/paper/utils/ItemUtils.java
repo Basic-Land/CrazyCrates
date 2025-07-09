@@ -5,12 +5,12 @@ import com.badbones69.crazycrates.paper.api.enums.other.keys.ItemKeys;
 import com.badbones69.crazycrates.paper.api.objects.Crate;
 import com.badbones69.crazycrates.paper.tasks.crates.CrateManager;
 import com.badbones69.crazycrates.paper.api.builders.LegacyItemBuilder;
-import com.ryderbelserion.fusion.api.utils.StringUtils;
-import com.ryderbelserion.fusion.paper.api.builder.items.modern.ItemBuilder;
-import com.ryderbelserion.fusion.paper.api.builder.items.modern.types.PatternBuilder;
-import com.ryderbelserion.fusion.paper.api.builder.items.modern.types.PotionBuilder;
-import com.ryderbelserion.fusion.paper.api.builder.items.modern.types.SkullBuilder;
-import com.ryderbelserion.fusion.paper.api.builder.items.modern.types.SpawnerBuilder;
+import com.ryderbelserion.fusion.kyori.utils.StringUtils;
+import com.ryderbelserion.fusion.paper.api.builders.items.ItemBuilder;
+import com.ryderbelserion.fusion.paper.api.builders.items.types.PatternBuilder;
+import com.ryderbelserion.fusion.paper.api.builders.items.types.PotionBuilder;
+import com.ryderbelserion.fusion.paper.api.builders.items.types.SkullBuilder;
+import com.ryderbelserion.fusion.paper.api.builders.items.types.SpawnerBuilder;
 import com.ryderbelserion.fusion.paper.utils.ColorUtils;
 import io.papermc.paper.persistence.PersistentDataContainerView;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
@@ -55,7 +55,7 @@ public class ItemUtils {
         item.setAmount(amount - 1);
     }
 
-    public static String getEnchant(String enchant) {
+    public static String getEnchant(@NotNull final String enchant) {
         if (enchant.isEmpty()) return "";
 
         switch (enchant) {
@@ -145,7 +145,7 @@ public class ItemUtils {
         }
     }
 
-    public static String getPotion(String potion) {
+    public static String getPotion(@NotNull final String potion) {
         return potion.isEmpty() ? "" : potion.toLowerCase();
     }
 
@@ -207,8 +207,8 @@ public class ItemUtils {
         return builder;
     }
 
-    public static LegacyItemBuilder convertItemStack(Player player, ItemStack itemStack) {
-        LegacyItemBuilder itemBuilder = new LegacyItemBuilder(itemStack);
+    public static LegacyItemBuilder convertItemStack(@Nullable final Player player, @NotNull final ItemStack itemStack) {
+        LegacyItemBuilder itemBuilder = new LegacyItemBuilder(plugin, itemStack);
 
         if (player != null) {
             itemBuilder.setPlayer(player);
@@ -217,7 +217,7 @@ public class ItemUtils {
         return itemBuilder;
     }
 
-    public static LegacyItemBuilder convertItemStack(ItemStack itemStack) {
+    public static LegacyItemBuilder convertItemStack(@NotNull final ItemStack itemStack) {
         return convertItemStack(null, itemStack);
     }
 
@@ -250,7 +250,7 @@ public class ItemUtils {
             }
 
             if (item.isString("amount")) {
-                final Optional<Number> integer = StringUtils.tryParseInt(item.getString("amount"));
+                final Optional<Number> integer = StringUtils.tryParseInt(item.getString("amount", "1"));
 
                 integer.ifPresent(number -> itemBuilder.setAmount(number.intValue()));
             } else {
@@ -273,6 +273,8 @@ public class ItemUtils {
                 itemBuilder.hideToolTip();
             }
 
+            itemBuilder.hideComponents(item.getStringList("hidden-components"));
+
             itemBuilder.setUnbreakable(item.getBoolean("unbreakable-item", false));
 
             // settings
@@ -280,7 +282,7 @@ public class ItemUtils {
 
             final String player = item.getString("settings.player", null);
 
-            if (player != null && !player.isEmpty()) {
+            if (player != null && !player.isEmpty() && itemBuilder.isPlayerHead()) {
                 final SkullBuilder skullBuilder = itemBuilder.asSkullBuilder();
 
                 skullBuilder.withName(player).build();
@@ -304,7 +306,7 @@ public class ItemUtils {
                 spawnerBuilder.withEntityType(com.ryderbelserion.fusion.paper.utils.ItemUtils.getEntity(mobType)).build();
             }
 
-            itemBuilder.setTrim(item.getString("settings.trim.pattern", ""), item.getString("settings.trim.material", ""), false);
+            itemBuilder.setTrim(item.getString("settings.trim.pattern", ""), item.getString("settings.trim.material", ""));
 
             final ConfigurationSection potions = item.getConfigurationSection("settings.potions");
 
@@ -336,15 +338,15 @@ public class ItemUtils {
             final ConfigurationSection patterns = item.getConfigurationSection("settings.patterns");
 
             if (patterns != null) {
+                final PatternBuilder patternBuilder = itemBuilder.asPatternBuilder();
+
                 for (final String pattern : patterns.getKeys(false)) {
                     final String patternColor = patterns.getString(pattern, "white");
 
-                    final PatternBuilder patternBuilder = itemBuilder.asPatternBuilder();
-
                     patternBuilder.addPattern(pattern, patternColor);
-
-                    patternBuilder.build();
                 }
+
+                patternBuilder.build();
             }
 
             cache.add(itemBuilder);
@@ -353,20 +355,20 @@ public class ItemUtils {
         return cache;
     }
 
-    public static List<LegacyItemBuilder> convertStringList(List<String> itemStrings) {
+    public static List<LegacyItemBuilder> convertStringList(@NotNull final List<String> itemStrings) {
         return convertStringList(itemStrings, null);
     }
 
-    public static List<LegacyItemBuilder> convertStringList(List<String> itemStrings, String section) {
+    public static List<LegacyItemBuilder> convertStringList(@NotNull final List<String> itemStrings, @Nullable final String section) {
         return itemStrings.stream().map(itemString -> convertString(itemString, section)).collect(Collectors.toList());
     }
 
-    public static LegacyItemBuilder convertString(String itemString) {
+    public static LegacyItemBuilder convertString(@NotNull final String itemString) {
         return convertString(itemString, null);
     }
 
-    public static LegacyItemBuilder convertString(String itemString, String section) {
-        LegacyItemBuilder itemBuilder = new LegacyItemBuilder();
+    public static LegacyItemBuilder convertString(@NotNull final String itemString, @Nullable final String section) {
+        LegacyItemBuilder itemBuilder = new LegacyItemBuilder(plugin);
 
         try {
             for (String optionString : itemString.split(", ")) {

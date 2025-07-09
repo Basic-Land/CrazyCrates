@@ -9,9 +9,9 @@ import com.badbones69.crazycrates.paper.api.objects.Tier;
 import com.badbones69.crazycrates.paper.api.objects.gacha.enums.GachaType;
 import com.badbones69.crazycrates.paper.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.ItemRepo;
-import com.ryderbelserion.fusion.paper.api.builder.gui.interfaces.GuiFiller;
-import com.ryderbelserion.fusion.paper.api.builder.gui.interfaces.GuiItem;
-import com.ryderbelserion.fusion.paper.api.builder.gui.types.PaginatedGui;
+import com.ryderbelserion.fusion.paper.api.builders.gui.interfaces.GuiFiller;
+import com.ryderbelserion.fusion.paper.api.builders.gui.interfaces.GuiItem;
+import com.ryderbelserion.fusion.paper.api.builders.gui.types.PaginatedGui;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -19,13 +19,14 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ItemType;
 
+import org.jetbrains.annotations.NotNull;
 import java.util.UUID;
 
 public class CratePreviewMenu extends DynamicInventoryBuilder {
 
     private final Tier tier;
 
-    public CratePreviewMenu(final Player player, final Crate crate, final Tier tier) {
+    public CratePreviewMenu(@NotNull final Player player, @NotNull final Crate crate, @NotNull final Tier tier) {
         super(player, crate, crate.getPreviewName(), crate.getPreviewChestLines());
 
         this.tier = tier;

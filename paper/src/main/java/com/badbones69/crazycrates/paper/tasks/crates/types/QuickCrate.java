@@ -11,9 +11,8 @@ import com.badbones69.crazycrates.paper.api.objects.crates.CrateLocation;
 import com.badbones69.crazycrates.paper.api.objects.gui.GuiSettings;
 import com.badbones69.crazycrates.paper.managers.events.enums.EventType;
 import com.badbones69.crazycrates.paper.support.holograms.HologramManager;
-import com.ryderbelserion.fusion.core.utils.AdvUtils;
+import com.ryderbelserion.fusion.kyori.utils.AdvUtils;
 import com.ryderbelserion.fusion.paper.api.scheduler.FoliaScheduler;
-import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import org.bukkit.Location;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -42,8 +41,8 @@ public class QuickCrate extends CrateBuilder {
     private final Crate crate = getCrate();
 
     @Override
-    public void open(@NotNull final KeyType type, final boolean checkHand, final boolean isSilent, final EventType eventType) {
-        // Crate event failed so we return.
+    public void open(@NotNull final KeyType type, final boolean checkHand, final boolean isSilent, @NotNull final EventType eventType) {
+        // Crate event failed, so we return.
         if (isCrateEventValid(type, checkHand, isSilent, eventType)) {
             return;
         }
@@ -61,13 +60,13 @@ public class QuickCrate extends CrateBuilder {
 
             Messages.not_enough_keys.sendMessage(this.player, new HashMap<>() {{
                 put("{required_amount}", String.valueOf(crate.getRequiredKeys()));
-                put("{key_amount}", String.valueOf(crate.getRequiredKeys())); // deprecated, remove in next major version of minecraft.
+                put("{key_amount}", String.valueOf(crate.getRequiredKeys())); // deprecated, remove in the next major version of minecraft.
                 put("{amount}", String.valueOf(finalKeys));
                 put("{crate}", crate.getCrateName());
                 put("{key}", crate.getKeyName());
             }});
 
-            // Remove from opening list.
+            // Remove from an opening list.
             this.crateManager.removePlayerFromOpeningList(this.player);
 
             return;
@@ -95,7 +94,7 @@ public class QuickCrate extends CrateBuilder {
                 // Send the message about failing to take the key.
                 MiscUtils.failedToTakeKey(this.player, fileName);
 
-                // Remove from opening list.
+                // Remove from an opening list.
                 this.crateManager.removePlayerFromOpeningList(this.player);
 
                 // Remove crates in use
@@ -141,70 +140,14 @@ public class QuickCrate extends CrateBuilder {
             }
         }
 
-        final boolean showQuickCrateItem = ConfigManager.getConfig().getProperty(ConfigKeys.show_quickcrate_item);
-
         // Only related to the item above the crate.
-        if (showQuickCrateItem) {
-            final HologramManager manager = this.crateManager.getHolograms();
-
-            if (manager != null && this.crate.getHologram().isEnabled()) {
-                CrateLocation crateLocation = this.crateManager.getCrateLocation(this.location);
-
-                if (crateLocation != null) {
-                    manager.removeHologram(crateLocation.getID());
-                }
-            }
-
-            // Get the display item.
-            ItemStack display = prize.getDisplayItem(this.player, this.crate); //todo() use display entities
-
-            // Get the item meta.
-            display.editMeta(itemMeta -> itemMeta.getPersistentDataContainer().set(ItemKeys.crate_prize.getNamespacedKey(), PersistentDataType.STRING, "1"));
-
-            Item reward;
-
-            try {
-                reward = this.player.getWorld().dropItem(this.location.clone().add(0.5, 1, 0.5), display);
-            } catch (IllegalArgumentException exception) {
-                if (MiscUtils.isLogging()) {
-                    final ComponentLogger logger = this.plugin.getComponentLogger();
-
-                    logger.warn("A prize could not be given due to an invalid display item for this prize.");
-                    logger.warn("Crate: {} Prize: {}", prize.getCrateName(), prize.getPrizeName(), exception);
-                }
-
-                return;
-            }
-
-            reward.setVelocity(new Vector(0, 0.2, 0));
-
-            reward.customName(AdvUtils.parse(prize.getPrizeName()));
-
-            reward.setCustomNameVisible(true);
-            reward.setCanMobPickup(false);
-            reward.setCanPlayerPickup(false);
-
-            this.crateManager.addReward(this.player, reward);
-
-            ChestManager.openChest(this.location.getBlock(), true);
-
-            PrizeManager.givePrize(this.player, this.location.clone().add(0.5, 1, 0.5), this.crate, prize);
-
-            addCrateTask(new FoliaScheduler(null, this.player) {
-                @Override
-                public void run() {
-                    crateManager.endQuickCrate(player, location, crate, false);
-                }
-            }.runDelayed(5 * 20));
-
-            return;
-        }
+        displayItem(prize);
 
         ChestManager.openChest(this.location.getBlock(), true);
 
         PrizeManager.givePrize(this.player, this.location.clone().add(0.5, 1, 0.5), this.crate, prize);
 
-        addCrateTask(new FoliaScheduler(null, this.player) {
+        addCrateTask(new FoliaScheduler(this.plugin, null, this.player) {
             @Override
             public void run() {
                 crateManager.endQuickCrate(player, location, crate, false);

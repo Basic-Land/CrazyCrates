@@ -9,7 +9,7 @@ import com.badbones69.crazycrates.paper.utils.MiscUtils;
 import com.badbones69.crazycrates.paper.managers.BukkitUserManager;
 import com.badbones69.crazycrates.paper.managers.InventoryManager;
 import com.badbones69.crazycrates.paper.tasks.crates.CrateManager;
-import com.ryderbelserion.fusion.core.utils.AdvUtils;
+import com.ryderbelserion.fusion.kyori.utils.AdvUtils;
 import net.kyori.adventure.text.Component;
 import com.ryderbelserion.fusion.paper.utils.ColorUtils;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
@@ -30,17 +30,17 @@ import static java.util.regex.Matcher.quoteReplacement;
 
 public abstract class InventoryBuilder implements InventoryHolder, Listener {
 
-    protected @NotNull final CrazyCrates plugin = CrazyCrates.getPlugin();
+    protected final CrazyCrates plugin = CrazyCrates.getPlugin();
 
-    protected @NotNull final ComponentLogger logger = this.plugin.getComponentLogger();
+    protected final BukkitUserManager userManager = this.plugin.getUserManager();
 
-    protected @NotNull final BukkitUserManager userManager = this.plugin.getUserManager();
+    protected final InventoryManager inventoryManager = this.plugin.getInventoryManager();
 
-    protected @NotNull final InventoryManager inventoryManager = this.plugin.getInventoryManager();
+    protected final CrateManager crateManager = this.plugin.getCrateManager();
 
-    protected @NotNull final CrateManager crateManager = this.plugin.getCrateManager();
+    protected final ComponentLogger logger = this.plugin.getComponentLogger();
 
-    protected @NotNull final Server server = this.plugin.getServer();
+    protected final Server server = this.plugin.getServer();
 
     private Inventory inventory;
     private Player player;
@@ -125,7 +125,7 @@ public abstract class InventoryBuilder implements InventoryHolder, Listener {
                 return true;
             }
 
-            if (MiscUtils.isLogging()) logger.warn("The property {} is empty so no commands were run.", ConfigKeys.menu_button_command_list.getPath());
+            if (MiscUtils.isLogging()) this.logger.warn("The property {} is empty so no commands were run.", ConfigKeys.menu_button_command_list.getPath());
 
             return true;
         }

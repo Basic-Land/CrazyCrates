@@ -25,8 +25,8 @@ import com.badbones69.crazycrates.paper.managers.BukkitUserManager;
 import com.badbones69.crazycrates.paper.managers.InventoryManager;
 import com.badbones69.crazycrates.paper.tasks.crates.CrateManager;
 import com.google.common.reflect.ClassPath;
-import com.ryderbelserion.fusion.api.enums.FileType;
-import com.ryderbelserion.fusion.core.utils.AdvUtils;
+import com.ryderbelserion.fusion.kyori.utils.AdvUtils;
+import com.ryderbelserion.fusion.core.files.FileType;
 import com.ryderbelserion.fusion.paper.FusionPaper;
 import com.ryderbelserion.fusion.paper.files.LegacyFileManager;
 import lombok.Getter;
@@ -79,7 +79,7 @@ public class CrazyCrates extends JavaPlugin {
 
         this.fileManager = this.api.getLegacyFileManager();
 
-        this.instance = new Server(getDataFolder());
+        this.instance = new Server(getDataPath());
         this.instance.apply();
 
         this.fileManager.addFile("locations.yml", FileType.YAML)
@@ -209,8 +209,6 @@ public class CrazyCrates extends JavaPlugin {
         }
 
         MiscUtils.janitor();
-
-        this.api.save();
     }
 
     public final InventoryManager getInventoryManager() {

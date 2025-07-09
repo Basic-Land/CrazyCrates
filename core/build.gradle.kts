@@ -1,14 +1,9 @@
 plugins {
-    id("root-plugin")
+    `config-java`
 }
 
 dependencies {
-    compileOnly(libs.fusion.core)
-    compileOnly(libs.fusion.api)
-
-    compileOnly(libs.jetbrains)
-
     api(project(":crazycrates-api"))
 
-    api(libs.jalu)
+    compileOnly(libs.fusion.core)
 }
