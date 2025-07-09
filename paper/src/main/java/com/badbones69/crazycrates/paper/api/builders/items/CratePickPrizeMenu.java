@@ -1,5 +1,6 @@
 package com.badbones69.crazycrates.paper.api.builders.items;
 
+import com.badbones69.crazycrates.paper.CrazyCrates;
 import com.badbones69.crazycrates.paper.api.builders.InventoryBuilder;
 import com.badbones69.crazycrates.paper.api.builders.LegacyItemBuilder;
 import com.badbones69.crazycrates.paper.api.objects.Crate;
@@ -20,8 +21,8 @@ public class CratePickPrizeMenu extends InventoryBuilder {
     private final ItemStack item;
     private final Tier tier;
     private final DatabaseManager databaseManager = plugin.getCrateManager().getDatabaseManager();
-    private final static ItemStack back = new LegacyItemBuilder(ItemType.RED_STAINED_GLASS_PANE).setDisplayName("Back").asItemStack();
-    private final static ItemStack save = new LegacyItemBuilder(ItemType.GREEN_STAINED_GLASS_PANE).setDisplayName("Save").asItemStack();
+    private final static ItemStack back = new LegacyItemBuilder(CrazyCrates.getPlugin(), ItemType.RED_STAINED_GLASS_PANE).setDisplayName("Back").asItemStack();
+    private final static ItemStack save = new LegacyItemBuilder(CrazyCrates.getPlugin(), ItemType.GREEN_STAINED_GLASS_PANE).setDisplayName("Save").asItemStack();
 
     public CratePickPrizeMenu(Player player, ItemStack item, Crate crate, Tier tier) {
         super(player, "Item menu", 9, crate);

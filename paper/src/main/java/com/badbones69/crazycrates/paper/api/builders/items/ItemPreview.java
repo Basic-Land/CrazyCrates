@@ -100,13 +100,13 @@ public class ItemPreview extends InventoryBuilder {
 
         // Add page navigation items
         if (page > 0) {
-            LegacyItemBuilder previousPage = new LegacyItemBuilder(ItemType.ARROW).setDisplayName("<green>Previous Page");
+            LegacyItemBuilder previousPage = new LegacyItemBuilder(plugin, ItemType.ARROW).setDisplayName("<green>Previous Page");
             // Add previous page item
             getInventory().setItem(getSize() - 9, previousPage.asItemStack());
         }
 
         if (page < totalPages - 1) {
-            LegacyItemBuilder nextPage = new LegacyItemBuilder(ItemType.ARROW).setDisplayName("<green>Next Page");
+            LegacyItemBuilder nextPage = new LegacyItemBuilder(plugin, ItemType.ARROW).setDisplayName("<green>Next Page");
             // Add next page item
             getInventory().setItem(getSize() - 1, nextPage.asItemStack());
         }
@@ -175,7 +175,7 @@ public class ItemPreview extends InventoryBuilder {
 
     private void add() {
         if (editing) {
-            LegacyItemBuilder back = new LegacyItemBuilder(ItemType.CHEST).setDisplayName("<green>Go back");
+            LegacyItemBuilder back = new LegacyItemBuilder(plugin, ItemType.CHEST).setDisplayName("<green>Go back");
             getInventory().setItem(getSize() - 5, back.asItemStack());
         }
     }

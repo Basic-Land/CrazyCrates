@@ -98,7 +98,7 @@ public class GachaCrate extends CrateBuilder {
         baseProfile.addStellarShards(stellarShards);
 
         setItem(37, ItemRepo.BORDER.asItemStack());
-        setItem(8, new LegacyItemBuilder(ItemType.PLAYER_HEAD).setDisplayName("<green>Skip").setCustomModelData(1000002).asItemStack());
+        setItem(8, new LegacyItemBuilder(plugin, ItemType.PLAYER_HEAD).setDisplayName("<green>Skip").setCustomModelData(1000002).asItemStack());
 
         addCrateTask(new RouletteStandard(this, items, sneak).runAtFixedRate(1, 2));
 

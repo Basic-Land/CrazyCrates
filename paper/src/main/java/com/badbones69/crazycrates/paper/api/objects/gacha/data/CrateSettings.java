@@ -14,7 +14,7 @@ import com.badbones69.crazycrates.paper.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.paper.api.objects.gacha.enums.Table;
 import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.ComponentBuilder;
 import com.badbones69.crazycrates.paper.api.objects.gacha.util.TierInfo;
-import com.ryderbelserion.fusion.api.enums.FileType;
+import com.ryderbelserion.fusion.core.files.FileType;
 import com.ryderbelserion.fusion.paper.files.LegacyCustomFile;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import lombok.Getter;

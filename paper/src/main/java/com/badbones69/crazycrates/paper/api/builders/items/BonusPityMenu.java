@@ -1,5 +1,6 @@
 package com.badbones69.crazycrates.paper.api.builders.items;
 
+import com.badbones69.crazycrates.paper.CrazyCrates;
 import com.badbones69.crazycrates.paper.api.builders.InventoryBuilder;
 import com.badbones69.crazycrates.paper.api.builders.LegacyItemBuilder;
 import com.badbones69.crazycrates.paper.api.objects.Crate;
@@ -84,11 +85,11 @@ public class BonusPityMenu extends InventoryBuilder {
         getInventory().setItem(27, pageBackItem); // Page back
         getInventory().setItem(35, pageForwardItem); // Page forward
 
-        LegacyItemBuilder backItem = new LegacyItemBuilder(ItemType.ARROW).setCustomModelData(1000002);
+        LegacyItemBuilder backItem = new LegacyItemBuilder(plugin, ItemType.ARROW).setCustomModelData(1000002);
         getInventory().setItem(29, backItem.asItemStack());
 
         // Set the paper at the specified position
-        ItemStack paper = new LegacyItemBuilder(ItemType.PAPER)
+        ItemStack paper = new LegacyItemBuilder(plugin, ItemType.PAPER)
                 .setCustomModelData(10)
                 .setDisplayName("#f0af37Progress " + totalPity + "/" + extraRewardPity)
                 .asItemStack();
@@ -97,7 +98,7 @@ public class BonusPityMenu extends InventoryBuilder {
         // Set the barrier or player head at the specified position based on a condition
         boolean extraPity = playerProfile.reachedExtraRewardPity();
 
-        LegacyItemBuilder confirm = new LegacyItemBuilder(extraPity ? ItemType.ARROW : ItemType.BARRIER)
+        LegacyItemBuilder confirm = new LegacyItemBuilder(plugin, extraPity ? ItemType.ARROW : ItemType.BARRIER)
                 .setCustomModelData(1000001);
 
         if (extraPity) {
@@ -193,6 +194,6 @@ public class BonusPityMenu extends InventoryBuilder {
     }
 
     private static ItemStack glass(ItemType item) {
-        return new LegacyItemBuilder(item).setCustomModelData(1000001).setDisplayName("<gray>").asItemStack();
+        return new LegacyItemBuilder(CrazyCrates.getPlugin(), item).setCustomModelData(1000001).setDisplayName("<gray>").asItemStack();
     }
 }

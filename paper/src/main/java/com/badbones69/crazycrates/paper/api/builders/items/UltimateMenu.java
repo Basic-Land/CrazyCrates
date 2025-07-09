@@ -280,7 +280,7 @@ public class UltimateMenu extends InventoryBuilder {
 
         LegacyItemBuilder selectedMain = ItemRepo.SELECTED;
         LegacyItemBuilder unselectedMain = ItemRepo.UNSELECTED;
-        LegacyItemBuilder mainCrate = new LegacyItemBuilder(ItemRepo.MAIN_MENU_NAME, true);
+        LegacyItemBuilder mainCrate = new LegacyItemBuilder(plugin, ItemRepo.MAIN_MENU_NAME, true);
 
         for (CrateSettings setting : manager.getCrateSettingsSplit().get(currentPage)) {
             if (setting == null) continue;
@@ -289,9 +289,9 @@ public class UltimateMenu extends InventoryBuilder {
             unselectedMain.setDisplayName("<red><b>" + setting.getCrateName());
 
             if (crate == selectedCrate) {
-                getInventory().setItem(slot, new LegacyItemBuilder(selectedMain, true).setCustomModelData(1000002).asItemStack());
+                getInventory().setItem(slot, new LegacyItemBuilder(plugin, selectedMain, true).setCustomModelData(1000002).asItemStack());
 
-                selectedMain = new LegacyItemBuilder(selectedMain, true).setCustomModelData(1000003);
+                selectedMain = new LegacyItemBuilder(plugin, selectedMain, true).setCustomModelData(1000003);
                 getInventory().setItem(slot + 1, selectedMain.asItemStack());
                 getInventory().setItem(slot + 2, selectedMain.asItemStack());
 
@@ -299,9 +299,9 @@ public class UltimateMenu extends InventoryBuilder {
                 mainCrate.setCustomModelData(model);
                 getPlayer().getInventory().setItem(29, mainCrate.asItemStack());
             } else {
-                getInventory().setItem(slot, new LegacyItemBuilder(unselectedMain, true).setCustomModelData(1000002).asItemStack());
+                getInventory().setItem(slot, new LegacyItemBuilder(plugin, unselectedMain, true).setCustomModelData(1000002).asItemStack());
 
-                unselectedMain = new LegacyItemBuilder(unselectedMain, true).setCustomModelData(1000001);
+                unselectedMain = new LegacyItemBuilder(plugin, unselectedMain, true).setCustomModelData(1000001);
 
                 getInventory().setItem(slot + 1, unselectedMain.asItemStack());
                 getInventory().setItem(slot + 2, unselectedMain.asItemStack());
@@ -316,7 +316,7 @@ public class UltimateMenu extends InventoryBuilder {
         PlayerInventory playerInventory = getPlayer().getInventory();
         playerInventory.setItem(27, ItemRepo.MAIN_MENU.asItemStack());
         BannerData banner = getCrate().getCrateSettings().getBannerPackage().getBanner();
-        playerInventory.setItem(28, new LegacyItemBuilder(ItemRepo.BANNER, true).setCustomModelData(banner == null ? -1 : banner.modelData()).asItemStack());
+        playerInventory.setItem(28, new LegacyItemBuilder(plugin, ItemRepo.BANNER, true).setCustomModelData(banner == null ? -1 : banner.modelData()).asItemStack());
     }
 
     private void setItemsPlayerInv() {

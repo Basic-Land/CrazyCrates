@@ -47,7 +47,7 @@ public class Tier {
         this.name = tier;
         this.coloredName = stack.name();
         this.lore = stack.lore();
-        this.item = new LegacyItemBuilder(stack.material().asItemType()).setCustomModelData(stack.modelData());
+        this.item = new LegacyItemBuilder(plugin, stack.material().asItemType()).setCustomModelData(stack.modelData());
         this.weight = chance;
         this.slot = slot;
     }

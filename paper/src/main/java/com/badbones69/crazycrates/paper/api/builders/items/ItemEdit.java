@@ -34,10 +34,10 @@ public class ItemEdit extends InventoryBuilder {
 
     @Override
     public InventoryBuilder build() {
-        ItemStack head = new LegacyItemBuilder(ItemType.PLAYER_HEAD).setPlayer("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjMyY2E2NjA1NmI3Mjg2M2U5OGY3ZjMyYmQ3ZDk0YzdhMGQ3OTZhZjY5MWM5YWMzYTkxMzYzMzEzNTIyODhmOSJ9fX0=").setDisplayName("Current Item").asItemStack();
-        ItemStack back = new LegacyItemBuilder(ItemType.RED_STAINED_GLASS_PANE).setDisplayName("Back").asItemStack();
-        ItemStack save = new LegacyItemBuilder(ItemType.GREEN_STAINED_GLASS_PANE).setDisplayName("Save").asItemStack();
-        ItemStack glass = new LegacyItemBuilder(ItemType.LIGHT_GRAY_STAINED_GLASS_PANE).setDisplayName("<gray>").asItemStack();
+        ItemStack head = new LegacyItemBuilder(plugin, ItemType.PLAYER_HEAD).setPlayer("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjMyY2E2NjA1NmI3Mjg2M2U5OGY3ZjMyYmQ3ZDk0YzdhMGQ3OTZhZjY5MWM5YWMzYTkxMzYzMzEzNTIyODhmOSJ9fX0=").setDisplayName("Current Item").asItemStack();
+        ItemStack back = new LegacyItemBuilder(plugin, ItemType.RED_STAINED_GLASS_PANE).setDisplayName("Back").asItemStack();
+        ItemStack save = new LegacyItemBuilder(plugin, ItemType.GREEN_STAINED_GLASS_PANE).setDisplayName("Save").asItemStack();
+        ItemStack glass = new LegacyItemBuilder(plugin, ItemType.LIGHT_GRAY_STAINED_GLASS_PANE).setDisplayName("<gray>").asItemStack();
 
         getInventory().setItem(10, head);
         getInventory().setItem(11, itemStack);

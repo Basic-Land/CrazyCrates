@@ -41,7 +41,7 @@ public class RouletteStandard extends FoliaScheduler {
     private long time = System.currentTimeMillis();
 
     public RouletteStandard(CrateBuilder builder, List<Result> prize, boolean sneak) {
-        super(null, builder.getPlayer());
+        super(CrazyCrates.getPlugin(), null, builder.getPlayer());
         this.builder = builder;
         this.crate = builder.getCrate();
         this.player = builder.getPlayer();
@@ -75,7 +75,7 @@ public class RouletteStandard extends FoliaScheduler {
         }
 
         if (!first && !skip) {
-            builder.setItem(36, new LegacyItemBuilder(ItemType.GRAY_STAINED_GLASS_PANE).setCustomModelData(modelData).asItemStack());
+            builder.setItem(36, new LegacyItemBuilder(plugin, ItemType.GRAY_STAINED_GLASS_PANE).setCustomModelData(modelData).asItemStack());
             player.updateInventory();
         }
 
@@ -115,7 +115,7 @@ public class RouletteStandard extends FoliaScheduler {
         if (!first) {
             first = true;
             lock = true;
-            builder.setItem(36, new LegacyItemBuilder(ItemType.GRAY_STAINED_GLASS_PANE).setCustomModelData(600).asItemStack());
+            builder.setItem(36, new LegacyItemBuilder(plugin, ItemType.GRAY_STAINED_GLASS_PANE).setCustomModelData(600).asItemStack());
             if (!sneak || !skip) builder.setItem(22, prize.getFirst().getPrize().getDisplayItem());
             skip = true;
             return;
@@ -143,7 +143,7 @@ public class RouletteStandard extends FoliaScheduler {
     }
 
     private void endTask() {
-        builder.setItem(36, new LegacyItemBuilder(ItemType.GRAY_STAINED_GLASS_PANE).setCustomModelData(600).asItemStack());
+        builder.setItem(36, new LegacyItemBuilder(plugin, ItemType.GRAY_STAINED_GLASS_PANE).setCustomModelData(600).asItemStack());
         if (!sneak) {
             builder.setItem(22, prize.getFirst().getPrize().getDisplayItem());
         }

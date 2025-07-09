@@ -96,16 +96,16 @@ public class CommandManager {
                 .mapToObj(String::valueOf)
                 .collect(Collectors.toList()));
 
-        commandManager.registerSuggestion(SuggestionKey.of("types"), (sender, context) -> {
-            Crate crate = plugin.getCrateManager().getCrateFromName(context.getFirst());
+        commandManager.registerSuggestion(SuggestionKey.of("types"), context -> {
+            Crate crate = plugin.getCrateManager().getCrateFromName(context.getArguments().getFirst());
             if (crate == null) return Collections.emptyList();
             CrateSettings crateSettings = crate.getCrateSettings();
             if (crateSettings == null) return Collections.emptyList();
             return Arrays.stream(RewardType.values()).map(RewardType::getName).toList();
         });
 
-        commandManager.registerSuggestion(SuggestionKey.of("rarities"), (sender, context) -> {
-            Crate crate = plugin.getCrateManager().getCrateFromName(context.getFirst());
+        commandManager.registerSuggestion(SuggestionKey.of("rarities"), context -> {
+            Crate crate = plugin.getCrateManager().getCrateFromName(context.getArguments().getFirst());
             if (crate == null) return Collections.emptyList();
             CrateSettings crateSettings = crate.getCrateSettings();
             if (crateSettings == null) return Collections.emptyList();
@@ -114,7 +114,7 @@ public class CommandManager {
             return rarityMap.stream().map(Enum::name).toList();
         });
 
-        commandManager.registerSuggestion(SuggestionKey.of("both"), (sender, context) -> {
+        commandManager.registerSuggestion(SuggestionKey.of("both"), context -> {
             List<String> collect = plugin.getCrateManager().getCrates().stream()
                     .filter(crate -> crate.getCrateSettings() != null)
                     .map(Crate::getFileName)
@@ -126,7 +126,7 @@ public class CommandManager {
             return collect;
         });
 
-        commandManager.registerSuggestion(SuggestionKey.of("currencies"), (sender, context) -> Arrays.stream(CurrencyType.values()).map(CurrencyType::getName).toList());
+        commandManager.registerSuggestion(SuggestionKey.of("currencies"), context -> Arrays.stream(CurrencyType.values()).map(CurrencyType::getName).toList());
 
         commandManager.registerSuggestion(SuggestionKey.of("doubles"), (context) -> {
             final List<String> numbers = new ArrayList<>();

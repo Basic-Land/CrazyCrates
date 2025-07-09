@@ -29,9 +29,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ShopManager {
     private final List<ShopData> shops = new ArrayList<>();
     private final LimitManager limitManager;
+    private final CrazyCrates plugin;
 
     public ShopManager(DatabaseManager databaseManager) {
-        CrazyCrates plugin = CrazyCrates.getPlugin();
+        plugin = CrazyCrates.getPlugin();
         LegacyFileManager yamlManager = plugin.getFileManager();
         limitManager = new LimitManager();
 
@@ -143,7 +144,7 @@ public class ShopManager {
         if (shopItem == null) return null;
         ShopPurchase shopPurchase = limitManager.getData(player, shopData.shopID(), shopItem, false);
         ItemStack stack = shopItem.stack().clone();
-        LegacyItemBuilder itemBuilder = new LegacyItemBuilder(stack);
+        LegacyItemBuilder itemBuilder = new LegacyItemBuilder(plugin, stack);
         itemBuilder.addDisplayLore("<green><b>Cena:</b> <white>" + shopItem.price() + shopData.currencyType().translateMM());
 
         switch (shopPurchase.limitType()) {
@@ -172,15 +173,15 @@ public class ShopManager {
             int ordinal = shopID.ordinal();
 
             if (selected == shopID) {
-                inv.setItem(slot, new LegacyItemBuilder(selectedMain, true).setCustomModelData(1000007 - ordinal).asItemStack());
+                inv.setItem(slot, new LegacyItemBuilder(plugin, selectedMain, true).setCustomModelData(1000007 - ordinal).asItemStack());
 
-                ItemStack selectedStack = new LegacyItemBuilder(selectedMain, true).setCustomModelData(1000003).asItemStack();
+                ItemStack selectedStack = new LegacyItemBuilder(plugin, selectedMain, true).setCustomModelData(1000003).asItemStack();
                 inv.setItem(slot + 1, selectedStack);
                 inv.setItem(slot + 2, selectedStack);
             } else {
-                inv.setItem(slot, new LegacyItemBuilder(unselectedMain, true).setCustomModelData(1000007 - ordinal).asItemStack());
+                inv.setItem(slot, new LegacyItemBuilder(plugin, unselectedMain, true).setCustomModelData(1000007 - ordinal).asItemStack());
 
-                ItemStack unselected = new LegacyItemBuilder(unselectedMain, true).setCustomModelData(1000001).asItemStack();
+                ItemStack unselected = new LegacyItemBuilder(plugin, unselectedMain, true).setCustomModelData(1000001).asItemStack();
                 inv.setItem(slot + 1, unselected);
                 inv.setItem(slot + 2, unselected);
             }

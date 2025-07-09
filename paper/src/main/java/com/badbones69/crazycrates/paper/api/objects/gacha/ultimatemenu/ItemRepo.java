@@ -1,5 +1,6 @@
 package com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu;
 
+import com.badbones69.crazycrates.paper.CrazyCrates;
 import com.badbones69.crazycrates.paper.api.builders.LegacyItemBuilder;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
@@ -95,7 +96,7 @@ public class ItemRepo {
     public static final Sound OPEN = Sound.sound(Key.key("crate", "open"), Sound.Source.MASTER, 1f, 1f);
 
     private static LegacyItemBuilder getItem(ItemType material, int modelData) {
-        return new LegacyItemBuilder(material).setCustomModelData(modelData).setDisplayName("<white>");
+        return new LegacyItemBuilder(CrazyCrates.getPlugin(), material).setCustomModelData(modelData).setDisplayName("<white>");
     }
 
 }

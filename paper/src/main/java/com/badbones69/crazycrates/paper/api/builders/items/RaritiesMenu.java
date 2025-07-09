@@ -33,7 +33,7 @@ public class RaritiesMenu extends InventoryBuilder {
 
             ItemStack item;
             if (raritySettings.is5050Enabled()) {
-                item = new LegacyItemBuilder(ItemType.CHEST).setDisplayName(rarity.name())
+                item = new LegacyItemBuilder(plugin, ItemType.CHEST).setDisplayName(rarity.name())
                         .addDisplayLore("<white>STANDARD")
                         .addDisplayLore("- <white>Kliknuti <red><b>LEVYM</red> tlacitkem pro <red><b>PRIDANI</red> itemu do crate</white>")
                         .addDisplayLore("- <white>Kliknuti <red><b>PRAVYM</red> tlacitkem pro <red><b>ODEBRANI</red> itemu z crate</white>")
@@ -42,7 +42,7 @@ public class RaritiesMenu extends InventoryBuilder {
                 getInventory().addItem(item);
             }
 
-            item = new LegacyItemBuilder(ItemType.CHEST).setDisplayName(rarity.name())
+            item = new LegacyItemBuilder(plugin, ItemType.CHEST).setDisplayName(rarity.name())
                     .addDisplayLore("<white>LIMITED")
                     .addDisplayLore("- <white>Kliknuti <red><b>LEVYM</red> tlacitkem pro <red><b>PRIDANI</red> itemu do crate</white>")
                     .addDisplayLore("- <white>Kliknuti <red><b>PRAVYM</red> tlacitkem pro <red><b>ODEBRANI</red> itemu z crate</white>")

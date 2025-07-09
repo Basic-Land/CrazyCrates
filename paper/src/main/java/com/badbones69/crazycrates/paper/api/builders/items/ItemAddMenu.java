@@ -27,7 +27,7 @@ public class ItemAddMenu extends InventoryBuilder {
     @Override
     public InventoryBuilder build() {
         Inventory inventory = getInventory();
-        LegacyItemBuilder builder = new LegacyItemBuilder(ItemType.CHEST);
+        LegacyItemBuilder builder = new LegacyItemBuilder(plugin, ItemType.CHEST);
         builder.setDisplayName("<green>Save Items");
         builder.addDisplayLore("");
         builder.addDisplayLore("<gray><b>Right click to close.");

@@ -136,7 +136,7 @@ public class Prize {
         NBT nbt = new NBT(itemStack);
         nbt.remove("rewardName");
 
-        this.builders = give ? Collections.singletonList(new LegacyItemBuilder(itemStack).setAmount(itemStack.getAmount())) : Collections.emptyList();
+        this.builders = give ? Collections.singletonList(new LegacyItemBuilder(plugin, itemStack).setAmount(itemStack.getAmount())) : Collections.emptyList();
         this.items = Collections.emptyList();
 
         this.tiers = Collections.singletonList(tier);
@@ -154,7 +154,7 @@ public class Prize {
 
         this.permissions = Collections.emptyList();
 
-        this.displayItem = new LegacyItemBuilder(stack.clone());
+        this.displayItem = new LegacyItemBuilder(plugin, stack.clone());
 
         displayItem.addDisplayLore("<white>");
         displayItem.addDisplayLore("<gray>Typ: " + type.getName());
