@@ -19,6 +19,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ItemType;
 
+import org.bukkit.inventory.ItemType;
 import org.jetbrains.annotations.NotNull;
 import java.util.UUID;
 
@@ -45,13 +46,15 @@ public class CratePreviewMenu extends DynamicInventoryBuilder {
 
         if (crate == null) return;
 
-        if (crate.isBorderToggle()) {
-            final GuiFiller guiFiller = this.gui.getFiller();
+        final GuiFiller guiFiller = this.gui.getFiller();
 
+        if (crate.isBorderToggle()) {
             final GuiItem guiItem = new GuiItem(crate.getBorderItem().setCustomModelData(gacha ? 1000001 : -1).asItemStack());
 
             guiFiller.fillTop(guiItem);
             guiFiller.fillBottom(guiItem);
+        } else {
+            guiFiller.fillBottom(new GuiItem(ItemType.AIR.createItemStack()));
         }
 
         final UUID uuid = this.player.getUniqueId();

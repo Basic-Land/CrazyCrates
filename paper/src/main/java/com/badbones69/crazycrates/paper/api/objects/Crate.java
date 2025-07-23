@@ -13,9 +13,9 @@ import com.badbones69.crazycrates.paper.managers.BukkitUserManager;
 import com.badbones69.crazycrates.paper.tasks.crates.CrateManager;
 import com.badbones69.crazycrates.paper.tasks.crates.effects.SoundEffect;
 import com.badbones69.crazycrates.paper.api.builders.LegacyItemBuilder;
-import com.ryderbelserion.fusion.kyori.utils.AdvUtils;
-import com.ryderbelserion.fusion.core.files.FileType;
-import com.ryderbelserion.fusion.paper.files.LegacyCustomFile;
+import com.ryderbelserion.fusion.core.api.utils.AdvUtils;
+import com.ryderbelserion.fusion.paper.files.FileManager;
+import com.ryderbelserion.fusion.paper.files.types.PaperCustomFile;
 import com.ryderbelserion.fusion.paper.utils.ColorUtils;
 import com.ryderbelserion.fusion.paper.utils.ItemUtils;
 import lombok.Getter;
@@ -40,6 +40,7 @@ import org.bukkit.inventory.ItemStack;
 import com.badbones69.crazycrates.paper.utils.MiscUtils;
 
 import java.util.*;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +54,7 @@ public class Crate {
     private LegacyItemBuilder keyBuilder;
 
     private AbstractCrateManager manager;
+    private final String fileName;
     private final String name;
     private String keyName;
     private int maxSlots;
@@ -103,6 +105,8 @@ public class Crate {
     private List<String> broadcastMessages = new ArrayList<>();
     private String broadcastPermission = "";
 
+    private boolean isTrackingOpening = true;
+
     private double sum = 0;
     private double tierSum = 0;
 
@@ -133,7 +137,8 @@ public class Crate {
         this.keyName = keyName;
 
         this.file = file;
-        this.name = name;
+        this.fileName = name;
+        this.name = name.replaceAll(".yml", "");
         this.tiers = tiers;
         this.maxMassOpen = maxMassOpen;
         this.requiredKeys = requiredKeys;
@@ -151,6 +156,8 @@ public class Crate {
         this.cyclePermissionToggle = this.file.getBoolean("Crate.Settings.Rewards.Permission.Toggle", false);
         this.cyclePersistRestart = this.file.getBoolean("Crate.Settings.Rewards.Permission.Persist", false);
         this.cyclePermissionCap = this.file.getInt("Crate.Settings.Rewards.Permission.Max-Cap", 20);
+
+        this.isTrackingOpening = this.file.getBoolean("Crate.Settings.Tracking-Crate-Opening", false);
 
         for (int node = 1; node <= this.cyclePermissionCap; node++) {
             if (this.cyclePermissionToggle) {
@@ -249,6 +256,7 @@ public class Crate {
 
     public Crate(@NotNull final String name) {
         this.crateType = CrateType.menu;
+        this.fileName = "";
         this.name = name;
     }
 
@@ -850,13 +858,17 @@ public class Crate {
         return section + "." + path;
     }
 
+    private final FileManager fileManager = this.plugin.getFileManager();
+
+    private final Path dataPath = this.plugin.getDataPath();
+
     /**
      * Saves item stacks to editor-items
      */
     public void saveFile() {
-        if (this.name.isEmpty()) return;
+        if (this.fileName.isEmpty()) return;
 
-        final LegacyCustomFile customFile = this.plugin.getFileManager().getFile(this.name, FileType.YAML);
+        final PaperCustomFile customFile = this.fileManager.getPaperCustomFile(this.dataPath.resolve("crates").resolve(this.fileName));
 
         if (customFile != null) {
             customFile.save(); // save to file
@@ -951,6 +963,10 @@ public class Crate {
 
     public final boolean useRequiredKeys() {
         return ConfigManager.getConfig().getProperty(ConfigKeys.crate_use_required_keys) && this.requiredKeys > 0;
+    }
+
+    public final boolean isTrackingOpening() {
+        return this.isTrackingOpening;
     }
 
     /**
