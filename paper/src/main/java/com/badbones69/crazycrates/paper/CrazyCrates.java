@@ -51,6 +51,9 @@ public class CrazyCrates extends JavaPlugin {
 
     private final Timer timer;
     private final long startTime;
+    private static final List<FileAction> STATIC_FILE = new ArrayList<>() {{
+        add(FileAction.STATIC_FILE);
+    }};
 
     public CrazyCrates() {
         this.startTime = System.nanoTime();
@@ -89,25 +92,15 @@ public class CrazyCrates extends JavaPlugin {
 
         final Path logs = path.resolve("logs");
 
-        this.fileManager.addFile(path.resolve("locations.yml"), FileType.PAPER, new ArrayList<>() {{
-                    add(FileAction.STATIC_FILE);
-                }}, null)
-                .addFile(path.resolve("data.yml"), FileType.PAPER, new ArrayList<>() {{
-                    add(FileAction.STATIC_FILE);
-                }}, null)
-                .addFile(logs.resolve("crates.log"), FileType.LOG, new ArrayList<>() {{
-                    add(FileAction.STATIC_FILE);
-                }}, null)
-                .addFile(logs.resolve("keys.log"), FileType.LOG, new ArrayList<>() {{
-                    add(FileAction.STATIC_FILE);
-                }}, null)
-                .addFile(path.resolve("guis").resolve("respin-gui.yml"), FileType.PAPER, new ArrayList<>() {{
-                    add(FileAction.STATIC_FILE);
-                }}, null)
+        this.fileManager.addFile(path.resolve("locations.yml"), FileType.PAPER, STATIC_FILE, null)
+                .addFile(path.resolve("data.yml"), FileType.PAPER, STATIC_FILE, null)
+                .addFile(logs.resolve("crates.log"), FileType.LOG, STATIC_FILE, null)
+                .addFile(logs.resolve("keys.log"), FileType.LOG, STATIC_FILE, null)
+                .addFile(path.resolve("guis").resolve("respin-gui.yml"), FileType.PAPER, STATIC_FILE, null)
                 .addFolder(path.resolve("crates"), FileType.PAPER, new ArrayList<>(), null)
-                .addFolder(path.resolve("schematics"), FileType.NBT, new  ArrayList<>(), null)
-                .addFolder("banners", FileType.YAML)
-                .addFolder("shops", FileType.YAML);
+                .addFolder(path.resolve("schematics"), FileType.NBT, new ArrayList<>(), null)
+                .addFolder(path.resolve("banners"), FileType.PAPER, new ArrayList<>(), null)
+                .addFolder(path.resolve("shops"), FileType.PAPER, new ArrayList<>(), null);
 
         MiscUtils.janitor();
         MiscUtils.save();

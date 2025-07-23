@@ -31,7 +31,6 @@ import org.bukkit.inventory.PlayerInventory;
 import us.crazycrew.crazycrates.api.enums.types.KeyType;
 
 import java.util.List;
-import java.util.logging.Level;
 import java.util.stream.IntStream;
 
 import static net.kyori.adventure.text.Component.empty;
@@ -368,35 +367,18 @@ public class UltimateMenu extends InventoryBuilder {
             InventoryCloseEvent.Reason reason = e.getReason();
             UltimateMenuManager menuManager = plugin.getCrateManager().getDatabaseManager().getUltimateMenuManager();
 
-            switch (e.getInventory().getHolder(false)) {
-                case UltimateMenu ultimateMenu -> {
-                    if (reason.equals(InventoryCloseEvent.Reason.PLAYER) || reason.equals(InventoryCloseEvent.Reason.PLUGIN)) {
+            if (e.getInventory().getHolder(false) instanceof UltimateMenu &&
+                    (reason.equals(InventoryCloseEvent.Reason.PLAYER) || reason.equals(InventoryCloseEvent.Reason.PLUGIN))) {
+                // Schedule inventory restoration for next tick to avoid race conditions
+                Bukkit.getScheduler().runTask(plugin, () -> {
+                    if (!player.isOnline()) return;
 
-                        // Schedule inventory restoration for next tick to avoid race conditions
-                        Bukkit.getScheduler().runTask(plugin, () -> {
-                            if (!player.isOnline()) return;
-
-                            // Check if player is not in another menu instance before restoring
-                            if (!(player.getOpenInventory().getTopInventory().getHolder(false) instanceof UltimateMenu)) {
-                                menuManager.remove(player);
-                            }
-                        });
+                    // Check if player is not in another menu instance before restoring
+                    if (!(player.getOpenInventory().getTopInventory().getHolder(false) instanceof UltimateMenu)) {
+                        menuManager.remove(player);
                     }
-                    print(player, reason, ultimateMenu);
-                }
-                case InventoryBuilder builder -> print(builder.getPlayer(), reason, builder);
-                case null, default -> {
-                }
+                });
             }
-        }
-
-        private void print(Player player, InventoryCloseEvent.Reason reason, InventoryBuilder builder) {
-            UltimateMenuManager ultimateMenuManager = plugin.getCrateManager().getDatabaseManager().getUltimateMenuManager();
-            CrazyCrates.LOGGER.setLevel(Level.INFO);
-            CrazyCrates.LOGGER.info(player.getName() +
-                    " closed " + builder.getClass().getSimpleName() +
-                    " reason: " + reason +
-                    " hasItems: " + ultimateMenuManager.hasItems(player));
         }
 
         @EventHandler

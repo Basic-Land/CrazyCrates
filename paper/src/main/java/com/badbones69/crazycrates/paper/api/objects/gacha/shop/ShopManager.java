@@ -11,8 +11,8 @@ import com.badbones69.crazycrates.paper.api.objects.gacha.enums.ShopID;
 import com.badbones69.crazycrates.paper.api.objects.gacha.enums.Table;
 import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.ComponentBuilder;
 import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.ItemRepo;
-import com.ryderbelserion.fusion.paper.files.LegacyCustomFile;
-import com.ryderbelserion.fusion.paper.files.LegacyFileManager;
+import com.ryderbelserion.fusion.paper.files.FileManager;
+import com.ryderbelserion.fusion.paper.files.types.PaperCustomFile;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.configuration.ConfigurationSection;
@@ -33,15 +33,14 @@ public class ShopManager {
 
     public ShopManager(DatabaseManager databaseManager) {
         plugin = CrazyCrates.getPlugin();
-        LegacyFileManager yamlManager = plugin.getFileManager();
+        FileManager yamlManager = plugin.getFileManager();
         limitManager = new LimitManager();
 
-        yamlManager.getFiles()
+        yamlManager.getCustomFiles()
                 .values()
                 .stream()
-                .filter(customFile -> customFile.getFile().getParent().contains("shops"))
-                .map(LegacyCustomFile::getConfiguration)
-                .filter(Objects::nonNull)
+                .filter(customFile -> customFile.getPath().getParent().toString().contains("shops"))
+                .map(file -> ((PaperCustomFile) file).getConfiguration())
                 .map(cfg -> {
                     ShopID shopID = ShopID.getShopID(cfg.getString("id"));
                     CurrencyType currencyType = CurrencyType.getCurrencyType(cfg.getString("currency"));
