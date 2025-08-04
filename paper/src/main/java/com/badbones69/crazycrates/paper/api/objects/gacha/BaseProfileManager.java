@@ -44,7 +44,7 @@ public class BaseProfileManager implements Listener {
     }
 
     public void startSavingTask() {
-        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> profilesCache.forEach(databaseManager::savePlayerBaseProfile), 0L, 20L * 60 * 5); // Run every 5 minutes
+        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, this::save, 0L, 20L * 60 * 5); // Run every 5 minutes
     }
 
     public void save() {
