@@ -47,7 +47,7 @@ public class CrateSettings {
     public CrateSettings(FileConfiguration config, String crateName, Crate crate) {
         String path = "Crate.Gacha.settings";
 
-        this.crateName = crateName;
+        this.crateName = crateName.replace(".yml", "");
         this.crate = crate;
         this.bannerFile = config.getString(path + ".banner-file", "");
         this.fatePointEnabled = config.getBoolean(path + ".fate-point.enabled");
