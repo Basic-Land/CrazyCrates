@@ -7,7 +7,6 @@ import com.badbones69.crazycrates.paper.api.enums.other.Plugins;
 import com.badbones69.crazycrates.core.config.impl.EditorKeys;
 import com.badbones69.crazycrates.paper.api.objects.gacha.DatabaseManager;
 import com.badbones69.crazycrates.paper.api.objects.gacha.gacha.GachaSystem;
-import com.badbones69.crazycrates.paper.listeners.items.NexoInteractListener;
 import com.badbones69.crazycrates.paper.listeners.items.OraxenInteractListener;
 import com.badbones69.crazycrates.paper.managers.events.enums.EventType;
 import com.badbones69.crazycrates.paper.tasks.crates.types.*;
@@ -244,19 +243,11 @@ public class CrateManager {
 
         final String pluginName = this.plugin.getFusion().getItemsPlugin().toLowerCase();
 
-        switch (pluginName) {
-            case "nexo" -> manager.registerEvents(new NexoInteractListener(), this.plugin);
-
-            case "oraxen" -> manager.registerEvents(new OraxenInteractListener(), this.plugin);
-
-            default -> {
-                if (Plugins.nexo.isEnabled()) {
-                    manager.registerEvents(new NexoInteractListener(), this.plugin);
-                }
-
-                if (Plugins.oraxen.isEnabled()) {
-                    manager.registerEvents(new OraxenInteractListener(), this.plugin);
-                }
+        if (pluginName.equals("oraxen")) {
+            manager.registerEvents(new OraxenInteractListener(), this.plugin);
+        } else {
+            if (Plugins.oraxen.isEnabled()) {
+                manager.registerEvents(new OraxenInteractListener(), this.plugin);
             }
         }
     }
