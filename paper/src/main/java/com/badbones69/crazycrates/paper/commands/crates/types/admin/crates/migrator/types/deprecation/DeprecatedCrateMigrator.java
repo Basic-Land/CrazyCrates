@@ -54,10 +54,28 @@ public class DeprecatedCrateMigrator extends ICrateMigrator {
                     isSave = true;
                 }
 
+                if (section.contains("Preview.ChestLines")) {
+                    set(section, "Preview.Rows", section.getInt("Preview.ChestLines"));
+                    set(section, "Preview.ChestLines", null);
+
+                    isSave = true;
+                }
+
+                if (section.contains("Settings.Border.Glass-Border.Toggle")) {
+                    set(section, "Animation.Glass-Frame.Toggle", section.getBoolean("Settings.Border.Glass-Border.Toggle", true));
+                    set(section, "Animation.Glass-Frame.Random.Toggle", true);
+                    set(section, "Animation.Glass-Frame.Random.Items", section.createSection("Animation.Glass-Frame.Random.Items"));
+                    set(section, "Animation.Glass-Frame.Items", section.createSection("Animation.Glass-Frame.Items"));
+
+                    set(section, "Settings.Border.Glass-Border", null);
+
+                    isSave = true;
+                }
+
                 final ConfigurationSection prizes = section.getConfigurationSection("Prizes");
 
                 if (prizes != null) {
-                    for (String value : prizes.getKeys(false)) {
+                    for (final String value : prizes.getKeys(false)) {
                         final ConfigurationSection prizeSection = prizes.getConfigurationSection(value);
 
                         if (prizeSection == null) continue;
@@ -82,9 +100,9 @@ public class DeprecatedCrateMigrator extends ICrateMigrator {
                     customFile.save();
                 }
 
-                success.add("<green>⤷ " + customFile.getPrettyName());
+                success.add("<green>⤷ " + customFile.getFileName());
             } catch (Exception exception) {
-                failed.add("<red>⤷ " + key.getPrettyName());
+                failed.add("<red>⤷ " + key.getFileName());
             }
         });
 

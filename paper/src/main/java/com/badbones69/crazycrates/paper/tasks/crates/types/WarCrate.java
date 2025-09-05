@@ -103,8 +103,6 @@ public class WarCrate extends CrateBuilder {
     }
 
     private void setRandomGlass() {
-        if (this.crate.isGlassBorderToggled()) return;
-
         final Player player = getPlayer();
 
         if (!this.crateManager.isInOpeningList(player) && !(this.inventory.getHolder(false) instanceof CratePrizeMenu)) return;

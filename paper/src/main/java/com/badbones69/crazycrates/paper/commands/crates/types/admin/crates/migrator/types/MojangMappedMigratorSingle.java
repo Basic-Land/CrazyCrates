@@ -26,7 +26,7 @@ public class MojangMappedMigratorSingle extends ICrateMigrator {
             return;
         }
 
-        final PaperCustomFile customFile = this.plugin.getFileManager().getPaperCustomFile(this.plugin.getDataPath().resolve("crates").resolve(this.crateName));
+        final PaperCustomFile customFile = this.fileManager.getPaperCustomFile(this.dataPath.resolve("crates").resolve(this.crateName));
 
         if (customFile == null) {
             Messages.error_migrating.sendMessage(this.sender, new HashMap<>() {{
@@ -55,7 +55,7 @@ public class MojangMappedMigratorSingle extends ICrateMigrator {
             migrate(customFile, this.crateName);
 
             success.add("<green>⤷ " + this.crateName);
-        } catch (Exception exception) {
+        } catch (final Exception exception) {
             failed.add("<red>⤷ " + this.crateName);
         }
 

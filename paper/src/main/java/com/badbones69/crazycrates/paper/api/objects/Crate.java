@@ -14,17 +14,19 @@ import com.badbones69.crazycrates.paper.tasks.crates.CrateManager;
 import com.badbones69.crazycrates.paper.tasks.crates.effects.SoundEffect;
 import com.badbones69.crazycrates.paper.api.builders.LegacyItemBuilder;
 import com.ryderbelserion.fusion.core.api.utils.AdvUtils;
+import com.ryderbelserion.fusion.paper.api.builders.items.ItemBuilder;
 import com.ryderbelserion.fusion.paper.files.FileManager;
 import com.ryderbelserion.fusion.paper.files.types.PaperCustomFile;
 import com.ryderbelserion.fusion.paper.utils.ColorUtils;
 import com.ryderbelserion.fusion.paper.utils.ItemUtils;
 import lombok.Getter;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.ItemLore;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.Nullable;
 import org.bukkit.configuration.ConfigurationSection;
@@ -74,8 +76,8 @@ public class Crate {
     private ArrayList<Prize> prizes;
     private String crateName;
     private boolean giveNewPlayerKeys;
-    private int previewChestLines;
     private int newPlayerKeys;
+    private int rows;
 
     private List<Tier> tiers;
     private CrateHologram hologram;
@@ -100,6 +102,9 @@ public class Crate {
     private final BukkitUserManager userManager = this.plugin.getUserManager();
 
     private boolean glassBorderToggle = true;
+
+    private boolean isAnimationBorderRandom = true;
+    private List<ItemBuilder> animationBorderItems = List.of();
 
     private boolean broadcastToggle = false;
     private List<String> broadcastMessages = new ArrayList<>();
@@ -145,7 +150,39 @@ public class Crate {
         this.prizeMessage = prizeMessage;
         this.prizeCommands = prizeCommands;
 
-        this.glassBorderToggle = this.file.getBoolean("Crate.Settings.Border.Glass-Border.Toggle", this.glassBorderToggle);
+        this.glassBorderToggle = this.file.contains("Crate.Settings.Border.Glass-Border.Toggle") ?
+                this.file.getBoolean("Crate.Settings.Border.Glass-Border.Toggle", this.glassBorderToggle) :
+                this.file.getBoolean("Crate.Animation.Glass-Frame.Toggle", this.glassBorderToggle);
+
+        final ConfigurationSection animationSection = this.file.contains("Crate.Animation") ? this.file.getConfigurationSection("Crate.Animation") : this.file.createSection("Crate.Animation");
+
+        ConfigurationSection itemsSection = null;
+
+        if (animationSection != null) {
+            this.animationName = animationSection.getString("Name", "Rolling your prize...");
+
+            final ConfigurationSection frameSection = animationSection.contains("Glass-Frame") ? animationSection.getConfigurationSection("Glass-Frame") : animationSection.createSection("Glass-Frame");
+
+            if (frameSection != null) {
+                if (this.glassBorderToggle) {
+                    final ConfigurationSection randomSection = frameSection.contains("Random") ? frameSection.getConfigurationSection("Random") : frameSection.createSection("Random");
+
+                    if (randomSection != null) {
+                        this.isAnimationBorderRandom = randomSection.getBoolean("Toggle", this.isAnimationBorderRandom);
+
+                        if (this.isAnimationBorderRandom) {
+                            itemsSection = randomSection.getConfigurationSection("Items");
+                        }
+                    }
+                } else {
+                    itemsSection = frameSection.getConfigurationSection("Items"); // if glass border is off, we grab the static items.
+                }
+            }
+        }
+
+        if (itemsSection != null) {
+            this.animationBorderItems = com.badbones69.crazycrates.paper.utils.ItemUtils.convertConfigurationSection(itemsSection);
+        }
 
         this.broadcastToggle = this.file.getBoolean("Crate.Settings.Broadcast.Toggle", false);
         this.broadcastMessages = this.file.getStringList("Crate.Settings.Broadcast.Messages");
@@ -188,8 +225,9 @@ public class Crate {
         this.newPlayerKeys = newPlayerKeys;
         this.giveNewPlayerKeys = newPlayerKeys > 0;
 
-        setPreviewChestLines(file.getInt("Crate.Preview.ChestLines", 6));
-        this.maxSlots = this.previewChestLines * 9;
+        setPreviewRows(file.contains("Crate.Preview.ChestLines") ? file.getInt("Crate.Preview.ChestLines", 6) : file.getInt("Crate.Preview.Rows", 6));
+
+        this.maxSlots = this.rows * 9;
 
         this.crateName = file.getString("Crate.Name", " ");
 
@@ -311,6 +349,14 @@ public class Crate {
         return this.glassBorderToggle;
     }
 
+    public List<ItemBuilder> getAnimationBorderItems() {
+        return this.animationBorderItems;
+    }
+
+    public boolean isAnimationBorderRandom() {
+        return this.isAnimationBorderRandom;
+    }
+
     public final boolean isBroadcastToggled() {
         return this.broadcastToggle;
     }
@@ -333,14 +379,8 @@ public class Crate {
      *
      * @param amount the number of lines the preview has.
      */
-    public void setPreviewChestLines(final int amount) {
-        int finalAmount;
-
-        if (this.borderToggle && amount < 3) {
-            finalAmount = 3;
-        } else finalAmount = Math.min(amount, 6);
-
-        this.previewChestLines = finalAmount;
+    public void setPreviewRows(final int amount) {
+        this.rows = this.borderToggle && amount < 3 ? 3 : Math.min(amount, 6);
     }
 
     /**
@@ -357,12 +397,12 @@ public class Crate {
     }
 
     /**
-     * Get the number of lines the preview will show.
+     * Get the number of rows the preview will show.
      *
-     * @return the number of lines it is set to show.
+     * @return the number of rows it is set to show.
      */
-    public final int getPreviewChestLines() {
-        return this.previewChestLines;
+    public final int getPreviewRows() {
+        return this.rows;
     }
     
     /**
@@ -401,7 +441,7 @@ public class Crate {
     public Prize pickPrize(@NotNull final Player player) {
         final List<Prize> prizes = new ArrayList<>();
 
-        for (Prize prize : getPrizes()) {
+        for (final Prize prize : getPrizes()) {
             if (validatePrize(player, prize)) continue;
 
             prizes.add(prize);
@@ -712,7 +752,7 @@ public class Crate {
     public void addEditorItem(@Nullable final ItemStack itemStack, @NotNull final String prizeName, final double weight) {
         if (itemStack == null || prizeName.isEmpty() || weight <= 0) return;
 
-        ConfigurationSection section = getPrizeSection();
+        final ConfigurationSection section = getPrizeSection();
 
         setItem(itemStack, prizeName, section, weight, "", Collections.emptyList());
     }
@@ -765,21 +805,21 @@ public class Crate {
 
         final String tiers = getPath(prizeName, "Tiers");
 
-        if (itemStack.hasItemMeta()) {
-            final ItemMeta itemMeta = itemStack.getItemMeta();
+        if (itemStack.hasData(DataComponentTypes.CUSTOM_NAME)) {
+            final Component displayName = itemStack.getData(DataComponentTypes.CUSTOM_NAME);
 
-            if (itemMeta.hasDisplayName()) {
-                final Component displayName = itemMeta.displayName();
-
-                if (displayName != null) {
-                    section.set(getPath(prizeName, "DisplayName"), AdvUtils.fromComponent(displayName));
-                }
+            if (displayName != null) {
+                section.set(getPath(prizeName, "DisplayName"), AdvUtils.fromComponent(displayName));
             }
+        }
 
-            if (itemMeta.hasLore()) {
-                final List<Component> lore = itemMeta.lore();
+        if (itemStack.hasData(DataComponentTypes.LORE)) {
+            @Nullable final ItemLore itemLore = itemStack.getData(DataComponentTypes.LORE);
 
-                if (lore != null) {
+            if (itemLore != null) {
+                final List<Component> lore = itemLore.lines();
+
+                if (!lore.isEmpty()) {
                     section.set(getPath(prizeName, "DisplayLore"), AdvUtils.fromComponent(lore));
                 }
             }
@@ -979,10 +1019,10 @@ public class Crate {
     public void playSound(@NotNull final Player player, @NotNull final Location location, @NotNull final String type, @NotNull final String fallback, @NotNull final Sound.Source source) {
         if (type.isEmpty() && fallback.isEmpty()) return;
 
-        ConfigurationSection section = getFile().getConfigurationSection("Crate.sound");
+        final ConfigurationSection section = this.file.getConfigurationSection("Crate.sound");
 
         if (section != null) {
-            SoundEffect sound = new SoundEffect(
+            final SoundEffect sound = new SoundEffect(
                     section,
                     type,
                     fallback,

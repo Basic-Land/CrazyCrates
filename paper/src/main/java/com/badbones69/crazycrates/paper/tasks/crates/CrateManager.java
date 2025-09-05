@@ -10,6 +10,7 @@ import com.badbones69.crazycrates.paper.api.objects.gacha.gacha.GachaSystem;
 import com.badbones69.crazycrates.paper.listeners.items.NexoInteractListener;
 import com.badbones69.crazycrates.paper.listeners.items.OraxenInteractListener;
 import com.badbones69.crazycrates.paper.managers.events.enums.EventType;
+import com.badbones69.crazycrates.paper.tasks.crates.other.quadcrates.QuadCrateManager;
 import com.badbones69.crazycrates.paper.tasks.crates.types.*;
 import com.badbones69.crazycrates.paper.tasks.menus.CrateMainMenu;
 import com.badbones69.crazycrates.paper.api.objects.crates.CrateHologram;
@@ -25,6 +26,7 @@ import com.badbones69.crazycrates.paper.managers.InventoryManager;
 import com.badbones69.crazycrates.paper.api.builders.LegacyItemBuilder;
 import com.ryderbelserion.fusion.core.api.enums.FileAction;
 import com.ryderbelserion.fusion.core.api.utils.FileUtils;
+import com.ryderbelserion.fusion.paper.FusionPaper;
 import com.ryderbelserion.fusion.paper.api.scheduler.FoliaScheduler;
 import com.ryderbelserion.fusion.paper.files.FileManager;
 import com.ryderbelserion.fusion.paper.files.types.PaperCustomFile;
@@ -83,12 +85,17 @@ import java.util.WeakHashMap;
 public class CrateManager {
 
     private final CrazyCrates plugin = CrazyCrates.getPlugin();
+    private final Path dataPath = this.plugin.getDataPath();
     private final InventoryManager inventoryManager = this.plugin.getInventoryManager();
     private final FileManager fileManager = this.plugin.getFileManager();
+    private final com.badbones69.crazycrates.core.Server instance = this.plugin.getInstance();
+    private final FusionPaper fusion = this.plugin.getFusion();
 
     private final ComponentLogger logger = this.plugin.getComponentLogger();
     private final Server server = this.plugin.getServer();
+    private final PluginManager pluginManager = this.server.getPluginManager();
 
+    private final List<QuadCrateManager> quadSessions = new ArrayList<>();
     private final List<CrateLocation> crateLocations = new ArrayList<>();
     private final List<CrateSchematic> crateSchematics = new ArrayList<>();
     private final List<BrokeLocation> brokeLocations = new ArrayList<>();
@@ -116,6 +123,22 @@ public class CrateManager {
 
     public @Nullable Crate getEditorCrate(@NotNull final Player player) {
         return this.crateEditors.getOrDefault(player.getUniqueId(), null);
+    }
+
+    public void addQuadSession(@NotNull final QuadCrateManager session) {
+        this.quadSessions.add(session);
+    }
+
+    public void removeQuadSession(@NotNull final QuadCrateManager session) {
+        this.quadSessions.remove(session);
+    }
+
+    public void purgeQuadSessions() {
+        this.quadSessions.clear();
+    }
+
+    public List<QuadCrateManager> getQuadSessions() {
+        return this.quadSessions;
     }
 
     private final Map<UUID, Map<Integer, Tier>> tiers = new WeakHashMap<>();
@@ -161,7 +184,7 @@ public class CrateManager {
             if (crate == null) return;
 
             // Grab the new file.
-            FileConfiguration file = crate.getFile();
+            final FileConfiguration file = crate.getFile();
 
             // Close the preview menu
             this.inventoryManager.closePreview();
@@ -170,25 +193,27 @@ public class CrateManager {
             crate.purge();
 
             // Profit?
-            List<Prize> prizes = new ArrayList<>();
-            ArrayList<Tier> tierPrizes = new ArrayList<>();
+            final List<Prize> prizes = new ArrayList<>();
+            final ArrayList<Tier> tierPrizes = new ArrayList<>();
 
             ConfigurationSection gachaSection = file.getConfigurationSection("Crate.Gacha");
             if (gachaSection != null) {
                 crate.getCrateSettings().loadItems(crate, prizes, databaseManager);
             }
 
-            ConfigurationSection prizesSection = file.getConfigurationSection("Crate.Prizes");
+            final ConfigurationSection prizesSection = file.getConfigurationSection("Crate.Prizes");
 
             if (prizesSection != null) {
                 for (final String prize : prizesSection.getKeys(false)) {
                     ConfigurationSection prizeSection = prizesSection.getConfigurationSection(prize);
 
+                    final List<Tier> tierPrizes = new ArrayList<>();
+
                     if (prizeSection != null) {
                         final List<ItemStack> editorItems = new ArrayList<>();
 
                         if (prizeSection.contains("Editor-Items")) {
-                            List<?> list = prizeSection.getList("Editor-Items");
+                            final List<?> list = prizeSection.getList("Editor-Items");
 
                             if (list != null) {
                                 for (Object key : list) {
@@ -207,10 +232,10 @@ public class CrateManager {
 
                         Prize alternativePrize = null;
 
-                        ConfigurationSection alternativeSection = prizeSection.getConfigurationSection("Alternative-Prize");
+                        final ConfigurationSection alternativeSection = prizeSection.getConfigurationSection("Alternative-Prize");
 
                         if (alternativeSection != null) {
-                            boolean isEnabled = alternativeSection.getBoolean("Toggle");
+                            final boolean isEnabled = alternativeSection.getBoolean("Toggle");
 
                             if (isEnabled) {
                                 alternativePrize = new Prize(prizeSection.getString("DisplayName", ""), prizeSection.getName(), alternativeSection);
@@ -242,7 +267,7 @@ public class CrateManager {
     public void loadCustomItems() {
         final PluginManager manager = this.server.getPluginManager();
 
-        final String pluginName = this.plugin.getFusion().getItemsPlugin().toLowerCase();
+        final String pluginName = this.fusion.getItemsPlugin().toLowerCase();
 
         switch (pluginName) {
             case "nexo" -> manager.registerEvents(new NexoInteractListener(), this.plugin);
@@ -329,11 +354,11 @@ public class CrateManager {
     }
 
     public List<String> getCrateNames(final boolean keepExtension) {
-        return this.plugin.getInstance().getCrateFiles(keepExtension);
+        return this.instance.getCrateFiles(keepExtension);
     }
 
     public List<String> getCrateNames() {
-        return this.plugin.getInstance().getCrateFiles(false);
+        return this.instance.getCrateFiles(false);
     }
 
     private final SettingsManager config = ConfigManager.getConfig();
@@ -343,17 +368,15 @@ public class CrateManager {
      */
     public void loadCrates() {
         if (this.config.getProperty(ConfigKeys.update_examples_folder)) {
-            final Path path = this.plugin.getDataPath();
-
             final List<FileAction> actions = new ArrayList<>();
 
             actions.add(FileAction.DELETE_FILE);
             actions.add(FileAction.EXTRACT_FOLDER);
 
-            FileUtils.extract("guis", path.resolve("examples"), actions);
-            FileUtils.extract("logs", path.resolve("examples"), actions);
-            FileUtils.extract("crates", path.resolve("examples"), actions);
-            FileUtils.extract("schematics", path.resolve("examples"), actions);
+            FileUtils.extract("guis", this.dataPath.resolve("examples"), actions);
+            FileUtils.extract("logs", this.dataPath.resolve("examples"), actions);
+            FileUtils.extract("crates", this.dataPath.resolve("examples"), actions);
+            FileUtils.extract("schematics", this.dataPath.resolve("examples"), actions);
 
             actions.remove(FileAction.EXTRACT_FOLDER);
 
@@ -363,7 +386,7 @@ public class CrateManager {
                     "locations.yml",
                     "messages.yml",
                     "editor.yml"
-            ).forEach(file -> FileUtils.extract(file, path.resolve("examples"), actions));
+            ).forEach(file -> FileUtils.extract(file, this.dataPath.resolve("examples"), actions));
         }
 
         this.giveNewPlayersKeys = false;
@@ -377,7 +400,7 @@ public class CrateManager {
 
         if (MiscUtils.isLogging()) this.logger.info("Loading all crate information...");
 
-        final Path crates = this.plugin.getDataPath().resolve("crates");
+        final Path crates = this.dataPath.resolve("crates");
 
         for (final String crateName : getCrateNames(true)) {
             try {
@@ -489,18 +512,16 @@ public class CrateManager {
                         file.getString("Crate.PhysicalKey.Name", "Crate.PhysicalKey.Name is missing from " + crateName),
                         prizes, file, newPlayersKeys, tiers, maxMassOpen, requiredKeys, prizeMessage, prizeCommands, holo));
 
-                final PluginManager server = this.server.getPluginManager();
-
                 final boolean isNewSystemEnabled = this.config.getProperty(ConfigKeys.use_new_permission_system);
 
                 final String node = isNewSystemEnabled ? "crazycrates.deny.open." + crateName : "crazycrates.open." + crateName;
                 final String description = isNewSystemEnabled ? "Prevents you from opening " + crateName : "Allows you to open " + crateName;
                 final PermissionDefault permissionDefault = isNewSystemEnabled ? PermissionDefault.FALSE : PermissionDefault.TRUE;
 
-                if (server.getPermission(node) == null) {
+                if (this.pluginManager.getPermission(node) == null) {
                     final Permission permission = new Permission(node, description, permissionDefault);
 
-                    server.addPermission(permission);
+                    this.pluginManager.addPermission(permission);
                 }
             } catch (final Exception exception) {
                 this.brokeCrates.add(crateName);
@@ -534,10 +555,13 @@ public class CrateManager {
                     if (worldName.isBlank()) return;
 
                     final World world = this.server.getWorld(worldName);
+
                     final int x = locations.getInt("Locations." + locationName + ".X");
                     final int y = locations.getInt("Locations." + locationName + ".Y");
                     final int z = locations.getInt("Locations." + locationName + ".Z");
+
                     final Location location = new Location(world, x, y, z);
+
                     final Crate crate = getCrateFromName(locations.getString("Locations." + locationName + ".Crate"));
 
                     if (world != null && crate != null) {
@@ -554,7 +578,7 @@ public class CrateManager {
                         brokeAmount++;
                     }
 
-                } catch (Exception ignored) {}
+                } catch (final Exception ignored) {}
             }
         }
 
@@ -721,12 +745,10 @@ public class CrateManager {
 
     private boolean isVirtualCrate(@NotNull final Player player, @NotNull final Crate crate, final boolean virtualCrate, @NotNull final String fancyName) {
         if (virtualCrate) {
-            final Map<String, String> placeholders = new HashMap<>();
-
-            placeholders.put("{cratetype}", crate.getCrateType().getName());
-            placeholders.put("{crate}", fancyName);
-
-            Messages.cant_be_a_virtual_crate.sendMessage(player, placeholders);
+            Messages.cant_be_a_virtual_crate.sendMessage(player, new HashMap<>() {{
+                put("{cratetype}", crate.getCrateType().getName());
+                put("{crate}", fancyName);
+            }});
 
             removePlayerFromOpeningList(player);
 
@@ -788,6 +810,7 @@ public class CrateManager {
 
         if (this.currentTasks.containsKey(uuid)) {
             this.currentTasks.get(uuid).cancel();
+
             this.currentTasks.remove(uuid);
         }
     }
@@ -801,7 +824,7 @@ public class CrateManager {
         final UUID uuid = player.getUniqueId();
 
         if (this.currentQuadTasks.containsKey(uuid)) {
-            for (ScheduledTask task : this.currentQuadTasks.get(uuid)) {
+            for (final ScheduledTask task : this.currentQuadTasks.get(uuid)) {
                 task.cancel();
             }
 
@@ -1167,6 +1190,7 @@ public class CrateManager {
         if (crate == null) return;
 
         final YamlConfiguration locations = FileKeys.locations.getConfiguration();
+
         String id = "1"; // Location ID
 
         for (int i = 1; locations.contains("Locations." + i); i++) {
@@ -1201,6 +1225,7 @@ public class CrateManager {
      */
     public void removeCrateLocation(@NotNull final String id) {
         FileKeys.locations.getConfiguration().set("Locations." + id, null);
+
         FileKeys.locations.save();
 
         CrateLocation location = null;
@@ -1224,7 +1249,7 @@ public class CrateManager {
      * @return an unmodifiable list of crate objects.
      */
     public @NotNull final List<Crate> getUsableCrates() {
-        List<Crate> crateList = new ArrayList<>(this.crates);
+        final List<Crate> crateList = new ArrayList<>(this.crates);
 
         crateList.removeIf(crate -> crate.getCrateType() == CrateType.menu);
 
@@ -1464,7 +1489,8 @@ public class CrateManager {
         final boolean glowing = file.getBoolean("Crate.PhysicalKey.Glowing", true);
         final boolean hideFlags = file.getBoolean("Crate.PhysicalKey.HideItemFlags", false);
 
-        final LegacyItemBuilder itemBuilder = file.contains("Crate.PhysicalKey.Data") ? new LegacyItemBuilder(this.plugin).fromBase64(file.getString("Crate.PhysicalKey.Data", "")) : new LegacyItemBuilder(this.plugin).withType(file.getString("Crate.PhysicalKey.Item", "tripwire_hook").toLowerCase());
+        final LegacyItemBuilder itemBuilder = file.contains("Crate.PhysicalKey.Data") ? new LegacyItemBuilder(this.plugin)
+                .fromBase64(file.getString("Crate.PhysicalKey.Data", "")) : new LegacyItemBuilder(this.plugin).withType(file.getString("Crate.PhysicalKey.Item", "tripwire_hook").toLowerCase());
 
         return itemBuilder.setDisplayName(name).setDisplayLore(lore).setGlowing(glowing).setItemModel(namespace, id).setHidingItemFlags(hideFlags).setCustomModelData(customModelData);
     }
@@ -1601,7 +1627,7 @@ public class CrateManager {
             public void run() {
                 ChestManager.closeChest(location.getBlock(), false);
             }
-        }.run();
+        }.runNow();
 
         removeCrateInUse(player);
         removePlayerFromOpeningList(player);
@@ -1679,7 +1705,7 @@ public class CrateManager {
         final UUID uuid = player.getUniqueId();
 
         if (this.slots.containsKey(uuid)) {
-            ArrayList<Integer> slots = this.slots.get(uuid);
+            final ArrayList<Integer> slots = this.slots.get(uuid);
 
             slots.add(rawSlot);
 

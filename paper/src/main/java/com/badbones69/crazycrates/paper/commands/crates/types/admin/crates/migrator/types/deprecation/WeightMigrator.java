@@ -67,7 +67,7 @@ public class WeightMigrator extends ICrateMigrator {
                 final ConfigurationSection prizes = section.getConfigurationSection("Prizes");
 
                 if (prizes != null) {
-                    for (String value : prizes.getKeys(false)) {
+                    for (final String value : prizes.getKeys(false)) {
                         final ConfigurationSection prizeSection = prizes.getConfigurationSection(value);
 
                         if (prizeSection == null) continue;
@@ -99,9 +99,9 @@ public class WeightMigrator extends ICrateMigrator {
                     customFile.save();
                 }
 
-                success.add("<green>⤷ " + customFile.getPrettyName());
-            } catch (Exception exception) {
-                failed.add("<red>⤷ " + key.getPrettyName());
+                success.add("<green>⤷ " + customFile.getFileName());
+            } catch (final Exception exception) {
+                failed.add("<red>⤷ " + key.getFileName());
             }
         });
 

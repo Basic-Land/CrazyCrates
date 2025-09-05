@@ -8,14 +8,18 @@ import com.badbones69.crazycrates.paper.utils.MiscUtils;
 import com.ryderbelserion.fusion.core.api.utils.AdvUtils;
 import com.ryderbelserion.fusion.paper.files.types.PaperCustomFile;
 import com.ryderbelserion.fusion.paper.utils.ItemUtils;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.CustomModelData;
+import io.papermc.paper.datacomponent.item.ItemLore;
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Unmodifiable;
 import su.nightexpress.excellentcrates.CratesAPI;
 import su.nightexpress.excellentcrates.crate.impl.Crate;
 import su.nightexpress.excellentcrates.data.impl.CrateUser;
@@ -71,7 +75,7 @@ public class ExcellentCratesMigrator extends ICrateMigrator {
                     });
 
                     success.add("<green>⤷ " + name);
-                } catch (Exception exception) {
+                } catch (final Exception exception) {
                     failed.add("<red>⤷ " + name);
                 }
             }
@@ -245,10 +249,14 @@ public class ExcellentCratesMigrator extends ICrateMigrator {
 
             set(root, "Preview-Name", AdvUtils.convert(itemName.isEmpty() ? crateConfig.getString("Name", "%crate%").replace("%crate%", strippedName) : itemName + " Preview"));
 
-            if (crateItem.hasItemMeta()) {
-                final ItemMeta itemMeta = crateItem.getItemMeta();
+            if (crateItem.hasData(DataComponentTypes.CUSTOM_MODEL_DATA)) {
+                @Nullable final CustomModelData builder = crateItem.getData(DataComponentTypes.CUSTOM_MODEL_DATA);
 
-                set(root, "Custom-Model-Data", itemMeta.hasCustomModelDataComponent() ? itemMeta.getCustomModelDataComponent().getFloats().getFirst() : -1);
+                if (builder != null) {
+                    @Unmodifiable final List<Float> floats = builder.floats();
+
+                    set(root, "Custom-Model-Data", !floats.isEmpty() ? floats.getFirst() : -1);
+                }
             }
 
             set(root, "Settings.Knockback", crate.isPushbackEnabled());
@@ -260,6 +268,7 @@ public class ExcellentCratesMigrator extends ICrateMigrator {
             set(root, "Hologram.Color", "transparent");
 
             List<String> hologramText = new ArrayList<>();
+
             crate.getHologramText().forEach(line -> {
                 final String filtered = line.replace(
                         "%excellentcrates_keys_" + strippedName + "%",
@@ -299,13 +308,13 @@ public class ExcellentCratesMigrator extends ICrateMigrator {
 
                 final ItemStack itemStack = reward.getPreview();
 
-                if (itemStack.hasItemMeta()) {
-                    final ItemMeta itemMeta = itemStack.getItemMeta();
+                if (itemStack.hasData(DataComponentTypes.LORE)) {
+                    @Nullable final ItemLore itemLore = itemStack.getData(DataComponentTypes.LORE);
 
-                    if (itemMeta.hasLore()) {
-                        final List<Component> lore = itemMeta.lore();
+                    if (itemLore != null) {
+                        final List<Component> lore = itemLore.lines();
 
-                        if (lore != null) {
+                        if (!lore.isEmpty()) {
                             set(root, "Prizes." + id + ".DisplayLore", AdvUtils.fromComponent(lore));
                         }
                     }
@@ -329,7 +338,7 @@ public class ExcellentCratesMigrator extends ICrateMigrator {
 
                 List<String> enchantments = new ArrayList<>();
 
-                for (Map.Entry<Enchantment, Integer> enchantment : itemStack.getEnchantments().entrySet()) {
+                for (final Map.Entry<Enchantment, Integer> enchantment : itemStack.getEnchantments().entrySet()) {
                     enchantments.add(enchantment.getKey().getKey().getKey() + ":" + enchantment.getValue());
                 }
 

@@ -19,7 +19,6 @@ import org.bukkit.permissions.PermissionDefault;
 import us.crazycrew.crazycrates.api.enums.types.CrateType;
 import us.crazycrew.crazycrates.api.enums.types.KeyType;
 import java.util.HashMap;
-import java.util.Map;
 
 public class CommandGive extends BaseCommand {
 
@@ -95,27 +94,20 @@ public class CommandGive extends BaseCommand {
 
         final KeyType keyType = getKeyType(type);
 
-        final Map<String, String> placeholders = new HashMap<>();
+        Messages.given_everyone_keys.sendMessage(sender, new HashMap<>() {{
+            put("{keytype}", keyType.getFriendlyName());
+            put("{amount}", String.valueOf(amount));
+            put("{key}", crate.getKeyName());
+        }});
 
-        placeholders.put("{amount}", String.valueOf(amount));
-        placeholders.put("{keytype}", keyType.getFriendlyName());
-        placeholders.put("{key}", crate.getKeyName());
-
-        Messages.given_everyone_keys.sendMessage(sender, placeholders);
-
-        for (final Player player : this.plugin.getServer().getOnlinePlayers()) {
+        for (final Player player : this.server.getOnlinePlayers()) {
             if (Permissions.CRAZYCRATES_PLAYER_EXCLUDE.hasPermission(player)) continue;
 
             final PlayerReceiveKeyEvent event = new PlayerReceiveKeyEvent(player, crate, PlayerReceiveKeyEvent.KeyReceiveReason.GIVE_ALL_COMMAND, amount);
-            this.plugin.getServer().getPluginManager().callEvent(event);
 
-            if (event.isCancelled()) return;
+            this.pluginManager.callEvent(event);
 
-            if (crate.getCrateType() == CrateType.crate_on_the_go) {
-                MiscUtils.addItem(player, crate.getKey(amount, player));
-
-                return;
-            }
+            if (event.isCancelled()) continue;
 
             addKey(sender, player, crate, keyType, amount, isSilent, true);
         }
