@@ -194,7 +194,6 @@ public class CrateManager {
 
             // Profit?
             final List<Prize> prizes = new ArrayList<>();
-            final ArrayList<Tier> tierPrizes = new ArrayList<>();
 
             ConfigurationSection gachaSection = file.getConfigurationSection("Crate.Gacha");
             if (gachaSection != null) {
