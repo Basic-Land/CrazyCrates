@@ -66,10 +66,8 @@ public class CratePreviewMenu extends DynamicInventoryBuilder {
         this.gui.setCloseGuiAction(event -> this.inventoryManager.removePreviewViewer(uuid));
 
         this.gui.open(this.player, gui -> {
-            final int rows = gui.getRows();
-
-            setBackButton(rows, 4, true);
-            setNextButton(rows, 6, true);
+            addBackButton(true);
+            addNextButton(true);
 
             if (gacha) {
                 gui.setItem(gui.getSize() - 5, new LegacyItemBuilder(plugin, ItemType.COMPASS).setCustomModelData(1000001).asGuiItem(action -> crate.getTierPreview(player).open()));

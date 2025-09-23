@@ -73,7 +73,7 @@ public class CrateTierMenu extends StaticInventoryBuilder {
         });
 
         if (gacha) setItemsGacha();
-        else addMenuButton(this.player, this.crate, this.gui, this.gui.getRows(), 5);
+        else addMenuButton(this.player, this.crate, this.gui);
 
         this.gui.setOpenGuiAction(event -> this.inventoryManager.addPreviewViewer(uuid));
 

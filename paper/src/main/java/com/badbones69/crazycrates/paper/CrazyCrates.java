@@ -94,11 +94,13 @@ public class CrazyCrates extends JavaPlugin {
 
         this.fileManager.addFile(path.resolve("locations.yml"), FileType.PAPER, STATIC_FILE, null)
                 .addFile(path.resolve("data.yml"), FileType.PAPER, STATIC_FILE, null)
-                .addFile(logs.resolve("crates.log"), FileType.LOG, STATIC_FILE, null)
-                .addFile(logs.resolve("keys.log"), FileType.LOG, STATIC_FILE, null)
                 .addFile(path.resolve("guis").resolve("respin-gui.yml"), FileType.PAPER, STATIC_FILE, null)
                 .addFolder(path.resolve("crates"), FileType.PAPER, new ArrayList<>(), null)
                 .addFolder(path.resolve("schematics"), FileType.NBT, new ArrayList<>(), null)
+                .addFolder(path.resolve("logs"), FileType.LOG, new ArrayList<>() {{
+                    add(FileAction.EXTRACT_FOLDER);
+                    add(FileAction.STATIC_FILE);
+                }}, null)
                 .addFolder(path.resolve("banners"), FileType.PAPER, new ArrayList<>(), null)
                 .addFolder(path.resolve("shops"), FileType.PAPER, new ArrayList<>(), null);
 
