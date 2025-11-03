@@ -77,7 +77,7 @@ public abstract class InventoryBuilder {
                 return;
             }
 
-            if (crate.getCrateType().isGacha()) crate.playSound(player, player.getLocation(), "click-sound", "ui.button.click", Sound.Source.MASTER);
+            if (!crate.getCrateType().isGacha()) crate.playSound(player, player.getLocation(), "click-sound", "ui.button.click", Sound.Source.MASTER);
             else player.playSound(ItemRepo.BACK);
 
             new CrateMainMenu(player, this.config.getProperty(ConfigKeys.inventory_name), this.config.getProperty(ConfigKeys.inventory_rows)).open();

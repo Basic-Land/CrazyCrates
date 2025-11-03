@@ -47,10 +47,6 @@ dependencies:
       load: BEFORE
       required: true
       join-classpath: true
-    bSpecializedCrates:
-      load: BEFORE
-      required: false
-      join-classpath: true
 
     # Other crate plugins to migrate for people
     ExcellentCrates:
