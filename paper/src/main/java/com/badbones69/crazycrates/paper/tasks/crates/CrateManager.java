@@ -10,6 +10,7 @@ import com.badbones69.crazycrates.paper.api.objects.gacha.gacha.GachaSystem;
 import com.badbones69.crazycrates.paper.listeners.items.NexoInteractListener;
 import com.badbones69.crazycrates.paper.listeners.items.OraxenInteractListener;
 import com.badbones69.crazycrates.paper.managers.events.enums.EventType;
+import com.badbones69.crazycrates.paper.support.holograms.types.CMIHologramsSupport;
 import com.badbones69.crazycrates.paper.tasks.crates.other.quadcrates.QuadCrateManager;
 import com.badbones69.crazycrates.paper.tasks.crates.types.*;
 import com.badbones69.crazycrates.paper.tasks.menus.CrateMainMenu;
@@ -19,7 +20,6 @@ import com.badbones69.crazycrates.paper.api.enums.other.keys.FileKeys;
 import com.badbones69.crazycrates.paper.api.objects.crates.BrokeLocation;
 import com.badbones69.crazycrates.paper.api.ChestManager;
 import com.badbones69.crazycrates.paper.utils.MiscUtils;
-import com.badbones69.crazycrates.paper.support.holograms.types.CMIHologramsSupport;
 import com.badbones69.crazycrates.paper.support.holograms.types.DecentHologramsSupport;
 import com.badbones69.crazycrates.paper.support.holograms.types.FancyHologramsSupport;
 import com.badbones69.crazycrates.paper.managers.InventoryManager;
@@ -72,15 +72,7 @@ import com.badbones69.crazycrates.paper.CrazyCrates;
 import com.badbones69.crazycrates.paper.utils.ItemUtils;
 import java.io.File;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.TimerTask;
-import java.util.UUID;
-import java.util.WeakHashMap;
+import java.util.*;
 
 public class CrateManager {
 
@@ -331,8 +323,10 @@ public class CrateManager {
                     break;
                 }
 
-                if (Plugins.cmi.isEnabled() && CMIModule.holograms.isEnabled()) {
-                    this.holograms = new CMIHologramsSupport();
+                if (this.holograms == null && Plugins.cmi.isEnabled() && CMIModule.holograms.isEnabled()) {
+                    this.fusion.log("warn", "<red>CMI Support is currently not automatically available.");
+                    this.fusion.log("warn", "<red>Try manually setting hologram-plugin to <yellow>CMI</yellow> <red>after downgrading to 9.8.2.0");
+                    this.fusion.log("warn", "<red>https://github.com/Zrips/CMI/issues/9919");
                 }
             }
         }
@@ -511,10 +505,12 @@ public class CrateManager {
                         file.getString("Crate.PhysicalKey.Name", "Crate.PhysicalKey.Name is missing from " + crateName),
                         prizes, file, newPlayersKeys, tiers, maxMassOpen, requiredKeys, prizeMessage, prizeCommands, holo));
 
+                final String strippedName = crateName.replace(".yml", "");
+
                 final boolean isNewSystemEnabled = this.config.getProperty(ConfigKeys.use_new_permission_system);
 
-                final String node = isNewSystemEnabled ? "crazycrates.deny.open." + crateName : "crazycrates.open." + crateName;
-                final String description = isNewSystemEnabled ? "Prevents you from opening " + crateName : "Allows you to open " + crateName;
+                final String node = isNewSystemEnabled ? "crazycrates.deny.open." + strippedName : "crazycrates.open." + strippedName;
+                final String description = isNewSystemEnabled ? "Prevents you from opening " + strippedName : "Allows you to open " + strippedName;
                 final PermissionDefault permissionDefault = isNewSystemEnabled ? PermissionDefault.FALSE : PermissionDefault.TRUE;
 
                 if (this.pluginManager.getPermission(node) == null) {
@@ -1283,6 +1279,22 @@ public class CrateManager {
         }
 
         return crate;
+    }
+
+    public @NotNull final Optional<Crate> getCrateByName(@NotNull final String name) {
+        if (name.isEmpty()) return Optional.empty();
+
+        Crate crate = null;
+
+        for (final Crate key : this.crates) {
+            if (key.getFileName().equalsIgnoreCase(name)) {
+                crate = key;
+
+                break;
+            }
+        }
+
+        return Optional.ofNullable(crate);
     }
 
     /**

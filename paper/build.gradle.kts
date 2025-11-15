@@ -1,5 +1,5 @@
 plugins {
-    `config-paper`
+    `paper-plugin`
 }
 
 project.group = "${rootProject.group}.paper"
@@ -15,7 +15,7 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":crazycrates-core"))
+    implementation(project(":api"))
 
     compileOnly(fileTree("$projectDir/libs/compile").include("*.jar"))
 
