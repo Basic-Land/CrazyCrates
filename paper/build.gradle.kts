@@ -17,8 +17,6 @@ repositories {
 dependencies {
     implementation(project(":api"))
 
-    compileOnly(fileTree("$projectDir/libs/compile").include("*.jar"))
-
     implementation(libs.triumph.cmds)
 
     implementation(libs.fusion.paper)

@@ -30,6 +30,7 @@ import com.ryderbelserion.fusion.core.api.enums.FileType;
 import com.ryderbelserion.fusion.core.api.utils.AdvUtils;
 import com.ryderbelserion.fusion.paper.FusionPaper;
 import com.ryderbelserion.fusion.paper.files.FileManager;
+import com.ryderbelserion.fusion.paper.files.FileManager;
 import lombok.Getter;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import org.bukkit.plugin.PluginManager;
@@ -90,17 +91,19 @@ public class CrazyCrates extends JavaPlugin {
         this.instance = new Server(path);
         this.instance.apply();
 
-        final Path logs = path.resolve("logs");
-
-        this.fileManager.addFile(path.resolve("locations.yml"), FileType.PAPER, STATIC_FILE, null)
+        this.fileManager.refresh(false).addFile(path.resolve("locations.yml"), FileType.PAPER, STATIC_FILE, null)
                 .addFile(path.resolve("data.yml"), FileType.PAPER, STATIC_FILE, null)
                 .addFile(path.resolve("guis").resolve("respin-gui.yml"), FileType.PAPER, STATIC_FILE, null)
-                .addFolder(path.resolve("crates"), FileType.PAPER, new ArrayList<>(), null)
-                .addFolder(path.resolve("schematics"), FileType.NBT, new ArrayList<>(), null)
-                .addFolder(path.resolve("logs"), FileType.LOG, new ArrayList<>() {{
-                    add(FileAction.EXTRACT_FOLDER);
-                    add(FileAction.STATIC_FILE);
-                }}, null)
+                .addFolder(path.resolve("logs"), FileType.LOG, List.of(
+                        FileAction.EXTRACT_FOLDER,
+                        FileAction.STATIC_FILE
+                ), null)
+                .addFolder(path.resolve("crates"), FileType.PAPER, List.of(
+                        FileAction.EXTRACT_FOLDER
+                ), null)
+                .addFolder(path.resolve("schematics"), FileType.NBT, List.of(
+                        FileAction.EXTRACT_FOLDER
+                ), null)
                 .addFolder(path.resolve("banners"), FileType.PAPER, new ArrayList<>(), null)
                 .addFolder(path.resolve("shops"), FileType.PAPER, new ArrayList<>(), null);
 
