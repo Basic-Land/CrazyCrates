@@ -1,4 +1,4 @@
-## Changes 🔨
+## Changes
 ### Configuration changes
 - `ChestLines` has been renamed to `Rows` in the crate config files, [5eec53b](https://github.com/Crazy-Crew/CrazyCrates/commit/5eec53b)
   - All existing configurations should continue to work, You can run `/crazyrates migrate -mt CratesDeprecated` to change this, or simply use Find and Replace.
@@ -21,7 +21,7 @@
 - Added toggle to disable opening tracking crate.
   - [76625ba](https://github.com/Crazy-Crew/CrazyCrates/commit/76625ba961367be51a75fc907faa75ad87676b79)
 
-## Bugs Fixed 🐛
+## Fixed
 - Fixed an error with WonderCrate.yml on first install, because a prize was lacking an `Items` section.
 - Fixed a potential memory leak caused by using double brace initializers.
 - Fixed multiple bugs with PlaceholderAPI support.
@@ -36,3 +36,5 @@
 - Fixed an issue with potion color not applying with the new items section.
 - Fixed an issue with the shield banners using the new item format.
 - Fixed crates debug command.
+
+As always, Report 🐛 to https://github.com/Crazy-Crew/CrazyCrates/issues
