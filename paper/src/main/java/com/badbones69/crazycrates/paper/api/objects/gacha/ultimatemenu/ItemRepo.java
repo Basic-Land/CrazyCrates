@@ -89,11 +89,12 @@ public class ItemRepo {
             .setDisplayName("<green><b>Hlavní Menu");
 
 
-    public static final Sound CLICK = Sound.sound(Key.key("crate", "click"), Sound.Source.MASTER, 1f, 1f);
-    public static final Sound BACK = Sound.sound(Key.key("crate", "back"), Sound.Source.MASTER, 1f, 1f);
-    public static final Sound ERROR = Sound.sound(Key.key("crate", "error"), Sound.Source.MASTER, 1f, 1f);
-    public static final Sound CRATE = Sound.sound(Key.key("crate", "crate"), Sound.Source.MASTER, 1f, 1f);
-    public static final Sound OPEN = Sound.sound(Key.key("crate", "open"), Sound.Source.MASTER, 1f, 1f);
+    private static final String namespace = "bl_gachagui";
+    public static final Sound CLICK = Sound.sound(Key.key(namespace, "click"), Sound.Source.MASTER, 1f, 1f);
+    public static final Sound BACK = Sound.sound(Key.key(namespace, "back"), Sound.Source.MASTER, 1f, 1f);
+    public static final Sound ERROR = Sound.sound(Key.key(namespace, "error"), Sound.Source.MASTER, 1f, 1f);
+    public static final Sound CRATE = Sound.sound(Key.key(namespace, "crate"), Sound.Source.MASTER, 1f, 1f);
+    public static final Sound OPEN = Sound.sound(Key.key(namespace, "open"), Sound.Source.MASTER, 1f, 1f);
 
     private static LegacyItemBuilder getItem(ItemType material, int modelData) {
         return new LegacyItemBuilder(CrazyCrates.getPlugin(), material).setCustomModelData(modelData).setDisplayName("<white>");
