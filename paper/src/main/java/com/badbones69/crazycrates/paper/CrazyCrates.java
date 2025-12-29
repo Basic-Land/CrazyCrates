@@ -32,6 +32,7 @@ import com.ryderbelserion.fusion.paper.FusionPaper;
 import com.ryderbelserion.fusion.paper.files.FileManager;
 import com.ryderbelserion.fusion.paper.files.FileManager;
 import lombok.Getter;
+import com.ryderbelserion.fusion.paper.files.FileManager;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -40,8 +41,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
-import java.util.logging.Logger;
-
 import static com.badbones69.crazycrates.paper.utils.MiscUtils.registerPermissions;
 
 public class CrazyCrates extends JavaPlugin {

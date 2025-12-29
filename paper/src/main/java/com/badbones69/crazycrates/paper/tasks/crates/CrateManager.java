@@ -15,6 +15,8 @@ import com.badbones69.crazycrates.paper.tasks.crates.other.quadcrates.QuadCrateM
 import com.badbones69.crazycrates.paper.support.holograms.types.CMIHologramsSupport;
 import com.badbones69.crazycrates.paper.tasks.crates.other.quadcrates.QuadCrateManager;
 import com.badbones69.crazycrates.paper.tasks.crates.types.*;
+import com.badbones69.crazycrates.paper.support.holograms.types.CMIHologramsSupport;
+import com.badbones69.crazycrates.paper.tasks.crates.other.quadcrates.QuadCrateManager;
 import com.badbones69.crazycrates.paper.tasks.menus.CrateMainMenu;
 import com.badbones69.crazycrates.paper.api.objects.crates.CrateHologram;
 import com.badbones69.crazycrates.paper.api.objects.crates.quadcrates.CrateSchematic;
@@ -505,9 +507,7 @@ public class CrateManager {
                         file.getInt("Crate.Hologram.Update-Interval", -1),
                         file.getStringList("Crate.Hologram.Message"));
 
-                addCrate(new Crate(crateName, previewName, crateType, getKey(file),
-                        file.getString("Crate.PhysicalKey.Name", "Crate.PhysicalKey.Name is missing from " + crateName),
-                        prizes, file, newPlayersKeys, tiers, maxMassOpen, requiredKeys, prizeMessage, prizeCommands, holo));
+                addCrate(new Crate(crateName, previewName, crateType, getKey(file), file.getString("Crate.PhysicalKey.Name", "Crate.PhysicalKey.Name is missing from " + crateName), prizes, file, newPlayersKeys, tiers, maxMassOpen, requiredKeys, prizeMessage, prizeCommands, holo));
 
                 final String strippedName = crateName.replace(".yml", "");
 
