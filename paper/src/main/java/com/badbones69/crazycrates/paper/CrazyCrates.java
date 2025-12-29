@@ -41,6 +41,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
+import java.util.logging.Logger;
+
 import static com.badbones69.crazycrates.paper.utils.MiscUtils.registerPermissions;
 
 public class CrazyCrates extends JavaPlugin {

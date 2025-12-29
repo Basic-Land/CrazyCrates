@@ -16,6 +16,7 @@ repositories {
 
 dependencies {
     implementation(project(":api"))
+    compileOnly(fileTree("$projectDir/libs/compile").include("*.jar"))
 
     implementation(libs.triumph.cmds)
 
@@ -54,12 +55,5 @@ tasks {
         defaultCharacterEncoding = Charsets.UTF_8.name()
 
         minecraftVersion(libs.versions.minecraft.get())
-    }
-}
-
-tasks.withType(xyz.jpenilla.runtask.task.AbstractRun::class.java).configureEach {
-    javaLauncher = javaToolchains.launcherFor {
-        vendor = JvmVendorSpec.JETBRAINS
-        languageVersion = JavaLanguageVersion.of(21)
     }
 }
