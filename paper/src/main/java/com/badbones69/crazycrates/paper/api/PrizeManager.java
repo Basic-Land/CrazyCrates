@@ -1,8 +1,8 @@
 package com.badbones69.crazycrates.paper.api;
 
 import ch.jalu.configme.SettingsManager;
-import com.badbones69.crazycrates.core.config.ConfigManager;
-import com.badbones69.crazycrates.core.config.impl.ConfigKeys;
+import com.badbones69.common.config.ConfigManager;
+import com.badbones69.common.config.impl.ConfigKeys;
 import com.badbones69.crazycrates.paper.api.enums.Messages;
 import com.badbones69.crazycrates.paper.api.enums.other.Plugins;
 import com.badbones69.crazycrates.paper.api.enums.other.keys.FileKeys;
@@ -28,6 +28,8 @@ import org.jetbrains.annotations.NotNull;
 import com.badbones69.crazycrates.paper.utils.MiscUtils;
 import com.badbones69.crazycrates.paper.utils.MsgUtils;
 import org.jetbrains.annotations.Nullable;
+import us.crazycrew.crazycrates.api.enums.types.CrateType;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -252,6 +254,10 @@ public class PrizeManager {
         final String pulls = String.valueOf(getCurrentPulls(prize, crate));
         final String prizeName = prize.getPrizeName().replaceAll("%maxpulls%", maxPulls).replaceAll("%pulls%", pulls);
 
+        final CrateType crateType = crate.getCrateType();
+
+        final String weight = crateType != CrateType.casino && crateType != CrateType.cosmic ? StringUtils.format(crate.getChance(prize.getWeight())) : StringUtils.format(crate.getTierChance(prize.getWeight()));
+
         final String defaultMessage = message
                 .replaceAll("%player%", quoteReplacement(player.getName()))
                 .replaceAll("%reward%", quoteReplacement(prizeName))
@@ -259,7 +265,7 @@ public class PrizeManager {
                 .replaceAll("%crate%", quoteReplacement(crate.getCrateName()))
                 .replaceAll("%maxpulls%", maxPulls)
                 .replaceAll("%pulls%", pulls)
-                .replaceAll("%chance%", StringUtils.format(crate.getChance(prize.getWeight())))
+                .replaceAll("%chance%", weight)
                 .replaceAll("%weight%", String.valueOf(prize.getWeight()));
 
         MsgUtils.sendMessage(player, Plugins.placeholder_api.isEnabled() ? PlaceholderAPI.setPlaceholders(player, defaultMessage) : defaultMessage, false);

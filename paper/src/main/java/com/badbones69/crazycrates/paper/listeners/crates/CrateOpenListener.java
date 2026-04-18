@@ -3,8 +3,8 @@ package com.badbones69.crazycrates.paper.listeners.crates;
 import ch.jalu.configme.SettingsManager;
 import com.badbones69.crazycrates.paper.CrazyCrates;
 import com.badbones69.crazycrates.paper.api.enums.other.Plugins;
-import com.badbones69.crazycrates.core.config.ConfigManager;
-import com.badbones69.crazycrates.core.config.impl.ConfigKeys;
+import com.badbones69.common.config.ConfigManager;
+import com.badbones69.common.config.impl.ConfigKeys;
 import com.badbones69.crazycrates.paper.managers.BukkitUserManager;
 import com.badbones69.crazycrates.paper.managers.events.EventManager;
 import com.badbones69.crazycrates.paper.tasks.crates.CrateManager;
@@ -57,28 +57,15 @@ public class CrateOpenListener implements Listener {
             }
         }
 
-        if (this.config.getProperty(ConfigKeys.use_new_permission_system)) {
-            if (player.hasPermission("crazycrates.deny.open." + fileName)) {
-                Messages.no_crate_permission.sendMessage(player, "{crate}", fancyName);
+        if (!player.hasPermission("crazycrates.open." + fileName)) {
+            Messages.no_crate_permission.sendMessage(player, "{crate}", fancyName);
 
-                this.crateManager.removePlayerFromOpeningList(player);
-                this.crateManager.removeCrateInUse(player);
+            this.crateManager.removePlayerFromOpeningList(player);
+            this.crateManager.removeCrateInUse(player);
 
-                event.setCancelled(true);
+            event.setCancelled(true);
 
-                return;
-            }
-        } else {
-            if (!player.hasPermission("crazycrates.open." + fileName)) {
-                Messages.no_crate_permission.sendMessage(player, "{crate}", fancyName);
-
-                this.crateManager.removePlayerFromOpeningList(player);
-                this.crateManager.removeCrateInUse(player);
-
-                event.setCancelled(true);
-
-                return;
-            }
+            return;
         }
 
         this.crateManager.addPlayerToOpeningList(player, crate);

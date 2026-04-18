@@ -5,8 +5,6 @@ plugins {
 project.group = "${rootProject.group}.paper"
 
 repositories {
-    maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
-
     maven("https://repo.fancyinnovations.com/releases/")
 
     maven("https://repo.nexomc.com/releases/")
@@ -15,7 +13,7 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":api"))
+    implementation(project(":common"))
     compileOnly(fileTree("$projectDir/libs/compile").include("*.jar"))
 
     implementation(libs.triumph.cmds)
@@ -40,6 +38,7 @@ tasks {
 
     shadowJar {
         listOf(
+            "com.ryderbelserion.fusion",
             "org.bstats"
         ).forEach {
             relocate(it, "libs.$it")

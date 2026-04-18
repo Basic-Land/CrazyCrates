@@ -4,11 +4,12 @@ import ch.jalu.configme.SettingsManager;
 import com.Zrips.CMI.Modules.ModuleHandling.CMIModule;
 import com.badbones69.crazycrates.paper.api.builders.CrateBuilder;
 import com.badbones69.crazycrates.paper.api.enums.other.Plugins;
-import com.badbones69.crazycrates.core.config.impl.EditorKeys;
+import com.badbones69.common.config.impl.EditorKeys;
 import com.badbones69.crazycrates.paper.api.objects.gacha.DatabaseManager;
 import com.badbones69.crazycrates.paper.api.objects.gacha.gacha.GachaSystem;
 import com.badbones69.crazycrates.paper.listeners.items.NexoInteractListener;
 import com.badbones69.crazycrates.paper.listeners.items.OraxenInteractListener;
+import com.badbones69.crazycrates.paper.managers.BukkitKeyManager;
 import com.badbones69.crazycrates.paper.managers.events.enums.EventType;
 import com.badbones69.crazycrates.paper.support.holograms.types.CMIHologramsSupport;
 import com.badbones69.crazycrates.paper.tasks.crates.other.quadcrates.QuadCrateManager;
@@ -56,8 +57,8 @@ import org.joml.Matrix4f;
 import us.crazycrew.crazycrates.api.enums.types.CrateType;
 import us.crazycrew.crazycrates.api.enums.types.KeyType;
 import com.badbones69.crazycrates.paper.api.enums.other.keys.ItemKeys;
-import com.badbones69.crazycrates.core.config.ConfigManager;
-import com.badbones69.crazycrates.core.config.impl.ConfigKeys;
+import com.badbones69.common.config.ConfigManager;
+import com.badbones69.common.config.impl.ConfigKeys;
 import com.badbones69.crazycrates.paper.api.enums.Messages;
 import com.badbones69.crazycrates.paper.support.holograms.HologramManager;
 import com.badbones69.crazycrates.paper.api.objects.Crate;
@@ -73,7 +74,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import com.badbones69.crazycrates.paper.CrazyCrates;
-import com.badbones69.crazycrates.paper.utils.ItemUtils;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.*;
@@ -81,6 +81,7 @@ import java.util.*;
 public class CrateManager {
 
     private final CrazyCrates plugin = CrazyCrates.getPlugin();
+    private final BukkitKeyManager keyManager = this.plugin.getKeyManager();
     private final Path dataPath = this.plugin.getDataPath();
     private final InventoryManager inventoryManager = this.plugin.getInventoryManager();
     private final FileManager fileManager = this.plugin.getFileManager();
@@ -504,21 +505,19 @@ public class CrateManager {
                         file.getDouble("Crate.Hologram.Height", 0.0),
                         file.getInt("Crate.Hologram.Range", 8),
                         file.getString("Crate.Hologram.Color", "transparent"),
+                        file.getBoolean("Crate.Hologram.TextShadow", false),
                         file.getInt("Crate.Hologram.Update-Interval", -1),
                         file.getStringList("Crate.Hologram.Message"));
 
                 addCrate(new Crate(crateName, previewName, crateType, getKey(file), file.getString("Crate.PhysicalKey.Name", "Crate.PhysicalKey.Name is missing from " + crateName), prizes, file, newPlayersKeys, tiers, maxMassOpen, requiredKeys, prizeMessage, prizeCommands, holo));
 
-                final String strippedName = crateName.replace(".yml", "");
+                final String cleanName = crateName.replace(".yml", "");
 
-                final boolean isNewSystemEnabled = this.config.getProperty(ConfigKeys.use_new_permission_system);
-
-                final String node = isNewSystemEnabled ? "crazycrates.deny.open." + strippedName : "crazycrates.open." + strippedName;
-                final String description = isNewSystemEnabled ? "Prevents you from opening " + strippedName : "Allows you to open " + strippedName;
-                final PermissionDefault permissionDefault = isNewSystemEnabled ? PermissionDefault.FALSE : PermissionDefault.TRUE;
+                final String node = "crazycrates.open.%s".formatted(cleanName);
+                final String description = "Allows you to open %s".formatted(cleanName);
 
                 if (this.pluginManager.getPermission(node) == null) {
-                    final Permission permission = new Permission(node, description, permissionDefault);
+                    final Permission permission = new Permission(node, description, PermissionDefault.TRUE);
 
                     this.pluginManager.addPermission(permission);
                 }
@@ -1335,7 +1334,7 @@ public class CrateManager {
      * @return a crate if is a key from a crate otherwise null if it is not.
      */
     public @Nullable final Crate getCrateFromKey(@NotNull final ItemStack item) {
-        return getCrateFromName(ItemUtils.getKey(item.getPersistentDataContainer()));
+        return getCrateFromName(this.keyManager.getKey(item));
     }
 
     /**
@@ -1434,11 +1433,11 @@ public class CrateManager {
         if (crate.getCrateType() == CrateType.menu) return false;
         if (item.getType() == Material.AIR) return false;
 
-        final PersistentDataContainerView container = item.getPersistentDataContainer();
+        final String key = this.keyManager.getKey(item);
 
-        if (!container.has(ItemKeys.crate_key.getNamespacedKey())) return false;
+        if (key.isEmpty()) return false;
 
-        return crate.getFileName().equals(ItemUtils.getKey(container));
+        return crate.getFileName().equals(key);
     }
 
     /**

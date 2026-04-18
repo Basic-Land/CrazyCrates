@@ -1,6 +1,6 @@
 package com.badbones69.crazycrates.paper.commands.crates.types.admin.crates.migrator.types.deprecation;
 
-import com.badbones69.crazycrates.core.enums.Comments;
+import com.badbones69.common.enums.Comments;
 import com.badbones69.crazycrates.paper.commands.crates.types.admin.crates.migrator.ICrateMigrator;
 import com.badbones69.crazycrates.paper.commands.crates.types.admin.crates.migrator.enums.MigrationType;
 import com.badbones69.crazycrates.paper.utils.MiscUtils;
@@ -79,10 +79,6 @@ public class NewItemMigrator extends ICrateMigrator {
                                         case "name" -> {
                                             prizeSection.set("Items." + uuid + ".name", type);
                                             prizeSection.setComments("Items." + uuid + ".name", Comments.name.getComments());
-                                        }
-                                        case "mob" -> {
-                                            prizeSection.set("Items." + uuid + ".settings.mob.type", type);
-                                            prizeSection.setComments("Items." + uuid + ".settings.mob.type", Comments.mob_type.getComments());
                                         }
                                         case "glowing" -> {
                                             prizeSection.set("Items." + uuid + ".settings.glowing", type);

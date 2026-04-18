@@ -1,7 +1,7 @@
 package com.badbones69.crazycrates.paper.api.objects;
 
 import ch.jalu.configme.SettingsManager;
-import com.badbones69.crazycrates.core.config.impl.ConfigKeys;
+import com.badbones69.common.config.impl.ConfigKeys;
 import com.badbones69.crazycrates.paper.CrazyCrates;
 import com.badbones69.crazycrates.paper.api.PrizeManager;
 import com.badbones69.crazycrates.paper.api.builders.LegacyItemBuilder;
@@ -12,8 +12,8 @@ import com.badbones69.crazycrates.paper.api.objects.gacha.enums.RewardType;
 import com.badbones69.crazycrates.paper.api.enums.other.keys.ItemKeys;
 import com.badbones69.crazycrates.paper.utils.ItemUtils;
 import com.badbones69.crazycrates.paper.utils.MiscUtils;
-import com.badbones69.crazycrates.core.config.ConfigManager;
-import com.badbones69.crazycrates.core.config.impl.messages.CrateKeys;
+import com.badbones69.common.config.ConfigManager;
+import com.badbones69.common.config.impl.messages.CrateKeys;
 import com.ryderbelserion.fusion.core.api.utils.AdvUtils;
 import com.ryderbelserion.fusion.core.api.utils.StringUtils;
 import com.ryderbelserion.fusion.paper.api.builders.items.ItemBuilder;
@@ -27,7 +27,6 @@ import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Color;
 import org.bukkit.Server;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ItemType;
@@ -35,6 +34,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.bukkit.configuration.ConfigurationSection;
+import us.crazycrew.crazycrates.api.enums.types.CrateType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.*;
@@ -77,7 +77,8 @@ public class Prize {
 
     private List<ItemStack> editorItems = new ArrayList<>();
 
-    public Prize(@NotNull final ConfigurationSection section, @NotNull final List<ItemStack> editorItems, @NotNull final List<Tier> tierPrizes, @NotNull final String crateName, @Nullable final Prize alternativePrize) {
+    public Prize(@NotNull final ConfigurationSection section, @NotNull final List<ItemStack> editorItems, @NotNull final List<Tier> tierPrizes,
+                 @NotNull final String crateName, @Nullable final Prize alternativePrize) {
         this.section = section;
 
         this.sectionName = section.getName();
@@ -274,7 +275,9 @@ public class Prize {
             this.displayItem.setPlayer(player);
         }
 
-        final String weight = StringUtils.format(crate.getChance(getWeight()));
+        final CrateType crateType = crate.getCrateType();
+
+        final String weight = crateType != CrateType.casino && crateType != CrateType.cosmic ? StringUtils.format(crate.getChance(getWeight())) : StringUtils.format(crate.getTierChance(getWeight()));
 
         this.displayItem.addLorePlaceholder("%chance%", weight).addLorePlaceholder("%maxpulls%", String.valueOf(maxPulls)).addLorePlaceholder("%pulls%", amount);
         this.displayItem.addNamePlaceholder("%chance%", weight).addNamePlaceholder("%maxpulls%", String.valueOf(maxPulls)).addNamePlaceholder("%pulls%", amount);
@@ -490,14 +493,6 @@ public class Prize {
             builder.setCustomModelData(this.section.getString("Settings.Custom-Model-Data", ""));
 
             builder.setItemModel(this.section.getString("Settings.Model.Namespace", ""), this.section.getString("Settings.Model.Id", ""));
-
-            if (this.section.contains("Settings.Mob-Type")) {
-                final EntityType type = com.ryderbelserion.fusion.paper.utils.ItemUtils.getEntity(this.section.getString("Settings.Mob-Type", "cow"));
-
-                if (type != null) {
-                    builder.setEntityType(type);
-                }
-            }
 
             if (this.section.contains("Settings.RGB")) {
                 @Nullable final Color color = ColorUtils.getRGB(this.section.getString("Settings.RGB", ""));

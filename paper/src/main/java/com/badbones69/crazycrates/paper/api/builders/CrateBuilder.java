@@ -10,8 +10,8 @@ import com.badbones69.crazycrates.paper.support.holograms.HologramManager;
 import com.badbones69.crazycrates.paper.tasks.menus.CratePrizeMenu;
 import com.badbones69.crazycrates.paper.api.objects.Crate;
 import com.badbones69.crazycrates.paper.api.objects.Tier;
-import com.badbones69.crazycrates.core.config.ConfigManager;
-import com.badbones69.crazycrates.core.config.impl.ConfigKeys;
+import com.badbones69.common.config.ConfigManager;
+import com.badbones69.common.config.impl.ConfigKeys;
 import com.badbones69.crazycrates.paper.managers.BukkitUserManager;
 import com.badbones69.crazycrates.paper.tasks.crates.CrateManager;
 import com.badbones69.crazycrates.paper.tasks.crates.other.CosmicCrateManager;
@@ -394,9 +394,7 @@ public abstract class CrateBuilder extends FoliaScheduler {
 
                 final String playerName = this.player.getName();
 
-                if (this.config.getProperty(ConfigKeys.use_new_permission_system) && this.player.hasPermission("crazycrates.deny.open." + fileName)) {
-                    this.logger.warn("{} could not open {} due to having the permission preventing them from opening the crate.", playerName, fileName);
-                } else if (!this.player.hasPermission("crazycrates.open." + fileName)) {
+                if (!this.player.hasPermission("crazycrates.open." + fileName)) {
                     this.logger.warn("{} could not open {} due to not having the permission required to open the crate.", playerName, fileName);
                 } else if (!this.crate.canWinPrizes(this.player)) {
                     this.logger.warn("{} could not open {} due to no valid prizes being found which led to the event being cancelled.", playerName, fileName);

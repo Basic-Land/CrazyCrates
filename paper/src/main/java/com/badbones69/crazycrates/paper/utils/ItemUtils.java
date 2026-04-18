@@ -153,6 +153,7 @@ public class ItemUtils {
         return crateManager.isKeyFromCrate(itemStack, crate);
     }
 
+    @Deprecated(forRemoval = true)
     public static String getKey(@NotNull final PersistentDataContainerView container) {
         return container.get(ItemKeys.crate_key.getNamespacedKey(), PersistentDataType.STRING);
     }
@@ -299,14 +300,6 @@ public class ItemUtils {
             final String value = !color.isEmpty() ? color : !rgb.isEmpty() ? rgb : "";
 
             itemBuilder.setColor(value);
-
-            final String mobType = item.getString("settings.mob.type", null);
-
-            if (mobType != null && !mobType.isEmpty()) {
-                final SpawnerBuilder spawnerBuilder = itemBuilder.asSpawnerBuilder();
-
-                spawnerBuilder.withEntityType(com.ryderbelserion.fusion.paper.utils.ItemUtils.getEntity(mobType)).build();
-            }
 
             itemBuilder.setTrim(item.getString("settings.trim.pattern", ""), item.getString("settings.trim.material", ""));
 

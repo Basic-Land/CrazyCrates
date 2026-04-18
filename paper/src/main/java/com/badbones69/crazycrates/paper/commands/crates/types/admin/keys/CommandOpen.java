@@ -24,7 +24,7 @@ import org.bukkit.permissions.PermissionDefault;
 import org.jetbrains.annotations.Nullable;
 import us.crazycrew.crazycrates.api.enums.types.CrateType;
 import us.crazycrew.crazycrates.api.enums.types.KeyType;
-import com.badbones69.crazycrates.core.config.impl.ConfigKeys;
+import com.badbones69.common.config.impl.ConfigKeys;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -195,6 +195,8 @@ public class CommandOpen extends BaseCommand {
         }
 
         this.crateManager.openCrate(player, crate, KeyType.free_key, player.getLocation(), true, false, EventType.event_crate_force_opened);
+
+        this.userManager.addOpenedCrate(player.getUniqueId(), crate.getFileName());
 
         Messages.opened_a_crate.sendMessage(sender, Map.of("{player}", player.getName(), "{crate}", fancyName));
     }

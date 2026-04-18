@@ -4,8 +4,8 @@ package us.crazycrew.crazycrates.api.enums.types;
  * An enum class that contains all our current crate types.
  *
  * @author Ryder Belserion
- * @version 0.7
- * @since 0.1
+ * @version 0.7.0
+ * @since 0.1.0
  */
 public enum CrateType {
 
@@ -65,7 +65,7 @@ public enum CrateType {
      * A constructor to build a {@link CrateType} reference.
      *
      * @param name the name of the {@link CrateType}
-     * @since 0.1
+     * @since 0.1.0
      */
     CrateType(String name) {
         this.name = name;
@@ -76,7 +76,7 @@ public enum CrateType {
      *
      * @param name the name of the crate
      * @return {@link CrateType}
-     * @since 0.1
+     * @since 0.1.0
      */
     public static CrateType getFromName(String name) {
         if (name.isEmpty()) return CrateType.csgo;
@@ -100,6 +100,7 @@ public enum CrateType {
      * Get the name of the crate.
      *
      * @return the crate name
+     * @since 0.1.0
      */
     public String getName() {
         return this.name;

@@ -6,11 +6,13 @@ import com.badbones69.crazycrates.paper.api.builders.items.UltimateMenu;
 import com.badbones69.crazycrates.paper.api.objects.gacha.BaseProfileManager;
 import com.badbones69.crazycrates.paper.api.enums.other.Plugins;
 import com.badbones69.crazycrates.core.Server;
-import com.badbones69.crazycrates.core.config.ConfigManager;
-import com.badbones69.crazycrates.core.config.impl.ConfigKeys;
+import com.badbones69.crazycrates.paper.api.enums.other.Plugins;
+import com.badbones69.common.config.ConfigManager;
+import com.badbones69.common.config.impl.ConfigKeys;
 import com.badbones69.crazycrates.paper.listeners.crates.CrateInteractListener;
 import com.badbones69.crazycrates.paper.listeners.crates.types.*;
 import com.badbones69.crazycrates.paper.listeners.items.PaperInteractListener;
+import com.badbones69.crazycrates.paper.managers.BukkitKeyManager;
 import com.badbones69.crazycrates.paper.support.MetricsWrapper;
 import com.badbones69.crazycrates.paper.utils.MiscUtils;
 import com.badbones69.crazycrates.paper.commands.CommandManager;
@@ -37,7 +39,6 @@ import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
@@ -65,6 +66,7 @@ public class CrazyCrates extends JavaPlugin {
 
     private InventoryManager inventoryManager;
     private BukkitUserManager userManager;
+    private BukkitKeyManager keyManager;
     private CrateManager crateManager;
 
     private FusionPaper fusion;
@@ -113,11 +115,15 @@ public class CrazyCrates extends JavaPlugin {
 
         registerPermissions();
 
+        this.keyManager = new BukkitKeyManager();
+
         this.inventoryManager = new InventoryManager();
         this.crateManager = new CrateManager();
+
         this.userManager = new BukkitUserManager();
 
         this.instance.setUserManager(this.userManager);
+        this.instance.setKeyManager(this.keyManager);
 
         // Load holograms.
         this.crateManager.loadHolograms();
@@ -239,6 +245,10 @@ public class CrazyCrates extends JavaPlugin {
 
     public final BukkitUserManager getUserManager() {
         return this.userManager;
+    }
+
+    public final BukkitKeyManager getKeyManager() {
+        return this.keyManager;
     }
 
     public final CrateManager getCrateManager() {
