@@ -23,7 +23,7 @@ public class GachaSystem {
     public GachaSystem() {
     }
 
-    public Result getResult(PlayerProfile playerProfile, CrateSettings itemSet) {
+    private Result getResult(PlayerProfile playerProfile, CrateSettings itemSet) {
         if (itemSet == null) throw new IllegalArgumentException("ItemSet cannot be null");
 
         playerProfile.incrementTotalPity();

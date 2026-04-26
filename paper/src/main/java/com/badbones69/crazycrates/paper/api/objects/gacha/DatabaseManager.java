@@ -120,7 +120,12 @@ public class DatabaseManager {
                         List<String> linked = Optional.ofNullable(other.getLinkedCrates()).orElse(Collections.emptyList());
                         return linked.stream().anyMatch(linkedName -> {
                             String normalized = linkedName.endsWith(".yml") ? linkedName.substring(0, linkedName.length() - 4) : linkedName;
-                            return normalized.equals(name) || linkedName.equals(name) || linkedName.equals(name + ".yml");
+
+                            if (normalized.equals(name) || linkedName.equals(name) || linkedName.equals(name + ".yml")) {
+                                crate.setLinksBackTo(other.getCrateName());
+                                return true;
+                            }
+                            return false;
                         });
                     });
 
@@ -259,7 +264,8 @@ public class DatabaseManager {
     }
 
     public void savePlayerProfile(String playerName, CrateSettings crateSettings, PlayerProfile profile) {
-        String crateName = crateSettings.getCrateName();
+        String crateName = crateSettings.getLinksBackTo() == null ? crateSettings.getCrateName() : crateSettings.getLinksBackTo();
+
         if (this.crateSettings.stream().noneMatch(cr -> cr.getCrateName().equals(crateName))) {
             LOGGER.warning("Error: Crate " + crateName + " does not exist.");
             return;
@@ -270,7 +276,7 @@ public class DatabaseManager {
     }
 
     public PlayerProfile getPlayerProfile(String playerName, CrateSettings crateSettings, boolean override) {
-        String crateName = crateSettings.getCrateName();
+        String crateName = crateSettings.getLinksBackTo() == null ? crateSettings.getCrateName() : crateSettings.getLinksBackTo();
 
         if (this.crateSettings.stream().noneMatch(cr -> cr.getCrateName().equals(crateName))) {
             LOGGER.warning("Error: Crate " + crateName + " does not exist.");

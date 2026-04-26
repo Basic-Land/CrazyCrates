@@ -17,6 +17,7 @@ import com.badbones69.crazycrates.paper.api.objects.gacha.util.TierInfo;
 import com.ryderbelserion.fusion.paper.files.types.PaperCustomFile;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -39,6 +40,8 @@ public class CrateSettings {
 
     private final List<ItemStack> extraRewards = new ArrayList<>();
     private final List<String> linkedCrates = new ArrayList<>();
+    @Setter
+    private String linksBackTo = null;
 
     private final Map<Rarity, RaritySettings> rarityMap = new LinkedHashMap<>();
     private final GachaType gachaType;
@@ -62,6 +65,7 @@ public class CrateSettings {
         this.gachaType = GachaType.getType(fatePointEnabled, overrideEnabled);
 
         this.extraRewardEnabled = config.getBoolean(path + ".extra-reward.enabled");
+        linkedCrates.addAll(config.getStringList(path + ".linked-crates"));
 
         for (Rarity rarity : Rarity.values()) {
             String rarityName = rarity.name().toLowerCase();
@@ -83,8 +87,6 @@ public class CrateSettings {
 
             rarityMap.put(rarity, raritySettings);
         }
-
-        linkedCrates.addAll(config.getStringList(path + ".linked-crates"));
 
         PaperCustomFile customFile = (PaperCustomFile) plugin.getFileManager().getCustomFiles()
                 .values()
