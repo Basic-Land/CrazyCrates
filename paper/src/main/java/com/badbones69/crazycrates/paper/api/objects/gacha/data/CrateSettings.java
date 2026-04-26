@@ -38,6 +38,7 @@ public class CrateSettings {
     private final int fatePointAmount, bonusPity, modelDataPreviewName, modelDataMainMenu;
 
     private final List<ItemStack> extraRewards = new ArrayList<>();
+    private final List<String> linkedCrates = new ArrayList<>();
 
     private final Map<Rarity, RaritySettings> rarityMap = new LinkedHashMap<>();
     private final GachaType gachaType;
@@ -82,6 +83,8 @@ public class CrateSettings {
 
             rarityMap.put(rarity, raritySettings);
         }
+
+        linkedCrates.addAll(config.getStringList(path + ".linked-crates"));
 
         PaperCustomFile customFile = (PaperCustomFile) plugin.getFileManager().getCustomFiles()
                 .values()

@@ -25,16 +25,20 @@ public final class ComponentBuilder {
     private static final CrazyCrates plugin = CrazyCrates.getPlugin();
     private static final Key KEY = Key.key("space", "default");
     private static final TextColor COLOR = NamedTextColor.WHITE;
-    private static final Component SPACE_BACK = translatable("space.-45", "").font(KEY);
-    private static final Component SPACE_NEGATIVE = translatable("space.-1", "").font(KEY);
-    private static final Component SPACE_PAGE = translatable("space.223", "").font(KEY);
-    private static final Component SPACE_TIME = translatable("space.-335", "").font(KEY);
-    private static final Component SPACE_PITY = translatable("space.-71", "").font(KEY);
-    private static final Component SPACE_SLASH = translatable("space.9", "").font(KEY);
-    private static final Component SPACE_NEWLINE = translatable("space.-72", "").font(KEY);
+    private static final Component SPACE_BACK = space("space.-45");
+    private static final Component SPACE_NEGATIVE = space("space.-1");
+    private static final Component SPACE_PAGE = space("space.223");
+    private static final Component SPACE_TIME = space("space.-335");
+    private static final Component SPACE_PITY = space("space.-71");
+    private static final Component SPACE_SLASH = space("space.9");
+    private static final Component SPACE_NEWLINE = space("space.-72");
     private static final Component FILL_TOP = translatable("fill_top", "").color(COLOR).append(SPACE_NEGATIVE);
     private static final Component FILL_DOWN = translatable("fill_down", "").color(COLOR).append(SPACE_NEGATIVE);
     private static final Component FILL_TIME = translatable("fill_time", "").color(COLOR).append(SPACE_NEGATIVE);
+
+    private static Component space(String name) {
+        return translatable(name, "").font(KEY);
+    }
 
     public static Component mainMenu(Player player, CrateSettings crateSettings) {
         TextComponent.Builder builder = text();
@@ -48,7 +52,7 @@ public final class ComponentBuilder {
 
         int spaceSize = getSize(crateName) + 62;
         builder.append(text(crateName));
-        builder.append(translatable("space.-" + spaceSize, "").font(KEY));
+        builder.append(space("space.-" + spaceSize));
 
         String voteTokens = String.valueOf(baseProfile.getVoteTokens());
         String premiumCurrency = String.valueOf(baseProfile.getPremiumCurrency());
@@ -116,7 +120,7 @@ public final class ComponentBuilder {
 
         int spaceSize = getSize(name) + 62;
         builder.append(text(name));
-        builder.append(translatable("space.-" + spaceSize, "").font(KEY));
+        builder.append(space("space.-" + spaceSize));
 
         String mystic = String.valueOf(baseProfile.getMysticTokens());
         String stellar = String.valueOf(baseProfile.getStellarShards());

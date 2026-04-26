@@ -7,6 +7,7 @@ import com.badbones69.crazycrates.paper.api.enums.other.Plugins;
 import com.badbones69.common.config.impl.EditorKeys;
 import com.badbones69.crazycrates.paper.api.objects.gacha.DatabaseManager;
 import com.badbones69.crazycrates.paper.api.objects.gacha.gacha.GachaSystem;
+import com.badbones69.crazycrates.paper.api.objects.gacha.util.LinkedCrates;
 import com.badbones69.crazycrates.paper.listeners.items.NexoInteractListener;
 import com.badbones69.crazycrates.paper.listeners.items.OraxenInteractListener;
 import com.badbones69.crazycrates.paper.managers.BukkitKeyManager;
@@ -527,6 +528,8 @@ public class CrateManager {
                 if (MiscUtils.isLogging()) this.logger.warn("There was an error while loading the {} file.", crateName, exception);
             }
         }
+
+        LinkedCrates.detect(this);
 
         addCrate(new Crate("Menu"));
 

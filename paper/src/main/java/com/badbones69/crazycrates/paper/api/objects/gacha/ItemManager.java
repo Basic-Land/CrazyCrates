@@ -2,16 +2,12 @@ package com.badbones69.crazycrates.paper.api.objects.gacha;
 
 import com.badbones69.crazycrates.paper.api.objects.gacha.enums.Table;
 import cz.basicland.blibs.shared.databases.hikari.DatabaseConnection;
-import cz.basicland.blibs.spigot.utils.item.DBItemStack;
 import cz.basicland.blibs.spigot.utils.item.DBItemStackNew;
 import org.bukkit.inventory.ItemStack;
-import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static com.badbones69.crazycrates.paper.CrazyCrates.LOGGER;
@@ -44,15 +40,21 @@ public class ItemManager {
                     int version = DatabaseManager.getVersion();
                     ItemStack item;
                     if (version == 1) {
-                        item = DBItemStack.decodeItem(rs.getString("itemStack"));
+                        throw new RuntimeException("UNSUPORTED VERSION PLEASE USE OLDER VERSION");
                     } else if (version == 2) {
-                        item = DBItemStackNew.decodeItem(rs.getString("itemStack"));
+                        try {
+                            item = DBItemStackNew.decodeItem(rs.getString("itemStack"));
+                        } catch (Exception ex) {
+                            LOGGER.warning("id: " + id + " table: " + table.getTable() + " " + ex.getMessage());
+                            continue;
+                        }
+
                     } else {
                         throw new SQLException("Unknown version " + version);
                     }
                     items.put(id, item);
                 }
-            } catch (SQLException | IOException | ClassNotFoundException e) {
+            } catch (SQLException e) {
                 LOGGER.warning(e.getMessage());
             }
             return items;
@@ -81,20 +83,16 @@ public class ItemManager {
      * @return The ID of the added item, or -1 if the item could not be added.
      */
     public int addItem(ItemStack item, Table table) {
-        try {
-            int version = DatabaseManager.getVersion();
-            String stack;
-            if (version == 1) {
-                stack = DBItemStack.encodeItem(item);
-            } else if (version == 2) {
-                stack = DBItemStackNew.encodeItem(item);
-            } else {
-                throw new RuntimeException("Unknown version " + version);
-            }
-            connection.updateSQLite("INSERT INTO " + table.getTable() + "(itemStack) VALUES(?)", stack).join();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        int version = DatabaseManager.getVersion();
+        String stack;
+        if (version == 1) {
+            throw new RuntimeException("UNSUPORTED VERSION PLEASE USE OLDER VERSION");
+        } else if (version == 2) {
+            stack = DBItemStackNew.encodeItem(item);
+        } else {
+            throw new RuntimeException("Unknown version " + version);
         }
+        connection.updateSQLite("INSERT INTO " + table.getTable() + "(itemStack) VALUES(?)", stack).join();
 
         int id = connection.querySQLite("SELECT last_insert_rowid()").thenApply(rs -> {
             try {

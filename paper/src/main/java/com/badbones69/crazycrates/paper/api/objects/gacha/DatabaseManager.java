@@ -14,7 +14,6 @@ import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.UltimateM
 import com.google.common.collect.Lists;
 import cz.basicland.blibs.shared.databases.hikari.DatabaseConnection;
 import cz.basicland.blibs.spigot.BLibs;
-import cz.basicland.blibs.spigot.utils.item.DBItemStack;
 import cz.basicland.blibs.spigot.utils.item.DBItemStackNew;
 import lombok.Getter;
 import net.jpountz.lz4.LZ4Compressor;
@@ -116,6 +115,17 @@ public class DatabaseManager {
 
                 crateSettings.forEach(crate -> {
                     String name = crate.getCrateName();
+
+                    boolean isLinked = crateSettings.stream().anyMatch(other -> {
+                        List<String> linked = Optional.ofNullable(other.getLinkedCrates()).orElse(Collections.emptyList());
+                        return linked.stream().anyMatch(linkedName -> {
+                            String normalized = linkedName.endsWith(".yml") ? linkedName.substring(0, linkedName.length() - 4) : linkedName;
+                            return normalized.equals(name) || linkedName.equals(name) || linkedName.equals(name + ".yml");
+                        });
+                    });
+
+                    if (isLinked) return;
+
                     Set<Rarity> rarities = crate.getRarityMap().keySet();
                     int bonusPity = crate.getBonusPity();
 
@@ -179,11 +189,9 @@ public class DatabaseManager {
                 while (rs.next()) {
                     String uuid = rs.getString("uuid");
                     String inventory = rs.getString("inventory");
-
-                    List<String> items = Arrays.asList(inventory.split("\n"));
                     ItemStack[] contents;
                     if (version == 1) {
-                        contents = DBItemStack.getItemStackList(items).toArray(new ItemStack[0]);
+                        throw new RuntimeException("UNSUPORTED VERSION PLEASE USE OLDER VERSION");
                     } else if (version == 2) {
                         contents = DBItemStackNew.getItemStackList(inventory).toArray(new ItemStack[0]);
                     } else {
@@ -203,8 +211,6 @@ public class DatabaseManager {
                 }
             } catch (SQLException e) {
                 LOGGER.warning(e.getMessage());
-            } catch (IOException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
             }
 
             connection.updateSQLite("DELETE FROM Backup" + targetStr);
@@ -253,20 +259,20 @@ public class DatabaseManager {
     }
 
     public void savePlayerProfile(String playerName, CrateSettings crateSettings, PlayerProfile profile) {
-        String name = crateSettings.getCrateName();
-        if (this.crateSettings.stream().noneMatch(cr -> cr.getCrateName().equals(crateSettings.getCrateName()))) {
-            LOGGER.warning("Error: Crate " + name + " does not exist.");
+        String crateName = crateSettings.getCrateName();
+        if (this.crateSettings.stream().noneMatch(cr -> cr.getCrateName().equals(crateName))) {
+            LOGGER.warning("Error: Crate " + crateName + " does not exist.");
             return;
         }
 
         byte[] profileString = serializeProfile(profile);
-        connection.updateSQLite("UPDATE PlayerData SET " + name + " = ? WHERE playerName = ?", profileString, playerName).join();
+        connection.updateSQLite("UPDATE PlayerData SET " + crateName + " = ? WHERE playerName = ?", profileString, playerName).join();
     }
 
     public PlayerProfile getPlayerProfile(String playerName, CrateSettings crateSettings, boolean override) {
         String crateName = crateSettings.getCrateName();
 
-        if (this.crateSettings.stream().noneMatch(cr -> cr.getCrateName().equals(crateSettings.getCrateName()))) {
+        if (this.crateSettings.stream().noneMatch(cr -> cr.getCrateName().equals(crateName))) {
             LOGGER.warning("Error: Crate " + crateName + " does not exist.");
             return null;
         }
@@ -326,13 +332,7 @@ public class DatabaseManager {
         String inventory;
 
         if (version == 1) {
-            List<String> items;
-            try {
-                items = DBItemStack.encodeItemList(Arrays.asList(contents));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            inventory = String.join("\n", items);
+            throw new RuntimeException("UNSUPORTED VERSION PLEASE USE OLDER VERSION");
         } else if (version == 2) {
             inventory = DBItemStackNew.encodeItemList(Arrays.asList(contents));
         } else {

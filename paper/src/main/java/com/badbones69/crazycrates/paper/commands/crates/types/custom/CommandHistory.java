@@ -39,4 +39,13 @@ public class CommandHistory extends BaseCommand {
         CrateSettings crateSettings = playerDataManager.getCrateSettings(crateName);
         playerDataManager.getHistory().sendHistory(player, target.name(), page, crateSettings);
     }
+
+    @Command(value = "adminhistoryrarity")
+    @Permission(value = "crazycrates.command.admin.history", def = PermissionDefault.OP)
+    public void history(Player player, @Suggestion("crates") String crateName, @Suggestion("players") PlayerBuilder target, @Suggestion("rarities") String type, @Optional @Suggestion("numbers") Integer page) {
+        if (page == null) page = 1;
+        DatabaseManager playerDataManager = crateManager.getDatabaseManager();
+        CrateSettings crateSettings = playerDataManager.getCrateSettings(crateName);
+        playerDataManager.getHistory().sendHistory(player, target.name(), page, crateSettings, type);
+    }
 }

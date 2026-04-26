@@ -4,7 +4,6 @@ import com.badbones69.crazycrates.paper.api.builders.InventoryBuilder;
 import com.badbones69.crazycrates.paper.api.builders.LegacyItemBuilder;
 import com.badbones69.crazycrates.paper.api.objects.gacha.DatabaseManager;
 import com.badbones69.crazycrates.paper.api.objects.gacha.enums.Table;
-import cz.basicland.blibs.spigot.utils.item.DBItemStack;
 import cz.basicland.blibs.spigot.utils.item.DBItemStackNew;
 import cz.basicland.blibs.spigot.utils.item.NBT;
 import org.bukkit.Material;
@@ -15,7 +14,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ItemType;
 import org.bukkit.inventory.PlayerInventory;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -76,21 +74,17 @@ public class ItemEdit extends InventoryBuilder {
                     NBT nbt = new NBT(holder.itemStack);
                     Integer id = nbt.getInteger("itemID");
                     if (id == null || id == 0) return;
-                    try {
-                        int version = DatabaseManager.getVersion();
-                        String stackString;
-                        if (version == 1) {
-                            stackString = DBItemStack.encodeItem(stack);
-                        } else if (version == 2) {
-                            stackString = DBItemStackNew.encodeItem(stack);
-                        } else {
-                            throw new RuntimeException("Unsupported database version: " + version);
-                        }
-
-                        holder.plugin.getCrateManager().getDatabaseManager().getItemManager().updateItem(id, stackString, holder.table);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
+                    int version = DatabaseManager.getVersion();
+                    String stackString;
+                    if (version == 1) {
+                        throw new RuntimeException("UNSUPORTED VERSION PLEASE USE OLDER VERSION");
+                    } else if (version == 2) {
+                        stackString = DBItemStackNew.encodeItem(stack);
+                    } else {
+                        throw new RuntimeException("Unsupported database version: " + version);
                     }
+
+                    holder.plugin.getCrateManager().getDatabaseManager().getItemManager().updateItem(id, stackString, holder.table);
                     player.openInventory(holder.preview.build().getInventory());
                 }
             }
