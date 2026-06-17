@@ -31,6 +31,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.badbones69.crazycrates.paper.CrazyCrates.LOGGER;
 
@@ -302,6 +303,20 @@ public class DatabaseManager {
             }
             return null;
         }).join();
+    }
+
+    public CompletableFuture<Stream<PlayerProfile>> getPlayerProfiles(CrateSettings crateSettings) {
+        String crateName = crateSettings.getCrateName();
+        return connection.querySQLite("SELECT " + crateName + " FROM PlayerData").thenApply(rs -> Stream.generate(() -> {
+            try {
+                if (rs.next()) {
+                    return deserializeProfile((byte[]) rs.getObject(crateName));
+                }
+            } catch (SQLException e) {
+                LOGGER.warning(e.getMessage());
+            }
+            return null;
+        }).takeWhile(Objects::nonNull));
     }
 
     public CompletableFuture<PlayerBaseProfile> getPlayerBaseProfile(String playerName) {

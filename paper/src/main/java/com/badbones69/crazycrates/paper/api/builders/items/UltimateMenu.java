@@ -68,12 +68,14 @@ public class UltimateMenu extends InventoryBuilder {
     }
 
     private UltimateMenu(Player player, Component trans, int page, int selectedCrate) {
-        super(CrazyCrates.getPlugin().getCrateManager().getDatabaseManager().getCrateSettingsSplit().get(page).get(selectedCrate).getCrate(), player, 54, trans);
-        manager = CrazyCrates.getPlugin().getCrateManager().getDatabaseManager();
+        DatabaseManager databaseManager = CrazyCrates.getPlugin().getCrateManager().getDatabaseManager();
+        List<List<CrateSettings>> split = databaseManager.getCrateSettingsSplit();
+        super(split.get(page).get(selectedCrate).getCrate(), player, 54, trans);
+        manager = databaseManager;
         this.currentPage = page;
         this.selectedCrate = selectedCrate;
 
-        this.totalPageAmount = manager.getCrateSettingsSplit().size();
+        this.totalPageAmount = split.size();
 
         player.getInventory().clear();
     }

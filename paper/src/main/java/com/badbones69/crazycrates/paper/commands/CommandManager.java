@@ -192,7 +192,8 @@ public class CommandManager {
                 new CommandHelp(),
                 new CommandHistory(),
                 new CommandPity(),
-                new CommandTest()
+                new CommandTest(),
+                new Count()
         ).forEach(commandManager::registerCommand);
     }
 
