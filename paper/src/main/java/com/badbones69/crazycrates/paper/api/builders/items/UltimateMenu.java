@@ -117,8 +117,7 @@ public class UltimateMenu extends InventoryBuilder {
 
         if (newCrateNum != -1) {
             List<CrateSettings> settings = manager.getCrateSettingsSplit().get(ultimateMenu.currentPage);
-            if (settings.size() <= newCrateNum) return;
-            if (selectedCrate == newCrateNum) return;
+            if (settings.size() <= newCrateNum || selectedCrate == newCrateNum) return;
 
             CrateSettings newCrate = settings.get(newCrateNum);
 

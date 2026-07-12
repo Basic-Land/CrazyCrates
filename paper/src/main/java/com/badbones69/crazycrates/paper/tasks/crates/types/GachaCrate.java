@@ -93,15 +93,6 @@ public class GachaCrate extends CrateBuilder {
 
             items.add(result);
         }
-//        items.removeIf(r -> !r.isLegendary());
-//
-//        var legendaryDistribution = items.stream()
-//                .collect(Collectors.groupingBy(Result::getPrize, Collectors.counting()));
-//
-//        legendaryDistribution.forEach((prizee, count) -> {
-//            String name = prizee != null ? prizee.getSectionName() : "Unknown";
-//            System.out.println(name + ": " + count);
-//        });
 
         baseProfile.addMysticTokens(mysticTokens);
         baseProfile.addStellarShards(stellarShards);

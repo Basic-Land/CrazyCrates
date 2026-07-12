@@ -62,7 +62,7 @@ public class GachaCrateListener implements Listener {
         long time = rouletteStandard.getTime();
         long diff = System.currentTimeMillis() - time;
 
-        if (diff < 300) return;
+        if (diff < 250) return;
 
         rouletteStandard.updateTimer();
 
@@ -74,7 +74,7 @@ public class GachaCrateListener implements Listener {
         if (rouletteStandard.isSneak()) {
             if (count == 10) {
                 int i = 0;
-                for (Integer slot : slots) {
+                for (int slot : slots) {
                     inventory.setItem(slot, prize.get(i++).getPrize().getDisplayItem());
                 }
                 rouletteStandard.incrementCount();

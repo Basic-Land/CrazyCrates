@@ -8,6 +8,7 @@ import com.badbones69.crazycrates.paper.api.objects.gacha.DatabaseManager;
 import com.badbones69.crazycrates.paper.api.objects.gacha.banners.BannerData;
 import com.badbones69.crazycrates.paper.api.objects.gacha.banners.BannerItem;
 import com.badbones69.crazycrates.paper.api.objects.gacha.banners.BannerPackage;
+import com.badbones69.crazycrates.paper.api.objects.gacha.constellation.ItemConData;
 import com.badbones69.crazycrates.paper.api.objects.gacha.enums.GachaType;
 import com.badbones69.crazycrates.paper.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.paper.api.objects.gacha.enums.RewardType;
@@ -16,6 +17,8 @@ import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.Component
 import com.badbones69.crazycrates.paper.api.objects.gacha.util.TierInfo;
 import com.ryderbelserion.fusion.paper.files.types.PaperCustomFile;
 import cz.basicland.blibs.spigot.utils.item.NBT;
+import cz.basicland.blibs.spigot.utils.item.enums.DataType;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -23,6 +26,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -275,6 +279,13 @@ public class CrateSettings {
 
         NBT nbt = new NBT(item);
         nbt.setString("rewardName", rewardName);
+        if (type == RewardType.LIMITED && rarity.isLegendary()) {
+            nbt.setInteger("constellation", 0);
+            nbt.setString("owner", "none");
+            nbt.setInteger("defMaxDurability", item.getDataOrDefault(DataComponentTypes.MAX_DAMAGE, item.getType().getDefaultData(DataComponentTypes.MAX_DAMAGE)));
+            item.getEnchantments().forEach((enchantment, level) ->
+                    nbt.setToCompound("gacha_default_enchants", enchantment.getKey().toString(), level, DataType.INT));
+        }
 
         List<String> commands = config.getStringList(path + "." + key + ".commands");
         List<String> messages = config.getStringList(path + "." + key + ".messages");

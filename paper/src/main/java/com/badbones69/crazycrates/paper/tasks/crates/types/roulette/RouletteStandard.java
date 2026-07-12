@@ -13,6 +13,7 @@ import com.badbones69.crazycrates.paper.tasks.crates.other.GachaCrateManager;
 import com.ryderbelserion.fusion.paper.api.scheduler.FoliaScheduler;
 import lombok.Getter;
 import net.kyori.adventure.sound.Sound;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
@@ -158,15 +159,12 @@ public class RouletteStandard extends FoliaScheduler {
                         .findFirst()
                         .ifPresent(prize -> PrizeManager.givePrize(player, crate, prize)));
 
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (player.getOpenInventory().getTopInventory().equals(inventory))
-                    player.closeInventory(InventoryCloseEvent.Reason.PLAYER);
-                crateManager.removePlayerFromOpeningList(player);
-                plugin.getCrateManager().getDatabaseManager().getUltimateMenuManager().open(player, crate);
-            }
-        }.runTaskLater(plugin, 20);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (player.getOpenInventory().getTopInventory().equals(inventory))
+                player.closeInventory(InventoryCloseEvent.Reason.PLAYER);
+            crateManager.removePlayerFromOpeningList(player);
+            plugin.getCrateManager().getDatabaseManager().getUltimateMenuManager().open(player, crate);
+        }, 20);
     }
 
     public void incrementCount() {
