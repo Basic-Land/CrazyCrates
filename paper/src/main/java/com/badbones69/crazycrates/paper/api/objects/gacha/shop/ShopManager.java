@@ -70,7 +70,7 @@ public class ShopManager {
                                     return null;
                                 }
 
-                                CurrencyType overrideType = CurrencyType.getFromName(item.getString("override_currency"));
+                                CurrencyType overrideType = CurrencyType.getCurrencyType(item.getString("override_currency"));
 
                                 return new ShopItem(
                                         itemFromCache,

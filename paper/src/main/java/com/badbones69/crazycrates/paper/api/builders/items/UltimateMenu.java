@@ -317,7 +317,7 @@ public class UltimateMenu extends InventoryBuilder {
         PlayerInventory playerInventory = getPlayer().getInventory();
         playerInventory.setItem(27, ItemRepo.MAIN_MENU.asItemStack());
         Optional<BannerData> banner = getCrate().getCrateSettings().getBannerPackage().getBanner();
-        playerInventory.setItem(28, new LegacyItemBuilder(plugin, ItemRepo.BANNER, true).setCustomModelData(banner.map(BannerData::modelData).orElse(-1)).asItemStack());
+        playerInventory.setItem(28, new LegacyItemBuilder(plugin, ItemRepo.BANNER, true).setCustomModelData(banner.map(BannerData::modelData).orElse(2000001)).asItemStack());
     }
 
     private void setItemsPlayerInv() {
