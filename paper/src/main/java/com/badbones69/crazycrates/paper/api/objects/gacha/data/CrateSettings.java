@@ -8,7 +8,6 @@ import com.badbones69.crazycrates.paper.api.objects.gacha.DatabaseManager;
 import com.badbones69.crazycrates.paper.api.objects.gacha.banners.BannerData;
 import com.badbones69.crazycrates.paper.api.objects.gacha.banners.BannerItem;
 import com.badbones69.crazycrates.paper.api.objects.gacha.banners.BannerPackage;
-import com.badbones69.crazycrates.paper.api.objects.gacha.constellation.ItemConData;
 import com.badbones69.crazycrates.paper.api.objects.gacha.enums.GachaType;
 import com.badbones69.crazycrates.paper.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.paper.api.objects.gacha.enums.RewardType;
@@ -26,7 +25,6 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -113,15 +111,15 @@ public class CrateSettings {
     }
 
     private void updateItems() {
-        BannerData currentBanner = bannerPackage.getBanner();
-        if (currentBanner == null) return;
+        Optional<BannerData> currentBanner = bannerPackage.getBanner();
+        if (currentBanner.isEmpty()) return;
 
         FileConfiguration crateFile = crate.getFile();
         String path = "Crate.Gacha";
         crateFile.set(path + ".standard", null);
         crateFile.set(path + ".limited", null);
 
-        List<BannerItem> items = currentBanner.items();
+        List<BannerItem> items = currentBanner.get().items();
 
         for (BannerItem item : items) {
             int id = item.number();

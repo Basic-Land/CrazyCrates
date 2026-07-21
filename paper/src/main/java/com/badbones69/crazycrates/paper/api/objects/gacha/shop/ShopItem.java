@@ -1,5 +1,6 @@
 package com.badbones69.crazycrates.paper.api.objects.gacha.shop;
 
+import com.badbones69.crazycrates.paper.api.objects.gacha.enums.CurrencyType;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -8,7 +9,8 @@ public record ShopItem(ItemStack stack,
                        int limit,
                        int place,
                        int id,
-                       String crate)
+                       String crate,
+                       CurrencyType currencyType)
         implements Comparable<ShopItem> {
 
     @Override

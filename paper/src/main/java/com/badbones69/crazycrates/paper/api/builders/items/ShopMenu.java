@@ -3,6 +3,7 @@ package com.badbones69.crazycrates.paper.api.builders.items;
 import com.badbones69.crazycrates.paper.api.builders.InventoryBuilder;
 import com.badbones69.crazycrates.paper.api.objects.Crate;
 import com.badbones69.crazycrates.paper.api.objects.gacha.data.PlayerBaseProfile;
+import com.badbones69.crazycrates.paper.api.objects.gacha.enums.CurrencyType;
 import com.badbones69.crazycrates.paper.api.objects.gacha.shop.ShopData;
 import com.badbones69.crazycrates.paper.api.objects.gacha.shop.ShopItem;
 import com.badbones69.crazycrates.paper.api.objects.gacha.shop.ShopManager;
@@ -56,13 +57,17 @@ public class ShopMenu extends InventoryBuilder {
 
         if (slot >= 27 && slot < 45 && item != null) {
             ShopItem itemByPlace = shopData.getItemByPlace(slot - 27);
+            CurrencyType type = itemByPlace.currencyType();
+            if (type == null) {
+                type = shopData.currencyType();
+            }
 
             PlayerBaseProfile playerBaseProfile = plugin.getBaseProfileManager().getPlayerBaseProfile(player.getName());
-            if (playerBaseProfile.has(itemByPlace.price(), shopData.currencyType())) {
+            if (playerBaseProfile.has(itemByPlace.price(), type)) {
                 ShopPurchase data = shopManager.getLimitManager().getData(player, shopData.shopID(), itemByPlace, true);
 
                 if (data.isSuccess() || data.isUnlimited()) {
-                    playerBaseProfile.remove(itemByPlace.price(), shopData.currencyType());
+                    playerBaseProfile.remove(itemByPlace.price(), type);
                     String crate = itemByPlace.crate();
 
                     if (crate == null) {

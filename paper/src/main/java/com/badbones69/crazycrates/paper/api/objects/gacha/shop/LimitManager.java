@@ -13,7 +13,7 @@ public class LimitManager {
 
     public ShopPurchase getData(Player player, ShopID shopID, ShopItem item, boolean increment) {
         PlayerBaseProfile playerBaseProfile = plugin.getBaseProfileManager().getPlayerBaseProfile(player.getName());
-        int bought = playerBaseProfile.getShops().computeIfAbsent(shopID, k -> new HashMap<>()).computeIfAbsent(item.id(), k -> 0);
+        int bought = playerBaseProfile.getShops().computeIfAbsent(shopID, _ -> new HashMap<>()).computeIfAbsent(item.id(), _ -> 0);
 
         LimitType limitType;
 

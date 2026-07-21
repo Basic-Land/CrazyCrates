@@ -4,28 +4,28 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 public record BannerPackage(List<BannerData> bannerDataList, boolean enabled) {
 
-    public BannerData getBanner() {
+    public Optional<BannerData> getBanner() {
         return bannerDataList.stream()
                 .filter(BannerData::isBannerActive)
-                .min(Comparator.comparing(BannerData::end))
-                .orElse(null);
+                .min(Comparator.comparing(BannerData::end));
     }
 
     public boolean isBannerActive() {
-        return getBanner() != null;
+        return getBanner().isPresent();
     }
 
     public String getRemainingDuration() {
-        BannerData banner = getBanner();
-        if (banner == null) {
+        Optional<BannerData> bannerOpt = getBanner();
+        if (bannerOpt.isEmpty()) {
             return "";
         }
 
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime endTime = banner.end();
+        LocalDateTime endTime = bannerOpt.get().end();
 
         Duration duration = Duration.between(now, endTime);
         return String.format("%dd %dh %dm",

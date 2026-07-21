@@ -31,6 +31,7 @@ import org.bukkit.inventory.PlayerInventory;
 import us.crazycrew.crazycrates.api.enums.types.KeyType;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
 import static net.kyori.adventure.text.Component.empty;
@@ -315,8 +316,8 @@ public class UltimateMenu extends InventoryBuilder {
     private void setTextureGlass() {
         PlayerInventory playerInventory = getPlayer().getInventory();
         playerInventory.setItem(27, ItemRepo.MAIN_MENU.asItemStack());
-        BannerData banner = getCrate().getCrateSettings().getBannerPackage().getBanner();
-        playerInventory.setItem(28, new LegacyItemBuilder(plugin, ItemRepo.BANNER, true).setCustomModelData(banner == null ? -1 : banner.modelData()).asItemStack());
+        Optional<BannerData> banner = getCrate().getCrateSettings().getBannerPackage().getBanner();
+        playerInventory.setItem(28, new LegacyItemBuilder(plugin, ItemRepo.BANNER, true).setCustomModelData(banner.map(BannerData::modelData).orElse(-1)).asItemStack());
     }
 
     private void setItemsPlayerInv() {
