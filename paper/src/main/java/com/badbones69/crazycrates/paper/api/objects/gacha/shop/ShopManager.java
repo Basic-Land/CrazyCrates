@@ -144,7 +144,7 @@ public class ShopManager {
 
     private ItemStack apply(Player player, ShopItem shopItem, ShopData shopData) {
         if (shopItem == null) return null;
-        ShopPurchase shopPurchase = limitManager.getData(player, shopData.shopID(), shopItem, false);
+        ShopPurchase shopPurchase = limitManager.getData(player, shopData.shopID(), shopItem, 0);
         ItemStack stack = shopItem.stack().clone();
         LegacyItemBuilder itemBuilder = new LegacyItemBuilder(plugin, stack);
 

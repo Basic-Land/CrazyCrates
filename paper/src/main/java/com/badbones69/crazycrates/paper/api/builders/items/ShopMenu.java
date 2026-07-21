@@ -62,18 +62,22 @@ public class ShopMenu extends InventoryBuilder {
                 type = shopData.currencyType();
             }
 
+            int amountBuy = e.isShiftClick() && itemByPlace.isUnlimited() ? 10 : 1;
+
             PlayerBaseProfile playerBaseProfile = plugin.getBaseProfileManager().getPlayerBaseProfile(player.getName());
-            if (playerBaseProfile.has(itemByPlace.price(), type)) {
-                ShopPurchase data = shopManager.getLimitManager().getData(player, shopData.shopID(), itemByPlace, true);
+            int amount = itemByPlace.price() * amountBuy;
+
+            if (playerBaseProfile.has(amount, type)) {
+                ShopPurchase data = shopManager.getLimitManager().getData(player, shopData.shopID(), itemByPlace, amountBuy);
 
                 if (data.isSuccess() || data.isUnlimited()) {
-                    playerBaseProfile.remove(itemByPlace.price(), type);
+                    playerBaseProfile.remove(amount, type);
                     String crate = itemByPlace.crate();
 
                     if (crate == null) {
                         player.getInventory().addItem(itemByPlace.stack());
                     } else {
-                        plugin.getUserManager().addVirtualKeys(player.getUniqueId(), crate, 1);
+                        plugin.getUserManager().addVirtualKeys(player.getUniqueId(), crate, amountBuy);
                     }
 
                     player.playSound(ItemRepo.CLICK);

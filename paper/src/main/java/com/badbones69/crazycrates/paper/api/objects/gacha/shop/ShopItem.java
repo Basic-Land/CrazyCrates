@@ -18,6 +18,10 @@ public record ShopItem(ItemStack stack,
         return Integer.compare(place, o.place);
     }
 
+    public boolean isUnlimited() {
+        return limit == -1;
+    }
+
     @Override
     public String toString() {
         return "ShopItem{" +

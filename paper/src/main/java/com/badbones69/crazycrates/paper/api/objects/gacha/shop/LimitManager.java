@@ -11,13 +11,14 @@ import java.util.HashMap;
 public class LimitManager {
     private final CrazyCrates plugin = CrazyCrates.getPlugin();
 
-    public ShopPurchase getData(Player player, ShopID shopID, ShopItem item, boolean increment) {
+    public ShopPurchase getData(Player player, ShopID shopID, ShopItem item, int amount) {
         PlayerBaseProfile playerBaseProfile = plugin.getBaseProfileManager().getPlayerBaseProfile(player.getName());
-        int bought = playerBaseProfile.getShops().computeIfAbsent(shopID, _ -> new HashMap<>()).computeIfAbsent(item.id(), _ -> 0);
+        var shops = playerBaseProfile.getShops();
+        int bought = shops.computeIfAbsent(shopID, _ -> new HashMap<>()).computeIfAbsent(item.id(), _ -> 0);
 
         LimitType limitType;
 
-        if (item.limit() == -1) {
+        if (item.isUnlimited()) {
             limitType = LimitType.UNLIMITED;
         } else if (bought >= item.limit()) {
             limitType = LimitType.LIMIT_REACHED;
@@ -25,8 +26,8 @@ public class LimitManager {
             limitType = LimitType.SUCCESS;
         }
 
-        if (increment && limitType == LimitType.SUCCESS) {
-            playerBaseProfile.getShops().get(shopID).put(item.id(), bought + 1);
+        if (amount > 0 && limitType == LimitType.SUCCESS) {
+            shops.get(shopID).put(item.id(), bought + amount);
         }
 
         return new ShopPurchase(limitType, bought);
