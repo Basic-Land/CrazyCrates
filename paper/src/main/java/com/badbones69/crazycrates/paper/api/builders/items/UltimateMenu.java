@@ -401,9 +401,9 @@ public class UltimateMenu extends InventoryBuilder {
                 List<ItemStack> items = menuManager.getItemsClean(player);
                 e.getDrops().clear();
                 if (items != null) {
-                    e.getDrops().addAll(items);
+                    player.getInventory().clear();
+                    player.getInventory().setContents(items.toArray(new ItemStack[0]));
                 }
-                player.getInventory().clear();
             }
         }
     }
