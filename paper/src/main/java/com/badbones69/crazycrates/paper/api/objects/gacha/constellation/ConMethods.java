@@ -9,6 +9,8 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
+
 @SuppressWarnings("UnstableApiUsage")
 public final class ConMethods {
     private static final NamespacedKey EFFICIENCY_KEY = NamespacedKey.fromString("effi", CrazyCrates.getPlugin());
@@ -40,19 +42,34 @@ public final class ConMethods {
         int addEffiLvl = constellation / levelStepping;
         int stepAdd = constellation % levelStepping;
 
+        ItemAttributeModifiers data = stack.getData(DataComponentTypes.ATTRIBUTE_MODIFIERS);
+        ItemAttributeModifiers.Builder builder = ItemAttributeModifiers.itemAttributes();
+
         if (stepAdd == 0 && addEffiLvl > 0) {
             stack.addUnsafeEnchantment(Enchantment.EFFICIENCY, defEffi + addEffiLvl);
-            stack.unsetData(DataComponentTypes.ATTRIBUTE_MODIFIERS);
+            if (data == null) return;
+            data.modifiers().forEach(entry -> {
+                if (!entry.modifier().key().equals(EFFICIENCY_KEY)) {
+                    builder.addModifier(entry.attribute(), entry.modifier());
+                }
+            });
+            stack.setData(DataComponentTypes.ATTRIBUTE_MODIFIERS, builder.build());
         } else {
             int current = defEffi + addEffiLvl;
             int nextLvl = current + 1;
             double stepSize = ((nextLvl * nextLvl + 1) - (current * current + 1d)) / levelStepping;
 
-            ItemAttributeModifiers modifiers = ItemAttributeModifiers.itemAttributes()
-                    .addModifier(Attribute.MINING_EFFICIENCY, new AttributeModifier(EFFICIENCY_KEY, stepSize * stepAdd, AttributeModifier.Operation.ADD_NUMBER))
-                    .build();
+            if (data != null) {
+                data.modifiers().forEach(entry -> {
+                    if (!entry.modifier().key().equals(EFFICIENCY_KEY)) {
+                        builder.addModifier(entry.attribute(), entry.modifier());
+                    }
+                });
+            }
 
-            stack.setData(DataComponentTypes.ATTRIBUTE_MODIFIERS, modifiers);
+            builder.addModifier(Attribute.MINING_EFFICIENCY, new AttributeModifier(EFFICIENCY_KEY, stepSize * stepAdd, AttributeModifier.Operation.ADD_NUMBER));
+
+            stack.setData(DataComponentTypes.ATTRIBUTE_MODIFIERS, builder.build());
         }
     }
 }

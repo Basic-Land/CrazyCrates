@@ -9,6 +9,7 @@ import com.badbones69.crazycrates.paper.api.objects.gacha.shop.ShopItem;
 import com.badbones69.crazycrates.paper.api.objects.gacha.shop.ShopManager;
 import com.badbones69.crazycrates.paper.api.objects.gacha.shop.ShopPurchase;
 import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.ItemRepo;
+import cz.basicland.blibs.spigot.utils.item.ItemUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -75,7 +76,7 @@ public class ShopMenu extends InventoryBuilder {
                     String crate = itemByPlace.crate();
 
                     if (crate == null) {
-                        player.getInventory().addItem(itemByPlace.stack());
+                        ItemUtils.giveOrDrop(player, itemByPlace.stack());
                     } else {
                         plugin.getUserManager().addVirtualKeys(player.getUniqueId(), crate, amountBuy);
                     }
