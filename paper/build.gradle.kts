@@ -10,11 +10,25 @@ repositories {
     maven("https://repo.nexomc.com/releases/")
 
     maven("https://repo.oraxen.com/releases/")
+
+    maven {
+        name = "local"
+        url = uri("http://192.168.1.103:30451/repository/dev-snapshots/")
+        isAllowInsecureProtocol = true
+        credentials {
+            username = "${System.getenv("NEXUS_USERNAME")}";
+            password = "${System.getenv("NEXUS_PASSWORD")}"
+        }
+    }
 }
 
 dependencies {
     implementation(project(":common"))
-    compileOnly(fileTree("$projectDir/libs/compile").include("*.jar"))
+    if (System.getenv("USERDOMAIN_ROAMINGPROFILE") == "DESKTOP-KPL18HN") {
+        compileOnly(fileTree("$projectDir/libs/compile").include("*.jar"))
+    } else {
+        compileOnly(libs.bLibs)
+    }
 
     implementation(libs.triumph.cmds)
 
