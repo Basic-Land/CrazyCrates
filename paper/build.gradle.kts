@@ -42,6 +42,7 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok:1.18.42")
     annotationProcessor("org.projectlombok:lombok:1.18.42")
+    compileOnly("com.github.resourcepack-ai:mcgui:0.8.6")
     //compileOnly("net.jpountz.lz4:lz4:1.3.0")
 }
 
