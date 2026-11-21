@@ -5,16 +5,16 @@ import ai.resourcepack.ui.framework.api.Key;
 import ai.resourcepack.ui.framework.api.UIFramework;
 import ai.resourcepack.ui.framework.api.ViewOptions;
 import com.badbones69.crazycrates.paper.CrazyCrates;
+import com.badbones69.crazycrates.paper.api.objects.gacha.DatabaseManager;
+import com.badbones69.crazycrates.paper.api.objects.gacha.data.CrateSettings;
+import com.badbones69.crazycrates.paper.api.objects.gacha.data.PlayerBaseProfile;
+import com.badbones69.crazycrates.paper.api.objects.gacha.data.PlayerProfile;
+import com.badbones69.crazycrates.paper.api.objects.gacha.enums.Rarity;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 
 import javax.imageio.ImageIO;
-import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
@@ -42,7 +42,8 @@ import java.util.List;
  *   SWAP_HANDS (F)                cancel: discard a new element, or revert the selection to where it was selected
  *   DROP (Q)                      delete the selection
  * CHAT
- *   load <image> | select <image> | select field <n> | select button <n> | center | delete | hud | save
+ *   load <image> | select <image> | select field <n> | select button <n> | text <n> <text> |
+ *   number <n> <number> | center | delete | hud | save
  */
 public class MapMenu {
     private final CrazyCrates plugin;
@@ -74,6 +75,8 @@ public class MapMenu {
         final Kind kind;
         final String name;      // images only
         final BufferedImage img; // images only
+        String fieldValue = "";
+        Color background, text;
         int x, y, w, h;
 
         Element(Kind kind, String name, BufferedImage img, int x, int y, int w, int h) {
@@ -130,28 +133,31 @@ public class MapMenu {
             addImage("levosipka", loadImage("levosipka"), 453, 485);
 
             // Text fields
-            addRect(Kind.FIELD, 174, 296, 60, 22);
-            addRect(Kind.FIELD, 174, 322, 60, 22);
-            addRect(Kind.FIELD, 236, 322, 32, 22);
-            addRect(Kind.FIELD, 236, 296, 32, 22);
-            addRect(Kind.FIELD, 286, 296, 32, 22);
-            addRect(Kind.FIELD, 286, 322, 32, 22);
-            addRect(Kind.FIELD, 178, 436, 134, 18);
-            addRect(Kind.FIELD, 222, 126, 90, 18);
-            addRect(Kind.FIELD, 222, 80, 90, 18);
-            addRect(Kind.FIELD, 758, 126, 90, 18);
+            Color bg = new Color(0xd5cdbd);
+            Color text = new Color(0);
+
+            addRect(Kind.FIELD, "legendary display", "LEG", bg, text, 174, 296, 60, 22); // legendary display         1.
+            addRect(Kind.FIELD, "epic display", "EPIC", bg, text, 174, 322, 60, 22); // epic display                  2.
+            addRect(Kind.FIELD, "epic current pity", null, bg, text, 236, 322, 32, 22); // epic current pity                3.
+            addRect(Kind.FIELD, "legendary current pity", null, bg, text, 236, 296, 32, 22); // legendary current pity      4.
+            addRect(Kind.FIELD, "legendary max pity", null, bg, text, 286, 296, 32, 22); // legendary max pity              5.
+            addRect(Kind.FIELD, "epic max pity", null, bg, text, 286, 322, 32, 22); // epic max pity                        6.
+            addRect(Kind.FIELD, "remaining time", null, bg, text, 178, 436, 134, 18); // remaining time                     7.
+            addRect(Kind.FIELD, "premium tokeny", 222, 126, 90, 18); // premium tokeny                      8.
+            addRect(Kind.FIELD, "vote tokeny", 222, 80, 90, 18); // vote tokeny                             9.
+            addRect(Kind.FIELD, "keys", 758, 126, 90, 18); // keys                                          10.
 
             // Buttons
-            addRect(Kind.BUTTON, 345, 485, 32, 32);
-            addRect(Kind.BUTTON, 381, 485, 32, 32);
-            addRect(Kind.BUTTON, 418, 485, 32, 32);
-            addRect(Kind.BUTTON, 523, 482, 72, 36);
-            addRect(Kind.BUTTON, 598, 482, 72, 36);
-            addRect(Kind.BUTTON, 334, 123, 108, 40);
-            addRect(Kind.BUTTON, 451, 123, 108, 40);
-            addRect(Kind.BUTTON, 570, 123, 108, 40);
-            addRect(Kind.BUTTON, 453, 485, 32, 32);
-            addRect(Kind.BUTTON, 488, 485, 32, 32);
+            addRect(Kind.BUTTON, "history", 345, 485, 32, 32); // history
+            addRect(Kind.BUTTON, "preview menu", 381, 485, 32, 32); // preview menu
+            addRect(Kind.BUTTON, "shop", 418, 485, 32, 32); // shop
+            addRect(Kind.BUTTON, "1x pull", 523, 482, 72, 36); // 1x pull
+            addRect(Kind.BUTTON, "10x pull", 598, 482, 72, 36); // 10x pull
+            addRect(Kind.BUTTON, "chest 1", 334, 123, 108, 40); // chest 1
+            addRect(Kind.BUTTON, "chest 2", 451, 123, 108, 40); // chest 2
+            addRect(Kind.BUTTON, "chest 3", 570, 123, 108, 40); // chest 3
+            addRect(Kind.BUTTON, "left arrow", 453, 485, 32, 32); // left arrow
+            addRect(Kind.BUTTON, "right arrow", 488, 485, 32, 32); // right arrow
         } catch (Exception e) {
             log("Init error: " + e);
         }
@@ -203,10 +209,26 @@ public class MapMenu {
     }
 
     private Element addRect(Kind kind, int x, int y, int w, int h) {
-        Element el = new Element(kind, null, null, x, y, w, h);
+        return addRect(kind, null, x, y, w, h);
+    }
+
+    private Element addRect(Kind kind, String name, int x, int y, int w, int h) {
+        return addRect(kind, name, null, x, y, w, h);
+    }
+
+    private Element addRect(Kind kind, String name, String value, int x, int y, int w, int h) {
+        return addRect(kind, name, value, null, null, x, y, w, h);
+    }
+
+    private Element addRect(Kind kind, String name, String value, Color background, Color text, int x, int y, int w, int h) {
+        Element el = new Element(kind, name, null, x, y, w, h);
+        el.fieldValue = value == null ? "" : value;
+        el.background = background == null ? FIELD_BG : background;
+        el.text = text == null ? FIELD_TEXT : text;
         elements.add(el);
         return el;
     }
+
 
     private Element findImage(String name) {
         for (Element el : elements) {
@@ -231,6 +253,21 @@ public class MapMenu {
             if (el.kind == kind && ++count == n) return el;
         }
         return null;
+    }
+
+    /** Sets the actual text displayed in a text field (1-based field number). */
+    public synchronized void setFieldValue(int fieldNumber, int number) {
+        setFieldValue(fieldNumber, String.valueOf(number));
+    }
+
+    public synchronized void setFieldValue(int fieldNumber, String text) {
+        Element field = nth(Kind.FIELD, fieldNumber);
+        if (field == null) {
+            log("No text field #" + fieldNumber);
+            return;
+        }
+        field.fieldValue = text == null ? "" : text;
+        refresh();
     }
 
     private String label(Element el) {
@@ -459,49 +496,45 @@ public class MapMenu {
         g.setFont(font);
     }
 
-    /**
-     * Draws a solid background, then fills the rectangle with digits.
-     * The font is scaled to the largest size where at least one line and one digit fit the field,
-     * and the digits are centered inside it.
-     */
+    /** Draws a solid background and renders the field's actual text or number value. */
     private void drawField(Graphics2D g, Element f) {
         java.awt.Shape oldClip = g.getClip();
         Font oldFont = g.getFont();
         try {
             // solid background
-            g.setColor(FIELD_BG);
+            g.setColor(f.background);
             g.fillRect(f.x, f.y, f.w, f.h);
 
-            // scale the font to the field
+            String value = f.fieldValue == null ? "" : f.fieldValue;
+            if (value.isEmpty()) return;
+
+            // Scale the font to the field and wrap the actual value to fit.
             Font fitted = font.deriveFont((float) MIN_FONT_SIZE);
+            int start = Math.clamp(f.h, MIN_FONT_SIZE, MAX_FONT_SIZE);
             FontMetrics fm = g.getFontMetrics(fitted);
-            int start = Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, f.h));
+            List<String> lines = new ArrayList<>();
             for (int size = start; size >= MIN_FONT_SIZE; size--) {
                 Font candidate = font.deriveFont((float) size);
                 FontMetrics m = g.getFontMetrics(candidate);
-                if (m.getHeight() <= f.h && m.charWidth('0') <= f.w) {
+                List<String> wrapped = wrapText(value, f.w, m);
+                if (!wrapped.isEmpty() && wrapped.size() * m.getHeight() <= f.h) {
                     fitted = candidate;
                     fm = m;
+                    lines = wrapped;
                     break;
                 }
             }
 
             g.setFont(fitted);
             g.setClip(f.x, f.y, f.w, f.h);
-            g.setColor(FIELD_TEXT);
+            g.setColor(f.text);
 
             int lineHeight = Math.max(1, fm.getHeight());
-            int digitWidth = Math.max(1, fm.charWidth('0'));
-            int perLine = Math.max(1, f.w / digitWidth);
-            int lines = Math.max(1, f.h / lineHeight);
-
-            int top = f.y + (f.h - lines * lineHeight) / 2;
-            int left = f.x + (f.w - perLine * digitWidth) / 2;
-
-            for (int row = 0; row < lines; row++) {
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < perLine; i++) sb.append((row * perLine + i) % 10);
-                g.drawString(sb.toString(), left, top + row * lineHeight + fm.getAscent());
+            int top = f.y + (f.h - lines.size() * lineHeight) / 2;
+            for (int row = 0; row < lines.size(); row++) {
+                String line = lines.get(row);
+                int left = f.x + (f.w - fm.stringWidth(line)) / 2;
+                g.drawString(line, left, top + row * lineHeight + fm.getAscent());
             }
         } catch (Exception e) {
             log("Text field error: " + e);
@@ -509,6 +542,30 @@ public class MapMenu {
             g.setClip(oldClip);
             g.setFont(oldFont);
         }
+    }
+
+    private List<String> wrapText(String text, int width, FontMetrics fm) {
+        List<String> lines = new ArrayList<>();
+        if (text.isEmpty()) return lines;
+
+        String remaining = text;
+        while (!remaining.isEmpty()) {
+            int end = remaining.length();
+            while (end > 0 && fm.stringWidth(remaining.substring(0, end)) > width) {
+                end--;
+            }
+            if (end == 0) {
+                end = 1;
+            } else if (end < remaining.length() && end > 1) {
+                int space = remaining.lastIndexOf(' ', end);
+                if (space > 0) end = space;
+            }
+
+            String line = remaining.substring(0, end);
+            lines.add(line);
+            remaining = remaining.substring(end).trim();
+        }
+        return lines;
     }
 
     private void refresh() {
@@ -524,6 +581,29 @@ public class MapMenu {
         try {
             refresh();
             player.getInventory().setHeldItemSlot(8);
+
+            DatabaseManager databaseManager = CrazyCrates.getPlugin().getCrateManager().getDatabaseManager();
+            CrateSettings crateSettings = databaseManager.getCrateSettingsSplit().get(0).get(0);
+            int virtualKeys = plugin.getUserManager().getVirtualKeys(player.getUniqueId(), crateSettings.getCrateName());
+            PlayerProfile playerProfile = plugin.getCrateManager().getDatabaseManager().getPlayerProfile(player.getName(), crateSettings, false);
+            PlayerBaseProfile baseProfile = plugin.getBaseProfileManager().getPlayerBaseProfile(player.getName());
+
+            String voteTokens = String.valueOf(baseProfile.getVoteTokens());
+            String premiumCurrency = String.valueOf(baseProfile.getPremiumCurrency());
+            String time = crateSettings.getBannerPackage().getRemainingDuration();
+
+            int epic = playerProfile.getPity(Rarity.EPIC).first();
+            int legendary = playerProfile.getPity(Rarity.LEGENDARY).first();
+
+            setFieldValue(3, epic);
+            setFieldValue(4, legendary);
+            setFieldValue(5, crateSettings.getRarityMap().get(Rarity.LEGENDARY).pity());
+            setFieldValue(6, crateSettings.getRarityMap().get(Rarity.EPIC).pity());
+            setFieldValue(7, time);
+            setFieldValue(8, premiumCurrency);
+            setFieldValue(9, voteTokens);
+            setFieldValue(10, virtualKeys);
+
             engine.openView(player, new ClickListener(this), new ViewOptions(0, true, true));
         } catch (Exception e) {
             log("Open error: " + e);
@@ -652,8 +732,6 @@ public class MapMenu {
                     BufferedImage img = loadImage(arg);
                     if (img == null) break;
                     String name = stripPng(arg);
-//                    Element old = findImage(name);
-//                    if (old != null) elements.remove(old);
                     Element loaded = addImage(name, img, (image.getWidth() - img.getWidth()) / 2, (image.getHeight() - img.getHeight()) / 2);
                     select(loaded);
                     log("Loaded '" + name + "'");
@@ -698,13 +776,25 @@ public class MapMenu {
                     selected.y = (image.getHeight() - selected.h) / 2;
                     log("Centered " + describe(selected));
                 }
+                case "text", "set-text", "settext" -> {
+                    String[] value = arg.split("\\s+", 2);
+                    if (value.length != 2) {
+                        log("Usage: text <field-number> <text>");
+                        break;
+                    }
+                    try {
+                        setFieldValue(Integer.parseInt(value[0]), value[1].trim());
+                    } catch (NumberFormatException ex) {
+                        log("Usage: text <field-number> <text>");
+                    }
+                }
                 case "delete" -> deleteSelected();
                 case "hud" -> {
                     hud = !hud;
                     log("HUD " + (hud ? "ON" : "OFF"));
                 }
                 case "save" -> save();
-                default -> log("Unknown command. Use: load <image>, select <image|field n|button n>, center, delete, hud, save");
+                default -> log("Unknown command. Use: load <image>, select <image|field n|button n>, text <n> <text>, center, delete, hud, save");
             }
         } catch (Exception e) {
             log("Chat error: " + e);
@@ -726,7 +816,8 @@ public class MapMenu {
         int i = 1;
         for (Element el : elements) {
             if (el.kind == Kind.FIELD) {
-                System.out.println("  #" + i++ + ": x=" + el.x + ", y=" + el.y + ", width=" + el.w + ", height=" + el.h);
+                System.out.println("  #" + i++ + ": x=" + el.x + ", y=" + el.y + ", width=" + el.w + ", height=" + el.h
+                        + ", value=" + el.fieldValue);
             }
         }
         System.out.println("Buttons (x, y = top-left):");
