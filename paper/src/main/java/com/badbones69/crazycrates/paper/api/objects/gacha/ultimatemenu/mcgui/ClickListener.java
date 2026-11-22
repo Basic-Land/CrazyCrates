@@ -10,11 +10,6 @@ public record ClickListener(MapMenu menu) implements ViewContent {
     }
 
     @Override
-    public void pointer(View view, int x, int y) {
-        // intentionally empty (no console spam)
-    }
-
-    @Override
     public void click(View view, int x, int y, Click click) {
         try {
             menu.handleClick(x, y, click == null ? "" : click.name());
@@ -40,10 +35,5 @@ public record ClickListener(MapMenu menu) implements ViewContent {
         } catch (Exception e) {
             System.out.println("[ClickListener] chat error: " + e);
         }
-    }
-
-    @Override
-    public void closed(View view, CloseReason reason) {
-        System.out.println("View closed with reason: " + reason);
     }
 }
