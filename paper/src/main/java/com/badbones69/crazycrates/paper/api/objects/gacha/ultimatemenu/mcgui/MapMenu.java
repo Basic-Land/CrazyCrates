@@ -6,6 +6,7 @@ import ai.resourcepack.ui.framework.api.UIFramework;
 import ai.resourcepack.ui.framework.api.ViewOptions;
 import com.badbones69.crazycrates.paper.CrazyCrates;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.entity.Player;
 
 import javax.imageio.ImageIO;
@@ -13,130 +14,80 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 /**
- * Mock-up editor with one unified control scheme. Everything is wrapped in try/catch: errors only go to the console.
+ * A map-canvas GUI made of images, text fields and buttons.
  * <p>
- * Elements: images, text fields and buttons. One element can be selected at a time.
+ * Used on its own it is the final menu: build it from a {@link MCGUIContent}, bind button actions and open it.
+ * <pre>{@code
+ * MapMenu menu = new MapMenu(plugin, new GachaMapMenuContent(plugin));
+ * menu.onClick("1x pull", click -> pull(click.player(), 1));
+ * menu.open(player);
+ * }</pre>
+ * To lay it out, attach the editor first: {@code MenuEditor.attach(menu)} (see the editor package).
  * <p>
- * TOOLS (hotbar)
- * HOTBAR_1 Select   left click selects the element under the cursor (buttons > fields > images),
- * left click on nothing deselects, right click moves the selection to the cursor
- * HOTBAR_2 Text     click two corners -> new text field, already selected with the SIZE handle
- * HOTBAR_3 Button   click two corners -> new button, already selected with the SIZE handle
- * HOTBAR_4 Preview  edit overlays hidden, clicking a button prints to the console
- * HANDLES (what the arrow keys change on the selection)
- * HOTBAR_5 Move     HOTBAR_6 Size (bottom-right corner)     HOTBAR_7 Origin (top-left corner, bottom-right stays)
- * images can only be moved
- * KEYS
- * UP/DOWN/LEFT/RIGHT (W A S D)  nudge the selection with the current handle
- * SPRINT                        toggle coarse (MOVE_STEP px) / fine (1 px) step, applies to everything
- * JUMP (space)                  confirm and deselect
- * SWAP_HANDS (F)                cancel: discard a new element, or revert the selection to where it was selected
- * DROP (Q)                      delete the selection
- * CHAT
- * load <image> | select <image> | select field <n> | select button <n> | text <n> <text> |
- * number <n> <number> | center | delete | hud | save
+ * Layers: {@link MenuRenderer} paints it, {@link MenuController} (optional, e.g. the editor) takes over input.
+ * Button actions run on whichever thread the UI framework calls from; schedule Bukkit work yourself.
  */
-@SuppressWarnings("UnusedReturnValue")
 public class MapMenu {
+    private static final Color FIELD_BG = new Color(30, 30, 30);
+    private static final Color FIELD_TEXT = Color.WHITE;
+
     private final CrazyCrates plugin;
     private final MCGUIContent content;
+    private final UIFramework engine = UIFramework.get();
     private final BufferedImage image;
     @Getter
     private final Canvas canvas;
-    private final UIFramework engine = UIFramework.get();
+    @Getter
     private final Font font;
-
-    private static final int MOVE_STEP = 4;
-    private static final int MIN_FONT_SIZE = 6;
-    private static final int MAX_FONT_SIZE = 64;
-    private static final Color FIELD_BG = new Color(30, 30, 30);
-    private static final Color FIELD_TEXT = Color.WHITE;
-    private static final Color BUTTON_FILL = new Color(0, 120, 255, 90);
-    private static final Color BUTTON_LINE = new Color(0, 120, 255, 220);
-
-    private enum Kind {IMAGE, FIELD, BUTTON}
-
-    private enum Tool {SELECT, TEXT, BUTTON, PREVIEW}
-
-    private enum Handle {MOVE, SIZE, ORIGIN}
-
-    public static final class Element {
-        final Kind kind;
-        final String name;      // images only
-        final BufferedImage img; // images only
-        String fieldValue = "";
-        Color background, text;
-        int x, y, w, h;
-
-        Element(Kind kind, String name, BufferedImage img, int x, int y, int w, int h) {
-            this.kind = kind;
-            this.name = name;
-            this.img = img;
-            this.x = x;
-            this.y = y;
-            this.w = w;
-            this.h = h;
-        }
-    }
-
-    /**
-     * Draw order is by kind (images, then fields, then buttons) and then by list order.
-     */
+    private final MenuRenderer renderer;
     private final List<Element> elements = new ArrayList<>();
-
-    private Tool tool = Tool.SELECT;
-    private Handle handle = Handle.MOVE;
-    private Element selected;
-    /**
-     * The selected element was just created (cancel discards it instead of reverting it).
-     */
-    private boolean selectedIsNew;
-    /**
-     * {x, y, w, h} of the selection when it was selected, used by cancel.
-     */
-    private int[] backup;
-    /**
-     * First corner while a create tool waits for the second click.
-     */
-    private int[] firstCorner;
-    /**
-     * false = coarse step (MOVE_STEP px), true = fine step (1 px). Toggled with SPRINT.
-     */
-    private boolean fineAdjust;
-    private boolean hud = true;
+    @Setter
+    @Getter
+    private volatile MenuController controller;
+    private Element hovered; // button currently under the cursor; guarded by this
 
     public MapMenu(CrazyCrates plugin, MCGUIContent content) {
         this.plugin = plugin;
         this.content = content;
-        CanvasSettings canvasSettings = content.canvasSettings();
-        canvas = engine.canvas(canvasSettings.width() / 128, canvasSettings.height() / 128);
-        canvas.transparency(canvasSettings.transparency());
-        canvas.tint(canvasSettings.tintColor());
+        CanvasSettings settings = content.canvasSettings();
+        canvas = engine.canvas(settings.width() / 128, settings.height() / 128);
+        canvas.transparency(settings.transparency());
+        canvas.tint(settings.tintColor());
         font = content.font();
-
-        image = new BufferedImage(canvasSettings.width(), canvasSettings.height(), BufferedImage.TYPE_INT_ARGB);
+        image = new BufferedImage(settings.width(), settings.height(), BufferedImage.TYPE_INT_ARGB);
+        renderer = new MenuRenderer(image, font);
         content.build(this);
     }
 
-    private static void log(String message) {
+    public static void log(String message) {
         CrazyCrates.getPlugin().getLogger().info("[MapMenu] " + message);
     }
 
+    public Logger logger() {
+        return plugin.getLogger();
+    }
+
+    public int canvasWidth() {
+        return image.getWidth();
+    }
+
+    public int canvasHeight() {
+        return image.getHeight();
+    }
+
+    // ------------------------------------------------------------------ images
+
     public BufferedImage scaleBy2(BufferedImage source) {
         if (source == null) return null;
-        BufferedImage scaled = new BufferedImage(
-                source.getWidth() * 2,
-                source.getHeight() * 2,
-                source.getType()
-        );
-
+        BufferedImage scaled = new BufferedImage(source.getWidth() * 2, source.getHeight() * 2, source.getType());
         Graphics2D g = scaled.createGraphics();
-        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
         g.drawImage(source, 0, 0, scaled.getWidth(), scaled.getHeight(), null);
         g.dispose();
         return scaled;
@@ -162,648 +113,231 @@ public class MapMenu {
         }
     }
 
-    // ------------------------------------------------------------------ elements
+    // ------------------------------------------------------------------ adding elements
 
-    public Element addImage(String name, BufferedImage img, int x, int y) {
+    public synchronized Element addImage(String name, BufferedImage img, int x, int y) {
         if (img == null) return null;
-        Element el = new Element(Kind.IMAGE, name, img, x, y, img.getWidth(), img.getHeight());
+        Element el = new Element(Element.Kind.IMAGE, name, img, x, y, img.getWidth(), img.getHeight());
         elements.add(el);
         return el;
     }
 
     public Element addField(int x, int y, int w, int h) {
-        return addRect(Kind.FIELD, null, x, y, w, h);
+        return addField(null, null, null, null, x, y, w, h);
     }
 
     public Element addField(String name, String value, int x, int y, int w, int h) {
-        return addRect(Kind.FIELD, name, value, null, null, x, y, w, h);
+        return addField(name, value, null, null, x, y, w, h);
     }
 
-    public Element addField(String name, String value, Color background, Color text, int x, int y, int w, int h) {
-        return addRect(Kind.FIELD, name, value, background, text, x, y, w, h);
-    }
-
-    public Element addButton(int x, int y, int w, int h) {
-        return addRect(Kind.BUTTON, null, x, y, w, h);
-    }
-
-    public Element addButton(String name, int x, int y, int w, int h) {
-        return addRect(Kind.BUTTON, name, x, y, w, h);
-    }
-
-    private Element addRect(Kind kind, int x, int y, int w, int h) {
-        return addRect(kind, null, x, y, w, h);
-    }
-
-    private Element addRect(Kind kind, String name, int x, int y, int w, int h) {
-        return addRect(kind, name, null, x, y, w, h);
-    }
-
-    private Element addRect(Kind kind, String name, String value, int x, int y, int w, int h) {
-        return addRect(kind, name, value, null, null, x, y, w, h);
-    }
-
-    private Element addRect(Kind kind, String name, String value, Color background, Color text, int x, int y, int w, int h) {
-        Element el = new Element(kind, name, null, x, y, w, h);
-        el.fieldValue = value == null ? "" : value;
-        el.background = background == null ? FIELD_BG : background;
-        el.text = text == null ? FIELD_TEXT : text;
+    public synchronized Element addField(String name, String value, Color background, Color text,
+                                         int x, int y, int w, int h) {
+        Element el = new Element(Element.Kind.FIELD, name, null, x, y, w, h);
+        el.setText(value);
+        el.setColors(background == null ? FIELD_BG : background, text == null ? FIELD_TEXT : text);
         elements.add(el);
         return el;
     }
 
+    public Element addButton(int x, int y, int w, int h) {
+        return addButton(null, x, y, w, h, null);
+    }
 
-    private Element findImage(String name) {
+    public Element addButton(String name, int x, int y, int w, int h) {
+        return addButton(name, x, y, w, h, null);
+    }
+
+    public synchronized Element addButton(String name, int x, int y, int w, int h, Consumer<ButtonClick> action) {
+        Element el = new Element(Element.Kind.BUTTON, name, null, x, y, w, h);
+        el.action(action);
+        elements.add(el);
+        return el;
+    }
+
+    // ------------------------------------------------------------------ button actions
+
+    /**
+     * Sets the action for every button with this name (case-insensitive).
+     *
+     * @return false if no button has that name
+     */
+    public synchronized boolean onClick(String buttonName, Consumer<ButtonClick> action) {
+        boolean found = false;
         for (Element el : elements) {
-            if (el.kind == Kind.IMAGE && el.name.equalsIgnoreCase(name)) return el;
+            if (el.kind() == Element.Kind.BUTTON && buttonName.equalsIgnoreCase(el.name())) {
+                el.action(action);
+                found = true;
+            }
+        }
+        if (!found) log("No button named '" + buttonName + "'");
+        return found;
+    }
+
+    // ------------------------------------------------------------------ hover
+
+    /**
+     * Color of the outline drawn around a hovered button (null = default white).
+     */
+    public void setHoverColor(Color color) {
+        renderer.setHoverColor(color);
+    }
+
+    /**
+     * Call when the cursor moves over the canvas. Outlines the button under the cursor and only redraws when the
+     * hovered button changes. Every button is outlined by default; see {@link Element#hoverOutline()} (boolean).
+     */
+    public synchronized void handleHover(Player player, int x, int y) {
+        Element button = hit(Element.Kind.BUTTON, x, y);
+        if (button != null && !button.hoverOutline()) button = null;
+        if (button == hovered) return;
+        hovered = button;
+        redraw();
+    }
+
+    /**
+     * Removes the hover outline (e.g. when the cursor leaves or the menu is opened).
+     */
+    public synchronized void clearHover() {
+        if (hovered == null) return;
+        hovered = null;
+        redraw();
+    }
+
+    // ------------------------------------------------------------------ element access
+
+    public synchronized List<Element> elements() {
+        return Collections.unmodifiableList(elements);
+    }
+
+    public synchronized void remove(Element el) {
+        elements.remove(el);
+        if (el == hovered) hovered = null;
+    }
+
+    /**
+     * The n-th (1-based) element of a kind, in creation order.
+     */
+    public synchronized Element element(Element.Kind kind, int n) {
+        int count = 0;
+        for (Element el : elements) {
+            if (el.kind() == kind && ++count == n) return el;
         }
         return null;
     }
 
     /**
-     * 1-based number of the element among elements of its kind.
+     * 1-based number of the element among elements of its kind, or -1.
      */
-    private int number(Element target) {
+    public synchronized int number(Element target) {
         int n = 0;
         for (Element el : elements) {
-            if (el.kind == target.kind) n++;
+            if (el.kind() == target.kind()) n++;
             if (el == target) return n;
         }
         return -1;
     }
 
-    private Element nth(Kind kind, int n) {
-        int count = 0;
-        for (Element el : elements) {
-            if (el.kind == kind && ++count == n) return el;
+    /**
+     * The topmost (last added) element of a kind at the canvas point, or null.
+     */
+    public synchronized Element hit(Element.Kind kind, int x, int y) {
+        for (int i = elements.size() - 1; i >= 0; i--) {
+            Element el = elements.get(i);
+            if (el.kind() == kind && el.contains(x, y)) return el;
         }
         return null;
     }
 
+    // ------------------------------------------------------------------ live values
+
     /**
-     * Sets the actual text displayed in a text field (1-based field number).
+     * Sets the text of a field (1-based field number) and redraws.
      */
-    public synchronized void setFieldValue(int fieldNumber, int number) {
+    public void setFieldValue(int fieldNumber, int number) {
         setFieldValue(fieldNumber, String.valueOf(number));
     }
 
     public synchronized void setFieldValue(int fieldNumber, String text) {
-        Element field = nth(Kind.FIELD, fieldNumber);
+        Element field = element(Element.Kind.FIELD, fieldNumber);
         if (field == null) {
             log("No text field #" + fieldNumber);
             return;
         }
-        field.fieldValue = text == null ? "" : text;
-        refresh();
+        field.setText(text);
+        redraw();
     }
 
-    private String label(Element el) {
-        return switch (el.kind) {
-            case IMAGE -> "image '" + el.name + "'";
-            case FIELD -> "field #" + number(el);
-            case BUTTON -> "button #" + number(el);
-        };
-    }
-
-    private String describe(Element el) {
-        return label(el) + " at " + el.x + ", " + el.y + " size " + el.w + "x" + el.h;
-    }
-
-    private boolean contains(Element el, int x, int y) {
-        int px = x - el.x;
-        int py = y - el.y;
-        if (px < 0 || py < 0 || px >= el.w || py >= el.h) return false;
-        if (el.kind == Kind.IMAGE) return (el.img.getRGB(px, py) >>> 24) != 0; // ignore transparent pixels
-        return true;
-    }
-
-    private Element topmost(Kind kind, int x, int y) {
-        for (int i = elements.size() - 1; i >= 0; i--) {
-            Element el = elements.get(i);
-            if (el.kind == kind && contains(el, x, y)) return el;
-        }
-        return null;
-    }
+    // ------------------------------------------------------------------ drawing / lifecycle
 
     /**
-     * Hit test order: buttons, then fields, then images.
+     * Repaints the backing image and sends it to the canvas.
      */
-    private Element hitAny(int x, int y) {
-        Element el = topmost(Kind.BUTTON, x, y);
-        if (el != null) return el;
-        el = topmost(Kind.FIELD, x, y);
-        if (el != null) return el;
-        return topmost(Kind.IMAGE, x, y);
-    }
-
-    // ------------------------------------------------------------------ selection
-
-    private void select(Element el) {
-        selected = el;
-        selectedIsNew = false;
-        backup = new int[]{el.x, el.y, el.w, el.h};
-        handle = Handle.MOVE;
-        log("Selected " + describe(el));
-    }
-
-    private void deselect() {
-        selected = null;
-        selectedIsNew = false;
-        backup = null;
-        handle = Handle.MOVE;
-    }
-
-    private void setTool(Tool newTool) {
-        tool = newTool;
-        firstCorner = null;
-        log("Tool: " + switch (newTool) {
-            case SELECT -> "SELECT (click to select, right click moves the selection)";
-            case TEXT -> "TEXT (click two corners)";
-            case BUTTON -> "BUTTON (click two corners)";
-            case PREVIEW -> "PREVIEW (buttons print when clicked)";
-        });
-    }
-
-    private void setHandle(Handle newHandle) {
-        if (selected == null) {
-            log("Nothing selected.");
-            return;
-        }
-        if (selected.kind == Kind.IMAGE && newHandle != Handle.MOVE) {
-            log("Images can only be moved.");
-            return;
-        }
-        handle = newHandle;
-        log("Handle: " + switch (newHandle) {
-            case MOVE -> "MOVE";
-            case SIZE -> "SIZE (bottom-right corner, top-left stays fixed)";
-            case ORIGIN -> "ORIGIN (top-left corner, bottom-right stays fixed)";
-        });
-    }
-
-    private void confirm() {
-        if (selected == null) return;
-        log("Confirmed " + describe(selected));
-        deselect();
-    }
-
-    private void cancel() {
-        if (firstCorner != null) {
-            firstCorner = null;
-            log("First corner cancelled.");
-            return;
-        }
-        if (selected == null) return;
-        if (selectedIsNew) {
-            log("Discarded new " + label(selected));
-            elements.remove(selected);
-        } else if (backup != null) {
-            selected.x = backup[0];
-            selected.y = backup[1];
-            selected.w = backup[2];
-            selected.h = backup[3];
-            log("Reverted " + describe(selected));
-        }
-        deselect();
-    }
-
-    private void deleteSelected() {
-        if (selected == null) {
-            log("Nothing selected to delete.");
-            return;
-        }
-        log("Deleted " + describe(selected));
-        elements.remove(selected);
-        deselect();
-    }
-
-    private void nudge(int dx, int dy) {
-        if (tool == Tool.PREVIEW) return;
-        if (selected == null) {
-            log("Nothing selected.");
-            return;
-        }
-        int step = fineAdjust ? 1 : MOVE_STEP;
-        int sx = dx * step;
-        int sy = dy * step;
-        Handle active = selected.kind == Kind.IMAGE ? Handle.MOVE : handle;
-        switch (active) {
-            case MOVE -> {
-                selected.x += sx;
-                selected.y += sy;
-            }
-            case SIZE -> {
-                selected.w = Math.max(1, selected.w + sx);
-                selected.h = Math.max(1, selected.h + sy);
-            }
-            case ORIGIN -> {
-                // move the top-left corner; the bottom-right corner stays where it is
-                if (selected.w - sx >= 1) {
-                    selected.x += sx;
-                    selected.w -= sx;
-                }
-                if (selected.h - sy >= 1) {
-                    selected.y += sy;
-                    selected.h -= sy;
-                }
-            }
-        }
-    }
-
-    // ------------------------------------------------------------------ rendering
-
-    public synchronized void draw() {
+    public synchronized void redraw() {
         try {
-            Graphics2D g = image.createGraphics();
-            try {
-                // clear previous frame
-                g.setComposite(AlphaComposite.Clear);
-                g.fillRect(0, 0, image.getWidth(), image.getHeight());
-                g.setComposite(AlphaComposite.SrcOver);
-
-                for (Element el : elements) {
-                    if (el.kind == Kind.IMAGE) g.drawImage(el.img, el.x, el.y, null);
-                }
-
-                g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
-                g.setFont(font);
-                for (Element el : elements) {
-                    if (el.kind == Kind.FIELD) drawField(g, el);
-                }
-
-                // everything below is an editing overlay; Preview shows the plain mock-up
-                if (tool == Tool.PREVIEW) {
-                    return;
-                }
-
-                for (Element el : elements) {
-                    if (el.kind != Kind.BUTTON) continue;
-                    g.setColor(BUTTON_FILL);
-                    g.fillRect(el.x, el.y, el.w, el.h);
-                    g.setColor(BUTTON_LINE);
-                    g.drawRect(el.x, el.y, el.w - 1, el.h - 1);
-                }
-
-                if (selected != null) {
-                    // yellow = move, green = size (bottom-right), orange = origin (top-left)
-                    Color color = switch (handle) {
-                        case MOVE -> new Color(255, 255, 0, 220);
-                        case SIZE -> Color.GREEN;
-                        case ORIGIN -> Color.ORANGE;
-                    };
-                    g.setColor(color);
-                    g.drawRect(selected.x, selected.y, selected.w - 1, selected.h - 1);
-                    if (handle == Handle.SIZE)
-                        g.fillRect(selected.x + selected.w - 4, selected.y + selected.h - 4, 5, 5);
-                    if (handle == Handle.ORIGIN) g.fillRect(selected.x - 1, selected.y - 1, 5, 5);
-                }
-
-                if (firstCorner != null) {
-                    g.setColor(Color.RED);
-                    g.fillRect(firstCorner[0] - 2, firstCorner[1] - 2, 5, 5);
-                }
-
-                if (hud) drawHud(g);
-            } finally {
-                g.dispose();
-            }
+            renderer.render(elements, hovered, controller);
+            canvas.draw(image, 0, 0);
         } catch (Exception e) {
             log("Draw error: " + e);
         }
     }
 
-    /**
-     * One line at the bottom of the canvas showing the current tool, handle, step and selection.
-     */
-    private void drawHud(Graphics2D g) {
-        String text = "TOOL " + tool + " | HANDLE " + handle + " | STEP " + (fineAdjust ? 1 : MOVE_STEP) + "px | SEL "
-                + (selected == null ? "-" : label(selected));
-        Font hudFont = font.deriveFont(12f);
-        g.setFont(hudFont);
-        FontMetrics fm = g.getFontMetrics(hudFont);
-        int height = fm.getHeight() + 4;
-        int top = image.getHeight() - height;
-        g.setColor(new Color(0, 0, 0, 170));
-        g.fillRect(0, top, image.getWidth(), height);
-        g.setColor(Color.WHITE);
-        g.drawString(text, 4, top + 2 + fm.getAscent());
-        g.setFont(font);
-    }
-
-    /**
-     * Draws a solid background and renders the field's actual text or number value.
-     */
-    private void drawField(Graphics2D g, Element f) {
-        Shape oldClip = g.getClip();
-        Font oldFont = g.getFont();
-        try {
-            // solid background
-            g.setColor(f.background);
-            g.fillRect(f.x, f.y, f.w, f.h);
-
-            String value = f.fieldValue == null ? "" : f.fieldValue;
-            if (value.isEmpty()) return;
-
-            // Scale the font to the field and wrap the actual value to fit.
-            Font fitted = font.deriveFont((float) MIN_FONT_SIZE);
-            int start = Math.clamp(f.h, MIN_FONT_SIZE, MAX_FONT_SIZE);
-            FontMetrics fm = g.getFontMetrics(fitted);
-            List<String> lines = new ArrayList<>();
-            for (int size = start; size >= MIN_FONT_SIZE; size--) {
-                Font candidate = font.deriveFont((float) size);
-                FontMetrics m = g.getFontMetrics(candidate);
-                List<String> wrapped = wrapText(value, f.w, m);
-                if (!wrapped.isEmpty() && wrapped.size() * m.getHeight() <= f.h) {
-                    fitted = candidate;
-                    fm = m;
-                    lines = wrapped;
-                    break;
-                }
-            }
-
-            g.setFont(fitted);
-            g.setClip(f.x, f.y, f.w, f.h);
-            g.setColor(f.text);
-
-            int lineHeight = Math.max(1, fm.getHeight());
-            int top = f.y + (f.h - lines.size() * lineHeight) / 2;
-            for (int row = 0; row < lines.size(); row++) {
-                String line = lines.get(row);
-                int left = f.x + (f.w - fm.stringWidth(line)) / 2;
-                g.drawString(line, left, top + row * lineHeight + fm.getAscent());
-            }
-        } catch (Exception e) {
-            log("Text field error: " + e);
-        } finally {
-            g.setClip(oldClip);
-            g.setFont(oldFont);
-        }
-    }
-
-    private List<String> wrapText(String text, int width, FontMetrics fm) {
-        List<String> lines = new ArrayList<>();
-        if (text.isEmpty()) return lines;
-
-        String remaining = text;
-        while (!remaining.isEmpty()) {
-            int end = remaining.length();
-            while (end > 0 && fm.stringWidth(remaining.substring(0, end)) > width) {
-                end--;
-            }
-            if (end == 0) {
-                end = 1;
-            } else if (end < remaining.length() && end > 1) {
-                int space = remaining.lastIndexOf(' ', end);
-                if (space > 0) end = space;
-            }
-
-            String line = remaining.substring(0, end);
-            lines.add(line);
-            remaining = remaining.substring(end).trim();
-        }
-        return lines;
-    }
-
-    private void refresh() {
-        try {
-            draw();
-            canvas.draw(image, 0, 0);
-        } catch (Exception e) {
-            log("Refresh error: " + e);
-        }
-    }
-
     public void open(Player player) {
         try {
-            refresh();
+            hovered = null;
+            redraw();
             player.getInventory().setHeldItemSlot(8);
             content.populate(this, player);
-            engine.openView(player, new ClickListener(this), new ViewOptions(0, true, true));
+            engine.openView(player, new ClickListener(this, player), new ViewOptions(0, true, true));
         } catch (Exception e) {
             log("Open error: " + e);
         }
     }
 
-    // ------------------------------------------------------------------ input
+    // ------------------------------------------------------------------ input (called by ClickListener)
 
-    public synchronized void handleClick(int x, int y, String clickName) {
+    public void handleClick(Player player, int x, int y, String clickName) {
+        String click = clickName == null ? "" : clickName;
+        MenuController c = controller;
         try {
-            boolean right = clickName != null && clickName.toUpperCase().contains("RIGHT");
-            switch (tool) {
-                case PREVIEW -> {
-                    Element button = topmost(Kind.BUTTON, x, y);
-                    if (button != null) {
-                        log("Button #" + number(button) + " clicked at " + x + ", " + y + " (" + clickName + ")");
-                    }
+            if (c != null) {
+                synchronized (this) {
+                    c.click(player, x, y, click);
+                    redraw();
                 }
-                case TEXT, BUTTON -> createClick(x, y, right);
-                case SELECT -> selectClick(x, y, right);
+                return;
+            }
+            Element button;
+            synchronized (this) {
+                button = hit(Element.Kind.BUTTON, x, y);
+            }
+            // run outside the lock so a slow action cannot block drawing
+            if (button != null && button.action() != null) {
+                button.action().accept(new ButtonClick(player, this, button, x, y, click));
             }
         } catch (Exception e) {
             log("Click error: " + e);
         }
-        refresh();
     }
 
-    private void createClick(int x, int y, boolean right) {
-        if (right) {
-            if (firstCorner != null) {
-                firstCorner = null;
-                log("First corner cancelled.");
-            }
-            return;
-        }
-
-        if (firstCorner == null) {
-            firstCorner = new int[]{x, y};
-            log("First corner: " + x + ", " + y + " (click again for the second corner)");
-            return;
-        }
-
-        int x1 = Math.min(firstCorner[0], x);
-        int y1 = Math.min(firstCorner[1], y);
-        int x2 = Math.max(firstCorner[0], x);
-        int y2 = Math.max(firstCorner[1], y);
-        firstCorner = null;
-        if (x2 - x1 < 1 || y2 - y1 < 1) {
-            log("No area, ignored.");
-            return;
-        }
-
-        Element created = addRect(tool == Tool.BUTTON ? Kind.BUTTON : Kind.FIELD, x1, y1, x2 - x1, y2 - y1);
-        selected = created;
-        selectedIsNew = true;
-        backup = null;
-        handle = Handle.SIZE;
-        log("Created " + describe(created) + ". Arrows resize (HOTBAR_5/6/7 change handle), SPACE confirms, F discards.");
-    }
-
-    private void selectClick(int x, int y, boolean right) {
-        if (right) {
-            if (selected == null) {
-                log("Nothing selected to move.");
-                return;
-            }
-            selected.x = x - selected.w / 2;
-            selected.y = y - selected.h / 2;
-            return;
-        }
-
-        Element hit = hitAny(x, y);
-        if (hit == null) {
-            if (selected != null) {
-                log("Deselected " + label(selected));
-                deselect();
-            }
-        } else if (hit != selected) {
-            select(hit);
-        }
-    }
-
-    public synchronized void handleKey(Key keyName, boolean down) {
+    public synchronized void handleKey(Player player, Key key, boolean down) {
+        MenuController c = controller;
+        if (c == null) return;
         try {
-            if (!down || keyName == null) return;
-            switch (keyName) {
-                case UP -> nudge(0, -1);
-                case DOWN -> nudge(0, 1);
-                case RIGHT -> nudge(1, 0);
-                case LEFT -> nudge(-1, 0);
-                case JUMP -> confirm();
-                case SWAP_HANDS -> cancel();
-                case DROP -> deleteSelected();
-                case SPRINT -> {
-                    fineAdjust = !fineAdjust;
-                    log("Step: " + (fineAdjust ? "FINE (1px)" : "COARSE (" + MOVE_STEP + "px)"));
-                }
-                case HOTBAR_1 -> setTool(Tool.SELECT);
-                case HOTBAR_2 -> setTool(Tool.TEXT);
-                case HOTBAR_3 -> setTool(Tool.BUTTON);
-                case HOTBAR_4 -> setTool(Tool.PREVIEW);
-                case HOTBAR_5 -> setHandle(Handle.MOVE);
-                case HOTBAR_6 -> setHandle(Handle.SIZE);
-                case HOTBAR_7 -> setHandle(Handle.ORIGIN);
-                default -> {
-                    return;
-                }
-            }
+            if (!c.key(player, key, down)) return;
         } catch (Exception e) {
             log("Key error: " + e);
         }
-        refresh();
+        redraw();
     }
 
-    public synchronized void handleChat(String text) {
+    public synchronized void handleChat(Player player, String text) {
+        MenuController c = controller;
+        if (c == null) return;
         try {
-            if (text == null) return;
-            String[] parts = text.trim().split("\\s+", 2);
-            String cmd = parts[0].toLowerCase();
-            String arg = parts.length > 1 ? parts[1].trim() : "";
-
-            switch (cmd) {
-                case "load" -> {
-                    if (arg.isEmpty()) {
-                        log("Usage: load <image>");
-                        break;
-                    }
-                    BufferedImage img = loadImage(arg);
-                    if (img == null) break;
-                    String name = stripPng(arg);
-                    Element loaded = addImage(name, img, (image.getWidth() - img.getWidth()) / 2, (image.getHeight() - img.getHeight()) / 2);
-                    select(loaded);
-                    log("Loaded '" + name + "'");
-                }
-                case "load-scaled" -> {
-                    if (arg.isEmpty()) {
-                        log("Usage: load-scaled <image>");
-                        break;
-                    }
-                    BufferedImage img = loadImage(arg);
-                    if (img == null) break;
-                    String name = stripPng(arg);
-                    Element loaded = addImage(name, scaleBy2(img), (image.getWidth() - img.getWidth() * 2) / 2, (image.getHeight() - img.getHeight() * 2) / 2);
-                    select(loaded);
-                    log("Loaded scaled '" + name + "'");
-                }
-                case "select" -> {
-                    String[] t = arg.split("\\s+");
-                    Element target = null;
-                    if (t.length == 2 && (t[0].equalsIgnoreCase("field") || t[0].equalsIgnoreCase("button"))) {
-                        Kind kind = t[0].equalsIgnoreCase("field") ? Kind.FIELD : Kind.BUTTON;
-                        try {
-                            target = nth(kind, Integer.parseInt(t[1]));
-                        } catch (NumberFormatException _) {
-                        }
-                    } else if (!arg.isEmpty()) {
-                        target = findImage(stripPng(arg));
-                    }
-                    if (target == null) {
-                        log("Nothing matches '" + arg + "'. Use: select <image> | select field <n> | select button <n>");
-                    } else {
-                        select(target);
-                    }
-                }
-                case "center" -> {
-                    if (selected == null) {
-                        log("Nothing selected.");
-                        break;
-                    }
-                    selected.x = (image.getWidth() - selected.w) / 2;
-                    selected.y = (image.getHeight() - selected.h) / 2;
-                    log("Centered " + describe(selected));
-                }
-                case "text", "set-text", "settext" -> {
-                    String[] value = arg.split("\\s+", 2);
-                    if (value.length != 2) {
-                        log("Usage: text <field-number> <text>");
-                        break;
-                    }
-                    try {
-                        setFieldValue(Integer.parseInt(value[0]), value[1].trim());
-                    } catch (NumberFormatException ex) {
-                        log("Usage: text <field-number> <text>");
-                    }
-                }
-                case "delete" -> deleteSelected();
-                case "hud" -> {
-                    hud = !hud;
-                    log("HUD " + (hud ? "ON" : "OFF"));
-                }
-                case "save" -> save();
-                default ->
-                        log("Unknown command. Use: load <image>, select <image|field n|button n>, text <n> <text>, center, delete, hud, save");
-            }
+            c.chat(player, text);
         } catch (Exception e) {
             log("Chat error: " + e);
         }
-        refresh();
-    }
-
-    // ------------------------------------------------------------------ output
-
-    private void save() {
-        Logger logger = plugin.getLogger();
-        logger.info("[MapMenu] ===== SAVE =====");
-        logger.info("Images (x, y = top-left):");
-        for (Element el : elements) {
-            if (el.kind == Kind.IMAGE) {
-                logger.info("  " + el.name + ": x=" + el.x + ", y=" + el.y + " (" + el.w + "x" + el.h + ")");
-            }
-        }
-        logger.info("Text fields (x, y = top-left):");
-        int i = 1;
-        for (Element el : elements) {
-            if (el.kind == Kind.FIELD) {
-                logger.info("  #" + i++ + ": x=" + el.x + ", y=" + el.y + ", width=" + el.w + ", height=" + el.h
-                        + ", value=" + el.fieldValue);
-            }
-        }
-        logger.info("Buttons (x, y = top-left):");
-        int b = 1;
-        for (Element el : elements) {
-            if (el.kind == Kind.BUTTON) {
-                logger.info("  #" + b++ + ": x=" + el.x + ", y=" + el.y + ", width=" + el.w + ", height=" + el.h);
-            }
-        }
-        logger.info("[MapMenu] ================");
+        redraw();
     }
 }

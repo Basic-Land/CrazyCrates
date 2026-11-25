@@ -13,6 +13,7 @@ import com.badbones69.crazycrates.paper.api.objects.gacha.enums.CurrencyType;
 import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.ComponentBuilder;
 import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.ItemRepo;
 import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.UltimateMenuManager;
+import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.mcgui.ClickListener;
 import com.badbones69.crazycrates.paper.managers.events.enums.EventType;
 import com.badbones69.crazycrates.paper.tasks.crates.CrateManager;
 import net.kyori.adventure.text.Component;
@@ -26,6 +27,7 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import us.crazycrew.crazycrates.api.enums.types.KeyType;
@@ -404,6 +406,13 @@ public class UltimateMenu extends InventoryBuilder {
                     player.getInventory().clear();
                     player.getInventory().setContents(items.toArray(new ItemStack[0]));
                 }
+            }
+        }
+
+        @EventHandler
+        public void kicked(PlayerKickEvent e) {
+            if (e.getCause() == PlayerKickEvent.Cause.FLYING_PLAYER && ClickListener.CACHE.getIfPresent(e.getPlayer().getUniqueId()) != null) {
+                e.setCancelled(true);
             }
         }
     }

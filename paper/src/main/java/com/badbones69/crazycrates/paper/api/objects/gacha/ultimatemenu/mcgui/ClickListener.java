@@ -1,8 +1,28 @@
 package com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.mcgui;
 
 import ai.resourcepack.ui.framework.api.*;
+import com.google.common.base.Ticker;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
-public record ClickListener(MapMenu menu) implements ViewContent {
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * Forwards view events of one player to the {@link MapMenu}.
+ */
+public record ClickListener(MapMenu menu, Player player) implements ViewContent {
+    public static final Cache<UUID, Boolean> CACHE = CacheBuilder.newBuilder()
+            .expireAfterWrite(10, TimeUnit.NANOSECONDS)
+            .ticker(new Ticker() {
+                @Override
+                public long read() {
+                    return Bukkit.getCurrentTick();
+                }
+            })
+            .build();
 
     @Override
     public Canvas canvas() {
@@ -10,30 +30,27 @@ public record ClickListener(MapMenu menu) implements ViewContent {
     }
 
     @Override
+    public void pointer(View view, int x, int y) {
+        menu.handleHover(player, x, y);
+    }
+
+    @Override
     public void click(View view, int x, int y, Click click) {
-        try {
-            menu.handleClick(x, y, click == null ? "" : click.name());
-        } catch (Exception e) {
-            System.out.println("[ClickListener] click error: " + e);
-        }
+        menu.handleClick(player, x, y, click == null ? "" : click.name());
     }
 
     @Override
     public void key(View view, Key key, boolean down) {
-        System.out.println("Key event: " + key + ", down: " + down);
-        try {
-            menu.handleKey(key, down);
-        } catch (Exception e) {
-            System.out.println("[ClickListener] key error: " + e);
-        }
+        menu.handleKey(player, key, down);
     }
 
     @Override
     public void chat(View view, String text) {
-        try {
-            menu.handleChat(text);
-        } catch (Exception e) {
-            System.out.println("[ClickListener] chat error: " + e);
-        }
+        menu.handleChat(player, text);
+    }
+
+    @Override
+    public void closed(View view, CloseReason reason) {
+        CACHE.put(player.getUniqueId(), true);
     }
 }
