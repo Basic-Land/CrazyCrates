@@ -14,8 +14,6 @@ import java.util.function.Consumer;
 @Getter
 @Accessors(fluent = true)
 public final class Element {
-    public enum Kind {IMAGE, FIELD, BUTTON}
-
     private final Kind kind;
     private final String name;
     private final BufferedImage image;   // images only
@@ -26,7 +24,6 @@ public final class Element {
     private Consumer<ButtonClick> action; // buttons only
     @Setter
     private boolean hoverOutline = true;  // buttons only: outline when hovered
-
     Element(Kind kind, String name, BufferedImage image, int x, int y, int width, int height) {
         this.kind = kind;
         this.name = name;
@@ -44,7 +41,9 @@ public final class Element {
         this.height = h;
     }
 
-    public void setText(String text) {this.text = text == null ? "" : text;}
+    public void setText(String text) {
+        this.text = text == null ? "" : text;
+    }
 
     void setColors(Color background, Color textColor) {
         this.background = background;
@@ -61,4 +60,6 @@ public final class Element {
         if (kind == Kind.IMAGE) return (image.getRGB(px, py) >>> 24) != 0;
         return true;
     }
+
+    public enum Kind {IMAGE, FIELD, BUTTON}
 }

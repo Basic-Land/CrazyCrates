@@ -1,5 +1,7 @@
 package com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.mcgui;
 
+import ai.resourcepack.ui.framework.api.UIFramework;
+import ai.resourcepack.ui.framework.api.View;
 import org.bukkit.entity.Player;
 
 /**
@@ -23,5 +25,12 @@ public record ButtonClick(Player player, MapMenu menu, Element button, int x, in
 
     public boolean isLeft() {
         return !isRight();
+    }
+
+    public void close() {
+        View view = UIFramework.get().viewOf(player);
+        if (view != null) {
+            view.close();
+        }
     }
 }

@@ -35,16 +35,10 @@ import static com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.mc
  * CHAT: see {@link EditorCommands}
  */
 public final class MenuEditor implements MenuController {
-    enum Tool {SELECT, TEXT, BUTTON, PREVIEW}
-
-    enum Handle {MOVE, SIZE, ORIGIN}
-
     private static final int COARSE_STEP = 4;
-
     final MapMenu menu;
     private final EditorOverlay overlay = new EditorOverlay(this);
     private final EditorCommands commands = new EditorCommands(this);
-
     // editor state (read by the overlay)
     Tool tool = Tool.SELECT;
     Handle handle = Handle.MOVE;
@@ -54,7 +48,6 @@ public final class MenuEditor implements MenuController {
     boolean hud = true;
     private boolean selectedIsNew;
     private int[] backup; // {x, y, w, h} when selected, for cancel
-
     private MenuEditor(MapMenu menu) {
         this.menu = menu;
     }
@@ -69,8 +62,6 @@ public final class MenuEditor implements MenuController {
         if (menu.getController() == this) menu.setController(null);
     }
 
-    // ---------------------------------------------------------------- MenuController
-
     @Override
     public void paintOverlay(Graphics2D g) {
         overlay.paint(g);
@@ -80,6 +71,8 @@ public final class MenuEditor implements MenuController {
     public void chat(Player player, String text) {
         commands.handle(text);
     }
+
+    // ---------------------------------------------------------------- MenuController
 
     @Override
     public void click(Player player, int x, int y, String clickName) {
@@ -121,8 +114,6 @@ public final class MenuEditor implements MenuController {
         }
         return true;
     }
-
-    // ---------------------------------------------------------------- clicks
 
     private void createClick(int x, int y, boolean right) {
         if (right) {
@@ -178,7 +169,7 @@ public final class MenuEditor implements MenuController {
         }
     }
 
-    // ---------------------------------------------------------------- selection
+    // ---------------------------------------------------------------- clicks
 
     void select(Element el) {
         selected = el;
@@ -194,6 +185,8 @@ public final class MenuEditor implements MenuController {
         backup = null;
         handle = Handle.MOVE;
     }
+
+    // ---------------------------------------------------------------- selection
 
     private void confirm() {
         if (selected == null) return;
@@ -238,8 +231,6 @@ public final class MenuEditor implements MenuController {
         log("Centered " + describe(selected));
     }
 
-    // ---------------------------------------------------------------- tool / handle / toggles
-
     private void setTool(Tool newTool) {
         tool = newTool;
         firstCorner = null;
@@ -267,6 +258,8 @@ public final class MenuEditor implements MenuController {
             case ORIGIN -> "ORIGIN (top-left corner, bottom-right stays fixed)";
         });
     }
+
+    // ---------------------------------------------------------------- tool / handle / toggles
 
     private void toggleStep() {
         fine = !fine;
@@ -304,8 +297,6 @@ public final class MenuEditor implements MenuController {
         }
     }
 
-    // ---------------------------------------------------------------- lookup helpers
-
     /**
      * Hit test order: buttons, then fields, then images.
      */
@@ -323,6 +314,8 @@ public final class MenuEditor implements MenuController {
         return null;
     }
 
+    // ---------------------------------------------------------------- lookup helpers
+
     String label(Element el) {
         return switch (el.kind()) {
             case IMAGE -> "image '" + el.name() + "'";
@@ -334,4 +327,8 @@ public final class MenuEditor implements MenuController {
     String describe(Element el) {
         return label(el) + " at " + el.x() + ", " + el.y() + " size " + el.width() + "x" + el.height();
     }
+
+    enum Tool {SELECT, TEXT, BUTTON, PREVIEW}
+
+    enum Handle {MOVE, SIZE, ORIGIN}
 }

@@ -2,7 +2,7 @@ package com.badbones69.crazycrates.paper.commands.crates.types.custom;
 
 import com.badbones69.crazycrates.paper.api.objects.gacha.constellation.ConManager;
 import com.badbones69.crazycrates.paper.api.objects.gacha.constellation.ItemConData;
-import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.mcgui.GachaMapMenuContent;
+import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.mcgui.menuimpl.GachaMapMenuContent;
 import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.mcgui.MapMenu;
 import com.badbones69.crazycrates.paper.commands.crates.types.BaseCommand;
 import dev.triumphteam.cmd.bukkit.annotation.Permission;
@@ -24,6 +24,6 @@ public class Test extends BaseCommand {
     @Command(value = "test2")
     @Permission(value = "crazycrates.command.admin.test", def = PermissionDefault.OP)
     public void add2(Player player) {
-        new MapMenu(new GachaMapMenuContent()).open(player);
+        new MapMenu(new GachaMapMenuContent(crateManager.getDatabaseManager().getCrateSettingsSplit().getFirst().getFirst().getCrate())).open(player);
     }
 }

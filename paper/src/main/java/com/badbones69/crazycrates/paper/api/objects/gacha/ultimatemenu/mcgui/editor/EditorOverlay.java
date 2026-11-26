@@ -45,7 +45,8 @@ final class EditorOverlay {
             case ORIGIN -> Color.ORANGE;
         });
         g.drawRect(sel.x(), sel.y(), sel.width() - 1, sel.height() - 1);
-        if (editor.handle == MenuEditor.Handle.SIZE) g.fillRect(sel.x() + sel.width() - 4, sel.y() + sel.height() - 4, 5, 5);
+        if (editor.handle == MenuEditor.Handle.SIZE)
+            g.fillRect(sel.x() + sel.width() - 4, sel.y() + sel.height() - 4, 5, 5);
         if (editor.handle == MenuEditor.Handle.ORIGIN) g.fillRect(sel.x() - 1, sel.y() - 1, 5, 5);
     }
 
