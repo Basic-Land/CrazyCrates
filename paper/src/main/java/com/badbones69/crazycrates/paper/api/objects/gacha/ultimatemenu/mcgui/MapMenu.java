@@ -9,22 +9,22 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.entity.Player;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
+import static com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.mcgui.MenuUtils.log;
+
 /**
  * A map-canvas GUI made of images, text fields and buttons.
  * <p>
  * Used on its own it is the final menu: build it from a {@link MCGUIContent}, bind button actions and open it.
  * <pre>{@code
- * MapMenu menu = new MapMenu(plugin, new GachaMapMenuContent(plugin));
+ * MapMenu menu = new MapMenu(new GachaMapMenuContent());
  * menu.onClick("1x pull", click -> pull(click.player(), 1));
  * menu.open(player);
  * }</pre>
@@ -36,10 +36,10 @@ import java.util.logging.Logger;
 public class MapMenu {
     private static final Color FIELD_BG = new Color(30, 30, 30);
     private static final Color FIELD_TEXT = Color.WHITE;
+    private static final UIFramework engine = UIFramework.get();
+    private static final CrazyCrates plugin = CrazyCrates.getPlugin();
 
-    private final CrazyCrates plugin;
     private final MCGUIContent content;
-    private final UIFramework engine = UIFramework.get();
     private final BufferedImage image;
     @Getter
     private final Canvas canvas;
@@ -52,8 +52,7 @@ public class MapMenu {
     private volatile MenuController controller;
     private Element hovered; // button currently under the cursor; guarded by this
 
-    public MapMenu(CrazyCrates plugin, MCGUIContent content) {
-        this.plugin = plugin;
+    public MapMenu(MCGUIContent content) {
         this.content = content;
         CanvasSettings settings = content.canvasSettings();
         canvas = engine.canvas(settings.width() / 128, settings.height() / 128);
@@ -63,10 +62,6 @@ public class MapMenu {
         image = new BufferedImage(settings.width(), settings.height(), BufferedImage.TYPE_INT_ARGB);
         renderer = new MenuRenderer(image, font);
         content.build(this);
-    }
-
-    public static void log(String message) {
-        CrazyCrates.getPlugin().getLogger().info("[MapMenu] " + message);
     }
 
     public Logger logger() {
@@ -79,38 +74,6 @@ public class MapMenu {
 
     public int canvasHeight() {
         return image.getHeight();
-    }
-
-    // ------------------------------------------------------------------ images
-
-    public BufferedImage scaleBy2(BufferedImage source) {
-        if (source == null) return null;
-        BufferedImage scaled = new BufferedImage(source.getWidth() * 2, source.getHeight() * 2, source.getType());
-        Graphics2D g = scaled.createGraphics();
-        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-        g.drawImage(source, 0, 0, scaled.getWidth(), scaled.getHeight(), null);
-        g.dispose();
-        return scaled;
-    }
-
-    public static String stripPng(String name) {
-        return name.toLowerCase().endsWith(".png") ? name.substring(0, name.length() - 4) : name;
-    }
-
-    /**
-     * Loads mcgui/textures/<n>.png (name may be given with or without .png). Returns null on failure.
-     */
-    public BufferedImage loadImage(String name) {
-        try {
-            name = stripPng(name);
-            File file = plugin.getDataFolder().toPath().resolve("mcgui/textures/" + name + ".png").toFile();
-            BufferedImage img = ImageIO.read(file);
-            if (img == null) log("Not a readable image: " + file);
-            return img;
-        } catch (Exception e) {
-            log("Could not load image '" + name + "': " + e);
-            return null;
-        }
     }
 
     // ------------------------------------------------------------------ adding elements

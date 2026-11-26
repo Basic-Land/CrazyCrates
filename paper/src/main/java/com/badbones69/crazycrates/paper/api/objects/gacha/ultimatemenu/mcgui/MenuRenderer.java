@@ -5,7 +5,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.mcgui.MapMenu.log;
+import static com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.mcgui.MenuUtils.log;
 
 /**
  * Paints the final look of a menu: images, then text fields. Buttons are invisible.

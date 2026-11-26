@@ -2,11 +2,12 @@ package com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.mcgui.ed
 
 import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.mcgui.Element;
 import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.mcgui.MapMenu;
+import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.mcgui.MenuUtils;
 
 import java.awt.image.BufferedImage;
 import java.util.logging.Logger;
 
-import static com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.mcgui.MapMenu.log;
+import static com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.mcgui.MenuUtils.log;
 
 /**
  * The editor's chat commands:
@@ -47,11 +48,11 @@ final class EditorCommands {
             log("Usage: " + (scaled ? "load-scaled" : "load") + " <image>");
             return;
         }
-        BufferedImage img = menu.loadImage(arg);
+        BufferedImage img = MenuUtils.loadImage(arg);
         if (img == null) return;
-        if (scaled) img = menu.scaleBy2(img);
+        if (scaled) img = MenuUtils.scaleBy2(img);
 
-        String name = MapMenu.stripPng(arg);
+        String name = MenuUtils.stripPng(arg);
         Element loaded = menu.addImage(name, img,
                 (menu.canvasWidth() - img.getWidth()) / 2, (menu.canvasHeight() - img.getHeight()) / 2);
         editor.select(loaded);
@@ -68,7 +69,7 @@ final class EditorCommands {
             } catch (NumberFormatException _) {
             }
         } else if (!arg.isEmpty()) {
-            target = editor.findImage(MapMenu.stripPng(arg));
+            target = editor.findImage(MenuUtils.stripPng(arg));
         }
         if (target == null) {
             log("Nothing matches '" + arg + "'. Use: select <image> | select field <n> | select button <n>");

@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 
 import java.awt.*;
 
-import static com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.mcgui.MapMenu.log;
+import static com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.mcgui.MenuUtils.log;
 
 /**
  * Optional layout editor for a {@link MapMenu}. Attach it while designing, leave it out for final use:

@@ -24,6 +24,7 @@ public final class Element {
     private Color background, textColor; // fields only
     @Setter
     private Consumer<ButtonClick> action; // buttons only
+    @Setter
     private boolean hoverOutline = true;  // buttons only: outline when hovered
 
     Element(Kind kind, String name, BufferedImage image, int x, int y, int width, int height) {

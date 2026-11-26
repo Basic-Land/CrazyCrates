@@ -15,11 +15,7 @@ import java.awt.image.BufferedImage;
  * The implemented gacha GUI layout used by {@link MapMenu}.
  */
 public class GachaMapMenuContent implements MCGUIContent {
-    private final CrazyCrates plugin;
-
-    public GachaMapMenuContent(CrazyCrates plugin) {
-        this.plugin = plugin;
-    }
+    private static final CanvasSettings CANVAS_SETTINGS = new CanvasSettings(1024, 640, true, 0);
 
     @Override
     public void build(MapMenu menu) {
@@ -59,17 +55,18 @@ public class GachaMapMenuContent implements MCGUIContent {
     }
 
     private void addImage(MapMenu menu, String name, int x, int y) {
-        BufferedImage image = menu.loadImage(name);
+        BufferedImage image = MenuUtils.loadImage(name);
         if (image != null) menu.addImage(name, image, x, y);
     }
 
     private void addScaledImage(MapMenu menu, String name, int x, int y) {
-        BufferedImage image = menu.loadImage(name);
-        if (image != null) menu.addImage(name, menu.scaleBy2(image), x, y);
+        BufferedImage image = MenuUtils.loadImage(name);
+        if (image != null) menu.addImage(name, MenuUtils.scaleBy2(image), x, y);
     }
 
     @Override
     public void populate(MapMenu menu, Player player) {
+        CrazyCrates plugin = CrazyCrates.getPlugin();
         DatabaseManager databaseManager = plugin.getCrateManager().getDatabaseManager();
         CrateSettings crateSettings = databaseManager.getCrateSettingsSplit().get(0).get(0);
         int virtualKeys = plugin.getUserManager().getVirtualKeys(player.getUniqueId(), crateSettings.getCrateName());
@@ -91,6 +88,6 @@ public class GachaMapMenuContent implements MCGUIContent {
 
     @Override
     public CanvasSettings canvasSettings() {
-        return new CanvasSettings(1024, 640, true, 0);
+        return CANVAS_SETTINGS;
     }
 }

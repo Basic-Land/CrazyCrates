@@ -13,14 +13,6 @@ import org.bukkit.permissions.PermissionDefault;
 
 public class Test extends BaseCommand {
 
-    private final MapMenu mapMenu = new MapMenu(plugin, new GachaMapMenuContent(plugin));
-    {
-        //MenuEditor.attach(mapMenu);
-        mapMenu.onClick("history", b -> {
-            System.out.println("History button clicked");
-        });
-    }
-
     @Command(value = "test")
     @Permission(value = "crazycrates.command.admin.test", def = PermissionDefault.OP)
     public void add(Player player) {
@@ -32,6 +24,6 @@ public class Test extends BaseCommand {
     @Command(value = "test2")
     @Permission(value = "crazycrates.command.admin.test", def = PermissionDefault.OP)
     public void add2(Player player) {
-        mapMenu.open(player);
+        new MapMenu(new GachaMapMenuContent()).open(player);
     }
 }
