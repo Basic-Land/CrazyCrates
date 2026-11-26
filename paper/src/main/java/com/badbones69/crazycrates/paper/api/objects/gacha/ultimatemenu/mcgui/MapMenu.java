@@ -14,6 +14,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
@@ -38,6 +39,7 @@ public class MapMenu {
     private static final Color FIELD_TEXT = Color.WHITE;
     private static final UIFramework engine = UIFramework.get();
     private static final CrazyCrates plugin = CrazyCrates.getPlugin();
+    private static final ViewOptions VIEW_OPTIONS = new ViewOptions(0, true, true);
 
     private final MCGUIContent content;
     private final BufferedImage image;
@@ -84,6 +86,13 @@ public class MapMenu {
         elements.add(el);
         return el;
     }
+
+//    public synchronized Element replaceImage(String original, String newName, BufferedImage img, int x, int y) {
+//        if (img == null) return null;
+//        Element el = new Element(Element.Kind.IMAGE, name, img, x, y, img.getWidth(), img.getHeight());
+//        elements.add(el);
+//        return el;
+//    }
 
     public Element addField(int x, int y, int w, int h) {
         return addField(null, null, null, null, x, y, w, h);
@@ -250,8 +259,10 @@ public class MapMenu {
             redraw();
             player.getInventory().setHeldItemSlot(8);
             content.populate(this, player);
-            engine.openView(player, new ClickListener(this, player), new ViewOptions(0, true, true));
+            MenuUtils.OPEN_MENUS.computeIfAbsent(player.getUniqueId(), _ -> new ConcurrentHashMap<>()).put(content.menuType(), this);
+            engine.openView(player, new ClickListener(this, player), VIEW_OPTIONS);
         } catch (Exception e) {
+            e.printStackTrace();
             log("Open error: " + e);
         }
     }
@@ -278,6 +289,7 @@ public class MapMenu {
                 button.action().accept(new ButtonClick(player, this, button, x, y, click));
             }
         } catch (Exception e) {
+            e.printStackTrace();
             log("Click error: " + e);
         }
     }
@@ -288,6 +300,7 @@ public class MapMenu {
         try {
             if (!c.key(player, key, down)) return;
         } catch (Exception e) {
+            e.printStackTrace();
             log("Key error: " + e);
         }
         redraw();
@@ -299,8 +312,20 @@ public class MapMenu {
         try {
             c.chat(player, text);
         } catch (Exception e) {
+            e.printStackTrace();
             log("Chat error: " + e);
         }
         redraw();
+    }
+
+    public synchronized void handleClose(Player player) {
+        MenuController c = controller;
+        if (c == null) return;
+        try {
+            c.close(player);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log("Close error: " + e);
+        }
     }
 }

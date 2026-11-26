@@ -1,16 +1,25 @@
 package com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.mcgui;
 
 import com.badbones69.crazycrates.paper.CrazyCrates;
+import com.badbones69.crazycrates.paper.api.objects.gacha.util.TickedCache;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.Map;
+import java.util.UUID;
 
 public class MenuUtils {
+    public static final TickedCache<UUID, Map<MenuType, MapMenu>> OPEN_MENUS = new TickedCache<>(1200);
+
     public static BufferedImage scaleBy2(BufferedImage source) {
+        return scaleBy(source, 2);
+    }
+
+    public static BufferedImage scaleBy(BufferedImage source, int scale) {
         if (source == null) return null;
-        BufferedImage scaled = new BufferedImage(source.getWidth() * 2, source.getHeight() * 2, source.getType());
+        BufferedImage scaled = new BufferedImage(source.getWidth() * scale, source.getHeight() * scale, source.getType());
         Graphics2D g = scaled.createGraphics();
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
         g.drawImage(source, 0, 0, scaled.getWidth(), scaled.getHeight(), null);

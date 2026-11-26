@@ -17,6 +17,8 @@ public interface MCGUIContent {
 
     CanvasSettings canvasSettings();
 
+    MenuType menuType();
+
     default Font font() {
         Font font;
         CrazyCrates plugin = CrazyCrates.getPlugin();

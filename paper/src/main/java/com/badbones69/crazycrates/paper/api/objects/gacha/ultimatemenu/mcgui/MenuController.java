@@ -19,6 +19,7 @@ public interface MenuController {
 
     void chat(Player player, String text);
 
+    void close(Player player);
     /**
      * Painted after the images and fields, on the same graphics.
      */

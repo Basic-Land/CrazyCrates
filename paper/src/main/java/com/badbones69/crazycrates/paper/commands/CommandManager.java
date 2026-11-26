@@ -159,6 +159,10 @@ public class CommandManager {
             return migrators;
         });
 
+        commandManager.registerSuggestion(SuggestionKey.of("testtt"), (context) -> {
+            return Arrays.asList("gacha", "gacha-editor", "preview", "preview-editor", "shop", "shop-editor", "empty");
+        });
+
         commandManager.registerArgument(PlayerBuilder.class, (sender, context) -> new PlayerBuilder(context));
 
         List.of(

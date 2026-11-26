@@ -37,8 +37,8 @@ import static com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.mc
 public final class MenuEditor implements MenuController {
     private static final int COARSE_STEP = 4;
     final MapMenu menu;
-    private final EditorOverlay overlay = new EditorOverlay(this);
-    private final EditorCommands commands = new EditorCommands(this);
+    private final EditorOverlay overlay ;
+    private final EditorCommands commands;
     // editor state (read by the overlay)
     Tool tool = Tool.SELECT;
     Handle handle = Handle.MOVE;
@@ -50,6 +50,8 @@ public final class MenuEditor implements MenuController {
     private int[] backup; // {x, y, w, h} when selected, for cancel
     private MenuEditor(MapMenu menu) {
         this.menu = menu;
+        overlay = new EditorOverlay(this);
+        commands = new EditorCommands(this);
     }
 
     public static MenuEditor attach(MapMenu menu) {
@@ -70,6 +72,11 @@ public final class MenuEditor implements MenuController {
     @Override
     public void chat(Player player, String text) {
         commands.handle(text);
+    }
+
+    @Override
+    public void close(Player player) {
+        commands.save();
     }
 
     // ---------------------------------------------------------------- MenuController

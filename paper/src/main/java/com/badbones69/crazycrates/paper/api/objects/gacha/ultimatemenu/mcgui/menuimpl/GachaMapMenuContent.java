@@ -7,11 +7,10 @@ import com.badbones69.crazycrates.paper.api.objects.gacha.data.PlayerProfile;
 import com.badbones69.crazycrates.paper.api.objects.gacha.enums.Rarity;
 import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.ItemRepo;
 import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.mcgui.MapMenu;
-import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.mcgui.MenuUtils;
+import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.mcgui.MenuType;
 import org.bukkit.entity.Player;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.util.List;
 
 /**
@@ -20,6 +19,10 @@ import java.util.List;
 public class GachaMapMenuContent extends BaseMenu {
     private final int selectedCrate, totalPageAmount, currentPage;
     private final CrateSettings crateSettings;
+
+    public GachaMapMenuContent() {
+        this(databaseManager.getCrateSettingsSplit().getFirst().getFirst().getCrate());
+    }
 
     public GachaMapMenuContent(Crate crate) {
         crateSettings = crate.getCrateSettings();
@@ -108,20 +111,18 @@ public class GachaMapMenuContent extends BaseMenu {
             databaseManager.getHistory().sendHistory(player, player.getName(), 1, crateSettings, null);
             b.close();
         });
-        menu.addButton("preview menu", 381, 485, 32, 32);
-        menu.addButton("shop", 418, 485, 32, 32);
+        menu.addButton("preview menu", 381, 485, 32, 32, b -> {
+            Player player = b.player();
+            player.playSound(ItemRepo.CLICK);
+            openMenu(b, MenuType.PREVIEW);
+        });
+        menu.addButton("shop", 418, 485, 32, 32, b -> {
+            Player player = b.player();
+            player.playSound(ItemRepo.CLICK);
+            openMenu(b, MenuType.VOTE_SHOP);
+        });
         menu.addButton("1x pull", 523, 482, 72, 36);
         menu.addButton("10x pull", 598, 482, 72, 36);
-    }
-
-    private void addImage(MapMenu menu, String name, int x, int y) {
-        BufferedImage image = MenuUtils.loadImage(name);
-        if (image != null) menu.addImage(name, image, x, y);
-    }
-
-    private void addScaledImage(MapMenu menu, String name, int x, int y) {
-        BufferedImage image = MenuUtils.loadImage(name);
-        if (image != null) menu.addImage(name, MenuUtils.scaleBy2(image), x, y);
     }
 
     @Override
@@ -141,5 +142,10 @@ public class GachaMapMenuContent extends BaseMenu {
         menu.setFieldValue(8, baseProfile.getPremiumCurrency());
         menu.setFieldValue(9, baseProfile.getVoteTokens());
         menu.setFieldValue(10, virtualKeys);
+    }
+
+    @Override
+    public MenuType menuType() {
+        return MenuType.GACHA;
     }
 }

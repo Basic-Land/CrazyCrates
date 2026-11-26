@@ -5,6 +5,7 @@ import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.mcgui.Map
 import com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.mcgui.MenuUtils;
 
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 import java.util.logging.Logger;
 
 import static com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.mcgui.MenuUtils.log;
@@ -25,16 +26,18 @@ final class EditorCommands {
 
     void handle(String text) {
         if (text == null) return;
-        String[] parts = text.trim().split("\\s+", 2);
+        String[] parts = text.trim().split("\\s+");
         String cmd = parts[0].toLowerCase();
         String arg = parts.length > 1 ? parts[1].trim() : "";
+        String[] multiparts = Arrays.copyOfRange(parts, 1, parts.length);
 
         switch (cmd) {
-            case "load" -> load(arg, false);
-            case "load-scaled" -> load(arg, true);
-            case "select" -> select(arg);
+            case "load" -> load(arg, 1);
+            case "load-scaled" -> load(arg, 2);
+            case "load-scaled-by" -> load(arg, parts.length > 2 ? Integer.parseInt(parts[2]) : -1);
+            case "select" -> select(multiparts);
             case "center" -> editor.centerSelected();
-            case "text", "set-text", "settext" -> setText(arg);
+            case "text", "set-text", "settext" -> setText(multiparts);
             case "delete" -> editor.deleteSelected();
             case "hud" -> editor.toggleHud();
             case "save" -> save();
@@ -43,49 +46,48 @@ final class EditorCommands {
         }
     }
 
-    private void load(String arg, boolean scaled) {
-        if (arg.isEmpty()) {
-            log("Usage: " + (scaled ? "load-scaled" : "load") + " <image>");
+    private void load(String arg, int scale) {
+        if (arg.isEmpty() || (scale == -1)) {
+            log("Usage: " + (scale == 1 ? "load" : scale == 2 ? "load-scaled" : "load-scaled-by") + " <image>");
             return;
         }
         BufferedImage img = MenuUtils.loadImage(arg);
         if (img == null) return;
-        if (scaled) img = MenuUtils.scaleBy2(img);
+        if (scale == 2) img = MenuUtils.scaleBy2(img);
+        if (scale >= 3) img = MenuUtils.scaleBy(img, 3);
 
         String name = MenuUtils.stripPng(arg);
         Element loaded = menu.addImage(name, img,
                 (menu.canvasWidth() - img.getWidth()) / 2, (menu.canvasHeight() - img.getHeight()) / 2);
         editor.select(loaded);
-        log((scaled ? "Loaded scaled '" : "Loaded '") + name + "'");
+        log((scale == 2 ? "Loaded scaled '" : scale == 3 ? "Loaded scaled by 3 '" : "Loaded '") + name + "'");
     }
 
-    private void select(String arg) {
-        String[] t = arg.split("\\s+");
+    private void select(String[] args) {
         Element target = null;
-        if (t.length == 2 && (t[0].equalsIgnoreCase("field") || t[0].equalsIgnoreCase("button"))) {
-            Element.Kind kind = t[0].equalsIgnoreCase("field") ? Element.Kind.FIELD : Element.Kind.BUTTON;
+        if (args.length == 2 && (args[0].equalsIgnoreCase("field") || args[0].equalsIgnoreCase("button"))) {
+            Element.Kind kind = args[0].equalsIgnoreCase("field") ? Element.Kind.FIELD : Element.Kind.BUTTON;
             try {
-                target = menu.element(kind, Integer.parseInt(t[1]));
+                target = menu.element(kind, Integer.parseInt(args[1]));
             } catch (NumberFormatException _) {
             }
-        } else if (!arg.isEmpty()) {
-            target = editor.findImage(MenuUtils.stripPng(arg));
+        } else if (!args[0].isEmpty()) {
+            target = editor.findImage(MenuUtils.stripPng(args[0]));
         }
         if (target == null) {
-            log("Nothing matches '" + arg + "'. Use: select <image> | select field <n> | select button <n>");
+            log("Nothing matches '" + args[0] + "'. Use: select <image> | select field <n> | select button <n>");
         } else {
             editor.select(target);
         }
     }
 
-    private void setText(String arg) {
-        String[] value = arg.split("\\s+", 2);
-        if (value.length != 2) {
+    private void setText(String[] args) {
+        if (args.length != 2) {
             log("Usage: text <field-number> <text>");
             return;
         }
         try {
-            menu.setFieldValue(Integer.parseInt(value[0]), value[1].trim());
+            menu.setFieldValue(Integer.parseInt(args[0]), args[1].trim());
         } catch (NumberFormatException ex) {
             log("Usage: text <field-number> <text>");
         }
@@ -94,7 +96,7 @@ final class EditorCommands {
     /**
      * Prints the layout to the console so it can be copied into a MCGUIContent.
      */
-    private void save() {
+    void save() {
         Logger out = menu.logger();
         out.info("[MapMenu] ===== SAVE =====");
         out.info("Images (x, y = top-left):");

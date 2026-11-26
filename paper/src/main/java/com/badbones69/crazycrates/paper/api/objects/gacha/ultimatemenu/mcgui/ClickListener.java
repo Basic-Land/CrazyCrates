@@ -1,28 +1,16 @@
 package com.badbones69.crazycrates.paper.api.objects.gacha.ultimatemenu.mcgui;
 
 import ai.resourcepack.ui.framework.api.*;
-import com.google.common.base.Ticker;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import org.bukkit.Bukkit;
+import com.badbones69.crazycrates.paper.api.objects.gacha.util.TickedCache;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Forwards view events of one player to the {@link MapMenu}.
  */
 public record ClickListener(MapMenu menu, Player player) implements ViewContent {
-    public static final Cache<UUID, Boolean> CACHE = CacheBuilder.newBuilder()
-            .expireAfterWrite(10, TimeUnit.NANOSECONDS)
-            .ticker(new Ticker() {
-                @Override
-                public long read() {
-                    return Bukkit.getCurrentTick();
-                }
-            })
-            .build();
+    public static final TickedCache<UUID, Boolean> CACHE = new TickedCache<>(10);
 
     @Override
     public Canvas canvas() {
@@ -51,6 +39,7 @@ public record ClickListener(MapMenu menu, Player player) implements ViewContent 
 
     @Override
     public void closed(View view, CloseReason reason) {
+        menu.handleClose(player);
         CACHE.put(player.getUniqueId(), true);
     }
 }
